@@ -1,15 +1,9 @@
-@AbapCatalog.sqlViewName: 'Z100085ZCC1'
-@AbapCatalog.compiler.compareFilter: true
-@AbapCatalog.preserveKey: true
+@EndUserText.label: 'proUBC PRVDOrgs Projection View'
 @AccessControl.authorizationCheck: #CHECK
-@EndUserText.label: 'Consumption View PRVD Orgs'
-@OData.publish: true
-@ObjectModel: {
-    createEnabled: true,
-    updateEnabled: true,
-    deleteEnabled: true
-}
-define view Z100085_ZCC_PRVDORGS as select from Z100085_ZC_PRVDORGS {
+
+@UI: {
+ headerInfo: { typeName: 'proUBCOrgs', typeNamePlural: 'proUBCOrgs', title: { type: #STANDARD, value: 'organization_id' } } }
+define root view entity Z100085_ZC_PROUBC_PRVDORGS as projection on Z100085_ZI_PROUBC_PRVDORGS {
   @UI: {
     lineItem: [{ position: 10, importance: #HIGH}],
     identification: [{position: 10, label: 'PRVD Org ID'}]
@@ -20,11 +14,19 @@ define view Z100085_ZCC_PRVDORGS as select from Z100085_ZC_PRVDORGS {
     identification: [{position: 20, label: 'BPI Endpoint'}]
   }
   bpi_endpoint,
-  @UI: {
+    @UI: {
     lineItem: [{ position: 30, importance: #HIGH}],
     identification: [{position: 30, label: 'Ident Endpoint'}]
   }
   ident_endpoint,
+  
+  @UI.hidden: true
   refresh_token, //todo merge these 2 columns into one large string
-  refresh_tokenext 
+  @UI.hidden: true
+  refresh_tokenext,
+  
+  createdby,
+  created_at,
+  changedby,
+  changed_at
 }

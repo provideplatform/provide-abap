@@ -3,9 +3,9 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <VSEOCLASS>
-    <CLSNAME>Z100085_ZCL_PROUBC_IDENT</CLSNAME>
+    <CLSNAME>Z100085_ZCL_ZAPI_PROUB_MPC_EXT</CLSNAME>
     <LANGU>E</LANGU>
-    <DESCRIPT>Provide Ident - ABAP Class</DESCRIPT>
+    <DESCRIPT>Z100085_ZCL_ZAPI_PROUB_MPC_EXT</DESCRIPT>
     <STATE>1</STATE>
     <CLSCCINCL>X</CLSCCINCL>
     <FIXPT>X</FIXPT>
