@@ -1,23 +1,27 @@
 CLASS z100085_zcl_proubc_api_sicf DEFINITION
   PUBLIC
+ INHERITING FROM cl_rest_http_handler
   CREATE PUBLIC .
 
   PUBLIC SECTION.
-    INTERFACES: if_http_extension .
+    "INTERFACES: if_http_extension .
+    METHODS: if_rest_application~get_root_handler REDEFINITION,
+      handle_request_old.
     CONSTANTS: c_json TYPE string VALUE 'application/json'.
   PROTECTED SECTION.
     METHODS:
       get_controller,
       tenants
         IMPORTING
-          !ii_server     TYPE REF TO if_http_server
-          !Iv_httpverb   TYPE string
-          !IV_payload    TYPE string
-          iv_payloaddata type ref to data
-          !iv_url        TYPE string
+          !ii_server      TYPE REF TO if_http_server
+          !Iv_httpverb    TYPE string
+          !IV_payload     TYPE string
+          !iv_payloaddata TYPE REF TO data
+          !it_tenants_in  TYPE z100085_Ztt_prvdorg
+          !iv_url         TYPE string
         EXPORTING
-          !ev_payload    TYPE string
-          !ev_returncode TYPE string,
+          !ev_payload     TYPE string
+          !ev_returncode  TYPE string,
       status
         IMPORTING
           !ii_server     TYPE REF TO if_http_server
@@ -64,10 +68,10 @@ CLASS z100085_zcl_proubc_api_sicf DEFINITION
           !ev_payload    TYPE string
           !ev_returncode TYPE string,
       copy_data_to_ref
-         importing
-            !IS_DATA type ANY
-         changing
-            !CR_DATA type ref to DATA ,
+        IMPORTING
+          !is_data TYPE any
+        CHANGING
+          !cr_data TYPE REF TO data ,
       read_mime
         IMPORTING
           !ii_server TYPE REF TO if_http_server
@@ -78,153 +82,34 @@ ENDCLASS.
 
 
 CLASS z100085_zcl_proubc_api_sicf IMPLEMENTATION.
-  METHOD if_http_extension~handle_request.
-    DATA: lv_path          TYPE string,
-          lv_pathfull      TYPE string,
-          lv_query_string  TYPE string,
-          lv_httpverb      TYPE string,
-          lv_payload       TYPE string,
-          lv_name          TYPE string,
-          li_http          TYPE REF TO if_http_extension,
-          lt_fields        TYPE tihttpnvp,
-          lv_returncode    TYPE string,
-          lv_returnpayload TYPE string.
 
-
-    " get URL info - will be used for finding matching URL patterns and specified controllers
-    lv_pathfull = server->request->get_header_field( name = '~path_translated' ).
-    lv_path = server->request->get_header_field( '~path' ).
-    lv_httpverb = server->request->get_header_field( '~request_method' ).
-    lv_query_string = cl_http_utility=>unescape_url( server->request->get_header_field( name = '~query_string' ) ).
-
-    server->request->get_header_fields(
-      CHANGING
-        fields = lt_fields    " Header fields
-    ).
-
-    "get payload if put or post
-    IF lv_httpverb = 'PUT' OR lv_httpverb = 'POST'.
-        data lv_payloaddata type ref to data.
-        data(lv_maybepayload) = server->request->get_cdata( ).
-       /UI2/CL_JSON=>deserialize( exporting json = lv_maybepayload
-                                  changing data = lv_payloaddata ).
-    ENDIF.
-
-    " get requested content type
-    DATA(lv_req_content_type) = server->request->get_content_type( ).
-
-    " if not specified, initial content type is set to JSON
-    IF lv_req_content_type IS INITIAL.
-      lv_req_content_type = c_json.
-    ENDIF.
-
-*
-*        case lv_path.
-*            when 'tenants'.
-*            when 'status'.
-*            when 'business_objects'.
-*            when 'business_object_models'.
-*            when 'proxies'.
-*            when 'auth'.
-*        endcase.
-
-    "lousy code, but gotta go fast here
-    "may need to write this into multiple handlers depending on complexity
-    TRY.
-        IF lv_path EQ '/sap/proubc/tenants'.
-          me->tenants( EXPORTING ii_server = server
-                                 iv_httpverb = lv_httpverb
-                                 iv_payload = lv_payload
-                                 iv_payloaddata = lv_payloaddata
-                                 iv_url = lv_path
-                       IMPORTING  ev_payload  = lv_returnpayload
-                                  ev_returncode = lv_returncode ).
-
-        ELSEIF lv_path EQ '/sap/proubc/status'.
-          me->status( EXPORTING ii_server = server
-                                 iv_httpverb = lv_httpverb
-                                 iv_payload = lv_payload
-                                       iv_url = lv_path
-                       IMPORTING  ev_payload  = lv_returnpayload
-                                  ev_returncode = lv_returncode  ).
-        ELSEIF lv_path+28 EQ '/sap/proubc/business_objects'.
-          me->business_objects( EXPORTING ii_server = server
-                                          iv_httpverb = lv_httpverb
-                                          iv_payload = lv_payload
-                                          iv_url = lv_path
-                       IMPORTING  ev_payload  = lv_returnpayload
-                                  ev_returncode = lv_returncode ).
-        ELSEIF lv_path EQ '/sap/proubc/business_object_models'.
-          me->business_object_models( EXPORTING ii_server = server
-                                                iv_httpverb = lv_httpverb
-                                                iv_payload = lv_payload
-                                                iv_url = lv_path
-                       IMPORTING  ev_payload  = lv_returnpayload
-                                  ev_returncode = lv_returncode ).
-          " We replaced this with tenants right?
-*        elseif lv_path cp 'proxies'.
-*            me->proxies( exporting ii_server = server
-*                                         iv_httpverb = lv_httpverb
-*                                         iv_payload = lv_payload
-*                                         iv_url = lv_path
-*                         importing  ev_payload  = lv_returnpayload
-*                                    ev_returncode = lv_returncode ).
-        ELSEIF lv_path CP '/sap/proubc/auth'.
-          me->auth( EXPORTING ii_server = server
-                              iv_httpverb = lv_httpverb
-                              iv_payload = lv_payload
-                                       iv_url = lv_path
-                       IMPORTING  ev_payload  = lv_returnpayload
-                                  ev_returncode = lv_returncode ).
-        ELSE. "default redirect to swagger doc / error?
-*            "server->response->set_cdata( '404' ).
-*            data: lv_errorpage type xstring value 'error finding path binding'.
-*            server->response->set_data( lv_errorpage  ).
-*            server->response->set_status( code = 404 reason = '404' ).
-
-          me->auth( EXPORTING ii_server = server
-                              iv_httpverb = lv_httpverb
-                              iv_payload = lv_payload
-                                       iv_url = lv_path
-                       IMPORTING  ev_payload  = lv_returnpayload
-                                  ev_returncode = lv_returncode ).
-        ENDIF.
-      CATCH cx_root.
-        "todo add more exception handling
-    ENDTRY.
-
-    " /proubc/tenants/{id}/proxy handler
-    " /proubc/status health check
-    " /proubc/business_objects/{id}/status
-    " /proubc/business_object_models/?=recordType
-    " /proubc/proxies
-    " /proubc/auth
-  ENDMETHOD.
 
   METHOD get_controller.
   ENDMETHOD.
 
-  METHOD tenants.
-    DATA: li_api  TYPE REF TO if_mr_api,
-          lv_data TYPE string,
-          lv_mime TYPE string,
-          lv_url  TYPE string,
-          lv_prvdorgid type Z100085_ZS_PRVDORG-ORGANIZATION_ID,
-          lt_prvdtenants TYPE Z100085_ZTT_PRVDORG,
-          ls_prvdtenant type z100085_ZS_PRVDORG,
-          lv_tenantdata type ref to data.
 
-    try.
-    CASE iv_httpverb.
-      WHEN 'GET'.
-        z100085_zcl_proubc_prvdtenants=>get_allprvdtenant( importing et_prvdorg = lt_prvdtenants ).
-        copy_data_to_ref(
-            exporting is_data = lt_prvdtenants
-            changing cr_data = lv_tenantdata
-        ).
-        /ui2/cl_json=>serialize(
-          EXPORTING
-            data             = lv_tenantdata
+  METHOD tenants.
+    DATA: li_api            TYPE REF TO if_mr_api,
+          lv_data           TYPE string,
+          lv_mime           TYPE string,
+          lv_url            TYPE string,
+          lv_prvdorgid      TYPE z100085_zs_prvdorg-organization_id,
+          lt_prvdtenants    TYPE z100085_ztt_prvdorg,
+          ls_prvdtenant     TYPE z100085_ZS_PRVDORG,
+          lt_prvdtenants_in TYPE z100085_ztt_prvdorg,
+          lv_tenantdata     TYPE REF TO data.
+
+    TRY.
+        CASE iv_httpverb.
+          WHEN 'GET'.
+            z100085_zcl_proubc_prvdtenants=>get_allprvdtenant( IMPORTING et_prvdorg = lt_prvdtenants ).
+            copy_data_to_ref(
+                EXPORTING is_data = lt_prvdtenants
+                CHANGING cr_data = lv_tenantdata
+            ).
+            /ui2/cl_json=>serialize(
+              EXPORTING
+                data             = lv_tenantdata
 *            compress         =
 *            name             =
 *            pretty_name      =
@@ -236,27 +121,29 @@ CLASS z100085_zcl_proubc_api_sicf IMPLEMENTATION.
 *            numc_as_string   =
 *            name_mappings    =
 *            conversion_exits =
-          RECEIVING
-            r_json           = lv_data
-        ).
-      WHEN 'PUT'.
-        "z100085_zcl_proubc_prvdtenants=>update_prvdtenant( it_prvdorg = )
-      WHEN 'POST'.
-        "move-corresponding iv_payloaddata to ls_prvdtenant.
-        z100085_zcl_proubc_api_helper=>map_data_to_tenant( exporting iv_data = lv_tenantdata ).
-        z100085_zcl_proubc_prvdtenants=>create_prvdtenant( exporting IS_PRVDORG = ls_prvdtenant ).
-      WHEN 'DELETE'.
-      WHEN OTHERS.
-    ENDCASE.
-    catch cx_root.
-    "todo exception handling
-    endtry.
+              RECEIVING
+                r_json           = lv_data
+            ).
+          WHEN 'PUT'.
+            "z100085_zcl_proubc_prvdtenants=>update_prvdtenant( it_prvdorg = )
+          WHEN 'POST'.
+            "move-corresponding iv_payloaddata to ls_prvdtenant.
+
+            "z100085_zcl_proubc_api_helper=>map_data_to_tenant( EXPORTING iv_data = iv_payloaddata ).
+          "  z100085_zcl_proubc_prvdtenants=>create_prvdtenant( EXPORTING is_prvdorg = lt_prvdtenants ).
+          WHEN 'DELETE'.
+          WHEN OTHERS.
+        ENDCASE.
+      CATCH cx_root.
+        "todo exception handling
+    ENDTRY.
 
     ii_server->response->set_compression( ).
     ii_server->response->set_content_type( c_json ).
     "ii_server->response->set_data( lv_data ).
     ii_server->response->set_cdata( lv_data ).
   ENDMETHOD.
+
 
   METHOD status.
     DATA: li_api  TYPE REF TO if_mr_api,
@@ -271,6 +158,7 @@ CLASS z100085_zcl_proubc_api_sicf IMPLEMENTATION.
     ii_server->response->set_data( lv_data ).
   ENDMETHOD.
 
+
   METHOD business_objects.
     DATA: li_api  TYPE REF TO if_mr_api,
           lv_data TYPE xstring,
@@ -283,6 +171,7 @@ CLASS z100085_zcl_proubc_api_sicf IMPLEMENTATION.
     ii_server->response->set_content_type( c_json ).
     ii_server->response->set_data( lv_data ).
   ENDMETHOD.
+
 
   METHOD business_object_models.
     DATA: li_api  TYPE REF TO if_mr_api,
@@ -297,6 +186,7 @@ CLASS z100085_zcl_proubc_api_sicf IMPLEMENTATION.
     ii_server->response->set_data( lv_data ).
   ENDMETHOD.
 
+
   METHOD proxies.
     DATA: li_api  TYPE REF TO if_mr_api,
           lv_data TYPE xstring,
@@ -309,6 +199,7 @@ CLASS z100085_zcl_proubc_api_sicf IMPLEMENTATION.
     ii_server->response->set_content_type( c_json ).
     ii_server->response->set_data( lv_data ).
   ENDMETHOD.
+
 
   METHOD auth.
     DATA: li_api  TYPE REF TO if_mr_api,
@@ -328,6 +219,7 @@ CLASS z100085_zcl_proubc_api_sicf IMPLEMENTATION.
 *        length = -1    " Length of character data
     ).
   ENDMETHOD.
+
 
   METHOD read_mime.
     DATA: li_api  TYPE REF TO if_mr_api,
@@ -360,13 +252,161 @@ CLASS z100085_zcl_proubc_api_sicf IMPLEMENTATION.
     ii_server->response->set_data( lv_data ).
   ENDMETHOD.
 
-  method copy_data_to_ref. "copied from oData implementation. see DPC class
-      FIELD-SYMBOLS:
-                   <ls_data> TYPE any.
+
+  METHOD copy_data_to_ref. "copied from oData implementation. see DPC class
+    FIELD-SYMBOLS:
+                 <ls_data> TYPE any.
 
     CREATE DATA cr_data LIKE is_data.
     ASSIGN cr_data->* TO <ls_data>.
     <ls_data> = is_data.
 
-  endmethod.
+  ENDMETHOD.
+
+
+  METHOD handle_request_old.
+    "    DATA: lv_path          TYPE string,
+    "         lv_pathfull      TYPE string,
+    "          lv_query_string  TYPE string,
+    "          lv_httpverb      TYPE string,
+    "          lv_payload       TYPE string,
+    "          lv_name          TYPE string,
+    "          li_http          TYPE REF TO if_http_extension,
+    "          lt_fields        TYPE tihttpnvp,
+    "          lv_returncode    TYPE string,
+    "          lv_returnpayload TYPE string,
+    "          lt_tenants_in type Z100085_ZTT_PRVDORG.
+    "
+    "
+    "    " get URL info - will be used for finding matching URL patterns and specified controllers
+    "    lv_pathfull = server->request->get_header_field( name = '~path_translated' ).
+    "    lv_path = server->request->get_header_field( '~path' ).
+    "    lv_httpverb = server->request->get_header_field( '~request_method' ).
+    "    lv_query_string = cl_http_utility=>unescape_url( server->request->get_header_field( name = '~query_string' ) ).
+    "
+    "    server->request->get_header_fields(
+    "      CHANGING
+    "        fields = lt_fields    " Header fields
+    "    ).
+    "
+    "    "get payload if put or post
+    "    "maybe too generic - maybe should handle in specific routes rather than generically
+    "*    IF lv_httpverb = 'PUT' OR lv_httpverb = 'POST'.
+    "*        data lv_payloaddata type ref to data.
+    "*        data(lv_maybepayload) = server->request->get_cdata( ).
+    "*       /UI2/CL_JSON=>deserialize( exporting json = lv_maybepayload
+    "*                                  changing data = lv_payloaddata ).
+    "*    ENDIF.
+    "
+    "    " get requested content type
+    "    DATA(lv_req_content_type) = server->request->get_content_type( ).
+    "
+    "    " if not specified, initial content type is set to JSON
+    "    IF lv_req_content_type IS INITIAL.
+    "      lv_req_content_type = c_json.
+    "    ENDIF.
+    "
+    "*
+    "*        case lv_path.
+    "*            when 'tenants'.
+    "*            when 'status'.
+    "*            when 'business_objects'.
+    "*            when 'business_object_models'.
+    "*            when 'proxies'.
+    "*            when 'auth'.
+    "*        endcase.
+    "
+    "    "lousy code, but gotta go fast here
+    "    "may need to write this into multiple handlers depending on complexity
+    "    TRY.
+    "        IF lv_path EQ '/sap/proubc/tenants'.
+    "
+    "          IF lv_httpverb = 'PUT' OR lv_httpverb = 'POST'.
+    "            DATA lv_payloaddata TYPE REF TO data.
+    "            DATA(lv_maybepayload) = server->request->get_cdata( ).
+    "            /ui2/cl_json=>deserialize( EXPORTING json = lv_maybepayload
+    "                                       CHANGING data = lv_payloaddata ).
+    "          ENDIF.
+    "
+    "          me->tenants( EXPORTING ii_server = server
+    "                                 iv_httpverb = lv_httpverb
+    "                                 iv_payload = lv_payload
+    "                                 iv_payloaddata = lv_payloaddata
+    "                                 iv_url = lv_path
+    "                       IMPORTING  ev_payload  = lv_returnpayload
+    "                                  ev_returncode = lv_returncode ).
+    "
+    "        ELSEIF lv_path EQ '/sap/proubc/status'.
+    "          me->status( EXPORTING ii_server = server
+    "                                 iv_httpverb = lv_httpverb
+    "                                 iv_payload = lv_payload
+    "                                       iv_url = lv_path
+    "                       IMPORTING  ev_payload  = lv_returnpayload
+    "                                  ev_returncode = lv_returncode  ).
+    "        ELSEIF lv_path+28 EQ '/sap/proubc/business_objects'.
+    "          me->business_objects( EXPORTING ii_server = server
+    "                                          iv_httpverb = lv_httpverb
+    "                                          iv_payload = lv_payload
+    "                                          iv_url = lv_path
+    "                       IMPORTING  ev_payload  = lv_returnpayload
+    "                                  ev_returncode = lv_returncode ).
+    "        ELSEIF lv_path EQ '/sap/proubc/business_object_models'.
+    "          me->business_object_models( EXPORTING ii_server = server
+    "                                                iv_httpverb = lv_httpverb
+    "                                                iv_payload = lv_payload
+    "                                                iv_url = lv_path
+    "                       IMPORTING  ev_payload  = lv_returnpayload
+    "                                  ev_returncode = lv_returncode ).
+    "          " We replaced this with tenants right?
+    "*        elseif lv_path cp 'proxies'.
+    "*            me->proxies( exporting ii_server = server
+    "*                                         iv_httpverb = lv_httpverb
+    "*                                         iv_payload = lv_payload
+    "*                                         iv_url = lv_path
+    "*                         importing  ev_payload  = lv_returnpayload
+    "*                                    ev_returncode = lv_returncode ).
+    "        ELSEIF lv_path CP '/sap/proubc/auth'.
+    "          me->auth( EXPORTING ii_server = server
+    "                              iv_httpverb = lv_httpverb
+    "                              iv_payload = lv_payload
+    "                                       iv_url = lv_path
+    "                       IMPORTING  ev_payload  = lv_returnpayload
+    "                                  ev_returncode = lv_returncode ).
+    "        ELSE. "default redirect to swagger doc / error?
+    "*            "server->response->set_cdata( '404' ).
+    "*            data: lv_errorpage type xstring value 'error finding path binding'.
+    "*            server->response->set_data( lv_errorpage  ).
+    "*            server->response->set_status( code = 404 reason = '404' ).
+    "
+    "          me->auth( EXPORTING ii_server = server
+    "                              iv_httpverb = lv_httpverb
+    "                              iv_payload = lv_payload
+    "                                       iv_url = lv_path
+    "                       IMPORTING  ev_payload  = lv_returnpayload
+    "                                  ev_returncode = lv_returncode ).
+    "        ENDIF.
+    "      CATCH cx_root.
+    "        "todo add more exception handling
+    "    ENDTRY.
+    "
+    "    " /proubc/tenants/{id}/proxy handler
+    "    " /proubc/status health check
+    "    " /proubc/business_objects/{id}/status
+    "    " /proubc/business_object_models/?=recordType
+    "    " /proubc/proxies
+    "    " /proubc/auth
+  ENDMETHOD.
+
+
+  METHOD if_rest_application~get_root_handler.
+     DATA(lo_router) = NEW cl_rest_router( ).
+    "    " /proubc/tenants/{id}/proxy handler
+      lo_router->attach( iv_template = '/tenants' iv_handler_class = 'Z100085_ZCL_PROUBC_TENANTSAPI' ).
+    "    " /proubc/status health check
+    "    " /proubc/business_objects/{id}/status
+    "    " /proubc/business_object_models/?=recordType
+    "    " /proubc/proxies
+    "    " /proubc/auth
+     ro_root_handler = lo_router.
+  ENDMETHOD.
 ENDCLASS.
