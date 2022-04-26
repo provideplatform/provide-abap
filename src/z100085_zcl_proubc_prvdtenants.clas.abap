@@ -6,8 +6,8 @@ CLASS z100085_zcl_proubc_prvdtenants DEFINITION
   PUBLIC SECTION.
 
     CLASS-METHODS get_prvdtenant
-      EXPORTING
-        !ev_prvdorgid TYPE z100085_zs_prvdorg-organization_id .
+      IMPORTING
+        !iv_prvdtenant TYPE Z100085_PRVDTENANTID .
     CLASS-METHODS get_allprvdtenant
       EXPORTING
         !et_prvdorg TYPE z100085_ztt_prvdorg .
@@ -131,7 +131,7 @@ CLASS z100085_zcl_proubc_prvdtenants IMPLEMENTATION.
 
   METHOD get_prvdtenant.
     DATA: ls_prvdorg TYPE z100085_prvdorgs.
-    SELECT SINGLE * FROM z100085_prvdorgs INTO ls_prvdorg WHERE organization_id = ev_prvdorgid.
+    SELECT SINGLE * FROM z100085_prvdorgs INTO ls_prvdorg WHERE organization_id = iv_prvdtenant.
     IF sy-subrc = 0.
     ELSEIF sy-subrc EQ 4. "can't find it. thats ok
     ELSEIF sy-subrc EQ 8. "problem with the db
