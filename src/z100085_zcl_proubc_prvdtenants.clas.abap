@@ -7,15 +7,15 @@ CLASS z100085_zcl_proubc_prvdtenants DEFINITION
 
     CLASS-METHODS get_prvdtenant
       IMPORTING
-        !iv_prvdtenant TYPE Z100085_PRVDTENANTID .
+        !iv_prvdtenant TYPE z100085_prvdtenantid .
     CLASS-METHODS get_allprvdtenant
       EXPORTING
         !et_prvdorg TYPE z100085_ztt_prvdorg .
     CLASS-METHODS create_prvdtenant
       IMPORTING
         !it_prvdorg TYPE z100085_ztt_prvdorg
-      exporting
-        !et_prvdorg type z100085_ztt_prvdorg.
+      EXPORTING
+        !et_prvdorg TYPE z100085_ztt_prvdorg.
     CLASS-METHODS update_prvdtenant
       IMPORTING
         !it_prvdorg TYPE z100085_ztt_prvdorg
@@ -47,9 +47,12 @@ CLASS z100085_zcl_proubc_prvdtenants IMPLEMENTATION.
     "TODO add SAP auth check
     "duplicate check
 
-    "update any existing entries - get the data
+    "throw out error message if the tenant already exists
     SELECT * FROM z100085_prvdorgs INTO TABLE lt_existingprvdorg
         FOR ALL ENTRIES IN it_prvdorg WHERE organization_id = it_prvdorg-organization_id.
+    IF sy-dbcnt > 0.
+      MESSAGE e004(z100085_zclproubcmsg) WITH 'orgid'.
+    ENDIF.
 
     GET TIME STAMP FIELD lv_timestamp.
 
@@ -61,24 +64,16 @@ CLASS z100085_zcl_proubc_prvdtenants IMPLEMENTATION.
       ls_prvdorg-ident_endpoint = <fs_prvdorg>-ident_endpoint.
       ls_prvdorg-refresh_token = <fs_prvdorg>-refresh_token.
       ls_prvdorg-refresh_tokenext = <fs_prvdorg>-refresh_tokenext.
-      READ TABLE lt_existingprvdorg ASSIGNING FIELD-SYMBOL(<fs_existingprvdorg>) WITH KEY organization_id = <fs_prvdorg>-organization_id.
-      IF sy-subrc = 0.
-        ls_prvdorg-createdby = <fs_prvdorg>-createdby.
-        ls_prvdorg-created_at = <fs_prvdorg>-created_at.
-        ls_prvdorg-changedby = sy-uname.
-        ls_prvdorg-changed_at = lv_timestamp.
-      ELSE.
-        ls_prvdorg-createdby = sy-uname.
-        ls_prvdorg-created_at = lv_timestamp.
-      ENDIF.
+      ls_prvdorg-createdby = sy-uname.
+      ls_prvdorg-created_at = lv_timestamp.
       APPEND ls_prvdorg TO lt_prvdorg.
     ENDLOOP.
 
     MODIFY z100085_prvdorgs FROM TABLE lt_prvdorg.
     IF sy-subrc <> 0.
       "TODO add raise exception here
-    else.
-        move-CORRESPONDING lt_prvdorg to et_prvdorg.
+    ELSE.
+      MOVE-CORRESPONDING lt_prvdorg TO et_prvdorg.
     ENDIF.
 
 
@@ -175,12 +170,23 @@ CLASS z100085_zcl_proubc_prvdtenants IMPLEMENTATION.
 
 
   METHOD update_prvdtenant.
-    DATA: ls_prvdorg   TYPE z100085_prvdorgs,
-          lt_prvdorg   TYPE TABLE OF z100085_prvdorgs,
-          lv_timestamp TYPE timestampl.
+    DATA: ls_prvdorg       TYPE z100085_prvdorgs,
+          lt_prvdorg       TYPE TABLE OF z100085_prvdorgs,
+          lv_timestamp     TYPE timestampl,
+          lt_targettenants TYPE TABLE OF z100085_prvdorgs.
+
     "TODO add SAP auth
 
+    DESCRIBE TABLE it_prvdorg LINES DATA(lv_targetcount).
+
+    IF it_prvdorg IS INITIAL OR lv_targetcount = 0.
+      "raise error for empty payload
+    ENDIF.
+
     GET TIME STAMP FIELD lv_timestamp.
+
+    SELECT * FROM z100085_prvdorgs INTO TABLE lt_targettenants
+        FOR ALL ENTRIES IN it_prvdorg WHERE organization_id = it_prvdorg-organization_id.
 
     LOOP AT it_prvdorg ASSIGNING FIELD-SYMBOL(<fs_prvdorg>).
       ls_prvdorg-mandt = sy-mandt.
@@ -196,6 +202,8 @@ CLASS z100085_zcl_proubc_prvdtenants IMPLEMENTATION.
     UPDATE Z100085_prvdorgs FROM TABLE lt_prvdorg.
     IF sy-subrc <> 0.
       "TODO add raise exception here
+    ELSE.
+      MOVE-CORRESPONDING lt_prvdorg TO et_prvdorg.
     ENDIF.
 
 

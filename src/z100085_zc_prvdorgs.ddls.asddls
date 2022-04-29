@@ -18,4 +18,6 @@ define view Z100085_ZC_PRVDORGS as select from Z100085_ZI_PRVDORGS {
   created_at,
   changedby,
   changed_at
+  
+  //cast('' as abap.rawstring( 2048 )) as refreshTokenFull
 }
