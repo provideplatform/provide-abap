@@ -41,7 +41,7 @@ INTERFACE Z100085_zif_proubc_Ident PUBLIC.
 * Component schema: AuthenticationRequest, object
   TYPES: BEGIN OF authenticationrequest,
            email TYPE string,
-           password TYPE string,
+           password TYPE Z100085_CASESENSITIVE_STR,
          END OF authenticationrequest.
 
 * Component schema: CreateuserRequest, object
@@ -226,6 +226,8 @@ INTERFACE Z100085_zif_proubc_Ident PUBLIC.
   METHODS authentication
     IMPORTING
       body TYPE authenticationrequest
+    exporting
+      apiresponse type ref to data
     RAISING cx_static_check.
 
 * GET - "List users Copy"

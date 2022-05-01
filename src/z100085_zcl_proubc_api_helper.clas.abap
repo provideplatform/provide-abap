@@ -18,7 +18,10 @@ CLASS z100085_zcl_proubc_api_helper DEFINITION
           !cr_data TYPE REF TO data.
     METHODS:
       call_ident_api IMPORTING iv_tenant TYPE z100085_prvdtenantid,
-      call_baseline_api.
+      call_baseline_api,
+      authenticate_ident_api_basic IMPORTING iv_userid   TYPE string
+                                             iv_password TYPE Z100085_CASESENSITIVE_STR
+                                   EXPORTING authtoken   TYPE REF TO data.
   PROTECTED SECTION.
   PRIVATE SECTION.
 ENDCLASS.
@@ -59,12 +62,12 @@ CLASS z100085_zcl_proubc_api_helper IMPLEMENTATION.
     DATA:
           lo_http_client TYPE REF TO if_http_client.
 
-     "TODO fix up this data access
+    "TODO fix up this data access
     "z100085_zcl_proubc_prvdtenants=>get_prvdtenant( importing Iv_PRVDTENANT = iv_tenant ).
 
     cl_http_client=>create_by_url(
       EXPORTING
-        url                = '' "TODO use the ident URL here
+        url                = 'https://ident.provide.services' "TODO use the ident URL here
       IMPORTING
         client             = lo_http_client
       EXCEPTIONS
@@ -76,31 +79,33 @@ CLASS z100085_zcl_proubc_api_helper IMPLEMENTATION.
       " error handling
     ENDIF.
 
-    "TODO pass the refresh token for the authentication
-    lo_http_client->authenticate( username = 'MY_SAP_USER' password = 'secret' ).
     lo_http_client->propertytype_accept_cookie = if_http_client=>co_enabled.
     lo_http_client->request->set_header_field( name  = if_http_form_fields_sap=>sap_client value = '100' ).
 
     DATA(lo_ident_api) = NEW Z100085_zcl_proubc_ident( ii_client = lo_http_client ).
 
+    "lo_ident_api->authentication( exporting body = ls_basicauthpayload
+    "                              importing apiresponse = authtoken  ).
+
+
     "TODO store the auth token securely
   ENDMETHOD.
-  method call_baseline_api.
-      DATA:
-          lo_http_client TYPE REF TO if_http_client.
-  "TODO check validity of current auth token
-  "or call me-call_ident_api to get new auth token
+  METHOD call_baseline_api.
+    DATA:
+        lo_http_client TYPE REF TO if_http_client.
+    "TODO check validity of current auth token
+    "or call me-call_ident_api to get new auth token
 
-      cl_http_client=>create_by_url(
-      EXPORTING
-        url                = '' "TODO use the BPI URL here
-      IMPORTING
-        client             = lo_http_client
-      EXCEPTIONS
-        argument_not_found = 1
-        plugin_not_active  = 2
-        internal_error     = 3
-        OTHERS             = 4 ).
+    cl_http_client=>create_by_url(
+    EXPORTING
+      url                = '' "TODO use the BPI URL here
+    IMPORTING
+      client             = lo_http_client
+    EXCEPTIONS
+      argument_not_found = 1
+      plugin_not_active  = 2
+      internal_error     = 3
+      OTHERS             = 4 ).
     IF sy-subrc <> 0.
       " error handling
     ENDIF.
@@ -112,5 +117,34 @@ CLASS z100085_zcl_proubc_api_helper IMPLEMENTATION.
 
     "TODO something about the text encoding messes up ii_client
     "data(lo_baseline_api) = new z100085_zcl_proubc_baseline( importing ii_client = lo_http_client ).
+  ENDMETHOD.
+
+  METHOD authenticate_ident_api_basic.
+    DATA: ls_basicauthpayload TYPE z100085_zif_proubc_ident=>authenticationrequest,
+          lo_http_client TYPE REF TO if_http_client,
+          lo_ident_api TYPE REF TO Z100085_zif_proubc_ident.
+
+    cl_http_client=>create_by_url(
+      EXPORTING
+        url                = 'https://ident.provide.services'
+      IMPORTING
+        client             = lo_http_client
+      EXCEPTIONS
+        argument_not_found = 1
+        plugin_not_active  = 2
+        internal_error     = 3
+        OTHERS             = 4 ).
+    IF sy-subrc <> 0.
+      " error handling
+    ENDIF.
+
+    lo_http_client->propertytype_accept_cookie = if_http_client=>co_enabled.
+    lo_http_client->request->set_header_field( name  = if_http_form_fields_sap=>sap_client value = '100' ).
+
+
+    lo_ident_api = NEW Z100085_zcl_proubc_ident( ii_client = lo_http_client ).
+    lo_ident_api->authentication( exporting body = ls_basicauthpayload
+                                  importing apiresponse = authtoken  ).
+
   ENDMETHOD.
 ENDCLASS.
