@@ -5,12 +5,12 @@ CLASS Z100085_zcl_proubc_ident DEFINITION PUBLIC GLOBAL FRIENDS Z100085_zcl_prou
     INTERFACES Z100085_zif_proubc_ident.
     METHODS constructor IMPORTING ii_client       TYPE REF TO if_http_client
                                   iv_tenant       TYPE string
-                                  iv_refreshtoken TYPE string.
+                                  iv_refreshtoken TYPE Z100085_PRVDREFRESHTOKEN.
   PROTECTED SECTION.
     DATA mi_client TYPE REF TO if_http_client.
     DATA mo_json TYPE REF TO Z100085_zcl_oapi_json.
-    DATA authtoken TYPE string.
-    DATA refreshtoken TYPE string.
+    DATA authtoken TYPE Z100085_PRVDREFRESHTOKEN.
+    DATA refreshtoken TYPE Z100085_PRVDREFRESHTOKEN.
     DATA tenant TYPE string.
     METHODS send_receive RETURNING VALUE(rv_code) TYPE i.
     METHODS parse_createapplicationrequest
@@ -349,6 +349,9 @@ CLASS Z100085_zcl_proubc_ident IMPLEMENTATION.
 
     me->get_refresh_bearer_token( ).
 
+    data(lv_wtfauth) = mi_client->request->get_header_field( name = 'authorization' ).
+    data(lv_wtfauth2) = mi_client->request->get_header_field( name = 'Authorization' ).
+
     lv_code = send_receive( ).
     WRITE / lv_code.
     CASE lv_code.
@@ -495,6 +498,10 @@ CLASS Z100085_zcl_proubc_ident IMPLEMENTATION.
         name  = 'authorization'    " Name of the header field
         value = lv_bearertoken    " HTTP header field value
     ).
+
+    data(lv_tokenlength) = strlen( lv_bearertoken ).
+    condense lv_bearertoken.
+    data(lv_condensedtokent) = strlen( lv_bearertoken ).
   ENDMETHOD.
 
   METHOD get_authtoken.

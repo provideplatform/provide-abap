@@ -8,8 +8,8 @@ CLASS z100085_zcl_proubc_prvdtenants DEFINITION
     CLASS-METHODS get_prvdtenant
       IMPORTING
         !iv_prvdtenant TYPE z100085_prvdtenantid
-      exporting
-        !ev_prvdtenant type z100085_prvdorgs .
+      EXPORTING
+        !ev_prvdtenant TYPE z100085_prvdorgs .
     CLASS-METHODS get_allprvdtenant
       EXPORTING
         !et_prvdorg TYPE z100085_ztt_prvdorg .
@@ -130,7 +130,7 @@ CLASS z100085_zcl_proubc_prvdtenants IMPLEMENTATION.
     DATA: ls_prvdorg TYPE z100085_prvdorgs.
     SELECT SINGLE * FROM z100085_prvdorgs INTO ls_prvdorg WHERE organization_id = 'e41dea7b-3510-4ffa-8ff4-53f3b158c8b4'.
     IF sy-subrc = 0.
-        ev_prvdtenant = ls_prvdorg.
+      ev_prvdtenant = ls_prvdorg.
     ELSEIF sy-subrc EQ 4. "can't find it. thats ok
     ELSEIF sy-subrc EQ 8. "problem with the db
     ELSE. "general error wtf
@@ -192,17 +192,24 @@ CLASS z100085_zcl_proubc_prvdtenants IMPLEMENTATION.
         FOR ALL ENTRIES IN it_prvdorg WHERE organization_id = it_prvdorg-organization_id.
 
     LOOP AT it_prvdorg ASSIGNING FIELD-SYMBOL(<fs_prvdorg>).
+      CLEAR: ls_prvdorg.
       ls_prvdorg-mandt = sy-mandt.
       ls_prvdorg-organization_id = <fs_prvdorg>-organization_id.
       ls_prvdorg-bpi_endpoint = <fs_prvdorg>-bpi_endpoint.
       ls_prvdorg-ident_endpoint = <fs_prvdorg>-ident_endpoint.
       ls_prvdorg-refresh_token = <fs_prvdorg>-refresh_token.
       ls_prvdorg-refresh_tokenext = <fs_prvdorg>-refresh_tokenext.
+      READ TABLE lt_targettenants ASSIGNING FIELD-SYMBOL(<fs_olddata>) WITH KEY organization_id = <fs_prvdorg>-organization_id.
+      IF sy-subrc = 0.
+        ls_prvdorg-createdby = <fs_olddata>-createdby.
+        ls_prvdorg-created_at = <fs_olddata>-created_at.
+      ENDIF.
       ls_prvdorg-changedby = sy-uname.
       ls_prvdorg-changed_at = lv_timestamp.
+      APPEND ls_prvdorg TO lt_prvdorg.
     ENDLOOP.
 
-    UPDATE Z100085_prvdorgs FROM TABLE lt_prvdorg.
+    MODIFY Z100085_prvdorgs FROM TABLE lt_prvdorg.
     IF sy-subrc <> 0.
       "TODO add raise exception here
     ELSE.

@@ -63,7 +63,7 @@ CLASS z100085_zcl_proubc_api_helper IMPLEMENTATION.
           lo_http_client TYPE REF TO if_http_client,
           lo_ident_api type ref to z100085_zif_proubc_ident,
           ls_prvdtenant type z100085_prvdorgs,
-          lv_refreshtokenstr type string.
+          lv_refreshtokenstr type Z100085_PRVDREFRESHTOKEN.
 
     z100085_zcl_proubc_prvdtenants=>get_prvdtenant( exporting iv_prvdtenant = 'e41dea7b-3510-4ffa-8ff4-53f3b158c8b4'
                                                     importing ev_prvdtenant = ls_prvdtenant
