@@ -7,7 +7,9 @@ CLASS z100085_zcl_proubc_prvdtenants DEFINITION
 
     CLASS-METHODS get_prvdtenant
       IMPORTING
-        !iv_prvdtenant TYPE z100085_prvdtenantid .
+        !iv_prvdtenant TYPE z100085_prvdtenantid
+      exporting
+        !ev_prvdtenant type z100085_prvdorgs .
     CLASS-METHODS get_allprvdtenant
       EXPORTING
         !et_prvdorg TYPE z100085_ztt_prvdorg .
@@ -126,8 +128,9 @@ CLASS z100085_zcl_proubc_prvdtenants IMPLEMENTATION.
 
   METHOD get_prvdtenant.
     DATA: ls_prvdorg TYPE z100085_prvdorgs.
-    SELECT SINGLE * FROM z100085_prvdorgs INTO ls_prvdorg WHERE organization_id = iv_prvdtenant.
+    SELECT SINGLE * FROM z100085_prvdorgs INTO ls_prvdorg WHERE organization_id = 'e41dea7b-3510-4ffa-8ff4-53f3b158c8b4'.
     IF sy-subrc = 0.
+        ev_prvdtenant = ls_prvdorg.
     ELSEIF sy-subrc EQ 4. "can't find it. thats ok
     ELSEIF sy-subrc EQ 8. "problem with the db
     ELSE. "general error wtf
@@ -160,7 +163,7 @@ CLASS z100085_zcl_proubc_prvdtenants IMPLEMENTATION.
     ENDIF.
 
     TRY.
-        lo_ident_api = NEW z100085_zcl_proubc_ident( ii_client = lo_http_client  ).
+        "lo_ident_api = NEW z100085_zcl_proubc_ident( ii_client = lo_http_client  ).
 
       CATCH cx_root.
         "todo implement better exception handling

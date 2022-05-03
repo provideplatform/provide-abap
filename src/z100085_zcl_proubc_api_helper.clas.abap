@@ -17,7 +17,7 @@ CLASS z100085_zcl_proubc_api_helper DEFINITION
         CHANGING
           !cr_data TYPE REF TO data.
     METHODS:
-      call_ident_api IMPORTING iv_tenant TYPE z100085_prvdtenantid,
+      call_ident_api, " IMPORTING iv_tenant TYPE z100085_prvdtenantid,
       call_baseline_api,
       authenticate_ident_api_basic IMPORTING iv_userid   TYPE string
                                              iv_password TYPE Z100085_CASESENSITIVE_STR
@@ -60,10 +60,16 @@ CLASS z100085_zcl_proubc_api_helper IMPLEMENTATION.
   ENDMETHOD.
   METHOD call_ident_api.
     DATA:
-          lo_http_client TYPE REF TO if_http_client.
+          lo_http_client TYPE REF TO if_http_client,
+          lo_ident_api type ref to z100085_zif_proubc_ident,
+          ls_prvdtenant type z100085_prvdorgs,
+          lv_refreshtokenstr type string.
 
-    "TODO fix up this data access
-    "z100085_zcl_proubc_prvdtenants=>get_prvdtenant( importing Iv_PRVDTENANT = iv_tenant ).
+    z100085_zcl_proubc_prvdtenants=>get_prvdtenant( exporting iv_prvdtenant = 'e41dea7b-3510-4ffa-8ff4-53f3b158c8b4'
+                                                    importing ev_prvdtenant = ls_prvdtenant
+                                                      ).
+
+    CONCATENATE ls_prvdtenant-refresh_token ls_prvdtenant-refresh_tokenext into lv_refreshtokenstr.
 
     cl_http_client=>create_by_url(
       EXPORTING
@@ -82,7 +88,18 @@ CLASS z100085_zcl_proubc_api_helper IMPLEMENTATION.
     lo_http_client->propertytype_accept_cookie = if_http_client=>co_enabled.
     lo_http_client->request->set_header_field( name  = if_http_form_fields_sap=>sap_client value = '100' ).
 
-    DATA(lo_ident_api) = NEW Z100085_zcl_proubc_ident( ii_client = lo_http_client ).
+    lo_ident_api = NEW Z100085_zcl_proubc_ident( ii_client = lo_http_client iv_tenant = 'e41dea7b-3510-4ffa-8ff4-53f3b158c8b4' iv_refreshtoken = lv_refreshtokenstr  ).
+
+    data: authtokenreqbody type z100085_zif_proubc_ident=>authorizelong_termtokenrequest.
+
+    authtokenreqbody-organization_id = 'e41dea7b-3510-4ffa-8ff4-53f3b158c8b4'.
+    authtokenreqbody-scope = 'offline_access'.
+
+    "lo_ident_api->
+
+    lo_ident_api->authorizelong_termtoken( body = authtokenreqbody  ).
+*    CATCH cx_static_check.
+
 
     "lo_ident_api->authentication( exporting body = ls_basicauthpayload
     "                              importing apiresponse = authtoken  ).
@@ -92,13 +109,14 @@ CLASS z100085_zcl_proubc_api_helper IMPLEMENTATION.
   ENDMETHOD.
   METHOD call_baseline_api.
     DATA:
-        lo_http_client TYPE REF TO if_http_client.
+        lo_http_client TYPE REF TO if_http_client,
+        lo_baseline_api type ref to z100085_zif_proubc_baseline.
     "TODO check validity of current auth token
     "or call me-call_ident_api to get new auth token
 
     cl_http_client=>create_by_url(
     EXPORTING
-      url                = '' "TODO use the BPI URL here
+      url                = 'https://baseline.provide.services'
     IMPORTING
       client             = lo_http_client
     EXCEPTIONS
@@ -110,19 +128,20 @@ CLASS z100085_zcl_proubc_api_helper IMPLEMENTATION.
       " error handling
     ENDIF.
 
-    "TODO pass the auth token from Ident api for the authentication
-    lo_http_client->authenticate( username = 'MY_SAP_USER' password = 'secret' ).
     lo_http_client->propertytype_accept_cookie = if_http_client=>co_enabled.
     lo_http_client->request->set_header_field( name  = if_http_form_fields_sap=>sap_client value = '100' ).
 
-    "TODO something about the text encoding messes up ii_client
-    "data(lo_baseline_api) = new z100085_zcl_proubc_baseline( importing ii_client = lo_http_client ).
+    lo_baseline_api = new z100085_zcl_proubc_baseline( ii_client = lo_http_client ).
+    "TODO - do something useful with the Baseline API
+    "lo_baseline_api->authentication( body =  ).
+*    CATCH cx_static_check.
   ENDMETHOD.
 
   METHOD authenticate_ident_api_basic.
     DATA: ls_basicauthpayload TYPE z100085_zif_proubc_ident=>authenticationrequest,
           lo_http_client TYPE REF TO if_http_client,
           lo_ident_api TYPE REF TO Z100085_zif_proubc_ident.
+
 
     cl_http_client=>create_by_url(
       EXPORTING
@@ -142,7 +161,7 @@ CLASS z100085_zcl_proubc_api_helper IMPLEMENTATION.
     lo_http_client->request->set_header_field( name  = if_http_form_fields_sap=>sap_client value = '100' ).
 
 
-    lo_ident_api = NEW Z100085_zcl_proubc_ident( ii_client = lo_http_client ).
+    lo_ident_api = NEW Z100085_zcl_proubc_ident( ii_client = lo_http_client iv_tenant = 'e41dea7b-3510-4ffa-8ff4-53f3b158c8b4' iv_refreshtoken = ''  ).
     lo_ident_api->authentication( exporting body = ls_basicauthpayload
                                   importing apiresponse = authtoken  ).
 

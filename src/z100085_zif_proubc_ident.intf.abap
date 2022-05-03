@@ -34,8 +34,8 @@ INTERFACE Z100085_zif_proubc_Ident PUBLIC.
 
 * Component schema: Authorizelong-termtokenRequest, object
   TYPES: BEGIN OF authorizelong_termtokenrequest,
-           scope TYPE string,
-           organization_id TYPE string,
+           scope TYPE Z100085_CASESENSITIVE_STR,
+           organization_id TYPE Z100085_CASESENSITIVE_STR,
          END OF authorizelong_termtokenrequest.
 
 * Component schema: AuthenticationRequest, object
@@ -197,6 +197,8 @@ INTERFACE Z100085_zif_proubc_Ident PUBLIC.
   METHODS authorizelong_termtoken
     IMPORTING
       body TYPE authorizelong_termtokenrequest
+    exporting
+      apiresponse type ref to data
     RAISING cx_static_check.
 
 * PUT - "Update user"
