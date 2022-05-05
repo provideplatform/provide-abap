@@ -401,7 +401,8 @@ CLASS z100085_zcl_proubc_api_sicf IMPLEMENTATION.
   METHOD if_rest_application~get_root_handler.
      DATA(lo_router) = NEW cl_rest_router( ).
     "    " /proubc/tenants/{id}/proxy handler
-      lo_router->attach( iv_template = '/tenants' iv_handler_class = 'Z100085_ZCL_PROUBC_TENANTSAPI' ).
+      lo_router->attach( iv_template = '/tenants'   iv_handler_class = 'Z100085_ZCL_PROUBC_TENANTSAPI' ).
+       lo_router->attach( iv_template = '/tenants/{ID}' iv_handler_class = 'Z100085_ZCL_PROUBC_TENANTSAPI' ).
     "    " /proubc/status health check
     "    " /proubc/business_objects/{id}/status
     "    " /proubc/business_object_models/?=recordType

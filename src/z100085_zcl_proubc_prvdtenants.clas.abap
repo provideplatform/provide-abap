@@ -85,12 +85,16 @@ CLASS z100085_zcl_proubc_prvdtenants IMPLEMENTATION.
   METHOD delete_prvdtenant.
     "TODO add SAP auth
 
+    if ev_prvdorgid is not INITIAL.
     DELETE FROM z100085_prvdorgs WHERE organization_id = ev_prvdorgid.
     IF sy-subrc = 0.
       "todo Add some logging for this
     ELSE. "delete failed. why?
       "TODO raise exception here
     ENDIF.
+    else.
+    "TODO raise exception msg here
+    endif.
 
 
   ENDMETHOD.
@@ -128,7 +132,7 @@ CLASS z100085_zcl_proubc_prvdtenants IMPLEMENTATION.
 
   METHOD get_prvdtenant.
     DATA: ls_prvdorg TYPE z100085_prvdorgs.
-    SELECT SINGLE * FROM z100085_prvdorgs INTO ls_prvdorg WHERE organization_id = 'e41dea7b-3510-4ffa-8ff4-53f3b158c8b4'.
+    SELECT SINGLE * FROM z100085_prvdorgs INTO ls_prvdorg WHERE organization_id = iv_prvdtenant.
     IF sy-subrc = 0.
       ev_prvdtenant = ls_prvdorg.
     ELSEIF sy-subrc EQ 4. "can't find it. thats ok
