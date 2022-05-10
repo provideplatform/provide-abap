@@ -14,49 +14,58 @@ INTERFACE Z100085_zif_proubc_Ident PUBLIC.
 
 * Component schema: UpdateapplicationRequest, object
   TYPES: BEGIN OF updateapplicationrequest,
-           name TYPE string,
+           name        TYPE string,
            description TYPE string,
-           type TYPE string,
-           hidden TYPE abap_bool,
+           type        TYPE string,
+           hidden      TYPE abap_bool,
          END OF updateapplicationrequest.
 
 * Component schema: CreateorganizationRequest, object
   TYPES: BEGIN OF createorganizationrequest,
-           name TYPE string,
+           name        TYPE string,
            description TYPE string,
          END OF createorganizationrequest.
 
 * Component schema: UpdateorganizationdetailsRequest, object
   TYPES: BEGIN OF updateorganizationdetailsreque,
-           name TYPE string,
+           name        TYPE string,
            description TYPE string,
          END OF updateorganizationdetailsreque.
 
 * Component schema: Authorizelong-termtokenRequest, object
   TYPES: BEGIN OF authorizelong_termtokenrequest,
-           scope TYPE Z100085_CASESENSITIVE_STR,
-           organization_id TYPE Z100085_CASESENSITIVE_STR,
+           scope           TYPE z100085_casesensitive_str,
+           organization_id TYPE z100085_casesensitive_str,
          END OF authorizelong_termtokenrequest.
+
+  types: begin of authorizelongtermtokenresponse,
+            id type z100085_casesensitive_str,
+            access_token type z100085_casesensitive_str,
+            refresh_token type z100085_casesensitive_str,
+            expires_in type int4,
+            scope type z100085_casesensitive_str,
+            permissions type int4,
+         end of authorizelongtermtokenresponse.
 
 * Component schema: AuthenticationRequest, object
   TYPES: BEGIN OF authenticationrequest,
-           email TYPE string,
-           password TYPE Z100085_CASESENSITIVE_STR,
+           email    TYPE string,
+           password TYPE z100085_casesensitive_str,
          END OF authenticationrequest.
 
 * Component schema: CreateuserRequest, object
   TYPES: BEGIN OF createuserrequest,
-           email TYPE string,
+           email      TYPE string,
            first_name TYPE string,
-           last_name TYPE string,
+           last_name  TYPE string,
          END OF createuserrequest.
 
 * Component schema: UpdateuserRequest, object
   TYPES: BEGIN OF updateuserrequest,
-           email TYPE string,
+           email      TYPE string,
            first_name TYPE string,
-           last_name TYPE string,
-           password TYPE string,
+           last_name  TYPE string,
+           password   TYPE string,
          END OF updateuserrequest.
 
 * POST - "Create application"
@@ -66,9 +75,9 @@ INTERFACE Z100085_zif_proubc_Ident PUBLIC.
 * Body ref: #/components/schemas/CreateapplicationRequest
   METHODS createapplication
     IMPORTING
-      name TYPE string
-      body TYPE createapplicationrequest
-    RAISING cx_static_check.
+              name TYPE string
+              body TYPE createapplicationrequest
+    RAISING   cx_static_check.
 
 * GET - "List applications"
 * Operation id: Listapplications
@@ -83,9 +92,9 @@ INTERFACE Z100085_zif_proubc_Ident PUBLIC.
 * Body ref: #/components/schemas/AssociateusertoapplicationRequest
   METHODS associateusertoapplication
     IMPORTING
-      application_id TYPE string
-      body TYPE associateusertoapplicationrequ
-    RAISING cx_static_check.
+              application_id TYPE string
+              body           TYPE associateusertoapplicationrequ
+    RAISING   cx_static_check.
 
 * GET - "List application users"
 * Operation id: Listapplicationusers
@@ -94,9 +103,9 @@ INTERFACE Z100085_zif_proubc_Ident PUBLIC.
 * Response: 200
   METHODS listapplicationusers
     IMPORTING
-      content_type TYPE string
-      application_id TYPE string
-    RAISING cx_static_check.
+              content_type   TYPE string
+              application_id TYPE string
+    RAISING   cx_static_check.
 
 * GET - "Get application details"
 * Operation id: Getapplicationdetails
@@ -105,9 +114,9 @@ INTERFACE Z100085_zif_proubc_Ident PUBLIC.
 * Response: 200
   METHODS getapplicationdetails
     IMPORTING
-      content_type TYPE string
-      application_id TYPE string
-    RAISING cx_static_check.
+              content_type   TYPE string
+              application_id TYPE string
+    RAISING   cx_static_check.
 
 * PUT - "Update application"
 * Operation id: Updateapplication
@@ -117,10 +126,10 @@ INTERFACE Z100085_zif_proubc_Ident PUBLIC.
 * Body ref: #/components/schemas/UpdateapplicationRequest
   METHODS updateapplication
     IMPORTING
-      name TYPE string
-      application_id TYPE string
-      body TYPE updateapplicationrequest
-    RAISING cx_static_check.
+              name           TYPE string
+              application_id TYPE string
+              body           TYPE updateapplicationrequest
+    RAISING   cx_static_check.
 
 * DELETE - "Delete application"
 * Operation id: Deleteapplication
@@ -129,9 +138,9 @@ INTERFACE Z100085_zif_proubc_Ident PUBLIC.
 * Response: 200
   METHODS deleteapplication
     IMPORTING
-      content_type TYPE string
-      application_id TYPE string
-    RAISING cx_static_check.
+              content_type   TYPE string
+              application_id TYPE string
+    RAISING   cx_static_check.
 
 * GET - "List organizations"
 * Operation id: Listorganizations
@@ -139,8 +148,8 @@ INTERFACE Z100085_zif_proubc_Ident PUBLIC.
 * Response: 200
   METHODS listorganizations
     IMPORTING
-      content_type TYPE string
-    RAISING cx_static_check.
+              content_type TYPE string
+    RAISING   cx_static_check.
 
 * POST - "Create organization"
 * Operation id: Createorganization
@@ -149,9 +158,9 @@ INTERFACE Z100085_zif_proubc_Ident PUBLIC.
 * Body ref: #/components/schemas/CreateorganizationRequest
   METHODS createorganization
     IMPORTING
-      name TYPE string
-      body TYPE createorganizationrequest
-    RAISING cx_static_check.
+              name TYPE string
+              body TYPE createorganizationrequest
+    RAISING   cx_static_check.
 
 * GET - "Get organization details"
 * Operation id: Getorganizationdetails
@@ -161,10 +170,10 @@ INTERFACE Z100085_zif_proubc_Ident PUBLIC.
 * Response: 200
   METHODS getorganizationdetails
     IMPORTING
-      content_type TYPE string
-      name TYPE string
-      organization_id TYPE string
-    RAISING cx_static_check.
+              content_type    TYPE string
+              name            TYPE string
+              organization_id TYPE string
+    RAISING   cx_static_check.
 
 * PUT - "Update organization details"
 * Operation id: Updateorganizationdetails
@@ -174,10 +183,10 @@ INTERFACE Z100085_zif_proubc_Ident PUBLIC.
 * Body ref: #/components/schemas/UpdateorganizationdetailsRequest
   METHODS updateorganizationdetails
     IMPORTING
-      name TYPE string
-      organization_id TYPE string
-      body TYPE updateorganizationdetailsreque
-    RAISING cx_static_check.
+              name            TYPE string
+              organization_id TYPE string
+              body            TYPE updateorganizationdetailsreque
+    RAISING   cx_static_check.
 
 * GET - "List tokens"
 * Operation id: Listtokens
@@ -186,9 +195,9 @@ INTERFACE Z100085_zif_proubc_Ident PUBLIC.
 * Response: 200
   METHODS listtokens
     IMPORTING
-      content_type TYPE string
-      name TYPE string
-    RAISING cx_static_check.
+              content_type TYPE string
+              name         TYPE string
+    RAISING   cx_static_check.
 
 * POST - "Authorize long-term token"
 * Operation id: Authorizelong-termtoken
@@ -196,10 +205,10 @@ INTERFACE Z100085_zif_proubc_Ident PUBLIC.
 * Body ref: #/components/schemas/Authorizelong-termtokenRequest
   METHODS authorizelong_termtoken
     IMPORTING
-      body TYPE authorizelong_termtokenrequest
-    exporting
-      apiresponse type ref to data
-    RAISING cx_static_check.
+              body        TYPE authorizelong_termtokenrequest
+    EXPORTING
+              apiresponse TYPE REF TO data
+    RAISING   cx_static_check.
 
 * PUT - "Update user"
 * Operation id: Updateuser
@@ -208,9 +217,9 @@ INTERFACE Z100085_zif_proubc_Ident PUBLIC.
 * Body ref: #/components/schemas/UpdateuserRequest
   METHODS updateuser
     IMPORTING
-      name TYPE string
-      body TYPE updateuserrequest
-    RAISING cx_static_check.
+              name TYPE string
+              body TYPE updateuserrequest
+    RAISING   cx_static_check.
 
 * DELETE - "Revoke token"
 * Operation id: Revoketoken
@@ -218,8 +227,8 @@ INTERFACE Z100085_zif_proubc_Ident PUBLIC.
 * Response: 200
   METHODS revoketoken
     IMPORTING
-      content_type TYPE string
-    RAISING cx_static_check.
+              content_type TYPE string
+    RAISING   cx_static_check.
 
 * POST - "Authentication"
 * Operation id: Authentication
@@ -227,10 +236,10 @@ INTERFACE Z100085_zif_proubc_Ident PUBLIC.
 * Body ref: #/components/schemas/AuthenticationRequest
   METHODS authentication
     IMPORTING
-      body TYPE authenticationrequest
-    exporting
-      apiresponse type ref to data
-    RAISING cx_static_check.
+              body        TYPE authenticationrequest
+    EXPORTING
+              apiresponse TYPE REF TO data
+    RAISING   cx_static_check.
 
 * GET - "List users Copy"
 * Operation id: ListusersCopy
@@ -238,8 +247,8 @@ INTERFACE Z100085_zif_proubc_Ident PUBLIC.
 * Response: 200
   METHODS listuserscopy
     IMPORTING
-      content_type TYPE string
-    RAISING cx_static_check.
+              content_type TYPE string
+    RAISING   cx_static_check.
 
 * POST - "Create user"
 * Operation id: Createuser
@@ -247,8 +256,8 @@ INTERFACE Z100085_zif_proubc_Ident PUBLIC.
 * Body ref: #/components/schemas/CreateuserRequest
   METHODS createuser
     IMPORTING
-      body TYPE createuserrequest
-    RAISING cx_static_check.
+              body TYPE createuserrequest
+    RAISING   cx_static_check.
 
 * GET - "Get user detail"
 * Operation id: Getuserdetail
@@ -258,10 +267,10 @@ INTERFACE Z100085_zif_proubc_Ident PUBLIC.
 * Response: 200
   METHODS getuserdetail
     IMPORTING
-      content_type TYPE string
-      name TYPE string
-      user_id TYPE string
-    RAISING cx_static_check.
+              content_type TYPE string
+              name         TYPE string
+              user_id      TYPE string
+    RAISING   cx_static_check.
 
 * DELETE - "Delete user"
 * Operation id: Deleteuser
@@ -270,8 +279,8 @@ INTERFACE Z100085_zif_proubc_Ident PUBLIC.
 * Response: 200
   METHODS deleteuser
     IMPORTING
-      content_type TYPE string
-      user_id TYPE string
-    RAISING cx_static_check.
+              content_type TYPE string
+              user_id      TYPE string
+    RAISING   cx_static_check.
 
 ENDINTERFACE.

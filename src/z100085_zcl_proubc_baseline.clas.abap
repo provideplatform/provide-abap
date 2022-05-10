@@ -229,9 +229,9 @@ CLASS z100085_zcl_proubc_baseline DEFINITION PUBLIC.
       IMPORTING iv_prefix                          TYPE string
       RETURNING VALUE(response_listworkgroupusers) TYPE z100085_zif_proubc_baseline=>response_listworkgroupusers
       RAISING   cx_static_check.
-    methods set_bearer_token importing iv_tokenstring type string.
-    methods get_bearer_token
-      raising cx_static_check.
+    METHODS set_bearer_token IMPORTING iv_tokenstring TYPE string.
+    METHODS get_bearer_token
+      RAISING cx_static_check.
 ENDCLASS.
 
 
@@ -780,7 +780,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE 'https://baseline.provide.network/accounts'.
-    data lv_bearertoken type string.
+    DATA lv_bearertoken TYPE string.
     mi_client->request->set_method( 'POST' ).
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
 * todo, set body, #/components/schemas/Account
@@ -823,12 +823,35 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD Z100085_zif_proubc_baseline~authentication.
+
+    "TODO add the code for basic auth - this code works for /tokens but not /authenticate
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE 'https://baseline.provide.network/authenticate'.
+    DATA lv_authpayload TYPE Z100085_zif_proubc_Ident=>authorizelong_termtokenrequest.
+    DATA lv_longtermrequestdata TYPE REF TO data.
+    DATA lv_requeststr TYPE string.
+
     mi_client->request->set_method( 'POST' ).
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
-* todo, set body, #/components/schemas/AuthenticationRequest
+    lv_authpayload-scope = 'offline_access'.
+    lv_authpayload-organization_id = iv_tenantid.
+
+    z100085_zcl_proubc_api_helper=>copy_data_to_ref( EXPORTING is_data = lv_authpayload
+                      CHANGING cr_data = lv_longtermrequestdata  ).
+
+    lv_requeststr = /ui2/cl_json=>serialize( EXPORTING data = lv_longtermrequestdata
+                                       pretty_name = /ui2/cl_json=>pretty_mode-low_case ).
+
+    mi_client->request->set_cdata(
+      EXPORTING
+        data   =  lv_requeststr
+*        offset = 0
+*        length = -1
+    ).
+
+
+    me->set_bearer_token( EXPORTING iv_tokenstring = body ).
     me->get_bearer_token( ).
     lv_code = send_receive( ).
     WRITE / lv_code.
@@ -841,6 +864,49 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
         " todo, raise
     ENDCASE.
   ENDMETHOD.
+
+
+    METHOD Z100085_zif_proubc_baseline~bearerauthentication.
+    DATA lv_code TYPE i.
+    DATA lv_temp TYPE string.
+    DATA lv_uri TYPE string VALUE 'https://baseline.provide.network/tokens'.
+    DATA lv_authpayload TYPE Z100085_zif_proubc_Ident=>authorizelong_termtokenrequest.
+    DATA lv_longtermrequestdata TYPE REF TO data.
+    DATA lv_requeststr TYPE string.
+
+    mi_client->request->set_method( 'POST' ).
+    mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
+    lv_authpayload-scope = 'offline_access'.
+    lv_authpayload-organization_id = iv_tenantid.
+
+    z100085_zcl_proubc_api_helper=>copy_data_to_ref( EXPORTING is_data = lv_authpayload
+                      CHANGING cr_data = lv_longtermrequestdata  ).
+
+    lv_requeststr = /ui2/cl_json=>serialize( EXPORTING data = lv_longtermrequestdata
+                                       pretty_name = /ui2/cl_json=>pretty_mode-low_case ).
+
+    mi_client->request->set_cdata(
+      EXPORTING
+        data   =  lv_requeststr
+*        offset = 0
+*        length = -1
+    ).
+
+
+    me->set_bearer_token( EXPORTING iv_tokenstring = body ).
+    me->get_bearer_token( ).
+    lv_code = send_receive( ).
+    WRITE / lv_code.
+    CASE lv_code.
+      WHEN 201. " Created
+        " application/json,#/components/schemas/AuthenticationResponse
+        CREATE OBJECT mo_json EXPORTING iv_json = mi_client->response->get_cdata( ).
+        return_data = parse_authenticationresponse( '' ).
+      WHEN 401.
+        " todo, raise
+    ENDCASE.
+  ENDMETHOD.
+
 
   METHOD Z100085_zif_proubc_baseline~listconnectors.
     DATA lv_code TYPE i.
@@ -2571,19 +2637,19 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
     ENDCASE.
   ENDMETHOD.
 
-  method set_bearer_token.
+  METHOD set_bearer_token.
     "todo add method implementation to retrive auth token from refresh token
     authtoken = iv_tokenstring.
-  endmethod.
+  ENDMETHOD.
 
-  method get_bearer_token.
-    data lv_bearertoken type string.
+  METHOD get_bearer_token.
+    DATA lv_bearertoken TYPE string.
     "todo check auth token is valid (not empty or expired)
-    CONCATENATE 'Bearer' authtoken into lv_bearertoken separated by space.
+    CONCATENATE 'Bearer' authtoken INTO lv_bearertoken SEPARATED BY space.
     mi_client->request->set_header_field(
       EXPORTING
         name  = 'Authorization'    " Name of the header field
-        value = 'Bearer <your token>'    " HTTP header field value
+        value = lv_bearertoken    " HTTP header field value
     ).
-  endmethod.
+  ENDMETHOD.
 ENDCLASS.

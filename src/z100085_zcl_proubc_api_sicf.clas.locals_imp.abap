@@ -2,29 +2,22 @@
 *"* local helper classes, interface definitions and type
 *"* declarations
 
-types: begin of ty_prvd_tenant,
-        organization_id  type char64,
-        bpi_endpoint     type char255,
-        ident_endpoint   type char255,
-        refresh_token    type Z100085_PRVDREFRESHTOKEN,
-       end of ty_prvd_tenant.
-
-class lcl_prvd_tenant definition.
-public section.
-  Data: organization_id  type char64,
-        bpi_endpoint     type char255,
-        ident_endpoint   type char255,
-        refresh_token    type Z100085_PRVDREFRESHTOKEN.
-protected section.
-private section.
-endclass.
-
-class lcl_prvd_tenant implementation.
-endclass.
-
 "todo add error msg handling
-class lcl_errormsg definition.
-endclass.
+CLASS lcl_errormsg DEFINITION.
+ENDCLASS.
 
-class lcl_errormsg implementation.
-endclass.
+CLASS lcl_errormsg IMPLEMENTATION.
+ENDCLASS.
+
+CLASS lcl_default_handler DEFINITION INHERITING FROM cl_rest_resource.
+  PUBLIC SECTION.
+    METHODS: if_rest_resource~get REDEFINITION.
+  PROTECTED SECTION.
+  PRIVATE SECTION.
+ENDCLASS.
+
+CLASS lcl_default_handler IMPLEMENTATION.
+  METHOD if_rest_resource~get.
+
+  ENDMETHOD.
+ENDCLASS.

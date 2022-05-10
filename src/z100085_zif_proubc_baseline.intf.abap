@@ -568,6 +568,22 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
   METHODS authentication
     IMPORTING
       body TYPE authenticationrequest
+      iv_tenantid type z100085_prvdtenantid
+    RETURNING
+      VALUE(return_data) TYPE authenticationresponse
+    RAISING cx_static_check.
+
+
+* POST - "Bearer authentication"
+* Operation id: Authentication
+* Response: 201
+*     application/json, #/components/schemas/AuthenticationResponse
+* Response: 401
+* Body ref: #/components/schemas/AuthenticationRequest
+  METHODS bearerauthentication
+    IMPORTING
+      body TYPE authenticationrequest
+      iv_tenantid type z100085_prvdtenantid
     RETURNING
       VALUE(return_data) TYPE authenticationresponse
     RAISING cx_static_check.

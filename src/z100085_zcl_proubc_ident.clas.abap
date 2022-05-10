@@ -41,6 +41,10 @@ CLASS Z100085_zcl_proubc_ident DEFINITION PUBLIC GLOBAL FRIENDS Z100085_zcl_prou
       IMPORTING iv_prefix                    TYPE string
       RETURNING VALUE(authenticationrequest) TYPE Z100085_zif_proubc_ident=>authenticationrequest
       RAISING   cx_static_check.
+    METHODS parse_longauthenticationresp
+      IMPORTING iv_prefix                    TYPE string
+      RETURNING VALUE(authenticationresponse) TYPE Z100085_zif_proubc_ident=>authorizelongtermtokenresponse
+      RAISING   cx_static_check.
     METHODS parse_createuserrequest
       IMPORTING iv_prefix                TYPE string
       RETURNING VALUE(createuserrequest) TYPE Z100085_zif_proubc_ident=>createuserrequest
@@ -97,6 +101,14 @@ CLASS Z100085_zcl_proubc_ident IMPLEMENTATION.
   METHOD parse_authorizelong_termtokenr.
     authorizelong_termtokenrequest-scope = mo_json->value_string( iv_prefix && '/scope' ).
     authorizelong_termtokenrequest-organization_id = mo_json->value_string( iv_prefix && '/organization_id' ).
+  ENDMETHOD.
+
+  method parse_longauthenticationresp.
+    authenticationresponse-id = mo_json->value_string( iv_prefix && '/id' ).
+    authenticationresponse-access_token = mo_json->value_string( iv_prefix && '/access_token' ).
+    authenticationresponse-refresh_token = mo_json->value_string( iv_prefix && '/refresh_token' ).
+    authenticationresponse-expires_in = mo_json->value_integer( iv_prefix && '/expires_in' ).
+    authenticationresponse-permissions = mo_json->value_integer( iv_prefix && '/permissions' ).
   ENDMETHOD.
 
   METHOD parse_authenticationrequest.
@@ -335,28 +347,16 @@ CLASS Z100085_zcl_proubc_ident IMPLEMENTATION.
 *        length = -1
     ).
 
-*    DATA: lv_wtfman                     TYPE REF TO data,
-*          lv_wtfstr TYPE string.
-*    mi_client->request->get_data(
-**      EXPORTING
-**        offset             = 0
-**        length             = -1
-**        virus_scan_profile = '/SIHTTP/HTTP_UPLOAD'
-**        vscan_scan_always  = if_http_entity=>co_content_check_profile
-*      RECEIVING
-*        data               =  lv_wtfstr
-*    ).
 
     me->get_refresh_bearer_token( ).
-
-    data(lv_wtfauth) = mi_client->request->get_header_field( name = 'authorization' ).
-    data(lv_wtfauth2) = mi_client->request->get_header_field( name = 'Authorization' ).
 
     lv_code = send_receive( ).
     WRITE / lv_code.
     CASE lv_code.
       WHEN 200 OR 201 OR 202.
-         lv_authresponsestr = mi_client->response->get_cdata( ).
+        data: lv_parsedresponse type Z100085_zif_proubc_ident=>authorizelongtermtokenresponse.
+        lv_authresponsestr = mi_client->response->get_cdata( ).
+        "lv_parsedresponse = me->parse_longauthenticationresp( exporting iv_prefix = lv_authresponsestr ).
         /ui2/cl_json=>deserialize( EXPORTING json = lv_authresponsestr CHANGING data =  apiresponse ).
     ENDCASE.
   ENDMETHOD.
@@ -495,13 +495,10 @@ CLASS Z100085_zcl_proubc_ident IMPLEMENTATION.
     CONCATENATE 'bearer' refreshtoken INTO lv_bearertoken SEPARATED BY space.
     mi_client->request->set_header_field(
       EXPORTING
-        name  = 'authorization'    " Name of the header field
-        value = lv_bearertoken    " HTTP header field value
-    ).
+        name  = 'authorization'
+        value = lv_bearertoken
+    ). "HINT: if this authorization does not appear to work, check token length
 
-    data(lv_tokenlength) = strlen( lv_bearertoken ).
-    condense lv_bearertoken.
-    data(lv_condensedtokent) = strlen( lv_bearertoken ).
   ENDMETHOD.
 
   METHOD get_authtoken.

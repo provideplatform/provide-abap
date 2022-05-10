@@ -110,17 +110,7 @@ CLASS z100085_zcl_proubc_api_sicf IMPLEMENTATION.
             /ui2/cl_json=>serialize(
               EXPORTING
                 data             = lv_tenantdata
-*            compress         =
-*            name             =
 *            pretty_name      =
-*            type_descr       =
-*            assoc_arrays     =
-*            ts_as_iso8601    =
-*            expand_includes  =
-*            assoc_arrays_opt =
-*            numc_as_string   =
-*            name_mappings    =
-*            conversion_exits =
               RECEIVING
                 r_json           = lv_data
             ).
@@ -403,11 +393,15 @@ CLASS z100085_zcl_proubc_api_sicf IMPLEMENTATION.
     "    " /proubc/tenants/{id}/proxy handler
       lo_router->attach( iv_template = '/tenants'   iv_handler_class = 'Z100085_ZCL_PROUBC_TENANTSAPI' ).
        lo_router->attach( iv_template = '/tenants/{ID}' iv_handler_class = 'Z100085_ZCL_PROUBC_TENANTSAPI' ).
-    "    " /proubc/status health check
+    "    " /proubc/status health check returns 204 if SAP is up
+       lo_router->attach( iv_template = '/status' iv_handler_class = 'Z100085_ZCL_PROUBC_HEALTHAPI' ).
     "    " /proubc/business_objects/{id}/status
+       lo_router->attach( iv_template = '/business_objects/{ID}/status' iv_handler_class = 'Z100085_ZCL_PROUBC_BUSOBJAPI' ).
+       lo_router->attach( iv_template = '/business_object_models' iv_handler_class = 'Z100085_ZCL_PROUBC_BOMODELAPI' ).
     "    " /proubc/business_object_models/?=recordType
     "    " /proubc/proxies
     "    " /proubc/auth
+       lo_router->attach( iv_template = '/auth' iv_handler_class = 'Z100085_ZCL_PROUBC_AUTHAPI').
      ro_root_handler = lo_router.
   ENDMETHOD.
 ENDCLASS.
