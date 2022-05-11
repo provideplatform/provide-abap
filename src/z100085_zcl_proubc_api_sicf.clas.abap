@@ -391,7 +391,7 @@ CLASS z100085_zcl_proubc_api_sicf IMPLEMENTATION.
   METHOD if_rest_application~get_root_handler.
      DATA(lo_router) = NEW cl_rest_router( ).
     "    " /proubc/tenants/{id}/proxy handler
-      lo_router->attach( iv_template = '/tenants'   iv_handler_class = 'Z100085_ZCL_PROUBC_TENANTSAPI' ).
+       lo_router->attach( iv_template = '/tenants'   iv_handler_class = 'Z100085_ZCL_PROUBC_TENANTSAPI' ).
        lo_router->attach( iv_template = '/tenants/{ID}' iv_handler_class = 'Z100085_ZCL_PROUBC_TENANTSAPI' ).
     "    " /proubc/status health check returns 204 if SAP is up
        lo_router->attach( iv_template = '/status' iv_handler_class = 'Z100085_ZCL_PROUBC_HEALTHAPI' ).
@@ -402,6 +402,8 @@ CLASS z100085_zcl_proubc_api_sicf IMPLEMENTATION.
     "    " /proubc/proxies
     "    " /proubc/auth
        lo_router->attach( iv_template = '/auth' iv_handler_class = 'Z100085_ZCL_PROUBC_AUTHAPI').
+       lo_router->attach( iv_template = '/schemas'   iv_handler_class = 'Z100085_ZCL_IDOCAPI_BTYPEAPI' ).
+       lo_router->attach( iv_template = '/schemas/{basictypeid}'   iv_handler_class = 'Z100085_ZCL_IDOCAPI_SEGMENTAPI' ).
      ro_root_handler = lo_router.
   ENDMETHOD.
 ENDCLASS.
