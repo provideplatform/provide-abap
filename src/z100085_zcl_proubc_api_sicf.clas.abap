@@ -390,17 +390,20 @@ CLASS z100085_zcl_proubc_api_sicf IMPLEMENTATION.
 
   METHOD if_rest_application~get_root_handler.
      DATA(lo_router) = NEW cl_rest_router( ).
-    "    " /proubc/tenants/{id}/proxy handler
        lo_router->attach( iv_template = '/tenants'   iv_handler_class = 'Z100085_ZCL_PROUBC_TENANTSAPI' ).
        lo_router->attach( iv_template = '/tenants/{ID}' iv_handler_class = 'Z100085_ZCL_PROUBC_TENANTSAPI' ).
-    "    " /proubc/status health check returns 204 if SAP is up
        lo_router->attach( iv_template = '/status' iv_handler_class = 'Z100085_ZCL_PROUBC_HEALTHAPI' ).
-    "    " /proubc/business_objects/{id}/status
-       lo_router->attach( iv_template = '/business_objects/{ID}/status' iv_handler_class = 'Z100085_ZCL_PROUBC_BUSOBJAPI' ).
-       lo_router->attach( iv_template = '/business_object_models' iv_handler_class = 'Z100085_ZCL_PROUBC_BOMODELAPI' ).
-    "    " /proubc/business_object_models/?=recordType
-    "    " /proubc/proxies
-    "    " /proubc/auth
+
+       "middleware tells SAP to create a new object (ex: sales order)
+       lo_router->attach( iv_template = '/objects' iv_handler_class = 'Z100085_ZCL_PROUBC_BUSOBJAPI' ).
+       "middleware tells SAP to update existing object by id. Are we querying by object ID or by baseline ID?
+       lo_router->attach( iv_template = '/objects/{ID}' iv_handler_class = 'Z100085_ZCL_PROUBC_OBJIDAPI' ).
+       " { table struct + type: ""} type ===
+       "middleware tells SAP to update status in BPI table
+       lo_router->attach( iv_template = '/objects/{ID}/status' iv_handler_class = 'Z100085_ZCL_PROUBC_OBJSTATAPI' ).
+
+       " { status: "something", baseline_id: ""}
+
        lo_router->attach( iv_template = '/auth' iv_handler_class = 'Z100085_ZCL_PROUBC_AUTHAPI').
        lo_router->attach( iv_template = '/schemas'   iv_handler_class = 'Z100085_ZCL_IDOCAPI_BTYPEAPI' ).
        lo_router->attach( iv_template = '/schemas/{basictypeid}'   iv_handler_class = 'Z100085_ZCL_IDOCAPI_SEGMENTAPI' ).

@@ -18,9 +18,6 @@ CLASS Z100085_ZCL_IDOCAPI_SEGMENTAPI IMPLEMENTATION.
 
 
   METHOD if_rest_resource~get.
-*CALL METHOD SUPER->IF_REST_RESOURCE~GET
-*    .
-
     DATA: lv_selectedbasictype TYPE string,
           ls_basictypes        TYPE z100085_zif_idocapi_typelist=>ty_basictype,
           ls_responsedata      TYPE z100085_zif_idocapi_typelist=>ty_basictype_w_segments,
@@ -32,8 +29,6 @@ CLASS Z100085_ZCL_IDOCAPI_SEGMENTAPI IMPLEMENTATION.
       lv_selectedbasictype = <fs_basictype>-value.
       LV_IDOCTYPE = LV_SELECTEDBASICTYPE.
     ENDIF.
-
-    "lV_selectedbasictype = 'ORDERS05'.
 
     "get the selected idoc Basic type
     SELECT SINGLE  a~idoctyp,
