@@ -67,7 +67,8 @@ CLASS z100085_zcl_proubc_objidapi IMPLEMENTATION.
 
     DATA: ls_obj      TYPE z100085_bpiobj,
           lt_obj      TYPE z100085_ztty_bpiobj,
-          lt_resp_obj TYPE z100085_ztty_bpiobj.
+          lt_resp_obj TYPE z100085_ztty_bpiobj,
+          ls_resp_obj type z100085_bpiobj.
 
     ls_obj-baseline_id = ls_objects-baseline_id.
     READ TABLE lt_uriattributes WITH KEY name = 'ID' ASSIGNING FIELD-SYMBOL(<fs_object_put>).
@@ -78,6 +79,8 @@ CLASS z100085_zcl_proubc_objidapi IMPLEMENTATION.
     ENDIF.
     "/objects/{ID}
 
+    append ls_obj to lt_obj.
+
     z100085_zcl_proubc_busobjhlpr=>update_object(
       EXPORTING
         it_objects =  lt_obj
@@ -85,16 +88,18 @@ CLASS z100085_zcl_proubc_objidapi IMPLEMENTATION.
         et_objects = lt_resp_obj
     ).
 
+   read table lt_resp_obj index 1 into ls_resp_obj.
+
     z100085_zcl_proubc_api_helper=>copy_data_to_ref(
-           EXPORTING is_data = lt_resp_obj
+           EXPORTING is_data = ls_resp_obj
            CHANGING cr_data = lv_bpiobjdata
    ).
 
 
     lo_entity = mo_response->create_entity( ).
-    lo_entity->set_content_type( if_rest_media_type=>gc_appl_json ).
-    lo_entity->set_string_data( /ui2/cl_json=>serialize( EXPORTING data = lv_bpiobjdata pretty_name = /ui2/cl_json=>pretty_mode-low_case ) ).
-    mo_response->set_status( cl_rest_status_code=>gc_success_ok ).
+    "lo_entity->set_content_type( if_rest_media_type=>gc_appl_json ).
+    "lo_entity->set_string_data( /ui2/cl_json=>serialize( EXPORTING data = lv_bpiobjdata pretty_name = /ui2/cl_json=>pretty_mode-low_case ) ).
+    mo_response->set_status( cl_rest_status_code=>gc_success_no_content ).
 
   ENDMETHOD.
 

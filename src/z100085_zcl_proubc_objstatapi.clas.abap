@@ -32,7 +32,7 @@ CLASS z100085_zcl_proubc_objstatapi IMPLEMENTATION.
         EXPORTING
           iv_objectid = lv_objectid
         IMPORTING
-          es_objects  = ls_status_response
+          es_objectstat = ls_status_response
       ).
     ELSE.
     ENDIF.
@@ -72,9 +72,9 @@ CLASS z100085_zcl_proubc_objstatapi IMPLEMENTATION.
       z100085_zcl_proubc_busobjhlpr=>update_object_status(
         EXPORTING
           iv_objectid = lv_objectid
-          is_object   = ls_objectstat
+          is_objectstat   = ls_objectstat
         IMPORTING
-          et_objects  = ls_resp_objstat
+          es_objectstat  = ls_resp_objstat
       ).
     ENDIF.
 

@@ -14,6 +14,6 @@ ENDCLASS.
 
 CLASS z100085_zcl_proubc_healthapi IMPLEMENTATION.
   METHOD if_rest_resource~get.
-    mo_response->set_status( cl_rest_status_code=>gc_success_ok ).
+    mo_response->set_status( cl_rest_status_code=>gc_success_no_content ).
   ENDMETHOD.
 ENDCLASS.
