@@ -24,10 +24,8 @@ CLASS z100085_zcl_proubc_tenantsapi IMPLEMENTATION.
           lv_mime            TYPE string,
           lv_url             TYPE string,
           lv_tenantid        TYPE z100085_zs_prvdorg-organization_id,
-          lt_prvdtenants     TYPE z100085_ztt_prvdorg,
-          ls_prvdtenant      TYPE z100085_prvdorgs,
-          lt_prvdtenants_in  TYPE z100085_ztt_prvdorg,
-          lt_prvdtenants_out TYPE z100085_ztt_prvdorg,
+          lt_prvdtenants     TYPE z100085_zif_proubc_tenants=>tty_tenant_wo_token,
+          ls_prvdtenant      TYPE z100085_zif_proubc_tenants=>ty_tenant_wo_token,
           "lo_entity          type ref to if_rest_response,
           lv_tenantdata      TYPE REF TO data.
 
@@ -51,7 +49,7 @@ CLASS z100085_zcl_proubc_tenantsapi IMPLEMENTATION.
 
     ELSE.
 
-
+    "TODO: add reachable true/false. call the bpi endpoints
       z100085_zcl_proubc_prvdtenants=>get_allprvdtenant( IMPORTING et_prvdorg = lt_prvdtenants ).
       z100085_zcl_proubc_api_helper=>copy_data_to_ref(
             EXPORTING is_data = lt_prvdtenants
@@ -81,7 +79,7 @@ CLASS z100085_zcl_proubc_tenantsapi IMPLEMENTATION.
     DATA(lo_entity) = mo_response->create_entity( ).
     lo_entity->set_content_type( if_rest_media_type=>gc_appl_json ).
     lo_entity->set_string_data( /ui2/cl_json=>serialize( exporting data = lv_tenantdata pretty_name = /ui2/cl_json=>pretty_mode-low_case ) ).
-    mo_response->set_status( cl_rest_status_code=>gc_success_ok ).
+    mo_response->set_status( cl_rest_status_code=>gc_success_created ).
   ENDMETHOD.
 
   METHOD if_rest_resource~put.
@@ -100,8 +98,8 @@ CLASS z100085_zcl_proubc_tenantsapi IMPLEMENTATION.
     ).
     DATA(lo_entity) = mo_response->create_entity( ).
     lo_entity->set_content_type( if_rest_media_type=>gc_appl_json ).
-    lo_entity->set_string_data( /ui2/cl_json=>serialize( exporting data = lv_tenantdata pretty_name = /ui2/cl_json=>pretty_mode-low_case  ) ).
-    mo_response->set_status( cl_rest_status_code=>gc_success_ok ).
+    "lo_entity->set_string_data( /ui2/cl_json=>serialize( exporting data = lv_tenantdata pretty_name = /ui2/cl_json=>pretty_mode-low_case  ) ).
+    mo_response->set_status( cl_rest_status_code=>gc_success_no_content ).
   ENDMETHOD.
 
   METHOD if_rest_resource~delete.
@@ -113,6 +111,6 @@ CLASS z100085_zcl_proubc_tenantsapi IMPLEMENTATION.
       z100085_zcl_proubc_prvdtenants=>delete_prvdtenant( IMPORTING ev_prvdorgid = lv_tenantid ).
     ENDIF.
     "TODO add a delete response if totally necessary....
-
+     mo_response->set_status( cl_rest_status_code=>gc_success_no_content ).
   ENDMETHOD.
 ENDCLASS.

@@ -9,10 +9,10 @@ CLASS z100085_zcl_proubc_prvdtenants DEFINITION
       IMPORTING
         !iv_prvdtenant TYPE z100085_prvdtenantid
       EXPORTING
-        !ev_prvdtenant TYPE z100085_prvdorgs .
+        !ev_prvdtenant TYPE z100085_zif_proubc_tenants=>ty_tenant_wo_token.
     CLASS-METHODS get_allprvdtenant
       EXPORTING
-        !et_prvdorg TYPE z100085_ztt_prvdorg .
+        !et_prvdorg TYPE  z100085_zif_proubc_tenants=>tty_tenant_wo_token..
     CLASS-METHODS create_prvdtenant
       IMPORTING
         !it_prvdorg TYPE z100085_ztt_prvdorg
@@ -85,24 +85,27 @@ CLASS z100085_zcl_proubc_prvdtenants IMPLEMENTATION.
   METHOD delete_prvdtenant.
     "TODO add SAP auth
 
-    if ev_prvdorgid is not INITIAL.
-    DELETE FROM z100085_prvdorgs WHERE organization_id = ev_prvdorgid.
-    IF sy-subrc = 0.
-      "todo Add some logging for this
-    ELSE. "delete failed. why?
-      "TODO raise exception here
+    IF ev_prvdorgid IS NOT INITIAL.
+      DELETE FROM z100085_prvdorgs WHERE organization_id = ev_prvdorgid.
+      IF sy-subrc = 0.
+        "todo Add some logging for this
+      ELSE. "delete failed. why?
+        "TODO raise exception here
+      ENDIF.
+    ELSE.
+      "TODO raise exception msg here
     ENDIF.
-    else.
-    "TODO raise exception msg here
-    endif.
 
 
   ENDMETHOD.
 
 
   METHOD get_allprvdtenant.
-    DATA: lt_prvdorg TYPE TABLE OF z100085_prvdorgs,
-          ls_prvdorg TYPE z100085_zs_prvdorg.
+    DATA: lt_prvdorg    TYPE TABLE OF z100085_prvdorgs,
+          ls_prvdorg    TYPE z100085_zif_proubc_tenants=>ty_tenant_wo_token,
+          lo_api_helper TYPE REF TO z100085_zcl_proubc_api_helper.
+
+    lo_api_helper = NEW z100085_zcl_proubc_api_helper( ).
     SELECT * FROM z100085_prvdorgs INTO TABLE lt_prvdorg.
     IF sy-subrc = 0.
     ELSEIF sy-subrc EQ 4. "can't find it. thats ok
@@ -115,15 +118,15 @@ CLASS z100085_zcl_proubc_prvdtenants IMPLEMENTATION.
 
     LOOP AT lt_prvdorg ASSIGNING FIELD-SYMBOL(<fs_prvdorg>).
       CLEAR ls_prvdorg.
+      ls_prvdorg-mandt = <fs_prvdorg>-mandt.
       ls_prvdorg-organization_id = <fs_prvdorg>-organization_id.
       ls_prvdorg-ident_endpoint = <fs_prvdorg>-ident_endpoint.
       ls_prvdorg-bpi_endpoint = <fs_prvdorg>-bpi_endpoint.
-      ls_prvdorg-createdby = <fs_prvdorg>-createdby.
+      ls_prvdorg-created_by = <fs_prvdorg>-createdby.
       ls_prvdorg-created_at = <fs_prvdorg>-created_at.
-      ls_prvdorg-changedby = <fs_prvdorg>-changedby.
+      ls_prvdorg-changed_by = <fs_prvdorg>-changedby.
       ls_prvdorg-changed_at = <fs_prvdorg>-changed_at.
-      ls_prvdorg-refresh_token = <fs_prvdorg>-refresh_token.
-      ls_prvdorg-refresh_tokenext = <fs_prvdorg>-refresh_tokenext.
+      "ls_prvdorg-reachable = abap_false. "TODO add call to BPI endpoint
       APPEND ls_prvdorg TO et_prvdorg.
     ENDLOOP.
 
@@ -131,10 +134,27 @@ CLASS z100085_zcl_proubc_prvdtenants IMPLEMENTATION.
 
 
   METHOD get_prvdtenant.
-    DATA: ls_prvdorg TYPE z100085_prvdorgs.
+    DATA: ls_prvdorg    TYPE z100085_prvdorgs,
+          lo_api_helper TYPE REF TO z100085_zcl_proubc_api_helper.
+
+    lo_api_helper = NEW z100085_zcl_proubc_api_helper( ).
     SELECT SINGLE * FROM z100085_prvdorgs INTO ls_prvdorg WHERE organization_id = iv_prvdtenant.
     IF sy-subrc = 0.
-      ev_prvdtenant = ls_prvdorg.
+      ev_prvdtenant-bpi_endpoint = ls_prvdorg-bpi_endpoint.
+      ev_prvdtenant-changed_at = ls_prvdorg-changed_at.
+      ev_prvdtenant-changed_by = ls_prvdorg-changedby.
+      ev_prvdtenant-created_at = ls_prvdorg-created_at.
+      ev_prvdtenant-created_by = ls_prvdorg-createdby.
+      ev_prvdtenant-ident_endpoint = ls_prvdorg-ident_endpoint.
+      ev_prvdtenant-mandt = ls_prvdorg-mandt.
+      ev_prvdtenant-organization_id = ls_prvdorg-organization_id.
+      lo_api_helper->baseline_health_check(
+        EXPORTING
+          iv_tenant      =  ls_prvdorg-organization_id
+        IMPORTING
+          ev_isreachable = ev_prvdtenant-reachable
+      ).
+      "ev_prvdtenant-reachable = abap_false. "TODO call the bpi health check
     ELSEIF sy-subrc EQ 4. "can't find it. thats ok
     ELSEIF sy-subrc EQ 8. "problem with the db
     ELSE. "general error wtf

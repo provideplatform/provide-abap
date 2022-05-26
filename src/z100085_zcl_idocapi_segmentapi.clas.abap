@@ -14,20 +14,21 @@ ENDCLASS.
 
 
 
-CLASS Z100085_ZCL_IDOCAPI_SEGMENTAPI IMPLEMENTATION.
+CLASS z100085_zcl_idocapi_segmentapi IMPLEMENTATION.
 
 
   METHOD if_rest_resource~get.
     DATA: lv_selectedbasictype TYPE string,
           ls_basictypes        TYPE z100085_zif_idocapi_typelist=>ty_basictype,
           ls_responsedata      TYPE z100085_zif_idocapi_typelist=>ty_basictype_w_segments,
-          LV_IDOCTYPE          TYPE LEDID_IDOCTYPE.
+          lv_idoctype          TYPE ledid_idoctype.
 
     DATA(lt_uriattributes) = mo_request->get_uri_attributes( ).
     READ TABLE lt_uriattributes WITH KEY name = 'basictypeid' ASSIGNING FIELD-SYMBOL(<fs_basictype>).
     IF sy-subrc = 0.
       lv_selectedbasictype = <fs_basictype>-value.
-      LV_IDOCTYPE = LV_SELECTEDBASICTYPE.
+      REPLACE ALL OCCURRENCES OF '%2F' IN lv_selectedbasictype WITH '/'.
+      lv_idoctype = lv_selectedbasictype.
     ENDIF.
 
     "get the selected idoc Basic type
@@ -53,23 +54,23 @@ CLASS Z100085_ZCL_IDOCAPI_SEGMENTAPI IMPLEMENTATION.
 
     ls_responsedata-basictype = ls_basictypes.
 
-    GET PARAMETER ID 'SEG' FIELD data(l_segtyp).
-    GET PARAMETER ID 'IDC' FIELD data(l_idoctyp).
-    GET PARAMETER ID 'CIM' FIELD data(l_cimtyp).
-    GET PARAMETER ID 'EDIDEF_OBJTYP' FIELD data(l_type). "settings from we30
-    GET PARAMETER ID 'EDD' FIELD data(l_object).
-    GET PARAMETER ID 'EDI_SELDOCU' FIELD data(l_recsel). "record selection
+    GET PARAMETER ID 'SEG' FIELD DATA(l_segtyp).
+    GET PARAMETER ID 'IDC' FIELD DATA(l_idoctyp).
+    GET PARAMETER ID 'CIM' FIELD DATA(l_cimtyp).
+    GET PARAMETER ID 'EDIDEF_OBJTYP' FIELD DATA(l_type). "settings from we30
+    GET PARAMETER ID 'EDD' FIELD DATA(l_object).
+    GET PARAMETER ID 'EDI_SELDOCU' FIELD DATA(l_recsel). "record selection
 
-    data: lv_idoc_type type LEDID_IDOC_TYPE,
-          lt_IDOC_STRUCT TYPE LEDID_T_IDOC_STRUCT,
-          lt_SEGMENTS TYPE LEDID_T_SEGMENT,
-          lt_SEGMENT_STRUCT TYPE LEDID_T_SEGMENT_STRUCT.
+    DATA: lv_idoc_type      TYPE ledid_idoc_type,
+          lt_IDOC_STRUCT    TYPE ledid_t_idoc_struct,
+          lt_SEGMENTS       TYPE ledid_t_segment,
+          lt_SEGMENT_STRUCT TYPE ledid_t_segment_struct.
 
     "get the idoc segments
     CALL FUNCTION 'IDOC_TYPE_COMPLETE_READ'
       EXPORTING
         struct_type    = 'B'
-        idoctype       = LV_IDOCTYPE
+        idoctype       = lv_idoctype
         release        = ''
         applrel        = ''
         version        = '3'
@@ -82,14 +83,14 @@ CLASS Z100085_ZCL_IDOCAPI_SEGMENTAPI IMPLEMENTATION.
       EXCEPTIONS
         OTHERS         = 1.
 
-     ls_responsedata-idocstruct = lt_idoc_struct.
-     ls_responsedata-idocsegments = lt_segments.
-     ls_responsedata-segmentstruct = lt_segment_struct.
+    ls_responsedata-idocstruct = lt_idoc_struct.
+    ls_responsedata-idocsegments = lt_segments.
+    ls_responsedata-segmentstruct = lt_segment_struct.
 
     "create the json HTTP response
-     DATA(lo_entity) = mo_response->create_entity( ).
-     lo_entity->set_content_type( if_rest_media_type=>gc_appl_json ).
-     lo_entity->set_string_data( /ui2/cl_json=>serialize( exporting data = ls_responsedata pretty_name = /ui2/cl_json=>pretty_mode-low_case ) ).
-     mo_response->set_status( cl_rest_status_code=>gc_success_ok ).
+    DATA(lo_entity) = mo_response->create_entity( ).
+    lo_entity->set_content_type( if_rest_media_type=>gc_appl_json ).
+    lo_entity->set_string_data( /ui2/cl_json=>serialize( EXPORTING data = ls_responsedata pretty_name = /ui2/cl_json=>pretty_mode-low_case ) ).
+    mo_response->set_status( cl_rest_status_code=>gc_success_ok ).
   ENDMETHOD.
 ENDCLASS.

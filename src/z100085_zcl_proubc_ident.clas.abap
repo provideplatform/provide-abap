@@ -4,14 +4,14 @@ CLASS Z100085_zcl_proubc_ident DEFINITION PUBLIC GLOBAL FRIENDS Z100085_zcl_prou
   PUBLIC SECTION.
     INTERFACES Z100085_zif_proubc_ident.
     METHODS constructor IMPORTING ii_client       TYPE REF TO if_http_client
-                                  iv_tenant       TYPE string
+                                  iv_tenant       TYPE z100085_prvdtenantid
                                   iv_refreshtoken TYPE Z100085_PRVDREFRESHTOKEN.
   PROTECTED SECTION.
     DATA mi_client TYPE REF TO if_http_client.
     DATA mo_json TYPE REF TO Z100085_zcl_oapi_json.
     DATA authtoken TYPE Z100085_PRVDREFRESHTOKEN.
     DATA refreshtoken TYPE Z100085_PRVDREFRESHTOKEN.
-    DATA tenant TYPE string.
+    DATA tenant TYPE z100085_prvdtenantid.
     METHODS send_receive RETURNING VALUE(rv_code) TYPE i.
     METHODS parse_createapplicationrequest
       IMPORTING iv_prefix                       TYPE string
@@ -351,7 +351,7 @@ CLASS Z100085_zcl_proubc_ident IMPLEMENTATION.
     me->get_refresh_bearer_token( ).
 
     lv_code = send_receive( ).
-    WRITE / lv_code.
+    "WRITE / lv_code.
     CASE lv_code.
       WHEN 200 OR 201 OR 202.
         data: lv_parsedresponse type Z100085_zif_proubc_ident=>authorizelongtermtokenresponse.

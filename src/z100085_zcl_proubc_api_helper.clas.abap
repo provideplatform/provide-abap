@@ -17,13 +17,21 @@ CLASS z100085_zcl_proubc_api_helper DEFINITION
         CHANGING
           !cr_data TYPE REF TO data.
     METHODS:
-      call_ident_api IMPORTING iv_tenant TYPE z100085_prvdtenantid EXPORTING ev_authtoken TYPE REF TO data,
+      call_ident_api IMPORTING iv_tenant TYPE z100085_prvdtenantid EXPORTING ev_authtoken TYPE REF TO data
+                                                                             ev_bpiendpoint TYPE string,
       call_baseline_api,
       authenticate_ident_api_basic IMPORTING iv_userid   TYPE string
                                              iv_password TYPE z100085_casesensitive_str
                                    EXPORTING authtoken   TYPE REF TO data,
-      baseline_health_check.
+      baseline_health_check IMPORTING iv_tenant TYPE z100085_prvdtenantid EXPORTING ev_isreachable TYPE boolean,
+      setup_protocol_msg,
+      send_protocol_msg IMPORTING body TYPE z100085_zif_proubc_baseline=>protocolmessage_req EXPORTING statuscode TYPE i.
   PROTECTED SECTION.
+    DATA: lv_defaulttenant        TYPE z100085_prvdorgs-organization_id VALUE 'e41dea7b-3510-4ffa-8ff4-53f3b158c8b4',
+          lv_defaultidenttoken    TYPE REF TO data,
+          lv_defaultbaselinetoken TYPE REF TO data,
+          lo_ident_client         TYPE REF TO Z100085_zif_proubc_ident,
+          lo_baseline_client      TYPE REF TO z100085_zif_proubc_baseline.
   PRIVATE SECTION.
 ENDCLASS.
 
@@ -68,12 +76,16 @@ CLASS z100085_zcl_proubc_api_helper IMPLEMENTATION.
       lv_identurl        TYPE string,
       lv_apiresponse     TYPE REF TO data.
 
-    z100085_zcl_proubc_prvdtenants=>get_prvdtenant( EXPORTING iv_prvdtenant = iv_tenant
-                                                    IMPORTING ev_prvdtenant = ls_prvdtenant
-                                                      ).
+    "z100085_zcl_proubc_prvdtenants=>get_prvdtenant( EXPORTING iv_prvdtenant = iv_tenant
+    "                                               IMPORTING ev_prvdtenant = ls_prvdtenant
+    "                                                 ).
+
+    SELECT SINGLE * FROM z100085_prvdorgs INTO ls_prvdtenant WHERE organization_id = iv_tenant.
 
     CONCATENATE ls_prvdtenant-refresh_token ls_prvdtenant-refresh_tokenext INTO lv_refreshtokenstr.
     lv_identurl = ls_prvdtenant-ident_endpoint.
+
+    ev_bpiendpoint = ls_prvdtenant-bpi_endpoint.
 
     cl_http_client=>create_by_url(
       EXPORTING
@@ -89,14 +101,17 @@ CLASS z100085_zcl_proubc_api_helper IMPLEMENTATION.
       " error handling
     ENDIF.
 
+
+
     lo_http_client->propertytype_accept_cookie = if_http_client=>co_enabled.
     lo_http_client->request->set_header_field( name  = if_http_form_fields_sap=>sap_client value = '100' ).
 
-    lo_ident_api = NEW Z100085_zcl_proubc_ident( ii_client = lo_http_client iv_tenant = 'e41dea7b-3510-4ffa-8ff4-53f3b158c8b4' iv_refreshtoken = lv_refreshtokenstr  ).
+    lo_ident_api = NEW Z100085_zcl_proubc_ident( ii_client = lo_http_client iv_tenant = iv_tenant iv_refreshtoken = lv_refreshtokenstr  ).
+    lo_ident_client = lo_ident_api.
 
     DATA: authtokenreqbody TYPE z100085_zif_proubc_ident=>authorizelong_termtokenrequest.
 
-    authtokenreqbody-organization_id = 'e41dea7b-3510-4ffa-8ff4-53f3b158c8b4'.
+    authtokenreqbody-organization_id = iv_tenant.
     authtokenreqbody-scope = 'offline_access'.
 
     "lo_ident_api->
@@ -170,52 +185,145 @@ CLASS z100085_zcl_proubc_api_helper IMPLEMENTATION.
   ENDMETHOD.
   METHOD baseline_health_check.
     DATA:
-      lo_http_client           TYPE REF TO if_http_client,
-      lo_baseline_api          TYPE REF TO z100085_zif_proubc_baseline,
-      lv_authreq TYPE z100085_zif_proubc_baseline=>authenticationrequest,
-      lv_tenant_jwt            TYPE REF TO data.
+      lo_http_client  TYPE REF TO if_http_client,
+      lo_baseline_api TYPE REF TO z100085_zif_proubc_baseline,
+      lv_authreq      TYPE z100085_zif_proubc_baseline=>authenticationrequest,
+      lv_tenant_jwt   TYPE REF TO data,
+      lv_tenant       TYPE z100085_prvdtenantid,
+      lv_baseline_jwt TYPE REF TO data,
+      lv_code         TYPE i,
+      lv_bpiendpoint  TYPE string.
 
+    "TODO improve the error handling for invalid tenant ids
     "get the current auth token
-    me->call_ident_api( EXPORTING iv_tenant = 'e41dea7b-3510-4ffa-8ff4-53f3b158c8b4'
-                        IMPORTING ev_authtoken = lv_tenant_jwt  ).
+    "for testing purposes 'e41dea7b-3510-4ffa-8ff4-53f3b158c8b4'
+    lv_tenant = iv_tenant.
+    me->call_ident_api( EXPORTING iv_tenant = lv_tenant
+                        IMPORTING ev_authtoken = lv_tenant_jwt
+                                  ev_bpiendpoint = lv_bpiendpoint  ).
 
     FIELD-SYMBOLS: <fs_authreq>  TYPE any,
                    <fs_authreq2> TYPE string.
 
-    ASSIGN lv_tenant_jwt->* TO FIELD-SYMBOL(<ls_data>). "dereference into field symbol
-    ASSIGN COMPONENT 'ACCESS_TOKEN' OF STRUCTURE <ls_data> TO <fs_authreq>.
-    ASSIGN <fs_authreq>->* TO <fs_authreq2>.
-    lv_authreq = <fs_authreq2>.
-    "assign <fs_authreq>->* to lv_authenticationrequest.
-    "lv_authenticationrequest = <fs_authreq>.
+    IF lv_tenant_jwt IS NOT INITIAL.
+      TRY.
+          ASSIGN lv_tenant_jwt->* TO FIELD-SYMBOL(<ls_data>). "dereference into field symbol
+          ASSIGN COMPONENT 'ACCESS_TOKEN' OF STRUCTURE <ls_data> TO <fs_authreq>.
+          ASSIGN <fs_authreq>->* TO <fs_authreq2>.
+          lv_authreq = <fs_authreq2>.
+          "assign <fs_authreq>->* to lv_authenticationrequest.
+          "lv_authenticationrequest = <fs_authreq>.
 
-    "TODO check validity of current auth token
-    "or call me-call_ident_api to get new auth token
+          "TODO check validity of current auth token
+          "or call me-call_ident_api to get new auth token
 
-    cl_http_client=>create_by_url(
-    EXPORTING
-      url                = 'https://baseline.provide.network'
-    IMPORTING
-      client             = lo_http_client
-    EXCEPTIONS
-      argument_not_found = 1
-      plugin_not_active  = 2
-      internal_error     = 3
-      OTHERS             = 4 ).
-    IF sy-subrc <> 0.
-      " error handling
-    ENDIF.
+          cl_http_client=>create_by_url(
+          EXPORTING
+            url                = lv_bpiendpoint
+          IMPORTING
+            client             = lo_http_client
+          EXCEPTIONS
+            argument_not_found = 1
+            plugin_not_active  = 2
+            internal_error     = 3
+            OTHERS             = 4 ).
+          IF sy-subrc <> 0.
+            " error handling
+          ENDIF.
 
-    lo_http_client->propertytype_accept_cookie = if_http_client=>co_enabled.
-    lo_http_client->request->set_header_field( name  = if_http_form_fields_sap=>sap_client value = '100' ).
+          lo_http_client->propertytype_accept_cookie = if_http_client=>co_enabled.
+          lo_http_client->request->set_header_field( name  = if_http_form_fields_sap=>sap_client value = '100' ).
 
-    lo_baseline_api = NEW z100085_zcl_proubc_baseline( ii_client = lo_http_client ).
+          lo_baseline_api = NEW z100085_zcl_proubc_baseline( ii_client = lo_http_client ).
 
-    "lv_authenticationrequest-
+          "lv_authenticationrequest-
 
-    lo_baseline_api->bearerauthentication( exporting body = lv_authreq iv_tenantid = 'e41dea7b-3510-4ffa-8ff4-53f3b158c8b4'  ).
+          lv_baseline_jwt = lo_baseline_api->bearerauthentication( EXPORTING body = lv_authreq iv_tenantid = lv_tenant IMPORTING code = lv_code  ).
 *    CATCH cx_static_check.
 
+          IF lv_code = 201.
+            ev_isreachable = 'X'.
+          ELSE.
+            ev_isreachable = '-'.
+          ENDIF.
+        CATCH cx_root.
+          ev_isreachable = '-'.
+      ENDTRY.
+    ELSE.
+      ev_isreachable = '-'.
+    ENDIF.
+
+
+  ENDMETHOD.
+
+
+  METHOD setup_protocol_msg.
+    "resolve tenant
+    DATA:
+      lo_http_client  TYPE REF TO if_http_client,
+      lo_baseline_api TYPE REF TO z100085_zif_proubc_baseline,
+      lv_authreq      TYPE z100085_zif_proubc_baseline=>authenticationrequest,
+      lv_tenant_jwt   TYPE REF TO data,
+      lv_tenant       TYPE z100085_prvdtenantid,
+      lv_baseline_jwt TYPE REF TO data,
+      lv_code         TYPE i,
+      lv_bpiendpoint  TYPE string.
+
+    FIELD-SYMBOLS: <fs_authreq>  TYPE any,
+                   <fs_authreq2> TYPE string.
+
+
+    me->call_ident_api( EXPORTING iv_tenant = lv_defaulttenant
+                      IMPORTING ev_authtoken = lv_tenant_jwt
+                                ev_bpiendpoint = lv_bpiendpoint  ).
+    lv_defaultidenttoken = lv_tenant_jwt.
+
+    IF lv_tenant_jwt IS NOT INITIAL.
+      TRY.
+          ASSIGN lv_tenant_jwt->* TO FIELD-SYMBOL(<ls_data>). "dereference into field symbol
+          ASSIGN COMPONENT 'ACCESS_TOKEN' OF STRUCTURE <ls_data> TO <fs_authreq>.
+          ASSIGN <fs_authreq>->* TO <fs_authreq2>.
+          lv_authreq = <fs_authreq2>.
+          "assign <fs_authreq>->* to lv_authenticationrequest.
+          "lv_authenticationrequest = <fs_authreq>.
+
+          "TODO check validity of current auth token
+          "or call me-call_ident_api to get new auth token
+
+          cl_http_client=>create_by_url(
+          EXPORTING
+            url                = lv_bpiendpoint
+          IMPORTING
+            client             = lo_http_client
+          EXCEPTIONS
+            argument_not_found = 1
+            plugin_not_active  = 2
+            internal_error     = 3
+            OTHERS             = 4 ).
+          IF sy-subrc <> 0.
+            " error handling
+          ENDIF.
+
+          lo_http_client->propertytype_accept_cookie = if_http_client=>co_enabled.
+          lo_http_client->request->set_header_field( name  = if_http_form_fields_sap=>sap_client value = '100' ).
+
+          lo_baseline_api = NEW z100085_zcl_proubc_baseline( ii_client = lo_http_client ).
+          lo_baseline_client = lo_baseline_api.
+
+          lv_baseline_jwt = lo_baseline_api->bearerauthentication( EXPORTING body = lv_authreq iv_tenantid = lv_tenant IMPORTING code = lv_code  ).
+          lv_defaultbaselinetoken = lv_baseline_jwt.
+        CATCH cx_root.
+      ENDTRY.
+    ENDIF.
+  ENDMETHOD.
+  METHOD send_protocol_msg.
+
+    TRY.
+        lo_baseline_client->send_protocol_msg( EXPORTING body = body IMPORTING statuscode = statuscode ).
+      CATCH cx_static_check.
+        "wat do
+    ENDTRY.
+*    CATCH cx_static_check.
 
   ENDMETHOD.
 ENDCLASS.

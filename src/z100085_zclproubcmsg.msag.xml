@@ -51,6 +51,504 @@
      <TEXT>Failed to delete org &amp;</TEXT>
     </T100>
    </T100>
+   <I18N_LANGS>
+    <LANGU>1</LANGU>
+    <LANGU>4</LANGU>
+    <LANGU>A</LANGU>
+    <LANGU>C</LANGU>
+    <LANGU>I</LANGU>
+    <LANGU>J</LANGU>
+    <LANGU>K</LANGU>
+    <LANGU>L</LANGU>
+    <LANGU>N</LANGU>
+    <LANGU>P</LANGU>
+    <LANGU>R</LANGU>
+    <LANGU>V</LANGU>
+   </I18N_LANGS>
+   <T100T>
+    <T100T>
+     <SPRSL>1</SPRSL>
+     <ARBGB>Z100085_ZCLPROUBCMSG</ARBGB>
+     <STEXT>Message class for proUBC connector</STEXT>
+    </T100T>
+    <T100T>
+     <SPRSL>4</SPRSL>
+     <ARBGB>Z100085_ZCLPROUBCMSG</ARBGB>
+     <STEXT>Message class for proUBC connector</STEXT>
+    </T100T>
+    <T100T>
+     <SPRSL>A</SPRSL>
+     <ARBGB>Z100085_ZCLPROUBCMSG</ARBGB>
+     <STEXT>Message class for proUBC connector</STEXT>
+    </T100T>
+    <T100T>
+     <SPRSL>C</SPRSL>
+     <ARBGB>Z100085_ZCLPROUBCMSG</ARBGB>
+     <STEXT>Message class for proUBC connector</STEXT>
+    </T100T>
+    <T100T>
+     <SPRSL>I</SPRSL>
+     <ARBGB>Z100085_ZCLPROUBCMSG</ARBGB>
+     <STEXT>Message class for proUBC connector</STEXT>
+    </T100T>
+    <T100T>
+     <SPRSL>J</SPRSL>
+     <ARBGB>Z100085_ZCLPROUBCMSG</ARBGB>
+     <STEXT>Message class for proUBC connector</STEXT>
+    </T100T>
+    <T100T>
+     <SPRSL>K</SPRSL>
+     <ARBGB>Z100085_ZCLPROUBCMSG</ARBGB>
+     <STEXT>Message class for proUBC connector</STEXT>
+    </T100T>
+    <T100T>
+     <SPRSL>L</SPRSL>
+     <ARBGB>Z100085_ZCLPROUBCMSG</ARBGB>
+     <STEXT>Message class for proUBC connector</STEXT>
+    </T100T>
+    <T100T>
+     <SPRSL>N</SPRSL>
+     <ARBGB>Z100085_ZCLPROUBCMSG</ARBGB>
+     <STEXT>Message class for proUBC connector</STEXT>
+    </T100T>
+    <T100T>
+     <SPRSL>P</SPRSL>
+     <ARBGB>Z100085_ZCLPROUBCMSG</ARBGB>
+     <STEXT>Message class for proUBC connector</STEXT>
+    </T100T>
+    <T100T>
+     <SPRSL>R</SPRSL>
+     <ARBGB>Z100085_ZCLPROUBCMSG</ARBGB>
+     <STEXT>Message class for proUBC connector</STEXT>
+    </T100T>
+    <T100T>
+     <SPRSL>V</SPRSL>
+     <ARBGB>Z100085_ZCLPROUBCMSG</ARBGB>
+     <STEXT>Message class for proUBC connector</STEXT>
+    </T100T>
+   </T100T>
+   <T100_TEXTS>
+    <item>
+     <SPRSL>1</SPRSL>
+     <MSGNR>000</MSGNR>
+     <TEXT>Refresh token updated for Org &amp;</TEXT>
+    </item>
+    <item>
+     <SPRSL>1</SPRSL>
+     <MSGNR>001</MSGNR>
+     <TEXT>Org &amp; created</TEXT>
+    </item>
+    <item>
+     <SPRSL>1</SPRSL>
+     <MSGNR>002</MSGNR>
+     <TEXT>Org &amp; updated</TEXT>
+    </item>
+    <item>
+     <SPRSL>1</SPRSL>
+     <MSGNR>003</MSGNR>
+     <TEXT>Org &amp; deleted</TEXT>
+    </item>
+    <item>
+     <SPRSL>1</SPRSL>
+     <MSGNR>004</MSGNR>
+     <TEXT>Failed to create org &amp;</TEXT>
+    </item>
+    <item>
+     <SPRSL>1</SPRSL>
+     <MSGNR>005</MSGNR>
+     <TEXT>Failed to update org &amp;</TEXT>
+    </item>
+    <item>
+     <SPRSL>1</SPRSL>
+     <MSGNR>006</MSGNR>
+     <TEXT>Failed to delete org &amp;</TEXT>
+    </item>
+    <item>
+     <SPRSL>4</SPRSL>
+     <MSGNR>000</MSGNR>
+     <TEXT>Refresh token updated for Org &amp;</TEXT>
+    </item>
+    <item>
+     <SPRSL>4</SPRSL>
+     <MSGNR>001</MSGNR>
+     <TEXT>Org &amp; created</TEXT>
+    </item>
+    <item>
+     <SPRSL>4</SPRSL>
+     <MSGNR>002</MSGNR>
+     <TEXT>Org &amp; updated</TEXT>
+    </item>
+    <item>
+     <SPRSL>4</SPRSL>
+     <MSGNR>003</MSGNR>
+     <TEXT>Org &amp; deleted</TEXT>
+    </item>
+    <item>
+     <SPRSL>4</SPRSL>
+     <MSGNR>004</MSGNR>
+     <TEXT>Failed to create org &amp;</TEXT>
+    </item>
+    <item>
+     <SPRSL>4</SPRSL>
+     <MSGNR>005</MSGNR>
+     <TEXT>Failed to update org &amp;</TEXT>
+    </item>
+    <item>
+     <SPRSL>4</SPRSL>
+     <MSGNR>006</MSGNR>
+     <TEXT>Failed to delete org &amp;</TEXT>
+    </item>
+    <item>
+     <SPRSL>A</SPRSL>
+     <MSGNR>000</MSGNR>
+     <TEXT>Refresh token updated for Org &amp;</TEXT>
+    </item>
+    <item>
+     <SPRSL>A</SPRSL>
+     <MSGNR>001</MSGNR>
+     <TEXT>Org &amp; created</TEXT>
+    </item>
+    <item>
+     <SPRSL>A</SPRSL>
+     <MSGNR>002</MSGNR>
+     <TEXT>Org &amp; updated</TEXT>
+    </item>
+    <item>
+     <SPRSL>A</SPRSL>
+     <MSGNR>003</MSGNR>
+     <TEXT>Org &amp; deleted</TEXT>
+    </item>
+    <item>
+     <SPRSL>A</SPRSL>
+     <MSGNR>004</MSGNR>
+     <TEXT>Failed to create org &amp;</TEXT>
+    </item>
+    <item>
+     <SPRSL>A</SPRSL>
+     <MSGNR>005</MSGNR>
+     <TEXT>Failed to update org &amp;</TEXT>
+    </item>
+    <item>
+     <SPRSL>A</SPRSL>
+     <MSGNR>006</MSGNR>
+     <TEXT>Failed to delete org &amp;</TEXT>
+    </item>
+    <item>
+     <SPRSL>C</SPRSL>
+     <MSGNR>000</MSGNR>
+     <TEXT>Refresh token updated for Org &amp;</TEXT>
+    </item>
+    <item>
+     <SPRSL>C</SPRSL>
+     <MSGNR>001</MSGNR>
+     <TEXT>Org &amp; created</TEXT>
+    </item>
+    <item>
+     <SPRSL>C</SPRSL>
+     <MSGNR>002</MSGNR>
+     <TEXT>Org &amp; updated</TEXT>
+    </item>
+    <item>
+     <SPRSL>C</SPRSL>
+     <MSGNR>003</MSGNR>
+     <TEXT>Org &amp; deleted</TEXT>
+    </item>
+    <item>
+     <SPRSL>C</SPRSL>
+     <MSGNR>004</MSGNR>
+     <TEXT>Failed to create org &amp;</TEXT>
+    </item>
+    <item>
+     <SPRSL>C</SPRSL>
+     <MSGNR>005</MSGNR>
+     <TEXT>Failed to update org &amp;</TEXT>
+    </item>
+    <item>
+     <SPRSL>C</SPRSL>
+     <MSGNR>006</MSGNR>
+     <TEXT>Failed to delete org &amp;</TEXT>
+    </item>
+    <item>
+     <SPRSL>I</SPRSL>
+     <MSGNR>000</MSGNR>
+     <TEXT>Refresh token updated for Org &amp;</TEXT>
+    </item>
+    <item>
+     <SPRSL>I</SPRSL>
+     <MSGNR>001</MSGNR>
+     <TEXT>Org &amp; created</TEXT>
+    </item>
+    <item>
+     <SPRSL>I</SPRSL>
+     <MSGNR>002</MSGNR>
+     <TEXT>Org &amp; updated</TEXT>
+    </item>
+    <item>
+     <SPRSL>I</SPRSL>
+     <MSGNR>003</MSGNR>
+     <TEXT>Org &amp; deleted</TEXT>
+    </item>
+    <item>
+     <SPRSL>I</SPRSL>
+     <MSGNR>004</MSGNR>
+     <TEXT>Failed to create org &amp;</TEXT>
+    </item>
+    <item>
+     <SPRSL>I</SPRSL>
+     <MSGNR>005</MSGNR>
+     <TEXT>Failed to update org &amp;</TEXT>
+    </item>
+    <item>
+     <SPRSL>I</SPRSL>
+     <MSGNR>006</MSGNR>
+     <TEXT>Failed to delete org &amp;</TEXT>
+    </item>
+    <item>
+     <SPRSL>J</SPRSL>
+     <MSGNR>000</MSGNR>
+     <TEXT>Refresh token updated for Org &amp;</TEXT>
+    </item>
+    <item>
+     <SPRSL>J</SPRSL>
+     <MSGNR>001</MSGNR>
+     <TEXT>Org &amp; created</TEXT>
+    </item>
+    <item>
+     <SPRSL>J</SPRSL>
+     <MSGNR>002</MSGNR>
+     <TEXT>Org &amp; updated</TEXT>
+    </item>
+    <item>
+     <SPRSL>J</SPRSL>
+     <MSGNR>003</MSGNR>
+     <TEXT>Org &amp; deleted</TEXT>
+    </item>
+    <item>
+     <SPRSL>J</SPRSL>
+     <MSGNR>004</MSGNR>
+     <TEXT>Failed to create org &amp;</TEXT>
+    </item>
+    <item>
+     <SPRSL>J</SPRSL>
+     <MSGNR>005</MSGNR>
+     <TEXT>Failed to update org &amp;</TEXT>
+    </item>
+    <item>
+     <SPRSL>J</SPRSL>
+     <MSGNR>006</MSGNR>
+     <TEXT>Failed to delete org &amp;</TEXT>
+    </item>
+    <item>
+     <SPRSL>K</SPRSL>
+     <MSGNR>000</MSGNR>
+     <TEXT>Refresh token updated for Org &amp;</TEXT>
+    </item>
+    <item>
+     <SPRSL>K</SPRSL>
+     <MSGNR>001</MSGNR>
+     <TEXT>Org &amp; created</TEXT>
+    </item>
+    <item>
+     <SPRSL>K</SPRSL>
+     <MSGNR>002</MSGNR>
+     <TEXT>Org &amp; updated</TEXT>
+    </item>
+    <item>
+     <SPRSL>K</SPRSL>
+     <MSGNR>003</MSGNR>
+     <TEXT>Org &amp; deleted</TEXT>
+    </item>
+    <item>
+     <SPRSL>K</SPRSL>
+     <MSGNR>004</MSGNR>
+     <TEXT>Failed to create org &amp;</TEXT>
+    </item>
+    <item>
+     <SPRSL>K</SPRSL>
+     <MSGNR>005</MSGNR>
+     <TEXT>Failed to update org &amp;</TEXT>
+    </item>
+    <item>
+     <SPRSL>K</SPRSL>
+     <MSGNR>006</MSGNR>
+     <TEXT>Failed to delete org &amp;</TEXT>
+    </item>
+    <item>
+     <SPRSL>L</SPRSL>
+     <MSGNR>000</MSGNR>
+     <TEXT>Refresh token updated for Org &amp;</TEXT>
+    </item>
+    <item>
+     <SPRSL>L</SPRSL>
+     <MSGNR>001</MSGNR>
+     <TEXT>Org &amp; created</TEXT>
+    </item>
+    <item>
+     <SPRSL>L</SPRSL>
+     <MSGNR>002</MSGNR>
+     <TEXT>Org &amp; updated</TEXT>
+    </item>
+    <item>
+     <SPRSL>L</SPRSL>
+     <MSGNR>003</MSGNR>
+     <TEXT>Org &amp; deleted</TEXT>
+    </item>
+    <item>
+     <SPRSL>L</SPRSL>
+     <MSGNR>004</MSGNR>
+     <TEXT>Failed to create org &amp;</TEXT>
+    </item>
+    <item>
+     <SPRSL>L</SPRSL>
+     <MSGNR>005</MSGNR>
+     <TEXT>Failed to update org &amp;</TEXT>
+    </item>
+    <item>
+     <SPRSL>L</SPRSL>
+     <MSGNR>006</MSGNR>
+     <TEXT>Failed to delete org &amp;</TEXT>
+    </item>
+    <item>
+     <SPRSL>N</SPRSL>
+     <MSGNR>000</MSGNR>
+     <TEXT>Refresh token updated for Org &amp;</TEXT>
+    </item>
+    <item>
+     <SPRSL>N</SPRSL>
+     <MSGNR>001</MSGNR>
+     <TEXT>Org &amp; created</TEXT>
+    </item>
+    <item>
+     <SPRSL>N</SPRSL>
+     <MSGNR>002</MSGNR>
+     <TEXT>Org &amp; updated</TEXT>
+    </item>
+    <item>
+     <SPRSL>N</SPRSL>
+     <MSGNR>003</MSGNR>
+     <TEXT>Org &amp; deleted</TEXT>
+    </item>
+    <item>
+     <SPRSL>N</SPRSL>
+     <MSGNR>004</MSGNR>
+     <TEXT>Failed to create org &amp;</TEXT>
+    </item>
+    <item>
+     <SPRSL>N</SPRSL>
+     <MSGNR>005</MSGNR>
+     <TEXT>Failed to update org &amp;</TEXT>
+    </item>
+    <item>
+     <SPRSL>N</SPRSL>
+     <MSGNR>006</MSGNR>
+     <TEXT>Failed to delete org &amp;</TEXT>
+    </item>
+    <item>
+     <SPRSL>P</SPRSL>
+     <MSGNR>000</MSGNR>
+     <TEXT>Refresh token updated for Org &amp;</TEXT>
+    </item>
+    <item>
+     <SPRSL>P</SPRSL>
+     <MSGNR>001</MSGNR>
+     <TEXT>Org &amp; created</TEXT>
+    </item>
+    <item>
+     <SPRSL>P</SPRSL>
+     <MSGNR>002</MSGNR>
+     <TEXT>Org &amp; updated</TEXT>
+    </item>
+    <item>
+     <SPRSL>P</SPRSL>
+     <MSGNR>003</MSGNR>
+     <TEXT>Org &amp; deleted</TEXT>
+    </item>
+    <item>
+     <SPRSL>P</SPRSL>
+     <MSGNR>004</MSGNR>
+     <TEXT>Failed to create org &amp;</TEXT>
+    </item>
+    <item>
+     <SPRSL>P</SPRSL>
+     <MSGNR>005</MSGNR>
+     <TEXT>Failed to update org &amp;</TEXT>
+    </item>
+    <item>
+     <SPRSL>P</SPRSL>
+     <MSGNR>006</MSGNR>
+     <TEXT>Failed to delete org &amp;</TEXT>
+    </item>
+    <item>
+     <SPRSL>R</SPRSL>
+     <MSGNR>000</MSGNR>
+     <TEXT>Refresh token updated for Org &amp;</TEXT>
+    </item>
+    <item>
+     <SPRSL>R</SPRSL>
+     <MSGNR>001</MSGNR>
+     <TEXT>Org &amp; created</TEXT>
+    </item>
+    <item>
+     <SPRSL>R</SPRSL>
+     <MSGNR>002</MSGNR>
+     <TEXT>Org &amp; updated</TEXT>
+    </item>
+    <item>
+     <SPRSL>R</SPRSL>
+     <MSGNR>003</MSGNR>
+     <TEXT>Org &amp; deleted</TEXT>
+    </item>
+    <item>
+     <SPRSL>R</SPRSL>
+     <MSGNR>004</MSGNR>
+     <TEXT>Failed to create org &amp;</TEXT>
+    </item>
+    <item>
+     <SPRSL>R</SPRSL>
+     <MSGNR>005</MSGNR>
+     <TEXT>Failed to update org &amp;</TEXT>
+    </item>
+    <item>
+     <SPRSL>R</SPRSL>
+     <MSGNR>006</MSGNR>
+     <TEXT>Failed to delete org &amp;</TEXT>
+    </item>
+    <item>
+     <SPRSL>V</SPRSL>
+     <MSGNR>000</MSGNR>
+     <TEXT>Refresh token updated for Org &amp;</TEXT>
+    </item>
+    <item>
+     <SPRSL>V</SPRSL>
+     <MSGNR>001</MSGNR>
+     <TEXT>Org &amp; created</TEXT>
+    </item>
+    <item>
+     <SPRSL>V</SPRSL>
+     <MSGNR>002</MSGNR>
+     <TEXT>Org &amp; updated</TEXT>
+    </item>
+    <item>
+     <SPRSL>V</SPRSL>
+     <MSGNR>003</MSGNR>
+     <TEXT>Org &amp; deleted</TEXT>
+    </item>
+    <item>
+     <SPRSL>V</SPRSL>
+     <MSGNR>004</MSGNR>
+     <TEXT>Failed to create org &amp;</TEXT>
+    </item>
+    <item>
+     <SPRSL>V</SPRSL>
+     <MSGNR>005</MSGNR>
+     <TEXT>Failed to update org &amp;</TEXT>
+    </item>
+    <item>
+     <SPRSL>V</SPRSL>
+     <MSGNR>006</MSGNR>
+     <TEXT>Failed to delete org &amp;</TEXT>
+    </item>
+   </T100_TEXTS>
   </asx:values>
  </asx:abap>
 </abapGit>

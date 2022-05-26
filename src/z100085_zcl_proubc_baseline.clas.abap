@@ -866,13 +866,14 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
   ENDMETHOD.
 
 
-    METHOD Z100085_zif_proubc_baseline~bearerauthentication.
+  METHOD Z100085_zif_proubc_baseline~bearerauthentication.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE 'https://baseline.provide.network/tokens'.
     DATA lv_authpayload TYPE Z100085_zif_proubc_Ident=>authorizelong_termtokenrequest.
     DATA lv_longtermrequestdata TYPE REF TO data.
     DATA lv_requeststr TYPE string.
+    DATA lv_authresponsestr TYPE string.
 
     mi_client->request->set_method( 'POST' ).
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
@@ -896,12 +897,15 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
     me->set_bearer_token( EXPORTING iv_tokenstring = body ).
     me->get_bearer_token( ).
     lv_code = send_receive( ).
-    WRITE / lv_code.
+    "WRITE / lv_code.
+    code = lv_code.
     CASE lv_code.
       WHEN 201. " Created
         " application/json,#/components/schemas/AuthenticationResponse
-        CREATE OBJECT mo_json EXPORTING iv_json = mi_client->response->get_cdata( ).
-        return_data = parse_authenticationresponse( '' ).
+        "CREATE OBJECT mo_json EXPORTING iv_json = mi_client->response->get_cdata( ).
+        lv_authresponsestr = mi_client->response->get_cdata( ).
+        "return_data = parse_authenticationresponse( '' ).
+        /ui2/cl_json=>deserialize( EXPORTING json = lv_authresponsestr CHANGING data =  apiresponse ).
       WHEN 401.
         " todo, raise
     ENDCASE.
@@ -2635,6 +2639,58 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
       WHEN 200. " The request was successful
       WHEN OTHERS.
     ENDCASE.
+  ENDMETHOD.
+
+
+
+  METHOD z100085_zif_proubc_baseline~send_protocol_msg.
+*https://gist.github.com/kthomas/459381e98c808febea9c1bb51408bbde
+*type Message struct {
+*    ID              *string          `sql:"-" json:"id,omitempty"`
+*    BaselineID      *uuid.UUID       `sql:"-" json:"baseline_id,omitempty"` // don't need this optional; when included, can be used to map outbound message just-in-time
+*    Errors          []*api.Error     `sql:"-" json:"errors,omitempty"`
+*    MessageID       *string          `sql:"-" json:"message_id,omitempty"` dont need this. but
+*    Payload         interface{}      `sql:"-" json:"payload,omitempty"` THE IDOC. need this
+*     payload_mimetype 'application/xml'
+*m    ProtocolMessage *ProtocolMessage `sql:"-" json:"protocol_essage,omitempty"`. don't need this.
+*    Recipients      []*Participant   `sql:"-" json:"recipients"` don't need this
+*    Status          *string          `sql:"-" json:"status,omitempty"` don't need this. shuttle gives this back to us.
+*    Type            *string          `sql:"-" json:"type,omitempty"`
+*}
+
+    DATA lv_code TYPE i.
+    DATA lv_temp TYPE string.
+    DATA lv_uri TYPE string VALUE 'https://baseline.provide.network/api/v1/protocol_messages'.
+    DATA: lv_requeststr TYPE string,
+         LV_RESPONSESTR TYPE STRING.
+    DATA lv_protocolmsg TYPE REF TO data.
+
+    mi_client->request->set_method( 'POST' ).
+    mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
+    me->get_bearer_token( ).
+
+    z100085_zcl_proubc_api_helper=>copy_data_to_ref( EXPORTING is_data = body
+                  CHANGING cr_data = lv_protocolmsg  ).
+
+    lv_requeststr = /ui2/cl_json=>serialize( EXPORTING data =  lv_protocolmsg
+                                       pretty_name = /ui2/cl_json=>pretty_mode-low_case ).
+
+    mi_client->request->set_cdata(
+      EXPORTING
+        data   =  lv_requeststr
+*        offset = 0
+*        length = -1
+    ).
+
+
+    lv_code = send_receive( ).
+    statuscode = lv_code.
+    LV_RESPONSESTR = MI_CLIENT->RESPONSE->GET_CDATA( ).
+    CASE lv_code.
+      WHEN 202. " The request was successful
+      WHEN OTHERS.
+    ENDCASE.
+
   ENDMETHOD.
 
   METHOD set_bearer_token.

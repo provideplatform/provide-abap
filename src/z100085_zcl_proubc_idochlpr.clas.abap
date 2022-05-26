@@ -13,6 +13,11 @@ CLASS z100085_zcl_proubc_idochlpr DEFINITION
       shuttle_idoc,
       load_idocs.
   PROTECTED SECTION.
+
+    METHODS: get_objid IMPORTING iv_schema TYPE string
+                                 it_edidd  TYPE tty_edidd
+                                 iv_idoc   TYPE REF TO data
+                       EXPORTING ev_objid  TYPE z100085_bpiobj-object_id.
   PRIVATE SECTION.
 ENDCLASS.
 
@@ -20,16 +25,77 @@ ENDCLASS.
 
 CLASS z100085_zcl_proubc_idochlpr IMPLEMENTATION.
   METHOD idoc_to_json.
-    LOOP AT loaded_idocs ASSIGNING FIELD-SYMBOL(<fs_loaded_idoc>).
+    DATA: lo_api_helper       TYPE REF TO z100085_zcl_proubc_api_helper,
+          lo_ident_api        TYPE REF TO z100085_zif_proubc_ident,
+          lo_baseline_api     TYPE REF TO z100085_zif_proubc_baseline,
+          ls_protocol_msg_req TYPE z100085_zif_proubc_baseline=>protocolmessage_req.
 
-*    data: lt_edids type table of edids,
-*          lt_edidd type table of edidd.
-*
-*    call function 'IDOC_READ_COMPLETELY'
-*        importing DOCUMENT_NUMBER = <fs_loaded_idoc>-idocnum
-*        tables INT_EDIDS = lt_edids
-*               INT_EDIDD = lt_edidd.
-*
+
+
+    lo_api_helper = NEW z100085_zcl_proubc_api_helper( ).
+
+    "sets the default tenant and ident/baseline api tokens
+    lo_api_helper->setup_protocol_msg( ).
+
+
+    LOOP AT loaded_idocs ASSIGNING FIELD-SYMBOL(<fs_loaded_idoc>).
+      DATA: lv_idoc TYPE REF TO data.
+      CLEAR: ls_protocol_msg_req.
+
+
+      DATA:
+        lv_idocnum      TYPE edidc-docnum,
+        lt_edids        TYPE TABLE OF edids,
+        lt_edidd        TYPE TABLE OF edidd,
+        wa_idoc_control TYPE edidc,
+        lv_status       TYPE i.
+
+      CLEAR: lt_edids, lt_edidd, lv_idocnum.
+
+      lv_idocnum = <fs_loaded_idoc>-idocnum.
+      CALL FUNCTION 'IDOC_READ_COMPLETELY'
+        EXPORTING
+          document_number = lv_idocnum
+        IMPORTING
+          idoc_control    = wa_idoc_control
+        TABLES
+          int_edids       = lt_edids
+          int_edidd       = lt_edidd
+        EXCEPTIONS
+          OTHERS          = 1.
+
+        data: lv_idocjson type string.
+      lv_idocjson = /ui2/cl_json=>serialize(
+         EXPORTING
+           data             = lt_edidd
+*            compress         =
+*            name             =
+*            pretty_name      =
+*            type_descr       =
+*            assoc_arrays     =
+*            ts_as_iso8601    =
+*            expand_includes  =
+*            assoc_arrays_opt =
+*            numc_as_string   =
+*            name_mappings    =
+*            conversion_exits =
+*          RECEIVING
+*            r_json           =
+       ).
+
+       ls_protocol_msg_req-payload = lv_idocjson.
+       ls_protocol_msg_req-payload_mimetype = 'json'.
+       ls_protocol_msg_req-type = 'ORDERS05'.
+
+
+      "TODO get the object id (eg PO number) from the idoc
+      me->get_objid( EXPORTING iv_schema = 'ORDERS05'
+                               it_edidd = lt_edidd
+                               iv_idoc = lv_idoc
+                     IMPORTING ev_objid = ls_protocol_msg_req-id ).
+
+      lo_api_helper->send_protocol_msg( EXPORTING body = ls_protocol_msg_req IMPORTING statuscode = lv_status  ). "should return 202
+
 *    data: lv_jsondata type ref to data.
 *
 *         " assign lt_edids to lv_jsondata->*.
@@ -48,12 +114,14 @@ CLASS z100085_zcl_proubc_idochlpr IMPLEMENTATION.
 *         SOURCE xml       = lv_idocxml
 *         RESULT data_node = data_json.
 
+*
+*     <fs_loaded_idoc>-idoc->get_xmldata_as_table( importing data_table = data(lt_datatable)
+*                                                              len = data(lv_len) ).
 
-     <fs_loaded_idoc>-idoc->get_xmldata_as_table( importing data_table = data(lt_datatable)
-                                                              len = data(lv_len) ).
+      "get access token from ident. This SAP client / SAP system user == a tenant.
 
-     "get access token from ident. This SAP client / SAP system user == a tenant.
-     "call baseline API /api/v1/protocolmessage
+      "call baseline API /api/v1/protocolmessage
+
 
 *https://gist.github.com/kthomas/459381e98c808febea9c1bb51408bbde
 *type Message struct {
@@ -71,7 +139,7 @@ CLASS z100085_zcl_proubc_idochlpr IMPLEMENTATION.
 
 
 *essentials
-"id", "payload", "payload_mimetype", "type" (eg. ORDERS05)
+      "id", "payload", "payload_mimetype", "type" (eg. ORDERS05)
 
       "data_json = lt_datatable.
 
@@ -143,5 +211,19 @@ CLASS z100085_zcl_proubc_idochlpr IMPLEMENTATION.
         APPEND wa_loadedidoc TO loaded_idocs.
       ENDIF.
     ENDLOOP.
+  ENDMETHOD.
+
+  METHOD get_objid.
+    CASE iv_schema.
+      WHEN 'ORDERS05'.
+        "data record E1EDK01 - BELNR
+        DATA: lv_headersegment TYPE e1edk01.
+        READ TABLE it_edidd WITH KEY segnam = 'E1EDK01' ASSIGNING FIELD-SYMBOL(<fs_header>).
+        IF sy-subrc = 0.
+          lv_headersegment = <fs_header>-sdata.
+          ev_objid = lv_headersegment-belnr.
+        ENDIF.
+      WHEN OTHERS.
+    ENDCASE.
   ENDMETHOD.
 ENDCLASS.

@@ -89,49 +89,49 @@ CLASS z100085_zcl_proubc_api_sicf IMPLEMENTATION.
 
 
   METHOD tenants.
-    DATA: li_api            TYPE REF TO if_mr_api,
-          lv_data           TYPE string,
-          lv_mime           TYPE string,
-          lv_url            TYPE string,
-          lv_prvdorgid      TYPE z100085_zs_prvdorg-organization_id,
-          lt_prvdtenants    TYPE z100085_ztt_prvdorg,
-          ls_prvdtenant     TYPE z100085_ZS_PRVDORG,
-          lt_prvdtenants_in TYPE z100085_ztt_prvdorg,
-          lv_tenantdata     TYPE REF TO data.
-
-    TRY.
-        CASE iv_httpverb.
-          WHEN 'GET'.
-            z100085_zcl_proubc_prvdtenants=>get_allprvdtenant( IMPORTING et_prvdorg = lt_prvdtenants ).
-            copy_data_to_ref(
-                EXPORTING is_data = lt_prvdtenants
-                CHANGING cr_data = lv_tenantdata
-            ).
-            /ui2/cl_json=>serialize(
-              EXPORTING
-                data             = lv_tenantdata
-*            pretty_name      =
-              RECEIVING
-                r_json           = lv_data
-            ).
-          WHEN 'PUT'.
-            "z100085_zcl_proubc_prvdtenants=>update_prvdtenant( it_prvdorg = )
-          WHEN 'POST'.
-            "move-corresponding iv_payloaddata to ls_prvdtenant.
-
-            "z100085_zcl_proubc_api_helper=>map_data_to_tenant( EXPORTING iv_data = iv_payloaddata ).
-          "  z100085_zcl_proubc_prvdtenants=>create_prvdtenant( EXPORTING is_prvdorg = lt_prvdtenants ).
-          WHEN 'DELETE'.
-          WHEN OTHERS.
-        ENDCASE.
-      CATCH cx_root.
-        "todo exception handling
-    ENDTRY.
-
-    ii_server->response->set_compression( ).
-    ii_server->response->set_content_type( c_json ).
-    "ii_server->response->set_data( lv_data ).
-    ii_server->response->set_cdata( lv_data ).
+*    DATA: li_api            TYPE REF TO if_mr_api,
+*          lv_data           TYPE string,
+*          lv_mime           TYPE string,
+*          lv_url            TYPE string,
+*          lv_prvdorgid      TYPE z100085_zs_prvdorg-organization_id,
+*          lt_prvdtenants    TYPE z100085_ztt_prvdorg,
+*          ls_prvdtenant     TYPE z100085_ZS_PRVDORG,
+*          lt_prvdtenants_in TYPE z100085_ztt_prvdorg,
+*          lv_tenantdata     TYPE REF TO data.
+*
+*    TRY.
+*        CASE iv_httpverb.
+*          WHEN 'GET'.
+*            z100085_zcl_proubc_prvdtenants=>get_allprvdtenant( IMPORTING et_prvdorg = lt_prvdtenants ).
+*            copy_data_to_ref(
+*                EXPORTING is_data = lt_prvdtenants
+*                CHANGING cr_data = lv_tenantdata
+*            ).
+*            /ui2/cl_json=>serialize(
+*              EXPORTING
+*                data             = lv_tenantdata
+**            pretty_name      =
+*              RECEIVING
+*                r_json           = lv_data
+*            ).
+*          WHEN 'PUT'.
+*            "z100085_zcl_proubc_prvdtenants=>update_prvdtenant( it_prvdorg = )
+*          WHEN 'POST'.
+*            "move-corresponding iv_payloaddata to ls_prvdtenant.
+*
+*            "z100085_zcl_proubc_api_helper=>map_data_to_tenant( EXPORTING iv_data = iv_payloaddata ).
+*          "  z100085_zcl_proubc_prvdtenants=>create_prvdtenant( EXPORTING is_prvdorg = lt_prvdtenants ).
+*          WHEN 'DELETE'.
+*          WHEN OTHERS.
+*        ENDCASE.
+*      CATCH cx_root.
+*        "todo exception handling
+*    ENDTRY.
+*
+*    ii_server->response->set_compression( ).
+*    ii_server->response->set_content_type( c_json ).
+*    "ii_server->response->set_data( lv_data ).
+*    ii_server->response->set_cdata( lv_data ).
   ENDMETHOD.
 
 
@@ -407,6 +407,7 @@ CLASS z100085_zcl_proubc_api_sicf IMPLEMENTATION.
        lo_router->attach( iv_template = '/auth' iv_handler_class = 'Z100085_ZCL_PROUBC_AUTHAPI').
        lo_router->attach( iv_template = '/schemas'   iv_handler_class = 'Z100085_ZCL_IDOCAPI_BTYPEAPI' ).
        lo_router->attach( iv_template = '/schemas/{basictypeid}'   iv_handler_class = 'Z100085_ZCL_IDOCAPI_SEGMENTAPI' ).
+       lo_router->attach( iv_template = '/test/trigger_outbound' iv_handler_class = 'Z100085_ZCL_PROUBC_OBTRIGTEST' ).
      ro_root_handler = lo_router.
   ENDMETHOD.
 ENDCLASS.

@@ -5,9 +5,11 @@
 *&---------------------------------------------------------------------*
 REPORT z100085_proubc_shuttleidocex.
 
+selection-SCREEN BEGIN OF BLOCK 1.
 RANGES: r_poebeln for ekko-ebeln,
         r_idocnum FOR edidc-docnum,
         r_idoctype FOR edidc-idoctp. "default to ORDERS05
+selection-screen end OF BLOCK 1.
 
 CLASS lcl_idoc_moni DEFINITION.
   PUBLIC SECTION.
@@ -38,6 +40,8 @@ CLASS lcl_idoc_moni IMPLEMENTATION.
 
   ENDMETHOD.
 ENDCLASS.
+
+INITIALIZATION.
 
 START-OF-SELECTION.
 

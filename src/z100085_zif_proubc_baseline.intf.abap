@@ -381,6 +381,34 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
            payload TYPE xstring,
          END OF protocolmessage.
 
+*https://gist.github.com/kthomas/459381e98c808febea9c1bb51408bbde
+*type Message struct {
+*    ID              *string          `sql:"-" json:"id,omitempty"`
+*    BaselineID      *uuid.UUID       `sql:"-" json:"baseline_id,omitempty"` // don't need this optional; when included, can be used to map outbound message just-in-time
+*    Errors          []*api.Error     `sql:"-" json:"errors,omitempty"`
+*    MessageID       *string          `sql:"-" json:"message_id,omitempty"` dont need this. but
+*    Payload         interface{}      `sql:"-" json:"payload,omitempty"` THE IDOC. need this
+*     payload_mimetype 'application/xml'
+*m    ProtocolMessage *ProtocolMessage `sql:"-" json:"protocol_essage,omitempty"`. don't need this.
+*    Recipients      []*Participant   `sql:"-" json:"recipients"` don't need this
+*    Status          *string          `sql:"-" json:"status,omitempty"` don't need this. shuttle gives this back to us.
+*    Type            *string          `sql:"-" json:"type,omitempty"`
+*}
+
+   types: begin of protocolmessage_req,
+            ID type z100085_bpiobj-object_id, "object id, e.g PO number
+            BaselineID type z100085_bpiobj-baseline_id, "optional
+            "errors type table of string,
+            "messageid type string, "ok to leave this empty
+            payload type string, "the idoc payload
+            payload_mimetype type string, " 'application/xml or json
+            "protocolmessage type ref to data,
+            "recipients type ref to data,
+            "status type string,
+            type type string, "e.g. ORDERS05
+          end of protocolmessage_req.
+
+
 * Component schema: ProtocolMessagePayload, string
 "  TYPES protocolmessagepayload TYPE string.
 
@@ -584,8 +612,11 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
     IMPORTING
       body TYPE authenticationrequest
       iv_tenantid type z100085_prvdtenantid
+    exporting
+      code type i
     RETURNING
-      VALUE(return_data) TYPE authenticationresponse
+      "VALUE(return_data) TYPE authenticationresponse
+       value(apiresponse) TYPE REF TO data
     RAISING cx_static_check.
 
 * GET - "List connectors"
@@ -1549,5 +1580,27 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 *     application/json, #/components/schemas/Error
   METHODS listopenidconfiguration
     RAISING cx_static_check.
+
+* POST
+* *https://gist.github.com/kthomas/459381e98c808febea9c1bb51408bbde
+*type Message struct {
+*    ID              *string          `sql:"-" json:"id,omitempty"`
+*    BaselineID      *uuid.UUID       `sql:"-" json:"baseline_id,omitempty"` // don't need this optional; when included, can be used to map outbound message just-in-time
+*    Errors          []*api.Error     `sql:"-" json:"errors,omitempty"`
+*    MessageID       *string          `sql:"-" json:"message_id,omitempty"` dont need this. but
+*    Payload         interface{}      `sql:"-" json:"payload,omitempty"` THE IDOC. need this
+*     payload_mimetype 'application/xml'
+*m    ProtocolMessage *ProtocolMessage `sql:"-" json:"protocol_essage,omitempty"`. don't need this.
+*    Recipients      []*Participant   `sql:"-" json:"recipients"` don't need this
+*    Status          *string          `sql:"-" json:"status,omitempty"` don't need this. shuttle gives this back to us.
+*    Type            *string          `sql:"-" json:"type,omitempty"`
+*}
+
+  methods send_protocol_msg
+    importing
+        body type protocolmessage_req
+    exporting
+        statuscode type i
+    raising cx_static_check.
 
 ENDINTERFACE.
