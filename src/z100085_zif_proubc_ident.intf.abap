@@ -207,6 +207,7 @@ INTERFACE Z100085_zif_proubc_Ident PUBLIC.
     IMPORTING
               body        TYPE authorizelong_termtokenrequest
     EXPORTING
+              status type i
               apiresponse TYPE REF TO data
     RAISING   cx_static_check.
 

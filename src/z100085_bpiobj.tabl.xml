@@ -103,6 +103,7 @@
     <LANGU>P</LANGU>
     <LANGU>R</LANGU>
     <LANGU>V</LANGU>
+    <LANGU>묩</LANGU>
    </I18N_LANGS>
    <DD02_TEXTS>
     <item>
@@ -151,6 +152,10 @@
     </item>
     <item>
      <DDLANGUAGE>V</DDLANGUAGE>
+     <DDTEXT>proUBC BPI objects</DDTEXT>
+    </item>
+    <item>
+     <DDLANGUAGE>묩</DDLANGUAGE>
      <DDTEXT>proUBC BPI objects</DDTEXT>
     </item>
    </DD02_TEXTS>

@@ -5,19 +5,25 @@ CLASS z100085_zcl_proubc_idochlpr DEFINITION
 
   PUBLIC SECTION.
     INTERFACES: z100085_zif_proubc_blidochlper.
+    TYPES: tty_edidd TYPE TABLE OF edidd.
     DATA: loaded_idocs   TYPE z100085_zif_proubc_blidochlper=>tty_idoc_xmllist,
           selected_idocs TYPE Z100085_Zif_proubc_blidochlper=>tty_proubc_idocs.
+
+    CLASS-METHODS:
+      get_objid IMPORTING iv_schema TYPE string
+                          it_edidd  TYPE tty_edidd
+                          iv_idoc   TYPE REF TO data
+                EXPORTING ev_objid  TYPE z100085_bpiobj-object_id,
+      get_DUMMY_objid IMPORTING iv_schema TYPE string
+                      EXPORTING ev_objid  TYPE z100085_bpiobj-object_id
+                                EV_NEWIDOCNUM TYPE EDIDD-docnum
+                      CHANGING  Ct_edidd  TYPE tty_edidd.
     METHODS: idoc_to_json,
       get_idocs_for_object,
       validate_idocstat_to_baseline,
       shuttle_idoc,
       load_idocs.
   PROTECTED SECTION.
-
-    METHODS: get_objid IMPORTING iv_schema TYPE string
-                                 it_edidd  TYPE tty_edidd
-                                 iv_idoc   TYPE REF TO data
-                       EXPORTING ev_objid  TYPE z100085_bpiobj-object_id.
   PRIVATE SECTION.
 ENDCLASS.
 
@@ -64,7 +70,7 @@ CLASS z100085_zcl_proubc_idochlpr IMPLEMENTATION.
         EXCEPTIONS
           OTHERS          = 1.
 
-        data: lv_idocjson type string.
+      DATA: lv_idocjson TYPE string.
       lv_idocjson = /ui2/cl_json=>serialize(
          EXPORTING
            data             = lt_edidd
@@ -83,13 +89,13 @@ CLASS z100085_zcl_proubc_idochlpr IMPLEMENTATION.
 *            r_json           =
        ).
 
-       ls_protocol_msg_req-payload = lv_idocjson.
-       ls_protocol_msg_req-payload_mimetype = 'json'.
-       ls_protocol_msg_req-type = 'ORDERS05'.
+      ls_protocol_msg_req-payload = lv_idocjson.
+      ls_protocol_msg_req-payload_mimetype = 'json'.
+      ls_protocol_msg_req-type = 'ORDERS05'.
 
 
       "TODO get the object id (eg PO number) from the idoc
-      me->get_objid( EXPORTING iv_schema = 'ORDERS05'
+      z100085_zcl_proubc_idochlpr=>get_objid( EXPORTING iv_schema = 'ORDERS05'
                                it_edidd = lt_edidd
                                iv_idoc = lv_idoc
                      IMPORTING ev_objid = ls_protocol_msg_req-id ).
@@ -186,6 +192,8 @@ CLASS z100085_zcl_proubc_idochlpr IMPLEMENTATION.
     "inner join EDID4 as b on a~docnum = b~docnum
     INTO TABLE @selected_idocs
     WHERE direct = '1'
+    AND status = '03'
+    AND mestyp = 'ORDERS'
     AND idoctp = 'ORDERS05'.
 
     me->load_idocs( ).
@@ -225,5 +233,99 @@ CLASS z100085_zcl_proubc_idochlpr IMPLEMENTATION.
         ENDIF.
       WHEN OTHERS.
     ENDCASE.
+  ENDMETHOD.
+  METHOD get_DUMMY_objid.
+    CASE iv_schema.
+      WHEN 'ORDERS05'.
+
+      DATA: LV_DUMMY_PO TYPE EKKO-EBELN,
+            LV_DUMMY_IDOCNUM TYPE EDIDD-docnum,
+            LV_RETURNCD TYPE inri-returncode.
+      "get a new po number
+*      CALL FUNCTION 'NUMBER_GET_NEXT'
+*    EXPORTING
+*      NR_RANGE_NR                   = hnrran   "Number range interval
+*      OBJECT                        = 'EINKBELEG' "Number range object (SNRO)
+**     QUANTITY                      = '1'       "No. of numbers
+**     SUBOBJECT                     = ' '
+**     TOYEAR                        = '0000'
+**     IGNORE_BUFFER                 = ' '
+*    IMPORTING
+*      NUMBER                        = LV_DUMMY_PO
+**     QUANTITY                      =
+*      RETURNCODE                    = LV_RETURNCD
+*    EXCEPTIONS
+*      INTERVAL_NOT_FOUND            = 1
+*      NUMBER_RANGE_NOT_INTERN       = 2
+*      OBJECT_NOT_FOUND              = 3
+*      QUANTITY_IS_0                 = 4
+*      QUANTITY_IS_NOT_1             = 5
+*      INTERVAL_OVERFLOW             = 6
+*      BUFFER_OVERFLOW               = 7
+*      OTHERS                        = 8.
+*
+*      CHECK SY-SUBRC = 0.
+
+*      "get a new idoc number
+*      CALL FUNCTION 'NUMBER_GET_NEXT'
+*    EXPORTING
+*      NR_RANGE_NR                   = '1'       "Number range interval
+*      OBJECT                        = '/AIF/IFA' "Number range object (SNRO)
+**     QUANTITY                      = '1'       "No. of numbers
+**     SUBOBJECT                     = ' '
+**     TOYEAR                        = '0000'
+**     IGNORE_BUFFER                 = ' '
+*    IMPORTING
+*      NUMBER                        = LV_DUMMY_IDOCNUM
+**     QUANTITY                      =
+*      RETURNCODE                    = LV_RETURNCD
+*    EXCEPTIONS
+*      INTERVAL_NOT_FOUND            = 1
+*      NUMBER_RANGE_NOT_INTERN       = 2
+*      OBJECT_NOT_FOUND              = 3
+*      QUANTITY_IS_0                 = 4
+*      QUANTITY_IS_NOT_1             = 5
+*      INTERVAL_OVERFLOW             = 6
+*      BUFFER_OVERFLOW               = 7
+*      OTHERS                        = 8.
+*
+*     CHECK SY-SUBRC = 0.
+
+      "EV_NEWIDOCNUM = LV_DUMMY_IDOCNUM.
+
+      DATA(r) = cl_abap_random_int=>create( seed = CONV i( sy-uzeit )
+                                      min  = 1
+                                      max = 10000 ).
+
+      DATA(r2) = cl_abap_random_int=>create( seed = CONV i( sy-uzeit )
+                                      min  = 1
+                                      max = 10000 ).
+        "data record E1EDK01 - BELNR
+        DATA: lv_headersegment TYPE e1edk01,
+              LV_HEADERSEGMENT2 TYPE E1EDK02.
+        READ TABLE Ct_edidd WITH KEY segnam = 'E1EDK01' ASSIGNING FIELD-SYMBOL(<fs_header>).
+        IF sy-subrc = 0.
+          lv_headersegment = <fs_header>-sdata.
+          data lv_belnr_int type int8.
+         move lv_headersegment-belnr to lv_belnr_int.
+          lv_belnr_int += r->get_next( ).
+          lv_dummy_po = lv_belnr_int.
+          lv_headersegment-belnr = LV_DUMMY_PO.
+          EV_OBJID = LV_DUMMY_PO.
+
+          data lv_idoc_int type int8.
+          lv_idoc_int = <fs_header>-docnum.
+          lv_idoc_int += r2->get_next( ).
+          lv_dummy_idocnum = lv_idoc_int.
+        ENDIF.
+        READ TABLE CT_EDIDD WITH KEY SEGNAM = 'E1EDK02' ASSIGNING FIELD-SYMBOL(<fs_header_EXT>).
+          lv_headersegment2 = <fs_header>-sdata.
+          lv_headersegment2-belnr = LV_DUMMY_PO.
+      WHEN OTHERS.
+    ENDCASE.
+
+    LOOP AT CT_EDIDD ASSIGNING FIELD-SYMBOL(<FS_EDIDD>).
+        <FS_EDIDD>-docnum = LV_DUMMY_IDOCNUM.
+    ENDLOOP.
   ENDMETHOD.
 ENDCLASS.

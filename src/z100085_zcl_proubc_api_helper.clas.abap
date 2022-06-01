@@ -17,27 +17,54 @@ CLASS z100085_zcl_proubc_api_helper DEFINITION
         CHANGING
           !cr_data TYPE REF TO data.
     METHODS:
+      constructor,
       call_ident_api IMPORTING iv_tenant TYPE z100085_prvdtenantid EXPORTING ev_authtoken TYPE REF TO data
+                                                                             status TYPE i
                                                                              ev_bpiendpoint TYPE string,
       call_baseline_api,
       authenticate_ident_api_basic IMPORTING iv_userid   TYPE string
                                              iv_password TYPE z100085_casesensitive_str
                                    EXPORTING authtoken   TYPE REF TO data,
       baseline_health_check IMPORTING iv_tenant TYPE z100085_prvdtenantid EXPORTING ev_isreachable TYPE boolean,
-      setup_protocol_msg,
-      send_protocol_msg IMPORTING body TYPE z100085_zif_proubc_baseline=>protocolmessage_req EXPORTING statuscode TYPE i.
+      setup_protocol_msg EXPORTING setup_success TYPE boolean,
+      send_protocol_msg IMPORTING body TYPE z100085_zif_proubc_baseline=>protocolmessage_req
+                        EXPORTING statuscode TYPE i
+                                  apiresponsestr TYPE string
+                                  apiresponse TYPE REF TO data,
+      get_default_tenant RETURNING VALUE(ev_defaulttenant) TYPE z100085_prvdorgs-organization_id,
+      get_default_tenant_bpiendpoint RETURNING VALUE(ev_bpiendpoint) TYPE z100085_prvdorgs-bpi_endpoint,
+      build_dummy_idoc_protocol_msg RETURNING VALUE(es_dummy_idoc_msg) TYPE z100085_zif_proubc_baseline=>protocolmessage_req.
   PROTECTED SECTION.
     DATA: lv_defaulttenant        TYPE z100085_prvdorgs-organization_id VALUE 'e41dea7b-3510-4ffa-8ff4-53f3b158c8b4',
           lv_defaultidenttoken    TYPE REF TO data,
           lv_defaultbaselinetoken TYPE REF TO data,
+          lv_default_bpiendpoint  TYPE string,
           lo_ident_client         TYPE REF TO Z100085_zif_proubc_ident,
           lo_baseline_client      TYPE REF TO z100085_zif_proubc_baseline.
+    METHODS: set_default_tenant IMPORTING iv_defaulttenant TYPE z100085_prvdorgs-organization_id OPTIONAL.
   PRIVATE SECTION.
 ENDCLASS.
 
 
 
 CLASS z100085_zcl_proubc_api_helper IMPLEMENTATION.
+  METHOD constructor.
+    "todo more robust selection criteria - based on sap user authorization/mapping to tenant
+    SELECT organization_id,
+           bpi_endpoint
+        FROM z100085_prvdorgs
+        INTO TABLE @DATA(lt_defaultorg)
+        UP TO 1 ROWS
+        ORDER BY created_at DESCENDING.
+    IF sy-subrc = 0.
+      READ TABLE lt_defaultorg INDEX 1 INTO DATA(wa_defaulttenant).
+      IF sy-subrc = 0.
+        lv_defaulttenant = wa_defaulttenant-organization_id.
+        lv_default_bpiendpoint = wa_defaulttenant-bpi_endpoint.
+      ENDIF.
+    ENDIF.
+
+  ENDMETHOD.
   METHOD map_data_to_tenant.
     DATA: ls_tenant TYPE z100085_prvdorgs.
     FIELD-SYMBOLS: <ls_data> TYPE REF TO data.
@@ -116,7 +143,7 @@ CLASS z100085_zcl_proubc_api_helper IMPLEMENTATION.
 
     "lo_ident_api->
 
-    lo_ident_api->authorizelong_termtoken( EXPORTING body = authtokenreqbody IMPORTING apiresponse = lv_apiresponse  ).
+    lo_ident_api->authorizelong_termtoken( EXPORTING body = authtokenreqbody IMPORTING status = status apiresponse = lv_apiresponse  ).
 *    CATCH cx_static_check.
 
     ev_authtoken = lv_apiresponse.
@@ -266,11 +293,13 @@ CLASS z100085_zcl_proubc_api_helper IMPLEMENTATION.
       lv_tenant_jwt   TYPE REF TO data,
       lv_tenant       TYPE z100085_prvdtenantid,
       lv_baseline_jwt TYPE REF TO data,
+      lv_ident_code   TYPE i,
       lv_code         TYPE i,
       lv_bpiendpoint  TYPE string.
 
     FIELD-SYMBOLS: <fs_authreq>  TYPE any,
                    <fs_authreq2> TYPE string.
+
 
 
     me->call_ident_api( EXPORTING iv_tenant = lv_defaulttenant
@@ -311,19 +340,118 @@ CLASS z100085_zcl_proubc_api_helper IMPLEMENTATION.
           lo_baseline_client = lo_baseline_api.
 
           lv_baseline_jwt = lo_baseline_api->bearerauthentication( EXPORTING body = lv_authreq iv_tenantid = lv_tenant IMPORTING code = lv_code  ).
+          IF lv_baseline_jwt IS NOT INITIAL.
+            setup_success = 'X'.
+          ELSE.
+            setup_success = '-'.
+          ENDIF.
           lv_defaultbaselinetoken = lv_baseline_jwt.
         CATCH cx_root.
       ENDTRY.
+    ELSE.
+      setup_success = '-'. " failed
     ENDIF.
   ENDMETHOD.
   METHOD send_protocol_msg.
 
     TRY.
-        lo_baseline_client->send_protocol_msg( EXPORTING body = body IMPORTING statuscode = statuscode ).
+        lo_baseline_client->send_protocol_msg( EXPORTING body = body
+                                               IMPORTING statuscode = statuscode
+                                                         apiresponsestr = apiresponsestr
+                                                         apiresponse = apiresponse ).
       CATCH cx_static_check.
         "wat do
     ENDTRY.
 *    CATCH cx_static_check.
 
   ENDMETHOD.
+
+  METHOD get_default_tenant.
+    "TODO add authorization check and mapping to sap user id
+    ev_defaulttenant = lv_defaulttenant.
+  ENDMETHOD.
+  METHOD get_default_tenant_bpiendpoint.
+    "TODO add authorization check and mapping to sap user id
+    ev_bpiendpoint = lv_default_bpiendpoint.
+  ENDMETHOD.
+  METHOD set_default_tenant.
+    "TODO add authorization check and mapping to sap user id
+    lv_defaulttenant = iv_defaulttenant.
+  ENDMETHOD.
+
+  METHOD build_dummy_idoc_protocol_msg.
+    DATA ls_dummy_idoc_protocol_msg TYPE z100085_zif_proubc_baseline=>protocolmessage_req.
+    SELECT docnum,
+       idoctp,
+       status,
+       credat,
+       cretim,
+       upddat,
+       updtim
+       FROM edidc
+       UP TO 1 ROWS
+       "inner join EDID4 as b on a~docnum = b~docnum
+       INTO TABLE @DATA(lt_selected_idocs)
+       WHERE direct = '1'
+       AND status = '03'
+       AND mestyp = 'ORDERS'
+       AND idoctp = 'ORDERS05'.
+
+    CHECK sy-subrc = 0.
+
+    READ TABLE lt_selected_idocs INTO DATA(wa_selected_idoc) INDEX 1.
+
+    DATA:
+      lv_idocnum      TYPE edidc-docnum,
+      LV_NEWIDOCNUM TYPE   EDIDC-DOCNUM,
+      lt_edids        TYPE TABLE OF edids,
+      lt_edidd        TYPE TABLE OF edidd,
+      wa_idoc_control TYPE edidc,
+      lv_status       TYPE i.
+
+    CLEAR: lt_edids, lt_edidd, lv_idocnum.
+
+
+    CALL FUNCTION 'IDOC_READ_COMPLETELY'
+      EXPORTING
+        document_number = wa_selected_idoc-docnum
+      IMPORTING
+        idoc_control    = wa_idoc_control
+      TABLES
+        int_edids       = lt_edids
+        int_edidd       = lt_edidd
+      EXCEPTIONS
+        OTHERS          = 1.
+
+    ls_dummy_idoc_protocol_msg-payload_mimetype = 'json'.
+    ls_dummy_idoc_protocol_msg-type = 'ORDERS05'.
+
+    z100085_zcl_proubc_idochlpr=>get_DUMMY_objid( EXPORTING iv_schema = 'ORDERS05'
+                   IMPORTING ev_objid = ls_dummy_idoc_protocol_msg-id
+                             EV_NEWIDOCNUM = LV_NEWIDOCNUM
+                    CHANGING ct_edidd = lt_edidd ).
+
+    DATA: lv_idocjson TYPE string.
+    lv_idocjson = /ui2/cl_json=>serialize(
+       EXPORTING
+         data             = lt_edidd
+*            compress         =
+*            name             =
+*            pretty_name      =
+*            type_descr       =
+*            assoc_arrays     =
+*            ts_as_iso8601    =
+*            expand_includes  =
+*            assoc_arrays_opt =
+*            numc_as_string   =
+*            name_mappings    =
+*            conversion_exits =
+*          RECEIVING
+*            r_json           =
+     ).
+    ls_dummy_idoc_protocol_msg-payload = lv_idocjson.
+
+    es_dummy_idoc_msg = ls_dummy_idoc_protocol_msg.
+  ENDMETHOD.
+
 ENDCLASS.

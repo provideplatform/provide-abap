@@ -2686,6 +2686,19 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
     lv_code = send_receive( ).
     statuscode = lv_code.
     LV_RESPONSESTR = MI_CLIENT->RESPONSE->GET_CDATA( ).
+    apiresponsestr = lv_responsestr.
+    /ui2/cl_json=>deserialize(
+      EXPORTING
+        json             = lv_responsestr
+*        jsonx            =
+*        pretty_name      =
+*        assoc_arrays     =
+*        assoc_arrays_opt =
+*        name_mappings    =
+*        conversion_exits =
+      CHANGING
+        data             = apiresponse
+    ).
     CASE lv_code.
       WHEN 202. " The request was successful
       WHEN OTHERS.

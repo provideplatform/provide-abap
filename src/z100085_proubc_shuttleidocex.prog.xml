@@ -138,6 +138,16 @@
       </item>
      </TEXTPOOL>
     </item>
+    <item>
+     <LANGUAGE>묩</LANGUAGE>
+     <TEXTPOOL>
+      <item>
+       <ID>R</ID>
+       <ENTRY>Example batch program to baseline idoc via Provide Shuttle</ENTRY>
+       <LENGTH>58</LENGTH>
+      </item>
+     </TEXTPOOL>
+    </item>
    </I18N_TPOOL>
   </asx:values>
  </asx:abap>

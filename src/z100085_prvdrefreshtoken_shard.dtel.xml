@@ -31,6 +31,7 @@
     <LANGU>P</LANGU>
     <LANGU>R</LANGU>
     <LANGU>V</LANGU>
+    <LANGU>묩</LANGU>
    </I18N_LANGS>
    <DD04_TEXTS>
     <item>
@@ -123,6 +124,14 @@
     </item>
     <item>
      <DDLANGUAGE>V</DDLANGUAGE>
+     <DDTEXT>proUBC Refresh Token Shard</DDTEXT>
+     <REPTEXT>Refresh Token Shard</REPTEXT>
+     <SCRTEXT_S>RefreshTkn</SCRTEXT_S>
+     <SCRTEXT_M>Refresh Token Shard</SCRTEXT_M>
+     <SCRTEXT_L>Refresh Token Shard</SCRTEXT_L>
+    </item>
+    <item>
+     <DDLANGUAGE>묩</DDLANGUAGE>
      <DDTEXT>proUBC Refresh Token Shard</DDTEXT>
      <REPTEXT>Refresh Token Shard</REPTEXT>
      <SCRTEXT_S>RefreshTkn</SCRTEXT_S>

@@ -407,7 +407,10 @@ CLASS z100085_zcl_proubc_api_sicf IMPLEMENTATION.
        lo_router->attach( iv_template = '/auth' iv_handler_class = 'Z100085_ZCL_PROUBC_AUTHAPI').
        lo_router->attach( iv_template = '/schemas'   iv_handler_class = 'Z100085_ZCL_IDOCAPI_BTYPEAPI' ).
        lo_router->attach( iv_template = '/schemas/{basictypeid}'   iv_handler_class = 'Z100085_ZCL_IDOCAPI_SEGMENTAPI' ).
+
        lo_router->attach( iv_template = '/test/trigger_outbound' iv_handler_class = 'Z100085_ZCL_PROUBC_OBTRIGTEST' ).
+       "triggers update
+       "lo_router->attach( iv_template = '/test/trigger_outbound/{ID}' iv_handler_class = 'Z100085_ZCL_PROUBC_OBTRIGTEST' ).
      ro_root_handler = lo_router.
   ENDMETHOD.
 ENDCLASS.

@@ -1601,6 +1601,8 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
         body type protocolmessage_req
     exporting
         statuscode type i
+        apiresponsestr type string
+        apiresponse type ref to data
     raising cx_static_check.
 
 ENDINTERFACE.

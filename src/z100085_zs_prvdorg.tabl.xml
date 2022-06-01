@@ -78,6 +78,7 @@
     <LANGU>P</LANGU>
     <LANGU>R</LANGU>
     <LANGU>V</LANGU>
+    <LANGU>묩</LANGU>
    </I18N_LANGS>
    <DD02_TEXTS>
     <item>
@@ -126,6 +127,10 @@
     </item>
     <item>
      <DDLANGUAGE>V</DDLANGUAGE>
+     <DDTEXT>Structure for the PRVDORG</DDTEXT>
+    </item>
+    <item>
+     <DDLANGUAGE>묩</DDLANGUAGE>
      <DDTEXT>Structure for the PRVDORG</DDTEXT>
     </item>
    </DD02_TEXTS>

@@ -351,6 +351,7 @@ CLASS Z100085_zcl_proubc_ident IMPLEMENTATION.
     me->get_refresh_bearer_token( ).
 
     lv_code = send_receive( ).
+    status = lv_code.
     "WRITE / lv_code.
     CASE lv_code.
       WHEN 200 OR 201 OR 202.
@@ -358,6 +359,8 @@ CLASS Z100085_zcl_proubc_ident IMPLEMENTATION.
         lv_authresponsestr = mi_client->response->get_cdata( ).
         "lv_parsedresponse = me->parse_longauthenticationresp( exporting iv_prefix = lv_authresponsestr ).
         /ui2/cl_json=>deserialize( EXPORTING json = lv_authresponsestr CHANGING data =  apiresponse ).
+      when 401. "refresh token incorrect
+      when 407. "check the certs in strust
     ENDCASE.
   ENDMETHOD.
 

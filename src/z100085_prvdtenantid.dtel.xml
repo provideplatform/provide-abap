@@ -31,6 +31,7 @@
     <LANGU>P</LANGU>
     <LANGU>R</LANGU>
     <LANGU>V</LANGU>
+    <LANGU>묩</LANGU>
    </I18N_LANGS>
    <DD04_TEXTS>
     <item>
@@ -123,6 +124,14 @@
     </item>
     <item>
      <DDLANGUAGE>V</DDLANGUAGE>
+     <DDTEXT>proUBC Tenant ID</DDTEXT>
+     <REPTEXT>proUBC Tenant</REPTEXT>
+     <SCRTEXT_S>prvdTenant</SCRTEXT_S>
+     <SCRTEXT_M>proUBC Tenant</SCRTEXT_M>
+     <SCRTEXT_L>proUBC Tenant</SCRTEXT_L>
+    </item>
+    <item>
+     <DDLANGUAGE>묩</DDLANGUAGE>
      <DDTEXT>proUBC Tenant ID</DDTEXT>
      <REPTEXT>proUBC Tenant</REPTEXT>
      <SCRTEXT_S>prvdTenant</SCRTEXT_S>

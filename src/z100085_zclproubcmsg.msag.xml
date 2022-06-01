@@ -64,6 +64,7 @@
     <LANGU>P</LANGU>
     <LANGU>R</LANGU>
     <LANGU>V</LANGU>
+    <LANGU>묩</LANGU>
    </I18N_LANGS>
    <T100T>
     <T100T>
@@ -123,6 +124,11 @@
     </T100T>
     <T100T>
      <SPRSL>V</SPRSL>
+     <ARBGB>Z100085_ZCLPROUBCMSG</ARBGB>
+     <STEXT>Message class for proUBC connector</STEXT>
+    </T100T>
+    <T100T>
+     <SPRSL>묩</SPRSL>
      <ARBGB>Z100085_ZCLPROUBCMSG</ARBGB>
      <STEXT>Message class for proUBC connector</STEXT>
     </T100T>
@@ -545,6 +551,41 @@
     </item>
     <item>
      <SPRSL>V</SPRSL>
+     <MSGNR>006</MSGNR>
+     <TEXT>Failed to delete org &amp;</TEXT>
+    </item>
+    <item>
+     <SPRSL>묩</SPRSL>
+     <MSGNR>000</MSGNR>
+     <TEXT>Refresh token updated for Org &amp;</TEXT>
+    </item>
+    <item>
+     <SPRSL>묩</SPRSL>
+     <MSGNR>001</MSGNR>
+     <TEXT>Org &amp; created</TEXT>
+    </item>
+    <item>
+     <SPRSL>묩</SPRSL>
+     <MSGNR>002</MSGNR>
+     <TEXT>Org &amp; updated</TEXT>
+    </item>
+    <item>
+     <SPRSL>묩</SPRSL>
+     <MSGNR>003</MSGNR>
+     <TEXT>Org &amp; deleted</TEXT>
+    </item>
+    <item>
+     <SPRSL>묩</SPRSL>
+     <MSGNR>004</MSGNR>
+     <TEXT>Failed to create org &amp;</TEXT>
+    </item>
+    <item>
+     <SPRSL>묩</SPRSL>
+     <MSGNR>005</MSGNR>
+     <TEXT>Failed to update org &amp;</TEXT>
+    </item>
+    <item>
+     <SPRSL>묩</SPRSL>
      <MSGNR>006</MSGNR>
      <TEXT>Failed to delete org &amp;</TEXT>
     </item>

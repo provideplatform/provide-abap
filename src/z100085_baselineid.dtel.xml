@@ -31,6 +31,7 @@
     <LANGU>P</LANGU>
     <LANGU>R</LANGU>
     <LANGU>V</LANGU>
+    <LANGU>묩</LANGU>
    </I18N_LANGS>
    <DD04_TEXTS>
     <item>
@@ -123,6 +124,14 @@
     </item>
     <item>
      <DDLANGUAGE>V</DDLANGUAGE>
+     <DDTEXT>proUBC Baseline ID data element</DDTEXT>
+     <REPTEXT>proUBC Baseline ID</REPTEXT>
+     <SCRTEXT_S>BaselineID</SCRTEXT_S>
+     <SCRTEXT_M>Baseline ID</SCRTEXT_M>
+     <SCRTEXT_L>proUBC Baseline ID</SCRTEXT_L>
+    </item>
+    <item>
+     <DDLANGUAGE>묩</DDLANGUAGE>
      <DDTEXT>proUBC Baseline ID data element</DDTEXT>
      <REPTEXT>proUBC Baseline ID</REPTEXT>
      <SCRTEXT_S>BaselineID</SCRTEXT_S>
