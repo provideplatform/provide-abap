@@ -139,7 +139,8 @@ CLASS z100085_zcl_proubc_api_helper IMPLEMENTATION.
     DATA: authtokenreqbody TYPE z100085_zif_proubc_ident=>authorizelong_termtokenrequest.
 
     authtokenreqbody-organization_id = iv_tenant.
-    authtokenreqbody-scope = 'offline_access'.
+    "authtokenreqbody-scope = ''.
+    authtokenreqbody-grant_type = 'refresh_token'.
 
     "lo_ident_api->
 

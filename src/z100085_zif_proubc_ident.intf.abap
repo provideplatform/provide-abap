@@ -36,6 +36,7 @@ INTERFACE Z100085_zif_proubc_Ident PUBLIC.
   TYPES: BEGIN OF authorizelong_termtokenrequest,
            scope           TYPE z100085_casesensitive_str,
            organization_id TYPE z100085_casesensitive_str,
+           grant_type      type z100085_casesensitive_str,
          END OF authorizelong_termtokenrequest.
 
   types: begin of authorizelongtermtokenresponse,

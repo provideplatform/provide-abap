@@ -47,6 +47,9 @@ CLASS z100085_zcl_proubc_prvdtenants IMPLEMENTATION.
           lt_existingprvdorg TYPE TABLE OF z100085_prvdorgs,
           lv_timestamp       TYPE timestampl.
     "TODO add SAP auth check
+
+    CHECK it_prvdorg IS NOT INITIAL.
+
     "duplicate check
 
     "throw out error message if the tenant already exists
@@ -64,8 +67,17 @@ CLASS z100085_zcl_proubc_prvdtenants IMPLEMENTATION.
       ls_prvdorg-organization_id = <fs_prvdorg>-organization_id.
       ls_prvdorg-bpi_endpoint = <fs_prvdorg>-bpi_endpoint.
       ls_prvdorg-ident_endpoint = <fs_prvdorg>-ident_endpoint.
-      ls_prvdorg-refresh_token = <fs_prvdorg>-refresh_token.
-      ls_prvdorg-refresh_tokenext = <fs_prvdorg>-refresh_tokenext.
+      DATA(lv_tokenlength) = strlen( <fs_prvdorg>-refresh_token ).
+      IF lv_tokenlength LE 1024 .
+        ls_prvdorg-refresh_token = <fs_prvdorg>-refresh_token(lv_tokenlength).
+      ELSE.
+        DATA(lv_remaininglength) = 2048 - lv_tokenlength.
+        ls_prvdorg-refresh_token = <fs_prvdorg>-refresh_token(1024).
+        ls_prvdorg-refresh_tokenext = <fs_prvdorg>-refresh_token+1024(lv_remaininglength).
+      ENDIF.
+
+
+
       ls_prvdorg-createdby = sy-uname.
       ls_prvdorg-created_at = lv_timestamp.
       APPEND ls_prvdorg TO lt_prvdorg.
@@ -204,6 +216,8 @@ CLASS z100085_zcl_proubc_prvdtenants IMPLEMENTATION.
 
     "TODO add SAP auth
 
+    CHECK it_prvdorg IS NOT INITIAL.
+
     DESCRIBE TABLE it_prvdorg LINES DATA(lv_targetcount).
 
     IF it_prvdorg IS INITIAL OR lv_targetcount = 0.
@@ -221,8 +235,16 @@ CLASS z100085_zcl_proubc_prvdtenants IMPLEMENTATION.
       ls_prvdorg-organization_id = <fs_prvdorg>-organization_id.
       ls_prvdorg-bpi_endpoint = <fs_prvdorg>-bpi_endpoint.
       ls_prvdorg-ident_endpoint = <fs_prvdorg>-ident_endpoint.
-      ls_prvdorg-refresh_token = <fs_prvdorg>-refresh_token.
-      ls_prvdorg-refresh_tokenext = <fs_prvdorg>-refresh_tokenext.
+      "ls_prvdorg-refresh_token = <fs_prvdorg>-refresh_token.
+      "ls_prvdorg-refresh_tokenext = <fs_prvdorg>-refresh_tokenext.
+      DATA(lv_tokenlength) = strlen( <fs_prvdorg>-refresh_token ).
+      IF lv_tokenlength LE 1024 .
+        ls_prvdorg-refresh_token = <fs_prvdorg>-refresh_token(lv_tokenlength).
+      ELSE.
+        DATA(lv_remaininglength) = 2048 - lv_tokenlength.
+        ls_prvdorg-refresh_token = <fs_prvdorg>-refresh_token(1024).
+        ls_prvdorg-refresh_tokenext = <fs_prvdorg>-refresh_token+1024(lv_remaininglength).
+      ENDIF.
       READ TABLE lt_targettenants ASSIGNING FIELD-SYMBOL(<fs_olddata>) WITH KEY organization_id = <fs_prvdorg>-organization_id.
       IF sy-subrc = 0.
         ls_prvdorg-createdby = <fs_olddata>-createdby.
