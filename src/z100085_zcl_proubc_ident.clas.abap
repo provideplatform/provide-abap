@@ -5,12 +5,12 @@ CLASS Z100085_zcl_proubc_ident DEFINITION PUBLIC GLOBAL FRIENDS Z100085_zcl_prou
     INTERFACES Z100085_zif_proubc_ident.
     METHODS constructor IMPORTING ii_client       TYPE REF TO if_http_client
                                   iv_tenant       TYPE z100085_prvdtenantid
-                                  iv_refreshtoken TYPE Z100085_PRVDREFRESHTOKEN.
+                                  iv_refreshtoken TYPE z100085_prvdrefreshtoken.
   PROTECTED SECTION.
     DATA mi_client TYPE REF TO if_http_client.
     DATA mo_json TYPE REF TO Z100085_zcl_oapi_json.
-    DATA authtoken TYPE Z100085_PRVDREFRESHTOKEN.
-    DATA refreshtoken TYPE Z100085_PRVDREFRESHTOKEN.
+    DATA authtoken TYPE z100085_prvdrefreshtoken.
+    DATA refreshtoken TYPE z100085_prvdrefreshtoken.
     DATA tenant TYPE z100085_prvdtenantid.
     METHODS send_receive RETURNING VALUE(rv_code) TYPE i.
     METHODS parse_createapplicationrequest
@@ -35,14 +35,14 @@ CLASS Z100085_zcl_proubc_ident DEFINITION PUBLIC GLOBAL FRIENDS Z100085_zcl_prou
       RAISING   cx_static_check.
     METHODS parse_authorizelong_termtokenr
       IMPORTING iv_prefix                             TYPE string
-      RETURNING VALUE(authorizelong_termtokenrequest) TYPE Z100085_zif_proubc_ident=>authorizelong_termtokenrequest
+      RETURNING VALUE(authorizelong_termtokenrequest) TYPE Z100085_zif_proubc_ident=>refresh_accesstoken_request
       RAISING   cx_static_check.
     METHODS parse_authenticationrequest
       IMPORTING iv_prefix                    TYPE string
       RETURNING VALUE(authenticationrequest) TYPE Z100085_zif_proubc_ident=>authenticationrequest
       RAISING   cx_static_check.
     METHODS parse_longauthenticationresp
-      IMPORTING iv_prefix                    TYPE string
+      IMPORTING iv_prefix                     TYPE string
       RETURNING VALUE(authenticationresponse) TYPE Z100085_zif_proubc_ident=>authorizelongtermtokenresponse
       RAISING   cx_static_check.
     METHODS parse_createuserrequest
@@ -99,11 +99,11 @@ CLASS Z100085_zcl_proubc_ident IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD parse_authorizelong_termtokenr.
-    authorizelong_termtokenrequest-scope = mo_json->value_string( iv_prefix && '/scope' ).
-    authorizelong_termtokenrequest-organization_id = mo_json->value_string( iv_prefix && '/organization_id' ).
+    "authorizelong_termtokenrequest-scope = mo_json->value_string( iv_prefix && '/scope' ).
+    "authorizelong_termtokenrequest-organization_id = mo_json->value_string( iv_prefix && '/organization_id' ).
   ENDMETHOD.
 
-  method parse_longauthenticationresp.
+  METHOD parse_longauthenticationresp.
     authenticationresponse-id = mo_json->value_string( iv_prefix && '/id' ).
     authenticationresponse-access_token = mo_json->value_string( iv_prefix && '/access_token' ).
     authenticationresponse-refresh_token = mo_json->value_string( iv_prefix && '/refresh_token' ).
@@ -327,17 +327,24 @@ CLASS Z100085_zcl_proubc_ident IMPLEMENTATION.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/api/v1/tokens'.
-    DATA: lv_longtermrequestdata  TYPE REF TO data,
-          lv_requeststr type string.
+    DATA: lv_longtermrequestdata TYPE REF TO data,
+          lv_requeststr          TYPE string.
     DATA lv_authresponsestr TYPE string.
 
     mi_client->request->set_method( 'POST' ).
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
+    mi_client->request->set_header_field( name = 'content-type' value = 'application/json' ).
+    me->get_refresh_bearer_token( ).
+    data: lt_headerfields type tihttpnvp.
+    mi_client->request->get_header_fields(
+      CHANGING
+        fields = lt_headerfields
+    ).
 
     z100085_zcl_proubc_api_helper=>copy_data_to_ref( EXPORTING is_data = body
                       CHANGING cr_data = lv_longtermrequestdata  ).
 
-    lv_requeststr = /ui2/cl_json=>serialize( exporting data = lv_longtermrequestdata
+    lv_requeststr = /ui2/cl_json=>serialize( EXPORTING data = lv_longtermrequestdata
                                        pretty_name = /ui2/cl_json=>pretty_mode-low_case ).
 
     mi_client->request->set_cdata(
@@ -347,20 +354,62 @@ CLASS Z100085_zcl_proubc_ident IMPLEMENTATION.
 *        length = -1
     ).
 
-
-    me->get_refresh_bearer_token( ).
-
     lv_code = send_receive( ).
     status = lv_code.
-    "WRITE / lv_code.
+
     CASE lv_code.
       WHEN 200 OR 201 OR 202.
-        data: lv_parsedresponse type Z100085_zif_proubc_ident=>authorizelongtermtokenresponse.
+        DATA: lv_parsedresponse TYPE Z100085_zif_proubc_ident=>authorizelongtermtokenresponse.
         lv_authresponsestr = mi_client->response->get_cdata( ).
         "lv_parsedresponse = me->parse_longauthenticationresp( exporting iv_prefix = lv_authresponsestr ).
         /ui2/cl_json=>deserialize( EXPORTING json = lv_authresponsestr CHANGING data =  apiresponse ).
-      when 401. "refresh token incorrect
-      when 407. "check the certs in strust
+      WHEN 401. "refresh token incorrect
+      WHEN 407. "check the certs in strust
+    ENDCASE.
+  ENDMETHOD.
+
+    METHOD Z100085_zif_proubc_ident~refresh_access_token.
+    DATA lv_code TYPE i.
+    DATA lv_temp TYPE string.
+    DATA lv_uri TYPE string VALUE '/api/v1/tokens'.
+    DATA: lv_longtermrequestdata TYPE REF TO data,
+          lv_requeststr          TYPE string.
+    DATA lv_authresponsestr TYPE string.
+
+    mi_client->request->set_method( 'POST' ).
+    mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
+    mi_client->request->set_header_field( name = 'content-type' value = 'application/json' ).
+    me->get_refresh_bearer_token( ).
+    data: lt_headerfields type tihttpnvp.
+    mi_client->request->get_header_fields(
+      CHANGING
+        fields = lt_headerfields
+    ).
+
+    z100085_zcl_proubc_api_helper=>copy_data_to_ref( EXPORTING is_data = body
+                      CHANGING cr_data = lv_longtermrequestdata  ).
+
+    lv_requeststr = /ui2/cl_json=>serialize( EXPORTING data = lv_longtermrequestdata
+                                       pretty_name = /ui2/cl_json=>pretty_mode-low_case ).
+
+    mi_client->request->set_cdata(
+      EXPORTING
+        data   =  lv_requeststr
+*        offset = 0
+*        length = -1
+    ).
+
+    lv_code = send_receive( ).
+    status = lv_code.
+
+    CASE lv_code.
+      WHEN 200 OR 201 OR 202.
+        DATA: lv_parsedresponse TYPE Z100085_zif_proubc_ident=>authorizelongtermtokenresponse.
+        lv_authresponsestr = mi_client->response->get_cdata( ).
+        "lv_parsedresponse = me->parse_longauthenticationresp( exporting iv_prefix = lv_authresponsestr ).
+        /ui2/cl_json=>deserialize( EXPORTING json = lv_authresponsestr CHANGING data =  apiresponse ).
+      WHEN 401. "refresh token incorrect
+      WHEN 407. "check the certs in strust
     ENDCASE.
   ENDMETHOD.
 
@@ -495,12 +544,20 @@ CLASS Z100085_zcl_proubc_ident IMPLEMENTATION.
   METHOD get_refresh_bearer_token.
     DATA lv_bearertoken TYPE string.
     "todo check auth token is valid (not empty or expired)
+
+    DATA(lv_refreshtoken_length) = strlen( refreshtoken ).
+
     CONCATENATE 'bearer' refreshtoken INTO lv_bearertoken SEPARATED BY space.
+
     mi_client->request->set_header_field(
       EXPORTING
         name  = 'authorization'
         value = lv_bearertoken
     ). "HINT: if this authorization does not appear to work, check token length
+
+
+
+
 
   ENDMETHOD.
 

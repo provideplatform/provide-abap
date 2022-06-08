@@ -71,9 +71,8 @@ CLASS z100085_zcl_proubc_prvdtenants IMPLEMENTATION.
       IF lv_tokenlength LE 1024 .
         ls_prvdorg-refresh_token = <fs_prvdorg>-refresh_token(lv_tokenlength).
       ELSE.
-        DATA(lv_remaininglength) = 2048 - lv_tokenlength.
         ls_prvdorg-refresh_token = <fs_prvdorg>-refresh_token(1024).
-        ls_prvdorg-refresh_tokenext = <fs_prvdorg>-refresh_token+1024(lv_remaininglength).
+        ls_prvdorg-refresh_tokenext = <fs_prvdorg>-refresh_token+1024(1024).
       ENDIF.
 
 
@@ -241,9 +240,11 @@ CLASS z100085_zcl_proubc_prvdtenants IMPLEMENTATION.
       IF lv_tokenlength LE 1024 .
         ls_prvdorg-refresh_token = <fs_prvdorg>-refresh_token(lv_tokenlength).
       ELSE.
-        DATA(lv_remaininglength) = 2048 - lv_tokenlength.
+*        DATA(lv_remaininglength) = 2048 - lv_tokenlength.
         ls_prvdorg-refresh_token = <fs_prvdorg>-refresh_token(1024).
-        ls_prvdorg-refresh_tokenext = <fs_prvdorg>-refresh_token+1024(lv_remaininglength).
+        ls_prvdorg-refresh_tokenext = <fs_prvdorg>-refresh_token+1024(1024).
+        "ls_prvdorg-refresh_token = substring( val = <fs_prvdorg>-refresh_token off = 0 len = 1024 ).
+        "ls_prvdorg-refresh_token = substring( val = <fs_prvdorg>-refresh_token off = 1024 len = 1024 ).
       ENDIF.
       READ TABLE lt_targettenants ASSIGNING FIELD-SYMBOL(<fs_olddata>) WITH KEY organization_id = <fs_prvdorg>-organization_id.
       IF sy-subrc = 0.

@@ -33,20 +33,26 @@ INTERFACE Z100085_zif_proubc_Ident PUBLIC.
          END OF updateorganizationdetailsreque.
 
 * Component schema: Authorizelong-termtokenRequest, object
-  TYPES: BEGIN OF authorizelong_termtokenrequest,
+  TYPES: BEGIN OF authorize_access_refreshtoken,
            scope           TYPE z100085_casesensitive_str,
            organization_id TYPE z100085_casesensitive_str,
-           grant_type      type z100085_casesensitive_str,
-         END OF authorizelong_termtokenrequest.
+         END OF authorize_access_refreshtoken.
 
-  types: begin of authorizelongtermtokenresponse,
-            id type z100085_casesensitive_str,
-            access_token type z100085_casesensitive_str,
-            refresh_token type z100085_casesensitive_str,
-            expires_in type int4,
-            scope type z100085_casesensitive_str,
-            permissions type int4,
-         end of authorizelongtermtokenresponse.
+* Component schema: Authorizelong-termtokenRequest, object
+  TYPES: BEGIN OF refresh_accesstoken_request,
+           organization_id TYPE z100085_casesensitive_str,
+           grant_type      TYPE z100085_casesensitive_str,
+         END OF refresh_accesstoken_request.
+
+
+  TYPES: BEGIN OF authorizelongtermtokenresponse,
+           id            TYPE z100085_casesensitive_str,
+           access_token  TYPE z100085_casesensitive_str,
+           refresh_token TYPE z100085_casesensitive_str,
+           expires_in    TYPE int4,
+           scope         TYPE z100085_casesensitive_str,
+           permissions   TYPE int4,
+         END OF authorizelongtermtokenresponse.
 
 * Component schema: AuthenticationRequest, object
   TYPES: BEGIN OF authenticationrequest,
@@ -200,17 +206,18 @@ INTERFACE Z100085_zif_proubc_Ident PUBLIC.
               name         TYPE string
     RAISING   cx_static_check.
 
-* POST - "Authorize long-term token"
-* Operation id: Authorizelong-termtoken
-* Response: 200
-* Body ref: #/components/schemas/Authorizelong-termtokenRequest
-  METHODS authorizelong_termtoken
+* POST - "Authorize refresh token"
+* Operation id: refresh_accesstoken_request
+* Response: 201
+* Body ref: #/components/schemas/refresh_accesstoken_request
+  METHODS refresh_access_token
     IMPORTING
-              body        TYPE authorizelong_termtokenrequest
+              body        TYPE refresh_accesstoken_request
     EXPORTING
-              status type i
+              status      TYPE i
               apiresponse TYPE REF TO data
     RAISING   cx_static_check.
+
 
 * PUT - "Update user"
 * Operation id: Updateuser

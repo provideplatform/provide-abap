@@ -101,13 +101,22 @@ CLASS z100085_zcl_proubc_api_helper IMPLEMENTATION.
       ls_prvdtenant      TYPE z100085_prvdorgs,
       lv_refreshtokenstr TYPE z100085_prvdrefreshtoken,
       lv_identurl        TYPE string,
-      lv_apiresponse     TYPE REF TO data.
+      lv_apiresponse     TYPE REF TO data,
+      lv_tenant          TYPE z100085_prvdorgs-organization_id.
 
     "z100085_zcl_proubc_prvdtenants=>get_prvdtenant( EXPORTING iv_prvdtenant = iv_tenant
     "                                               IMPORTING ev_prvdtenant = ls_prvdtenant
     "                                                 ).
 
-    SELECT SINGLE * FROM z100085_prvdorgs INTO ls_prvdtenant WHERE organization_id = iv_tenant.
+    IF iv_tenant IS NOT INITIAL.
+      lv_tenant = iv_tenant.
+    ELSE.
+      lv_tenant = lv_defaulttenant.
+    ENDIF.
+
+    SELECT SINGLE * FROM z100085_prvdorgs INTO ls_prvdtenant WHERE organization_id = lv_tenant.
+
+    CHECK sy-subrc = 0. "todo send error message, org not found
 
     CONCATENATE ls_prvdtenant-refresh_token ls_prvdtenant-refresh_tokenext INTO lv_refreshtokenstr.
     lv_identurl = ls_prvdtenant-ident_endpoint.
@@ -133,18 +142,26 @@ CLASS z100085_zcl_proubc_api_helper IMPLEMENTATION.
     lo_http_client->propertytype_accept_cookie = if_http_client=>co_enabled.
     lo_http_client->request->set_header_field( name  = if_http_form_fields_sap=>sap_client value = '100' ).
 
-    lo_ident_api = NEW Z100085_zcl_proubc_ident( ii_client = lo_http_client iv_tenant = iv_tenant iv_refreshtoken = lv_refreshtokenstr  ).
+    lo_ident_api = NEW Z100085_zcl_proubc_ident( ii_client = lo_http_client iv_tenant = lv_tenant iv_refreshtoken = lv_refreshtokenstr  ).
     lo_ident_client = lo_ident_api.
 
-    DATA: authtokenreqbody TYPE z100085_zif_proubc_ident=>authorizelong_termtokenrequest.
+    DATA: authtokenreqbody TYPE z100085_zif_proubc_ident=>refresh_accesstoken_request.
 
-    authtokenreqbody-organization_id = iv_tenant.
+    authtokenreqbody-organization_id = lv_tenant.
     "authtokenreqbody-scope = ''.
     authtokenreqbody-grant_type = 'refresh_token'.
 
     "lo_ident_api->
 
-    lo_ident_api->authorizelong_termtoken( EXPORTING body = authtokenreqbody IMPORTING status = status apiresponse = lv_apiresponse  ).
+    "lo_ident_api->authorizelong_termtoken( EXPORTING body = authtokenreqbody IMPORTING status = status apiresponse = lv_apiresponse  ).
+    lo_ident_api->refresh_access_token(
+      EXPORTING
+        body        = authtokenreqbody
+      IMPORTING
+        status      = status
+        apiresponse = lv_apiresponse
+    ).
+*    CATCH cx_static_check.
 *    CATCH cx_static_check.
 
     ev_authtoken = lv_apiresponse.
@@ -266,10 +283,16 @@ CLASS z100085_zcl_proubc_api_helper IMPLEMENTATION.
 
           "lv_authenticationrequest-
 
-          lv_baseline_jwt = lo_baseline_api->bearerauthentication( EXPORTING body = lv_authreq iv_tenantid = lv_tenant IMPORTING code = lv_code  ).
+          "lo_baseline_api->
+          "lv_baseline_jwt = lo_baseline_api->bearerauthentication( EXPORTING body = lv_authreq iv_tenantid = lv_tenant IMPORTING code = lv_code  ).
 *    CATCH cx_static_check.
 
-          IF lv_code = 201.
+          lo_baseline_api->status(
+            IMPORTING
+              statuscode = lv_code
+          ).
+
+          IF lv_code = 200 or lv_code = 204.
             ev_isreachable = 'X'.
           ELSE.
             ev_isreachable = '-'.
@@ -404,7 +427,7 @@ CLASS z100085_zcl_proubc_api_helper IMPLEMENTATION.
 
     DATA:
       lv_idocnum      TYPE edidc-docnum,
-      LV_NEWIDOCNUM TYPE   EDIDC-DOCNUM,
+      lv_newidocnum   TYPE   edidc-docnum,
       lt_edids        TYPE TABLE OF edids,
       lt_edidd        TYPE TABLE OF edidd,
       wa_idoc_control TYPE edidc,
@@ -429,7 +452,7 @@ CLASS z100085_zcl_proubc_api_helper IMPLEMENTATION.
 
     z100085_zcl_proubc_idochlpr=>get_DUMMY_objid( EXPORTING iv_schema = 'ORDERS05'
                    IMPORTING ev_objid = ls_dummy_idoc_protocol_msg-id
-                             EV_NEWIDOCNUM = LV_NEWIDOCNUM
+                             ev_newidocnum = lv_newidocnum
                     CHANGING ct_edidd = lt_edidd ).
 
     DATA: lv_idocjson TYPE string.

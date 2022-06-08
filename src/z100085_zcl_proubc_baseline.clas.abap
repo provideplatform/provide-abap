@@ -7,7 +7,7 @@ CLASS z100085_zcl_proubc_baseline DEFINITION PUBLIC.
   PROTECTED SECTION.
     DATA mi_client TYPE REF TO if_http_client.
     DATA mo_json TYPE REF TO z100085_zcl_oapi_json.
-    DATA authtoken TYPE string.
+    DATA authtoken TYPE z100085_prvdrefreshtoken.
     METHODS send_receive RETURNING VALUE(rv_code) TYPE i.
     METHODS parse_account
       IMPORTING iv_prefix      TYPE string
@@ -750,7 +750,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
   METHOD Z100085_zif_proubc_baseline~listaccounts.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE 'https://baseline.provide.network/accounts'.
+    DATA lv_uri TYPE string VALUE '/accounts'.
     lv_temp = page.
     CONDENSE lv_temp.
     IF page IS SUPPLIED.
@@ -779,7 +779,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
   METHOD Z100085_zif_proubc_baseline~createaccount.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE 'https://baseline.provide.network/accounts'.
+    DATA lv_uri TYPE string VALUE '/accounts'.
     DATA lv_bearertoken TYPE string.
     mi_client->request->set_method( 'POST' ).
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
@@ -800,7 +800,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
   METHOD Z100085_zif_proubc_baseline~getaccountdetails.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE 'https://baseline.provide.network/accounts/{id}'.
+    DATA lv_uri TYPE string VALUE '/accounts/{id}'.
     lv_temp = id.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{id}' IN lv_uri WITH lv_temp.
@@ -827,8 +827,8 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
     "TODO add the code for basic auth - this code works for /tokens but not /authenticate
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE 'https://baseline.provide.network/authenticate'.
-    DATA lv_authpayload TYPE Z100085_zif_proubc_Ident=>authorizelong_termtokenrequest.
+    DATA lv_uri TYPE string VALUE '/authenticate'.
+    DATA lv_authpayload TYPE Z100085_zif_proubc_Ident=>authorize_access_refreshtoken.
     DATA lv_longtermrequestdata TYPE REF TO data.
     DATA lv_requeststr TYPE string.
 
@@ -869,8 +869,8 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
   METHOD Z100085_zif_proubc_baseline~bearerauthentication.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE 'https://baseline.provide.network/tokens'.
-    DATA lv_authpayload TYPE Z100085_zif_proubc_Ident=>authorizelong_termtokenrequest.
+    DATA lv_uri TYPE string VALUE '/tokens'.
+    DATA lv_authpayload TYPE Z100085_zif_proubc_Ident=>authorize_access_refreshtoken.
     DATA lv_longtermrequestdata TYPE REF TO data.
     DATA lv_requeststr TYPE string.
     DATA lv_authresponsestr TYPE string.
@@ -915,7 +915,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
   METHOD Z100085_zif_proubc_baseline~listconnectors.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE 'https://baseline.provide.network/connectors'.
+    DATA lv_uri TYPE string VALUE '/connectors'.
     lv_temp = page.
     CONDENSE lv_temp.
     IF page IS SUPPLIED.
@@ -953,7 +953,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
   METHOD Z100085_zif_proubc_baseline~createconnector.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE 'https://baseline.provide.network/connectors'.
+    DATA lv_uri TYPE string VALUE '/connectors'.
     mi_client->request->set_method( 'POST' ).
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
 * todo, set body, #/components/schemas/Connector
@@ -977,7 +977,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
   METHOD Z100085_zif_proubc_baseline~getconnectordetails.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE 'https://baseline.provide.network/connectors/{id}'.
+    DATA lv_uri TYPE string VALUE '/connectors/{id}'.
     lv_temp = id.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{id}' IN lv_uri WITH lv_temp.
@@ -1003,7 +1003,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
   METHOD Z100085_zif_proubc_baseline~deleteconnector.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE 'https://baseline.provide.network/connectors/{id}'.
+    DATA lv_uri TYPE string VALUE '/connectors/{id}'.
     lv_temp = id.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{id}' IN lv_uri WITH lv_temp.
@@ -1023,7 +1023,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
   METHOD Z100085_zif_proubc_baseline~getloadbalancerdetails.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE 'https://baseline.provide.network/connectors/{id}/load_balancers'.
+    DATA lv_uri TYPE string VALUE '/connectors/{id}/load_balancers'.
     lv_temp = id.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{id}' IN lv_uri WITH lv_temp.
@@ -1049,7 +1049,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
   METHOD Z100085_zif_proubc_baseline~listcontracts.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE 'https://baseline.provide.network/contracts'.
+    DATA lv_uri TYPE string VALUE '/contracts'.
     lv_temp = filter_tokens.
     CONDENSE lv_temp.
     IF filter_tokens IS SUPPLIED.
@@ -1090,7 +1090,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
   METHOD Z100085_zif_proubc_baseline~deploycontract.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE 'https://baseline.provide.network/contracts'.
+    DATA lv_uri TYPE string VALUE '/contracts'.
     mi_client->request->set_method( 'POST' ).
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
 * todo, set body, #/components/schemas/Contract
@@ -1118,7 +1118,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
   METHOD Z100085_zif_proubc_baseline~getcontractdetail.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE 'https://baseline.provide.network/contracts/{id}'.
+    DATA lv_uri TYPE string VALUE '/contracts/{id}'.
     lv_temp = id.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{id}' IN lv_uri WITH lv_temp.
@@ -1144,7 +1144,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
   METHOD Z100085_zif_proubc_baseline~executecontract.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE 'https://baseline.provide.network/contracts/{id}/execute'.
+    DATA lv_uri TYPE string VALUE '/contracts/{id}/execute'.
     lv_temp = id.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{id}' IN lv_uri WITH lv_temp.
@@ -1172,7 +1172,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
   METHOD Z100085_zif_proubc_baseline~listnetworks.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE 'https://baseline.provide.network/networks'.
+    DATA lv_uri TYPE string VALUE '/networks'.
     lv_temp = page.
     CONDENSE lv_temp.
     IF page IS SUPPLIED.
@@ -1209,7 +1209,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
   METHOD Z100085_zif_proubc_baseline~createnetwork.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE 'https://baseline.provide.network/networks'.
+    DATA lv_uri TYPE string VALUE '/networks'.
     mi_client->request->set_method( 'POST' ).
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
 * todo, set body, #/components/schemas/Network
@@ -1232,7 +1232,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
   METHOD Z100085_zif_proubc_baseline~updatenetwork.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE 'https://baseline.provide.network/networks/{id}'.
+    DATA lv_uri TYPE string VALUE '/networks/{id}'.
     lv_temp = id.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{id}' IN lv_uri WITH lv_temp.
@@ -1259,7 +1259,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
   METHOD Z100085_zif_proubc_baseline~getnetworkstatus.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE 'https://baseline.provide.network/networks/{id}/status'.
+    DATA lv_uri TYPE string VALUE '/networks/{id}/status'.
     lv_temp = id.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{id}' IN lv_uri WITH lv_temp.
@@ -1285,7 +1285,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
   METHOD Z100085_zif_proubc_baseline~listoracles.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE 'https://baseline.provide.network/oracles'.
+    DATA lv_uri TYPE string VALUE '/oracles'.
     lv_temp = page.
     CONDENSE lv_temp.
     IF page IS SUPPLIED.
@@ -1317,7 +1317,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
   METHOD Z100085_zif_proubc_baseline~createoracle.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE 'https://baseline.provide.network/oracles'.
+    DATA lv_uri TYPE string VALUE '/oracles'.
     mi_client->request->set_method( 'POST' ).
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
     me->get_bearer_token( ).
@@ -1339,7 +1339,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
   METHOD Z100085_zif_proubc_baseline~getoracledetail.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE 'https://baseline.provide.network/oracles/{id}'.
+    DATA lv_uri TYPE string VALUE '/oracles/{id}'.
     lv_temp = id.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{id}' IN lv_uri WITH lv_temp.
@@ -1364,7 +1364,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
   METHOD Z100085_zif_proubc_baseline~updateoracle.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE 'https://baseline.provide.network/oracles/{id}'.
+    DATA lv_uri TYPE string VALUE '/oracles/{id}'.
     lv_temp = id.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{id}' IN lv_uri WITH lv_temp.
@@ -1389,7 +1389,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
   METHOD Z100085_zif_proubc_baseline~deleteoracle.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE 'https://baseline.provide.network/oracles/{id}'.
+    DATA lv_uri TYPE string VALUE '/oracles/{id}'.
     lv_temp = id.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{id}' IN lv_uri WITH lv_temp.
@@ -1414,7 +1414,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
   METHOD Z100085_zif_proubc_baseline~listorganizations.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE 'https://baseline.provide.network/organizations'.
+    DATA lv_uri TYPE string VALUE '/organizations'.
     lv_temp = page.
     CONDENSE lv_temp.
     IF page IS SUPPLIED.
@@ -1446,7 +1446,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
   METHOD Z100085_zif_proubc_baseline~createorganization.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE 'https://baseline.provide.network/organizations'.
+    DATA lv_uri TYPE string VALUE '/organizations'.
     mi_client->request->set_method( 'POST' ).
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
 * todo, set body, #/components/schemas/Organization
@@ -1469,7 +1469,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
   METHOD Z100085_zif_proubc_baseline~getorganizationdetails.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE 'https://baseline.provide.network/organizations/{id}'.
+    DATA lv_uri TYPE string VALUE '/organizations/{id}'.
     lv_temp = id.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{id}' IN lv_uri WITH lv_temp.
@@ -1494,7 +1494,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
   METHOD Z100085_zif_proubc_baseline~updateorganizationdetails.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE 'https://baseline.provide.network/organizations/{id}'.
+    DATA lv_uri TYPE string VALUE '/organizations/{id}'.
     lv_temp = id.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{id}' IN lv_uri WITH lv_temp.
@@ -1520,7 +1520,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
   METHOD Z100085_zif_proubc_baseline~listtokens.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE 'https://baseline.provide.network/tokens'.
+    DATA lv_uri TYPE string VALUE '/tokens'.
     lv_temp = page.
     CONDENSE lv_temp.
     IF page IS SUPPLIED.
@@ -1555,7 +1555,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
   METHOD Z100085_zif_proubc_baseline~tokenauthorization.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE 'https://baseline.provide.network/tokens'.
+    DATA lv_uri TYPE string VALUE '/tokens'.
     mi_client->request->set_method( 'POST' ).
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
 * todo, set body, #/components/schemas/Token
@@ -1581,7 +1581,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
   METHOD Z100085_zif_proubc_baseline~revoketoken.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE 'https://baseline.provide.network/tokens/{id}'.
+    DATA lv_uri TYPE string VALUE '/tokens/{id}'.
     lv_temp = id.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{id}' IN lv_uri WITH lv_temp.
@@ -1606,7 +1606,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
   METHOD Z100085_zif_proubc_baseline~listtransactions.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE 'https://baseline.provide.network/transactions'.
+    DATA lv_uri TYPE string VALUE '/transactions'.
     lv_temp = filter_contract_creations.
     CONDENSE lv_temp.
     IF filter_contract_creations IS SUPPLIED.
@@ -1646,7 +1646,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
   METHOD Z100085_zif_proubc_baseline~createtransaction.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE 'https://baseline.provide.network/transactions'.
+    DATA lv_uri TYPE string VALUE '/transactions'.
     mi_client->request->set_method( 'POST' ).
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
 * todo, set body, #/components/schemas/Transaction
@@ -1669,7 +1669,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
   METHOD Z100085_zif_proubc_baseline~gettransactiondetails.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE 'https://baseline.provide.network/transactions/{id}'.
+    DATA lv_uri TYPE string VALUE '/transactions/{id}'.
     lv_temp = id.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{id}' IN lv_uri WITH lv_temp.
@@ -1694,7 +1694,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
   METHOD Z100085_zif_proubc_baseline~listusers.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE 'https://baseline.provide.network/users'.
+    DATA lv_uri TYPE string VALUE '/users'.
     lv_temp = page.
     CONDENSE lv_temp.
     IF page IS SUPPLIED.
@@ -1729,7 +1729,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
   METHOD Z100085_zif_proubc_baseline~createuser.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE 'https://baseline.provide.network/users'.
+    DATA lv_uri TYPE string VALUE '/users'.
     mi_client->request->set_method( 'POST' ).
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
 * todo, set body, #/components/schemas/User
@@ -1747,7 +1747,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
   METHOD Z100085_zif_proubc_baseline~getuserdetail.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE 'https://baseline.provide.network/users/{id}'.
+    DATA lv_uri TYPE string VALUE '/users/{id}'.
     lv_temp = id.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{id}' IN lv_uri WITH lv_temp.
@@ -1773,7 +1773,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
   METHOD Z100085_zif_proubc_baseline~updateuser.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE 'https://baseline.provide.network/users/{id}'.
+    DATA lv_uri TYPE string VALUE '/users/{id}'.
     lv_temp = id.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{id}' IN lv_uri WITH lv_temp.
@@ -1802,7 +1802,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
   METHOD Z100085_zif_proubc_baseline~deleteuserrequest.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE 'https://baseline.provide.network/users/{id}'.
+    DATA lv_uri TYPE string VALUE '/users/{id}'.
     lv_temp = id.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{id}' IN lv_uri WITH lv_temp.
@@ -1827,7 +1827,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
   METHOD Z100085_zif_proubc_baseline~unsealvault.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE 'https://baseline.provide.network/unseal'.
+    DATA lv_uri TYPE string VALUE '/unseal'.
     mi_client->request->set_method( 'POST' ).
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
 * todo, set body, #/components/schemas/UnsealVaultRequest
@@ -1850,7 +1850,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
   METHOD Z100085_zif_proubc_baseline~listvaults.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE 'https://baseline.provide.network/vaults'.
+    DATA lv_uri TYPE string VALUE '/vaults'.
     lv_temp = page.
     CONDENSE lv_temp.
     IF page IS SUPPLIED.
@@ -1882,7 +1882,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
   METHOD Z100085_zif_proubc_baseline~createvault.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE 'https://baseline.provide.network/vaults'.
+    DATA lv_uri TYPE string VALUE '/vaults'.
     mi_client->request->set_method( 'POST' ).
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
 * todo, set body, #/components/schemas/Vault
@@ -1905,7 +1905,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
   METHOD Z100085_zif_proubc_baseline~listkeys.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE 'https://baseline.provide.network/vaults/{id}/keys'.
+    DATA lv_uri TYPE string VALUE '/vaults/{id}/keys'.
     lv_temp = id.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{id}' IN lv_uri WITH lv_temp.
@@ -1940,7 +1940,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
   METHOD Z100085_zif_proubc_baseline~createkey.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE 'https://baseline.provide.network/vaults/{id}/keys'.
+    DATA lv_uri TYPE string VALUE '/vaults/{id}/keys'.
     lv_temp = id.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{id}' IN lv_uri WITH lv_temp.
@@ -1966,7 +1966,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
   METHOD Z100085_zif_proubc_baseline~deriveakeyrequest.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE 'https://baseline.provide.network/vaults/{id}/keys/{key_id}/derive'.
+    DATA lv_uri TYPE string VALUE '/vaults/{id}/keys/{key_id}/derive'.
     lv_temp = id.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{id}' IN lv_uri WITH lv_temp.
@@ -1995,7 +1995,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
   METHOD Z100085_zif_proubc_baseline~deleteakey.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE 'https://baseline.provide.network/vaults/{id}/keys/{key_id}'.
+    DATA lv_uri TYPE string VALUE '/vaults/{id}/keys/{key_id}'.
     lv_temp = id.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{id}' IN lv_uri WITH lv_temp.
@@ -2023,7 +2023,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
   METHOD Z100085_zif_proubc_baseline~listsecrets.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE 'https://baseline.provide.network/vaults/{id}/secrets'.
+    DATA lv_uri TYPE string VALUE '/vaults/{id}/secrets'.
     lv_temp = id.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{id}' IN lv_uri WITH lv_temp.
@@ -2058,7 +2058,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
   METHOD Z100085_zif_proubc_baseline~storesecret.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE 'https://baseline.provide.network/vaults/{id}/secrets'.
+    DATA lv_uri TYPE string VALUE '/vaults/{id}/secrets'.
     lv_temp = id.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{id}' IN lv_uri WITH lv_temp.
@@ -2084,7 +2084,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
   METHOD Z100085_zif_proubc_baseline~retrievesecret.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE 'https://baseline.provide.network/vaults/{id}/secrets/{secret_id}'.
+    DATA lv_uri TYPE string VALUE '/vaults/{id}/secrets/{secret_id}'.
     lv_temp = id.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{id}' IN lv_uri WITH lv_temp.
@@ -2112,7 +2112,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
   METHOD Z100085_zif_proubc_baseline~deletesecret.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE 'https://baseline.provide.network/vaults/{id}/secrets/{secret_id}'.
+    DATA lv_uri TYPE string VALUE '/vaults/{id}/secrets/{secret_id}'.
     lv_temp = id.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{id}' IN lv_uri WITH lv_temp.
@@ -2140,7 +2140,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
   METHOD Z100085_zif_proubc_baseline~listwallets.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE 'https://baseline.provide.network/wallets'.
+    DATA lv_uri TYPE string VALUE '/wallets'.
     lv_temp = page.
     CONDENSE lv_temp.
     IF page IS SUPPLIED.
@@ -2172,7 +2172,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
   METHOD Z100085_zif_proubc_baseline~createwallet.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE 'https://baseline.provide.network/wallets'.
+    DATA lv_uri TYPE string VALUE '/wallets'.
     mi_client->request->set_method( 'POST' ).
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
 * todo, set body, #/components/schemas/Wallet
@@ -2195,7 +2195,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
   METHOD Z100085_zif_proubc_baseline~listwalletaccounts.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE 'https://baseline.provide.network/wallets/{id}/accounts'.
+    DATA lv_uri TYPE string VALUE '/wallets/{id}/accounts'.
     lv_temp = id.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{id}' IN lv_uri WITH lv_temp.
@@ -2225,7 +2225,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
   METHOD Z100085_zif_proubc_baseline~listworkgroups.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE 'https://baseline.provide.network/workgroups'.
+    DATA lv_uri TYPE string VALUE '/workgroups'.
     lv_temp = page.
     CONDENSE lv_temp.
     IF page IS SUPPLIED.
@@ -2252,7 +2252,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
   METHOD Z100085_zif_proubc_baseline~createworkgroup.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE 'https://baseline.provide.network/workgroups'.
+    DATA lv_uri TYPE string VALUE '/workgroups'.
     mi_client->request->set_method( 'POST' ).
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
 * todo, set body, #/components/schemas/Workgroup
@@ -2278,7 +2278,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
   METHOD Z100085_zif_proubc_baseline~listworkgroupusers.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE 'https://baseline.provide.network/workgroups/{id}/users'.
+    DATA lv_uri TYPE string VALUE '/workgroups/{id}/users'.
     lv_temp = id.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{id}' IN lv_uri WITH lv_temp.
@@ -2316,7 +2316,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
   METHOD Z100085_zif_proubc_baseline~associateworkgroupuser.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE 'https://baseline.provide.network/workgroups/{id}/users'.
+    DATA lv_uri TYPE string VALUE '/workgroups/{id}/users'.
     lv_temp = id.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{id}' IN lv_uri WITH lv_temp.
@@ -2342,7 +2342,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
   METHOD Z100085_zif_proubc_baseline~getworkgroupdetails.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE 'https://baseline.provide.network/workgroups/{id}'.
+    DATA lv_uri TYPE string VALUE '/workgroups/{id}'.
     lv_temp = id.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{id}' IN lv_uri WITH lv_temp.
@@ -2367,7 +2367,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
   METHOD Z100085_zif_proubc_baseline~updateworkgroup.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE 'https://baseline.provide.network/workgroups/{id}'.
+    DATA lv_uri TYPE string VALUE '/workgroups/{id}'.
     lv_temp = id.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{id}' IN lv_uri WITH lv_temp.
@@ -2393,7 +2393,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
   METHOD Z100085_zif_proubc_baseline~deleteworkgroup.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE 'https://baseline.provide.network/workgroups/{id}'.
+    DATA lv_uri TYPE string VALUE '/workgroups/{id}'.
     lv_temp = id.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{id}' IN lv_uri WITH lv_temp.
@@ -2418,7 +2418,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
   METHOD Z100085_zif_proubc_baseline~createbaselinebusinessobject.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE 'https://baseline.provide.network/business_objects'.
+    DATA lv_uri TYPE string VALUE '/business_objects'.
     mi_client->request->set_method( 'POST' ).
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
 * todo, set body, #/components/schemas/BusinessObject
@@ -2445,7 +2445,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
   METHOD Z100085_zif_proubc_baseline~updatebaselinebusinessobject.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE 'https://baseline.provide.network/business_objects/{id}'.
+    DATA lv_uri TYPE string VALUE '/business_objects/{id}'.
     lv_temp = id.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{id}' IN lv_uri WITH lv_temp.
@@ -2471,7 +2471,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
   METHOD Z100085_zif_proubc_baseline~listcircuits.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE 'https://baseline.provide.network/circuits'.
+    DATA lv_uri TYPE string VALUE '/circuits'.
     IF curve IS SUPPLIED.
       mi_client->request->set_form_field( name = 'curve' value = curve ).
     ENDIF.
@@ -2508,7 +2508,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
   METHOD Z100085_zif_proubc_baseline~createcircuit.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE 'https://baseline.provide.network/circuits'.
+    DATA lv_uri TYPE string VALUE '/circuits'.
     mi_client->request->set_method( 'POST' ).
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
 * todo, set body, #/components/schemas/Circuit
@@ -2531,7 +2531,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
   METHOD Z100085_zif_proubc_baseline~prove.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE 'https://baseline.provide.network/circuits/{id}/prove'.
+    DATA lv_uri TYPE string VALUE '/circuits/{id}/prove'.
     lv_temp = id.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{id}' IN lv_uri WITH lv_temp.
@@ -2560,7 +2560,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
   METHOD Z100085_zif_proubc_baseline~verify.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE 'https://baseline.provide.network/circuits/{id}/verify'.
+    DATA lv_uri TYPE string VALUE '/circuits/{id}/verify'.
     lv_temp = id.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{id}' IN lv_uri WITH lv_temp.
@@ -2586,7 +2586,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
   METHOD Z100085_zif_proubc_baseline~getstorevalue.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE 'https://baseline.provide.network/circuits/{id}/store/{index}'.
+    DATA lv_uri TYPE string VALUE '/circuits/{id}/store/{index}'.
     lv_temp = id.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{id}' IN lv_uri WITH lv_temp.
@@ -2614,7 +2614,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
   METHOD Z100085_zif_proubc_baseline~listwellknownkeys.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE 'https://baseline.provide.network/.well-known/keys'.
+    DATA lv_uri TYPE string VALUE '/.well-known/keys'.
     mi_client->request->set_method( 'GET' ).
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
     me->get_bearer_token( ).
@@ -2629,7 +2629,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
   METHOD Z100085_zif_proubc_baseline~listopenidconfiguration.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE 'https://baseline.provide.network/.well-known/openid-configuration'.
+    DATA lv_uri TYPE string VALUE '/.well-known/openid-configuration'.
     mi_client->request->set_method( 'GET' ).
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
     me->get_bearer_token( ).
@@ -2660,9 +2660,9 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
 
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE 'https://baseline.provide.network/api/v1/protocol_messages'.
-    DATA: lv_requeststr TYPE string,
-         LV_RESPONSESTR TYPE STRING.
+    DATA lv_uri TYPE string VALUE '/api/v1/protocol_messages'.
+    DATA: lv_requeststr  TYPE string,
+          lv_responsestr TYPE string.
     DATA lv_protocolmsg TYPE REF TO data.
 
     mi_client->request->set_method( 'POST' ).
@@ -2685,7 +2685,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
 
     lv_code = send_receive( ).
     statuscode = lv_code.
-    LV_RESPONSESTR = MI_CLIENT->RESPONSE->GET_CDATA( ).
+    lv_responsestr = mi_client->response->get_cdata( ).
     apiresponsestr = lv_responsestr.
     /ui2/cl_json=>deserialize(
       EXPORTING
@@ -2720,5 +2720,16 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
         name  = 'Authorization'    " Name of the header field
         value = lv_bearertoken    " HTTP header field value
     ).
+  ENDMETHOD.
+
+  METHOD Z100085_zif_proubc_baseline~status.
+    DATA lv_code TYPE i.
+    DATA lv_temp TYPE string.
+    DATA lv_uri TYPE string VALUE '/status'.
+    mi_client->request->set_method( 'GET' ).
+    mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
+    me->get_bearer_token( ).
+    lv_code = send_receive( ).
+    statuscode = lv_code.
   ENDMETHOD.
 ENDCLASS.

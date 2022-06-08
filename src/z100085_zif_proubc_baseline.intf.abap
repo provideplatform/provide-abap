@@ -1605,4 +1605,9 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
         apiresponse type ref to data
     raising cx_static_check.
 
+  methods status
+    exporting
+        statuscode type i
+    raising cx_static_check.
+
 ENDINTERFACE.

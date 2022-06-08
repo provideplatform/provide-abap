@@ -19,15 +19,15 @@ ENDCLASS.
 
 CLASS z100085_zcl_proubc_tenantsapi IMPLEMENTATION.
   METHOD if_rest_resource~get.
-    DATA: li_api             TYPE REF TO if_mr_api,
-          lv_data            TYPE string,
-          lv_mime            TYPE string,
-          lv_url             TYPE string,
-          lv_tenantid        TYPE z100085_zs_prvdorg-organization_id,
-          lt_prvdtenants     TYPE z100085_zif_proubc_tenants=>tty_tenant_wo_token,
-          ls_prvdtenant      TYPE z100085_zif_proubc_tenants=>ty_tenant_wo_token,
+    DATA: li_api         TYPE REF TO if_mr_api,
+          lv_data        TYPE string,
+          lv_mime        TYPE string,
+          lv_url         TYPE string,
+          lv_tenantid    TYPE z100085_zs_prvdorg-organization_id,
+          lt_prvdtenants TYPE z100085_zif_proubc_tenants=>tty_tenant_wo_token,
+          ls_prvdtenant  TYPE z100085_zif_proubc_tenants=>ty_tenant_wo_token,
           "lo_entity          type ref to if_rest_response,
-          lv_tenantdata      TYPE REF TO data.
+          lv_tenantdata  TYPE REF TO data.
 
     "TODO add SAP auths for reading the tenant(s)
 
@@ -44,12 +44,12 @@ CLASS z100085_zcl_proubc_tenantsapi IMPLEMENTATION.
 
       DATA(lo_entity) = mo_response->create_entity( ).
       lo_entity->set_content_type( if_rest_media_type=>gc_appl_json ).
-      lo_entity->set_string_data( /ui2/cl_json=>serialize( exporting data = ls_prvdtenant pretty_name = /ui2/cl_json=>pretty_mode-low_case ) ).
+      lo_entity->set_string_data( /ui2/cl_json=>serialize( EXPORTING data = ls_prvdtenant pretty_name = /ui2/cl_json=>pretty_mode-low_case ) ).
       mo_response->set_status( cl_rest_status_code=>gc_success_ok ).
 
     ELSE.
 
-    "TODO: add reachable true/false. call the bpi endpoints
+      "TODO: add reachable true/false. call the bpi endpoints
       z100085_zcl_proubc_prvdtenants=>get_allprvdtenant( IMPORTING et_prvdorg = lt_prvdtenants ).
       z100085_zcl_proubc_api_helper=>copy_data_to_ref(
             EXPORTING is_data = lt_prvdtenants
@@ -58,7 +58,7 @@ CLASS z100085_zcl_proubc_tenantsapi IMPLEMENTATION.
 
       lo_entity = mo_response->create_entity( ).
       lo_entity->set_content_type( if_rest_media_type=>gc_appl_json ).
-      lo_entity->set_string_data( /ui2/cl_json=>serialize( exporting data = lv_tenantdata pretty_name = /ui2/cl_json=>pretty_mode-low_case ) ).
+      lo_entity->set_string_data( /ui2/cl_json=>serialize( EXPORTING data = lv_tenantdata pretty_name = /ui2/cl_json=>pretty_mode-low_case ) ).
       mo_response->set_status( cl_rest_status_code=>gc_success_ok ).
     ENDIF.
   ENDMETHOD.
@@ -66,19 +66,26 @@ CLASS z100085_zcl_proubc_tenantsapi IMPLEMENTATION.
     DATA: lt_prvdtenants     TYPE z100085_ztt_prvdorg,
           ls_prvdtenant      TYPE z100085_ZS_PRVDORG,
           lt_prvdtenants_out TYPE z100085_ztt_prvdorg,
+          wa_prvdtenant      TYPE z100085_zs_prvdorg,
           lv_tenantdata      TYPE REF TO data.
 
     DATA(lv_request_body) = mo_request->get_entity( )->get_string_data( ).
-    /ui2/cl_json=>deserialize( EXPORTING json = lv_request_body CHANGING data = lt_prvdtenants ).
+    /ui2/cl_json=>deserialize( EXPORTING json = lv_request_body CHANGING data = ls_prvdtenant ).
+
+    APPEND ls_prvdtenant TO lt_prvdtenants.
 
     z100085_zcl_proubc_prvdtenants=>create_prvdtenant( EXPORTING it_prvdorg = lt_prvdtenants IMPORTING et_prvdorg = lt_prvdtenants_out ).
+    "TODO improve error handling
+
+    READ TABLE lt_prvdtenants_out INDEX 1 INTO wa_prvdtenant.
+    wa_prvdtenant-refresh_token = '***'.
     z100085_zcl_proubc_api_helper=>copy_data_to_ref(
-          EXPORTING is_data = lt_prvdtenants_out
+          EXPORTING is_data = wa_prvdtenant
           CHANGING cr_data = lv_tenantdata
     ).
     DATA(lo_entity) = mo_response->create_entity( ).
     lo_entity->set_content_type( if_rest_media_type=>gc_appl_json ).
-    lo_entity->set_string_data( /ui2/cl_json=>serialize( exporting data = lv_tenantdata pretty_name = /ui2/cl_json=>pretty_mode-low_case ) ).
+    lo_entity->set_string_data( /ui2/cl_json=>serialize( EXPORTING data = lv_tenantdata pretty_name = /ui2/cl_json=>pretty_mode-low_case ) ).
     mo_response->set_status( cl_rest_status_code=>gc_success_created ).
   ENDMETHOD.
 
@@ -86,14 +93,19 @@ CLASS z100085_zcl_proubc_tenantsapi IMPLEMENTATION.
     DATA: lt_prvdtenants     TYPE z100085_ztt_prvdorg,
           ls_prvdtenant      TYPE z100085_ZS_PRVDORG,
           lt_prvdtenants_out TYPE z100085_ztt_prvdorg,
+          wa_prvdtenant      TYPE z100085_zs_prvdorg,
           lv_tenantdata      TYPE REF TO data.
 
     DATA(lv_request_body) = mo_request->get_entity( )->get_string_data( ).
-    /ui2/cl_json=>deserialize( EXPORTING json = lv_request_body CHANGING data = lt_prvdtenants ).
+    /ui2/cl_json=>deserialize( EXPORTING json = lv_request_body CHANGING data = ls_prvdtenant ).
+
+    APPEND ls_prvdtenant TO lt_prvdtenants.
 
     z100085_zcl_proubc_prvdtenants=>update_prvdtenant( EXPORTING it_prvdorg = lt_prvdtenants IMPORTING et_prvdorg = lt_prvdtenants_out ).
+    READ TABLE lt_prvdtenants_out INDEX 1 INTO wa_prvdtenant.
+
     z100085_zcl_proubc_api_helper=>copy_data_to_ref(
-          EXPORTING is_data = lt_prvdtenants_out
+          EXPORTING is_data = wa_prvdtenant
           CHANGING cr_data = lv_tenantdata
     ).
     DATA(lo_entity) = mo_response->create_entity( ).
@@ -111,6 +123,6 @@ CLASS z100085_zcl_proubc_tenantsapi IMPLEMENTATION.
       z100085_zcl_proubc_prvdtenants=>delete_prvdtenant( IMPORTING ev_prvdorgid = lv_tenantid ).
     ENDIF.
     "TODO add a delete response if totally necessary....
-     mo_response->set_status( cl_rest_status_code=>gc_success_no_content ).
+    mo_response->set_status( cl_rest_status_code=>gc_success_no_content ).
   ENDMETHOD.
 ENDCLASS.
