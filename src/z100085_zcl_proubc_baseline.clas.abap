@@ -2728,7 +2728,6 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
     DATA lv_uri TYPE string VALUE '/status'.
     mi_client->request->set_method( 'GET' ).
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
-    me->get_bearer_token( ).
     lv_code = send_receive( ).
     statuscode = lv_code.
   ENDMETHOD.

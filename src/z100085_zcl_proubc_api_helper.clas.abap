@@ -287,6 +287,7 @@ CLASS z100085_zcl_proubc_api_helper IMPLEMENTATION.
           "lv_baseline_jwt = lo_baseline_api->bearerauthentication( EXPORTING body = lv_authreq iv_tenantid = lv_tenant IMPORTING code = lv_code  ).
 *    CATCH cx_static_check.
 
+* why is this raising exceptions?
           lo_baseline_api->status(
             IMPORTING
               statuscode = lv_code
