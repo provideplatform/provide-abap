@@ -287,11 +287,17 @@ CLASS z100085_zcl_proubc_api_helper IMPLEMENTATION.
           "lv_baseline_jwt = lo_baseline_api->bearerauthentication( EXPORTING body = lv_authreq iv_tenantid = lv_tenant IMPORTING code = lv_code  ).
 *    CATCH cx_static_check.
 
-* why is this raising exceptions?
+* raises exception when docker instance of configured bpi instance is down
+          try.
           lo_baseline_api->status(
             IMPORTING
               statuscode = lv_code
           ).
+          catch cx_static_check.
+            ev_isreachable = '-'.
+          catch cx_root.
+            ev_isreachable = '-'.
+          endtry.
 
           IF lv_code = 200 or lv_code = 204.
             ev_isreachable = 'X'.

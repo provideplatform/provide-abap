@@ -242,8 +242,20 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD send_receive.
-    mi_client->send( ).
-    mi_client->receive( ).
+    mi_client->send( EXCEPTIONS
+      http_communication_failure = 1
+      http_invalid_state         = 2 ).
+    IF sy-subrc = 0.
+      mi_client->receive(    EXCEPTIONS
+        http_communication_failure = 1
+        http_invalid_state         = 2
+        http_processing_failed     = 3 ).
+      IF sy-subrc NE 0.
+        rv_code = 500.
+      ENDIF.
+    ELSE.
+      rv_code = 500.
+    ENDIF.
     mi_client->response->get_status( IMPORTING code = rv_code ).
   ENDMETHOD.
 
