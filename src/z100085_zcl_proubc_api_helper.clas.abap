@@ -5,8 +5,6 @@ CLASS z100085_zcl_proubc_api_helper DEFINITION
 
   PUBLIC SECTION.
     CLASS-METHODS:
-      map_data_to_tenant IMPORTING iv_data    TYPE REF TO data
-                         EXPORTING et_tenants TYPE z100085_prvdorgs,
       build_refresh_token IMPORTING iv_refreshtoken1 TYPE string
                                     iv_refreshtoken2 TYPE string
                           EXPORTING ev_tokenlength   TYPE int4
@@ -17,7 +15,7 @@ CLASS z100085_zcl_proubc_api_helper DEFINITION
         CHANGING
           !cr_data TYPE REF TO data.
     METHODS:
-      constructor,
+      constructor   IMPORTING iv_tenant TYPE z100085_prvdtenantid OPTIONAL,
       call_ident_api IMPORTING iv_tenant TYPE z100085_prvdtenantid EXPORTING ev_authtoken TYPE REF TO data
                                                                              status TYPE i
                                                                              ev_bpiendpoint TYPE string,
@@ -50,14 +48,34 @@ ENDCLASS.
 CLASS z100085_zcl_proubc_api_helper IMPLEMENTATION.
   METHOD constructor.
     "todo more robust selection criteria - based on sap user authorization/mapping to tenant
+
+    "option 1 create ZPRVDTENANT parameter id - and auth check it whenever used
+
+    "try using the tenant id provided by user
+    IF iv_tenant IS NOT INITIAL.
+      SELECT organization_id,
+             bpi_endpoint
+          FROM z100085_prvdorgs
+          INTO TABLE @DATA(lt_defaultorg)
+          WHERE organization_id = @iv_tenant.
+      IF sy-subrc = 0.
+        READ TABLE lt_defaultorg INDEX 1 INTO DATA(wa_defaulttenant).
+        IF sy-subrc = 0.
+          lv_defaulttenant = wa_defaulttenant-organization_id.
+          lv_default_bpiendpoint = wa_defaulttenant-bpi_endpoint.
+          RETURN.
+        ENDIF.
+      ENDIF.
+    ENDIF.
+
     SELECT organization_id,
            bpi_endpoint
         FROM z100085_prvdorgs
-        INTO TABLE @DATA(lt_defaultorg)
+        INTO TABLE @lt_defaultorg
         UP TO 1 ROWS
         ORDER BY created_at DESCENDING.
     IF sy-subrc = 0.
-      READ TABLE lt_defaultorg INDEX 1 INTO DATA(wa_defaulttenant).
+      READ TABLE lt_defaultorg INDEX 1 INTO wa_defaulttenant.
       IF sy-subrc = 0.
         lv_defaulttenant = wa_defaulttenant-organization_id.
         lv_default_bpiendpoint = wa_defaulttenant-bpi_endpoint.
@@ -65,22 +83,7 @@ CLASS z100085_zcl_proubc_api_helper IMPLEMENTATION.
     ENDIF.
 
   ENDMETHOD.
-  METHOD map_data_to_tenant.
-    DATA: ls_tenant TYPE z100085_prvdorgs.
-    FIELD-SYMBOLS: <ls_data> TYPE REF TO data.
-    "Todo this is dumping the ABAP code, need it fixed to map the deserialized data into the ABAP structure for populating db
-*    "might all be garbage. try something else.
-*    ASSIGN iv_data->* TO <ls_data>.
-*    DATA(lo_structdescr) = CAST cl_abap_structdescr(  cl_abap_structdescr=>describe_by_data( p_data = <ls_data> ) ).
-*    DATA(components)     = lo_structdescr->get_components( ).
-*    LOOP AT components ASSIGNING FIELD-SYMBOL(<fs_component>).
-*    ENDLOOP.
 
-    "loop at iv_data assigning field-symbol(<fs_data>).
-    "endloop.
-    "assign iv_data->* to et_tenants.
-    "assign component '' of structure iv_data to ls_tenant-prvdorgid.
-  ENDMETHOD.
   METHOD build_refresh_token.
     "strlen( iv_refreshtoken1 )
     CONCATENATE iv_refreshtoken1 iv_refreshtoken2 INTO ev_refreshtoken.
@@ -288,18 +291,18 @@ CLASS z100085_zcl_proubc_api_helper IMPLEMENTATION.
 *    CATCH cx_static_check.
 
 * raises exception when docker instance of configured bpi instance is down
-          try.
-          lo_baseline_api->status(
-            IMPORTING
-              statuscode = lv_code
-          ).
-          catch cx_static_check.
-            ev_isreachable = '-'.
-          catch cx_root.
-            ev_isreachable = '-'.
-          endtry.
+          TRY.
+              lo_baseline_api->status(
+                IMPORTING
+                  statuscode = lv_code
+              ).
+            CATCH cx_static_check.
+              ev_isreachable = '-'.
+            CATCH cx_root.
+              ev_isreachable = '-'.
+          ENDTRY.
 
-          IF lv_code = 200 or lv_code = 204.
+          IF lv_code = 200 OR lv_code = 204.
             ev_isreachable = 'X'.
           ELSE.
             ev_isreachable = '-'.

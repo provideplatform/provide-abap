@@ -44,9 +44,13 @@ INTERFACE z100085_zif_proubc_blidochlper
          END OF ty_idoc_xmllist.
   types: tty_idoc_xmllist type table of ty_idoc_xmllist.
 
-  METHODS get_idocs IMPORTING it_idoctype TYPE tty_r_idoctype
+  METHODS shuttle_idocs IMPORTING it_idoctype TYPE tty_r_idoctype
                               it_idocnum  TYPE tty_r_idocnum
-                              it_ebeln    TYPE tty_r_ebeln.
+                              it_ebeln    TYPE tty_r_ebeln
+                              iv_direct   type edidc-direct
+                              Iv_idocstatus type edidc-status
+                              iv_idocmestyp type edidc-mestyp
+                              iv_idoctp     type edidc-idoctp.
 
 
 ENDINTERFACE.
