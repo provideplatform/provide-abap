@@ -20,7 +20,7 @@ CLASS z100085_zcl_proubc_idochlpr DEFINITION
                                 ev_newidocnum TYPE edidd-docnum
                       CHANGING  Ct_edidd      TYPE tty_edidd.
     METHODS:
-      constructor IMPORTING iv_tenant type z100085_prvdtenantid,
+      constructor IMPORTING iv_tenant TYPE z100085_prvdtenantid,
       launch_idoc_to_baseline.
   PROTECTED SECTION.
   PRIVATE SECTION.
@@ -34,7 +34,7 @@ CLASS z100085_zcl_proubc_idochlpr IMPLEMENTATION.
 
     "sets the default tenant and ident/baseline api tokens
     lo_api_helper->setup_protocol_msg( IMPORTING setup_success = lv_setup_success ).
-"TODO pass back error message to spool if unsuccessful
+    "TODO pass back error message to spool if unsuccessful
     CHECK lv_setup_success = abap_true.
 
   ENDMETHOD.
@@ -43,6 +43,7 @@ CLASS z100085_zcl_proubc_idochlpr IMPLEMENTATION.
       lo_ident_api         TYPE REF TO z100085_zif_proubc_ident,
       lo_baseline_api      TYPE REF TO z100085_zif_proubc_baseline,
       ls_protocol_msg_req  TYPE z100085_zif_proubc_baseline=>protocolmessage_req,
+      ls_bpiobjects_req    TYPE z100085_zif_proubc_baseline=>bpiobjects_req,
       lt_updatedbpis       TYPE TABLE OF z100085_bpiobj,
       lt_newbpis           TYPE TABLE OF z100085_bpiobj,
       lt_final_updatedbpis TYPE TABLE OF z100085_bpiobj,
@@ -75,26 +76,42 @@ CLASS z100085_zcl_proubc_idochlpr IMPLEMENTATION.
         EXCEPTIONS
           OTHERS          = 1.
 
+      "only keeping this around in case I need to change the payload string yet
+      "data: lv_idoc_data type ref to data.
+      "lv_idoc_data = lt_edidd.
+
       DATA: lv_idocjson TYPE string.
       lv_idocjson = /ui2/cl_json=>serialize(
          EXPORTING
            data             = lt_edidd
        ).
 
+      "request to /api/v1/protocol_messages
       ls_protocol_msg_req-payload = lv_idocjson.
       ls_protocol_msg_req-payload_mimetype = 'json'.
-      ls_protocol_msg_req-type = wa_idoc_control-mestyp. "should be orders05 for demo purposes
+      ls_protocol_msg_req-type = wa_idoc_control-idoctp. "should be orders05 for demo purposes
 
 
-      "TODO get the object id (eg PO number) from the idoc
+      "TODO handle errors if mapping to id is not implemented yet
       z100085_zcl_proubc_idochlpr=>get_objid( EXPORTING iv_schema = ls_protocol_msg_req-type
                                it_edidd = lt_edidd
                                iv_idoc = lv_idoc
                      IMPORTING ev_objid = ls_protocol_msg_req-id ).
 
+      "request to /objects
+      ls_bpiobjects_req-id = ls_protocol_msg_req-id.
+      ls_bpiobjects_req-type =  wa_idoc_control-idoctp. "maybe needs to be purchase_order instead of ORDERS05?
+      ls_bpiobjects_req-payload = lv_idocjson.
+
+
+
 *https://gist.github.com/kthomas/459381e98c808febea9c1bb51408bbde
       "call baseline API /api/v1/protocolmessage
-      lo_api_helper->send_protocol_msg( EXPORTING body = ls_protocol_msg_req IMPORTING statuscode = lv_status  ). "should return 202
+      "this method keeps sending 404. is really implemented?
+      "lo_api_helper->send_protocol_msg( EXPORTING body = ls_protocol_msg_req IMPORTING statuscode = lv_status  ). "should return 202
+
+      "this appears to be the actual endpoint live today based on https://app.swaggerhub.com/apis/prvd/Baseline/v1.0.0#/info
+      lo_api_helper->send_bpiobjects_msg( exporting body = ls_bpiobjects_req importing statuscode = lv_status ).
       IF lv_status = '202'.
         DATA: wa_bpiobj    TYPE z100085_bpiobj,
               lv_timestamp TYPE timestampl.
@@ -123,7 +140,7 @@ CLASS z100085_zcl_proubc_idochlpr IMPLEMENTATION.
           wa_bpiobj-schema_id = wa_idoc_control-mestyp.
           APPEND wa_bpiobj TO lt_newbpis.
         ENDIF.
-      else. "log error message
+      ELSE. "log error message
       ENDIF.
 
     ENDLOOP.
@@ -172,9 +189,12 @@ CLASS z100085_zcl_proubc_idochlpr IMPLEMENTATION.
     WHERE direct = @iv_direct
     AND status = @iv_idocstatus
     AND mestyp = @iv_idocmestyp
-    AND idoctp = @iv_idoctp.
+    AND idoctp = @iv_idoctp
+    AND docnum IN @it_idocnum.
 
-    me->launch_idoc_to_baseline(  ).
+    IF sy-subrc EQ 0.
+      me->launch_idoc_to_baseline(  ).
+    ENDIF.
 
   ENDMETHOD.
 

@@ -3,11 +3,14 @@ CLASS z100085_zcl_proubc_baseline DEFINITION PUBLIC.
 * Baseline API, v1.0.0
   PUBLIC SECTION.
     INTERFACES z100085_zif_proubc_baseline.
-    METHODS constructor IMPORTING ii_client TYPE REF TO if_http_client.
+    METHODS constructor IMPORTING ii_client TYPE REF TO if_http_client
+                                  iv_bpitenant_url type string.
   PROTECTED SECTION.
     DATA mi_client TYPE REF TO if_http_client.
+    data lv_bpitenant_url type string.
     DATA mo_json TYPE REF TO z100085_zcl_oapi_json.
     DATA authtoken TYPE z100085_prvdrefreshtoken.
+    DATA bpitoken TYPE z100085_prvdrefreshtoken.
     METHODS send_receive RETURNING VALUE(rv_code) TYPE i.
     METHODS parse_account
       IMPORTING iv_prefix      TYPE string
@@ -232,6 +235,9 @@ CLASS z100085_zcl_proubc_baseline DEFINITION PUBLIC.
     METHODS set_bearer_token IMPORTING iv_tokenstring TYPE string.
     METHODS get_bearer_token
       RAISING cx_static_check.
+    METHODS set_bpi_token IMPORTING iv_tokenstring TYPE string.
+    METHODS get_bpi_token
+      RAISING cx_static_check.
 ENDCLASS.
 
 
@@ -239,6 +245,7 @@ ENDCLASS.
 CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
   METHOD constructor.
     mi_client = ii_client.
+    lv_bpitenant_url = iv_bpitenant_url.
   ENDMETHOD.
 
   METHOD send_receive.
@@ -886,6 +893,10 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
     DATA lv_longtermrequestdata TYPE REF TO data.
     DATA lv_requeststr TYPE string.
     DATA lv_authresponsestr TYPE string.
+    data lv_bpiauthreq      TYPE z100085_zif_proubc_baseline=>authenticationrequest.
+    FIELD-SYMBOLS: <fs_bpiauthreq>  TYPE any,
+                   <fs_bpiauthreq2> TYPE string.
+
 
     mi_client->request->set_method( 'POST' ).
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
@@ -901,10 +912,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
     mi_client->request->set_cdata(
       EXPORTING
         data   =  lv_requeststr
-*        offset = 0
-*        length = -1
     ).
-
 
     me->set_bearer_token( EXPORTING iv_tokenstring = body ).
     me->get_bearer_token( ).
@@ -913,11 +921,13 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
     code = lv_code.
     CASE lv_code.
       WHEN 201. " Created
-        " application/json,#/components/schemas/AuthenticationResponse
-        "CREATE OBJECT mo_json EXPORTING iv_json = mi_client->response->get_cdata( ).
         lv_authresponsestr = mi_client->response->get_cdata( ).
-        "return_data = parse_authenticationresponse( '' ).
         /ui2/cl_json=>deserialize( EXPORTING json = lv_authresponsestr CHANGING data =  apiresponse ).
+        ASSIGN apiresponse->* TO FIELD-SYMBOL(<ls_data>). "dereference into field symbol
+        ASSIGN COMPONENT 'ACCESS_TOKEN' OF STRUCTURE <ls_data> TO <fs_bpiauthreq>.
+        ASSIGN <fs_bpiauthreq>->* TO <fs_bpiauthreq2>.
+        lv_bpiauthreq = <fs_bpiauthreq2>.
+        me->set_bpi_token( lv_bpiauthreq ).
       WHEN 401.
         " todo, raise
     ENDCASE.
@@ -2657,29 +2667,16 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
 
   METHOD z100085_zif_proubc_baseline~send_protocol_msg.
 *https://gist.github.com/kthomas/459381e98c808febea9c1bb51408bbde
-*type Message struct {
-*    ID              *string          `sql:"-" json:"id,omitempty"`
-*    BaselineID      *uuid.UUID       `sql:"-" json:"baseline_id,omitempty"` // don't need this optional; when included, can be used to map outbound message just-in-time
-*    Errors          []*api.Error     `sql:"-" json:"errors,omitempty"`
-*    MessageID       *string          `sql:"-" json:"message_id,omitempty"` dont need this. but
-*    Payload         interface{}      `sql:"-" json:"payload,omitempty"` THE IDOC. need this
-*     payload_mimetype 'application/xml'
-*m    ProtocolMessage *ProtocolMessage `sql:"-" json:"protocol_essage,omitempty"`. don't need this.
-*    Recipients      []*Participant   `sql:"-" json:"recipients"` don't need this
-*    Status          *string          `sql:"-" json:"status,omitempty"` don't need this. shuttle gives this back to us.
-*    Type            *string          `sql:"-" json:"type,omitempty"`
-*}
-
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE '/api/v1/protocol_messages'.
+    DATA lv_uri TYPE string VALUE '/api/v1/protocolmessages'.
     DATA: lv_requeststr  TYPE string,
           lv_responsestr TYPE string.
     DATA lv_protocolmsg TYPE REF TO data.
 
     mi_client->request->set_method( 'POST' ).
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
-    me->get_bearer_token( ).
+    me->get_bpi_token( ).
 
     z100085_zcl_proubc_api_helper=>copy_data_to_ref( EXPORTING is_data = body
                   CHANGING cr_data = lv_protocolmsg  ).
@@ -2690,10 +2687,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
     mi_client->request->set_cdata(
       EXPORTING
         data   =  lv_requeststr
-*        offset = 0
-*        length = -1
     ).
-
 
     lv_code = send_receive( ).
     statuscode = lv_code.
@@ -2702,21 +2696,58 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
     /ui2/cl_json=>deserialize(
       EXPORTING
         json             = lv_responsestr
-*        jsonx            =
-*        pretty_name      =
-*        assoc_arrays     =
-*        assoc_arrays_opt =
-*        name_mappings    =
-*        conversion_exits =
       CHANGING
         data             = apiresponse
     ).
     CASE lv_code.
       WHEN 202. " The request was successful
+      WHEN 404. " may be more than one reason for this...
       WHEN OTHERS.
     ENDCASE.
 
   ENDMETHOD.
+
+    METHOD z100085_zif_proubc_baseline~send_bpiobjects_msg.
+    DATA lv_code TYPE i.
+    DATA lv_temp TYPE string.
+    DATA lv_uri TYPE string VALUE '/objects'.
+    DATA: lv_requeststr  TYPE string,
+          lv_responsestr TYPE string.
+    DATA lv_protocolmsg TYPE REF TO data.
+
+    mi_client->request->set_method( 'POST' ).
+    mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
+    me->get_bpi_token( ).
+
+    z100085_zcl_proubc_api_helper=>copy_data_to_ref( EXPORTING is_data = body
+                  CHANGING cr_data = lv_protocolmsg  ).
+
+    lv_requeststr = /ui2/cl_json=>serialize( EXPORTING data =  lv_protocolmsg
+                                       pretty_name = /ui2/cl_json=>pretty_mode-low_case ).
+
+    mi_client->request->set_cdata(
+      EXPORTING
+        data   =  lv_requeststr
+    ).
+
+    lv_code = send_receive( ).
+    statuscode = lv_code.
+    lv_responsestr = mi_client->response->get_cdata( ).
+    apiresponsestr = lv_responsestr.
+    /ui2/cl_json=>deserialize(
+      EXPORTING
+        json             = lv_responsestr
+      CHANGING
+        data             = apiresponse
+    ).
+    CASE lv_code.
+      WHEN 202. " The request was successful
+      WHEN 404. " may be more than one reason for this...
+      WHEN OTHERS.
+    ENDCASE.
+
+  ENDMETHOD.
+
 
   METHOD set_bearer_token.
     "todo add method implementation to retrive auth token from refresh token
@@ -2727,6 +2758,22 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
     DATA lv_bearertoken TYPE string.
     "todo check auth token is valid (not empty or expired)
     CONCATENATE 'Bearer' authtoken INTO lv_bearertoken SEPARATED BY space.
+    mi_client->request->set_header_field(
+      EXPORTING
+        name  = 'Authorization'    " Name of the header field
+        value = lv_bearertoken    " HTTP header field value
+    ).
+  ENDMETHOD.
+
+  METHOD set_bpi_token.
+    "todo add method implementation to retrive auth token from refresh token
+    bpitoken = iv_tokenstring.
+  ENDMETHOD.
+
+  METHOD get_bpi_token.
+    DATA lv_bearertoken TYPE string.
+    "todo check auth token is valid (not empty or expired)
+    CONCATENATE 'Bearer' bpitoken INTO lv_bearertoken SEPARATED BY space.
     mi_client->request->set_header_field(
       EXPORTING
         name  = 'Authorization'    " Name of the header field

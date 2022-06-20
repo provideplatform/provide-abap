@@ -29,9 +29,14 @@ CLASS z100085_zcl_proubc_api_helper DEFINITION
                         EXPORTING statuscode TYPE i
                                   apiresponsestr TYPE string
                                   apiresponse TYPE REF TO data,
+      send_bpiobjects_msg IMPORTING body TYPE z100085_zif_proubc_baseline=>bpiobjects_req
+                        EXPORTING statuscode TYPE i
+                                  apiresponsestr TYPE string
+                                  apiresponse TYPE REF TO data,
       get_default_tenant RETURNING VALUE(ev_defaulttenant) TYPE z100085_prvdorgs-organization_id,
       get_default_tenant_bpiendpoint RETURNING VALUE(ev_bpiendpoint) TYPE z100085_prvdorgs-bpi_endpoint,
-      build_dummy_idoc_protocol_msg RETURNING VALUE(es_dummy_idoc_msg) TYPE z100085_zif_proubc_baseline=>protocolmessage_req.
+      build_dummy_idoc_protocol_msg RETURNING VALUE(es_dummy_idoc_msg) TYPE z100085_zif_proubc_baseline=>protocolmessage_req,
+      list_bpi_accounts.
   PROTECTED SECTION.
     DATA: lv_defaulttenant        TYPE z100085_prvdorgs-organization_id VALUE 'e41dea7b-3510-4ffa-8ff4-53f3b158c8b4',
           lv_defaultidenttoken    TYPE REF TO data,
@@ -196,7 +201,7 @@ CLASS z100085_zcl_proubc_api_helper IMPLEMENTATION.
     lo_http_client->propertytype_accept_cookie = if_http_client=>co_enabled.
     lo_http_client->request->set_header_field( name  = if_http_form_fields_sap=>sap_client value = '100' ).
 
-    lo_baseline_api = NEW z100085_zcl_proubc_baseline( ii_client = lo_http_client ).
+    lo_baseline_api = NEW z100085_zcl_proubc_baseline( ii_client = lo_http_client iv_bpitenant_url = 'https://baseline.provide.services' ).
     "TODO - do something useful with the Baseline API
     "lo_baseline_api->authentication( body =  ).
 *    CATCH cx_static_check.
@@ -282,7 +287,7 @@ CLASS z100085_zcl_proubc_api_helper IMPLEMENTATION.
           lo_http_client->propertytype_accept_cookie = if_http_client=>co_enabled.
           lo_http_client->request->set_header_field( name  = if_http_form_fields_sap=>sap_client value = '100' ).
 
-          lo_baseline_api = NEW z100085_zcl_proubc_baseline( ii_client = lo_http_client ).
+          lo_baseline_api = NEW z100085_zcl_proubc_baseline( ii_client = lo_http_client iv_bpitenant_url = lv_bpiendpoint ).
 
           "lv_authenticationrequest-
 
@@ -370,7 +375,7 @@ CLASS z100085_zcl_proubc_api_helper IMPLEMENTATION.
           lo_http_client->propertytype_accept_cookie = if_http_client=>co_enabled.
           lo_http_client->request->set_header_field( name  = if_http_form_fields_sap=>sap_client value = '100' ).
 
-          lo_baseline_api = NEW z100085_zcl_proubc_baseline( ii_client = lo_http_client ).
+          lo_baseline_api = NEW z100085_zcl_proubc_baseline( ii_client = lo_http_client iv_bpitenant_url = lv_bpiendpoint ).
           lo_baseline_client = lo_baseline_api.
 
           lv_baseline_jwt = lo_baseline_api->bearerauthentication( EXPORTING body = lv_authreq iv_tenantid = lv_tenant IMPORTING code = lv_code  ).
@@ -390,6 +395,21 @@ CLASS z100085_zcl_proubc_api_helper IMPLEMENTATION.
 
     TRY.
         lo_baseline_client->send_protocol_msg( EXPORTING body = body
+                                               IMPORTING statuscode = statuscode
+                                                         apiresponsestr = apiresponsestr
+                                                         apiresponse = apiresponse ).
+      CATCH cx_static_check.
+        "wat do
+    ENDTRY.
+*    CATCH cx_static_check.
+
+  ENDMETHOD.
+
+
+    METHOD send_bpiobjects_msg.
+
+    TRY.
+        lo_baseline_client->send_bpiobjects_msg( EXPORTING body = body
                                                IMPORTING statuscode = statuscode
                                                          apiresponsestr = apiresponsestr
                                                          apiresponse = apiresponse ).
@@ -469,23 +489,26 @@ CLASS z100085_zcl_proubc_api_helper IMPLEMENTATION.
     lv_idocjson = /ui2/cl_json=>serialize(
        EXPORTING
          data             = lt_edidd
-*            compress         =
-*            name             =
-*            pretty_name      =
-*            type_descr       =
-*            assoc_arrays     =
-*            ts_as_iso8601    =
-*            expand_includes  =
-*            assoc_arrays_opt =
-*            numc_as_string   =
-*            name_mappings    =
-*            conversion_exits =
-*          RECEIVING
-*            r_json           =
      ).
     ls_dummy_idoc_protocol_msg-payload = lv_idocjson.
 
     es_dummy_idoc_msg = ls_dummy_idoc_protocol_msg.
+  ENDMETHOD.
+
+    METHOD list_bpi_accounts.
+
+    TRY.
+        lo_baseline_client->listaccounts(
+*          EXPORTING
+*            page =
+*            rpp  =
+        ).
+*        CATCH cx_static_check.
+      CATCH cx_static_check.
+        "wat do
+    ENDTRY.
+*    CATCH cx_static_check.
+
   ENDMETHOD.
 
 ENDCLASS.

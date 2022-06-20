@@ -4,14 +4,14 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 
 * Component schema: Account, object
   TYPES: BEGIN OF account,
-           id TYPE string,
+           id         TYPE string,
            created_at TYPE string,
            network_id TYPE string,
-           user_id TYPE string,
-           vault_id TYPE string,
-           key_id TYPE string,
+           user_id    TYPE string,
+           vault_id   TYPE string,
+           key_id     TYPE string,
            public_key TYPE string,
-           address TYPE string,
+           address    TYPE string,
          END OF account.
 
 * Component schema: AssociateWorkgroupUserRequest, object
@@ -24,23 +24,23 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 
 * Component schema: AuthenticationResponse, object
   TYPES: BEGIN OF authenticationresponse,
-           user TYPE user,
+           user  TYPE user,
            token TYPE token,
          END OF authenticationresponse.
 
 * Component schema: BaselineRecord, object
   TYPES: BEGIN OF baselinerecord,
            baseline_id TYPE string,
-           id TYPE string,
-           type TYPE string,
-           identifier TYPE string,
-           workflow TYPE workflow,
+           id          TYPE string,
+           type        TYPE string,
+           identifier  TYPE string,
+           workflow    TYPE workflow,
          END OF baselinerecord.
 
 * Component schema: BusinessObject, object
   TYPES: BEGIN OF businessobject,
            type TYPE string,
-           id TYPE string,
+           id   TYPE string,
          END OF businessobject.
 
 * Component schema: Chainspec, object
@@ -48,281 +48,281 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
            dummy_workaround TYPE i,
          END OF subchainspec_alloc.
   TYPES: BEGIN OF chainspec,
-           config TYPE string,
-           alloc TYPE subchainspec_alloc,
-           coinbase TYPE string,
+           config     TYPE string,
+           alloc      TYPE subchainspec_alloc,
+           coinbase   TYPE string,
            difficulty TYPE string,
-           extradata TYPE string,
-           gaslimit TYPE string,
-           nonce TYPE string,
-           mixhash TYPE string,
+           extradata  TYPE string,
+           gaslimit   TYPE string,
+           nonce      TYPE string,
+           mixhash    TYPE string,
            parenthash TYPE string,
-           timestamp TYPE string,
+           timestamp  TYPE string,
          END OF chainspec.
 
 * Component schema: Circuit, object
   TYPES: BEGIN OF circuit,
-           id TYPE string,
-           created_at TYPE string,
-           vault_id TYPE string,
-           proving_key_id TYPE string,
+           id               TYPE string,
+           created_at       TYPE string,
+           vault_id         TYPE string,
+           proving_key_id   TYPE string,
            verifying_key_id TYPE string,
-           name TYPE string,
-           description TYPE string,
-           identifier TYPE string,
-           provider TYPE string,
-           proving_scheme TYPE string,
-           curve TYPE string,
-           status TYPE string,
-           store_id TYPE string,
+           name             TYPE string,
+           description      TYPE string,
+           identifier       TYPE string,
+           provider         TYPE string,
+           proving_scheme   TYPE string,
+           curve            TYPE string,
+           status           TYPE string,
+           store_id         TYPE string,
          END OF circuit.
 
 * Component schema: CompiledArtifact, object
   TYPES: BEGIN OF compiledartifact,
            contractname TYPE string,
-           abi TYPE STANDARD TABLE OF string WITH DEFAULT KEY, " todo, handle array
-           bytecode TYPE string,
-           source TYPE string,
+           abi          TYPE STANDARD TABLE OF string WITH DEFAULT KEY, " todo, handle array
+           bytecode     TYPE string,
+           source       TYPE string,
          END OF compiledartifact.
 
 * Component schema: Participant, object
   TYPES: BEGIN OF participant,
-           address TYPE string,
-           metadata TYPE string,
-           api_endpoint TYPE string,
+           address            TYPE string,
+           metadata           TYPE string,
+           api_endpoint       TYPE string,
            messaging_endpoint TYPE string,
          END OF participant.
 
 * Component schema: Config, object
   TYPES: BEGIN OF config,
-           counterparties TYPE participant,
-           env TYPE string,
-           errors TYPE string,
-           network_id TYPE string,
-           organization_address TYPE string,
-           organization_id TYPE string,
+           counterparties             TYPE participant,
+           env                        TYPE string,
+           errors                     TYPE string,
+           network_id                 TYPE string,
+           organization_address       TYPE string,
+           organization_id            TYPE string,
            organization_refresh_token TYPE string,
-           registry_contract_address TYPE string,
+           registry_contract_address  TYPE string,
          END OF config.
 
 
 * Component schema: Security, object
   TYPES: BEGIN OF security,
-           egress TYPE string,
+           egress  TYPE string,
            ingress TYPE string,
          END OF security.
 
 * Component schema: ConnectorConfig, object
   TYPES: BEGIN OF connectorconfig,
-           image TYPE string,
+           image        TYPE string,
            gateway_port TYPE i,
-           provider_id TYPE string,
-           region TYPE string,
-           role TYPE string,
-           rpc_port TYPE i,
-           security TYPE security,
-           target_id TYPE string,
-           api_port TYPE i,
-           api_url TYPE string,
+           provider_id  TYPE string,
+           region       TYPE string,
+           role         TYPE string,
+           rpc_port     TYPE i,
+           security     TYPE security,
+           target_id    TYPE string,
+           api_port     TYPE i,
+           api_url      TYPE string,
          END OF connectorconfig.
 
 * Component schema: Connector, object
   TYPES: BEGIN OF connector,
-           id TYPE string,
-           created_at TYPE string,
-           workgroup_id TYPE string,
-           network_id TYPE string,
+           id              TYPE string,
+           created_at      TYPE string,
+           workgroup_id    TYPE string,
+           network_id      TYPE string,
            organization_id TYPE string,
-           name TYPE string,
-           type TYPE string,
-           status TYPE string,
-           description TYPE string,
-           config TYPE connectorconfig,
+           name            TYPE string,
+           type            TYPE string,
+           status          TYPE string,
+           description     TYPE string,
+           config          TYPE connectorconfig,
          END OF connector.
 
 * Component schema: ContractParams, object
   TYPES: BEGIN OF contractparams,
-           account_id TYPE string,
+           account_id        TYPE string,
            compiled_artifact TYPE compiledartifact,
          END OF contractparams.
 
 
 * Component schema: Contract, object
   TYPES: BEGIN OF contract,
-           id TYPE string,
-           created_at TYPE string,
-           workgroup_id TYPE string,
+           id              TYPE string,
+           created_at      TYPE string,
+           workgroup_id    TYPE string,
            organization_id TYPE string,
-           network_id TYPE string,
-           contract_id TYPE string,
-           transaction_id TYPE string,
-           name TYPE string,
-           address TYPE string,
-           type TYPE string,
-           accessed_at TYPE string,
-           pubsub_prefix TYPE string,
-           params TYPE contractparams,
+           network_id      TYPE string,
+           contract_id     TYPE string,
+           transaction_id  TYPE string,
+           name            TYPE string,
+           address         TYPE string,
+           type            TYPE string,
+           accessed_at     TYPE string,
+           pubsub_prefix   TYPE string,
+           params          TYPE contractparams,
          END OF contract.
 
 
 * Component schema: CreateSealorUnsealKey, object
   TYPES: BEGIN OF createsealorunsealkey,
-           key TYPE string,
+           key             TYPE string,
            validation_hash TYPE string,
          END OF createsealorunsealkey.
 
 * Component schema: Credentials, object
   TYPES: BEGIN OF credentials,
-           aws_access_key_id TYPE string,
+           aws_access_key_id     TYPE string,
            aws_secret_access_key TYPE string,
          END OF credentials.
 
 * Component schema: DeployContract, object
   TYPES: BEGIN OF ty_deploycontract,
-           id TYPE string,
-           created_at TYPE string,
-           workgroup_id TYPE string,
+           id              TYPE string,
+           created_at      TYPE string,
+           workgroup_id    TYPE string,
            organization_id TYPE string,
-           network_id TYPE string,
-           contract_id TYPE string,
-           transaction_id TYPE string,
-           name TYPE string,
-           address TYPE string,
-           type TYPE string,
-           params TYPE contractparams,
-           accessed_at TYPE string,
-           pubsub_prefix TYPE string,
+           network_id      TYPE string,
+           contract_id     TYPE string,
+           transaction_id  TYPE string,
+           name            TYPE string,
+           address         TYPE string,
+           type            TYPE string,
+           params          TYPE contractparams,
+           accessed_at     TYPE string,
+           pubsub_prefix   TYPE string,
          END OF ty_deploycontract.
 
 * Component schema: DeriveKeyRequest, object
   TYPES: BEGIN OF derivekeyrequest,
-           nonce TYPE i,
-           context TYPE string,
-           name TYPE string,
+           nonce       TYPE i,
+           context     TYPE string,
+           name        TYPE string,
            description TYPE string,
          END OF derivekeyrequest.
 
 * Component schema: Error, object
   TYPES: BEGIN OF error,
-           code TYPE string,
+           code    TYPE string,
            message TYPE string,
          END OF error.
 
 * Component schema: ExecuteContractRequest, object
   TYPES: BEGIN OF executecontractrequest,
-           method TYPE string,
-           params TYPE STANDARD TABLE OF string WITH DEFAULT KEY, " todo, handle array
-           value TYPE i,
+           method     TYPE string,
+           params     TYPE STANDARD TABLE OF string WITH DEFAULT KEY, " todo, handle array
+           value      TYPE i,
            account_id TYPE string,
          END OF executecontractrequest.
 
 * Component schema: ExecuteContractResponse, object
   TYPES: BEGIN OF executecontractresponse,
            confidence TYPE string,
-           ref TYPE string,
+           ref        TYPE string,
          END OF executecontractresponse.
 
-" TODO fix Ingress type
+  " TODO fix Ingress type
 * Component schema: Ingress, object
-"  TYPES: BEGIN OF ingress,
-"           0_0_0_0_0 TYPE string,
-"         END OF ingress.
+  "  TYPES: BEGIN OF ingress,
+  "           0_0_0_0_0 TYPE string,
+  "         END OF ingress.
 
 * Component schema: IssueVerifiableCredential, object
   TYPES: BEGIN OF issueverifiablecredential,
-           address TYPE string,
+           address         TYPE string,
            organization_id TYPE string,
-           public_key TYPE string,
-           signature TYPE string,
+           public_key      TYPE string,
+           signature       TYPE string,
          END OF issueverifiablecredential.
 
 * Component schema: JWK, object
   TYPES: BEGIN OF jwk,
-           kid TYPE string,
-           n TYPE string,
-           e TYPE string,
+           kid         TYPE string,
+           n           TYPE string,
+           e           TYPE string,
            fingerprint TYPE string,
-           public_key TYPE string,
+           public_key  TYPE string,
          END OF jwk.
 
 * Component schema: Key, object
   TYPES: BEGIN OF key,
-           type TYPE string,
-           usage TYPE string,
-           spec TYPE string,
-           name TYPE string,
+           type        TYPE string,
+           usage       TYPE string,
+           spec        TYPE string,
+           name        TYPE string,
            description TYPE string,
-           public_key TYPE string,
+           public_key  TYPE string,
          END OF key.
 
 * Component schema: LastBlockHeader, object
   TYPES: BEGIN OF lastblockheader,
-           difficulty TYPE string,
-           extradata TYPE string,
-           gaslimit TYPE string,
-           gasused TYPE string,
-           hash TYPE string,
-           logsbloom TYPE string,
-           miner TYPE string,
-           mixhash TYPE string,
-           nonce TYPE string,
-           number TYPE string,
-           parenthash TYPE string,
-           receiptsroot TYPE string,
-           sha3uncles TYPE string,
-           stateroot TYPE string,
-           timestamp TYPE string,
+           difficulty       TYPE string,
+           extradata        TYPE string,
+           gaslimit         TYPE string,
+           gasused          TYPE string,
+           hash             TYPE string,
+           logsbloom        TYPE string,
+           miner            TYPE string,
+           mixhash          TYPE string,
+           nonce            TYPE string,
+           number           TYPE string,
+           parenthash       TYPE string,
+           receiptsroot     TYPE string,
+           sha3uncles       TYPE string,
+           stateroot        TYPE string,
+           timestamp        TYPE string,
            transactionsroot TYPE string,
          END OF lastblockheader.
 
 * Component schema: LoadBalancer, object
   TYPES: BEGIN OF loadbalancer,
-           id TYPE string,
-           created_at TYPE string,
-           network_id TYPE string,
+           id           TYPE string,
+           created_at   TYPE string,
+           network_id   TYPE string,
            workgroup_id TYPE string,
-           name TYPE string,
-           type TYPE string,
-           host TYPE string,
-           ipv4 TYPE string,
-           ipv6 TYPE string,
-           description TYPE string,
-           region TYPE string,
-           status TYPE string,
+           name         TYPE string,
+           type         TYPE string,
+           host         TYPE string,
+           ipv4         TYPE string,
+           ipv6         TYPE string,
+           description  TYPE string,
+           region       TYPE string,
+           status       TYPE string,
          END OF loadbalancer.
 
 * Component schema: LogMessage, object
   TYPES: BEGIN OF logmessage,
            baseline_id TYPE string,
-           message TYPE string,
-           object_id TYPE string,
-           severity TYPE string,
-           timestamp TYPE string,
-           type TYPE string,
+           message     TYPE string,
+           object_id   TYPE string,
+           severity    TYPE string,
+           timestamp   TYPE string,
+           type        TYPE string,
          END OF logmessage.
 
 * Component schema: Message, object
   TYPES: BEGIN OF message,
-           baseline_id TYPE string,
-           errors TYPE string,
-           id TYPE string,
-           message_id TYPE string,
-           payload TYPE string,
+           baseline_id      TYPE string,
+           errors           TYPE string,
+           id               TYPE string,
+           message_id       TYPE string,
+           payload          TYPE string,
            protocol_message TYPE string,
-           recipients TYPE string,
-           type TYPE string,
+           recipients       TYPE string,
+           type             TYPE string,
          END OF message.
 
 * Component schema: Network, object
   TYPES: BEGIN OF network,
-           id TYPE string,
-           created_at TYPE string,
+           id           TYPE string,
+           created_at   TYPE string,
            workgroup_id TYPE string,
-           name TYPE string,
-           description TYPE string,
-           enabled TYPE abap_bool,
-           chain_id TYPE string,
-           config TYPE string,
+           name         TYPE string,
+           description  TYPE string,
+           enabled      TYPE abap_bool,
+           chain_id     TYPE string,
+           config       TYPE string,
          END OF network.
 
 * Component schema: NetworkStatus, string
@@ -339,31 +339,31 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
            dummy_workaround TYPE i,
          END OF subopenidconfig_end_session_en.
   TYPES: BEGIN OF openidconfig,
-           authorization_endpoint TYPE string,
-           claims_supported TYPE STANDARD TABLE OF string WITH DEFAULT KEY, " todo, handle array
-           cloud_instance_name TYPE string,
-           device_authorization_endpoint TYPE string,
-           end_session_endpoint TYPE subopenidconfig_end_session_en,
-           frontchannel_logout_supported TYPE abap_bool,
-           http_logout_supported TYPE abap_bool,
+           authorization_endpoint         TYPE string,
+           claims_supported               TYPE STANDARD TABLE OF string WITH DEFAULT KEY, " todo, handle array
+           cloud_instance_name            TYPE string,
+           device_authorization_endpoint  TYPE string,
+           end_session_endpoint           TYPE subopenidconfig_end_session_en,
+           frontchannel_logout_supported  TYPE abap_bool,
+           http_logout_supported          TYPE abap_bool,
            id_token_signing_alg_values_su TYPE STANDARD TABLE OF string WITH DEFAULT KEY, " todo, handle array
-           issuer TYPE string,
-           jwks_uri TYPE string,
-           rbac_url TYPE subopenidconfig_rbac_url,
+           issuer                         TYPE string,
+           jwks_uri                       TYPE string,
+           rbac_url                       TYPE subopenidconfig_rbac_url,
            request_uri_parameter_supporte TYPE abap_bool,
-           response_modes_supported TYPE STANDARD TABLE OF string WITH DEFAULT KEY, " todo, handle array
-           response_types_supported TYPE STANDARD TABLE OF string WITH DEFAULT KEY, " todo, handle array
-           scopes_supported TYPE STANDARD TABLE OF string WITH DEFAULT KEY, " todo, handle array
-           subject_types_supported TYPE STANDARD TABLE OF string WITH DEFAULT KEY, " todo, handle array
-           tenant_region_scope TYPE subopenidconfig_tenant_region_,
-           token_endpoint TYPE string,
+           response_modes_supported       TYPE STANDARD TABLE OF string WITH DEFAULT KEY, " todo, handle array
+           response_types_supported       TYPE STANDARD TABLE OF string WITH DEFAULT KEY, " todo, handle array
+           scopes_supported               TYPE STANDARD TABLE OF string WITH DEFAULT KEY, " todo, handle array
+           subject_types_supported        TYPE STANDARD TABLE OF string WITH DEFAULT KEY, " todo, handle array
+           tenant_region_scope            TYPE subopenidconfig_tenant_region_,
+           token_endpoint                 TYPE string,
            token_endpoint_auth_methods_su TYPE STANDARD TABLE OF string WITH DEFAULT KEY, " todo, handle array
-           userinfo_endpoint TYPE string,
+           userinfo_endpoint              TYPE string,
          END OF openidconfig.
 
 * Component schema: Organization, object
   TYPES: BEGIN OF organization,
-           name TYPE string,
+           name        TYPE string,
            description TYPE string,
          END OF organization.
 
@@ -371,14 +371,14 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 * Component schema: ProtocolMessage, object
   TYPES: BEGIN OF protocolmessage,
            baseline_id TYPE string,
-           opcode TYPE string,
-           sender TYPE string,
-           recipient TYPE string,
-           shield TYPE string,
-           identifer TYPE string,
-           signature TYPE string,
-           type TYPE string,
-           payload TYPE xstring,
+           opcode      TYPE string,
+           sender      TYPE string,
+           recipient   TYPE string,
+           shield      TYPE string,
+           identifer   TYPE string,
+           signature   TYPE string,
+           type        TYPE string,
+           payload     TYPE xstring,
          END OF protocolmessage.
 
 *https://gist.github.com/kthomas/459381e98c808febea9c1bb51408bbde
@@ -395,55 +395,62 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 *    Type            *string          `sql:"-" json:"type,omitempty"`
 *}
 
-   types: begin of protocolmessage_req,
-            ID type z100085_bpiobj-object_id, "object id, e.g PO number
-            BaselineID type z100085_bpiobj-baseline_id, "optional
-            "errors type table of string,
-            "messageid type string, "ok to leave this empty
-            payload type string, "the idoc payload
-            payload_mimetype type string, " 'application/xml or json
-            "protocolmessage type ref to data,
-            "recipients type ref to data,
-            "status type string,
-            type type string, "e.g. ORDERS05
-          end of protocolmessage_req.
+  TYPES: BEGIN OF protocolmessage_req,
+           id               TYPE z100085_bpiobj-object_id, "object id, e.g PO number
+           BaselineID       TYPE z100085_bpiobj-baseline_id, "optional
+           "errors type table of string,
+           "messageid type string, "ok to leave this empty
+           payload          TYPE string, "the idoc payload
+           payload_mimetype TYPE string, " 'application/xml or json
+           "protocolmessage type ref to data,
+           "recipients type ref to data,
+           "status type string,
+           type             TYPE string, "e.g. ORDERS05
+         END OF protocolmessage_req.
+
+
+  TYPES: BEGIN OF bpiobjects_req,
+           type    TYPE string,
+           id      TYPE string,
+           payload TYPE string,
+         END OF bpiobjects_req.
 
 
 * Component schema: ProtocolMessagePayload, string
-"  TYPES protocolmessagepayload TYPE string.
+  "  TYPES protocolmessagepayload TYPE string.
 
 * Component schema: ProveRequest, object
   TYPES: BEGIN OF proverequest,
-           identifier TYPE string,
+           identifier     TYPE string,
            proving_scheme TYPE string,
-           curve TYPE string,
-           provider TYPE string,
-           name TYPE string,
+           curve          TYPE string,
+           provider       TYPE string,
+           name           TYPE string,
          END OF proverequest.
 
 * Component schema: Secret, object
   TYPES: BEGIN OF secret,
-           id TYPE string,
-           created_at TYPE string,
-           vault_id TYPE string,
-           type TYPE string,
-           name TYPE string,
+           id          TYPE string,
+           created_at  TYPE string,
+           vault_id    TYPE string,
+           type        TYPE string,
+           name        TYPE string,
            description TYPE string,
-           value TYPE string,
+           value       TYPE string,
          END OF secret.
 
 
 * Component schema: Token, object
   TYPES: BEGIN OF token,
-           id TYPE string,
-           scope TYPE string,
-           expires_in TYPE f,
-           access_token TYPE string,
-           refresh_token TYPE string,
-           token TYPE string,
-           permissions TYPE f,
+           id              TYPE string,
+           scope           TYPE string,
+           expires_in      TYPE f,
+           access_token    TYPE string,
+           refresh_token   TYPE string,
+           token           TYPE string,
+           permissions     TYPE f,
            organization_id TYPE string,
-           application_id TYPE string,
+           application_id  TYPE string,
          END OF token.
 
 * Component schema: Transaction, string
@@ -456,15 +463,15 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 
 * Component schema: User, object
   TYPES: BEGIN OF user,
-           id TYPE string,
-           created_at TYPE string,
-           name TYPE string,
-           first_name TYPE string,
-           last_name TYPE string,
-           email TYPE string,
-           password TYPE string,
-           permissions TYPE i,
-           privacy_policy_agreed_at TYPE string,
+           id                         TYPE string,
+           created_at                 TYPE string,
+           name                       TYPE string,
+           first_name                 TYPE string,
+           last_name                  TYPE string,
+           email                      TYPE string,
+           password                   TYPE string,
+           permissions                TYPE i,
+           privacy_policy_agreed_at   TYPE string,
            terms_of_service_agreed_at TYPE string,
          END OF user.
 
@@ -480,49 +487,49 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 * Component schema: VerifyProofRequest, object
   TYPES: BEGIN OF verifyproofrequest,
            witness TYPE witness,
-           proof TYPE string,
-           store TYPE abap_bool,
+           proof   TYPE string,
+           store   TYPE abap_bool,
          END OF verifyproofrequest.
 
 * Component schema: Wallet, object
   TYPES: BEGIN OF wallet,
-           id TYPE string,
+           id         TYPE string,
            created_at TYPE string,
            network_id TYPE string,
-           user_id TYPE string,
-           vault_id TYPE string,
-           key_id TYPE string,
-           purpose TYPE i,
+           user_id    TYPE string,
+           vault_id   TYPE string,
+           key_id     TYPE string,
+           purpose    TYPE i,
            public_key TYPE string,
          END OF wallet.
 
 
 * Component schema: WorkgroupConfig, object
   TYPES: BEGIN OF workgroupconfig,
-           baselined TYPE abap_bool,
+           baselined      TYPE abap_bool,
            webhook_secret TYPE string,
-           network_id TYPE string,
+           network_id     TYPE string,
          END OF workgroupconfig.
 
 * Component schema: Workgroup, object
   TYPES: BEGIN OF workgroup,
-           id TYPE string,
-           created_at TYPE string,
-           network_id TYPE string,
-           user_id TYPE string,
-           name TYPE string,
+           id          TYPE string,
+           created_at  TYPE string,
+           network_id  TYPE string,
+           user_id     TYPE string,
+           name        TYPE string,
            description TYPE string,
-           type TYPE string,
-           config TYPE workgroupconfig,
-           hidden TYPE abap_bool,
+           type        TYPE string,
+           config      TYPE workgroupconfig,
+           hidden      TYPE abap_bool,
          END OF workgroup.
 
 * Component schema: Workflow, object
   TYPES: BEGIN OF workflow,
-           circuits TYPE string,
-           identifier TYPE string,
-           parcicipants TYPE STANDARD TABLE OF string WITH DEFAULT KEY, " todo, handle array
-           shield TYPE string,
+           circuits       TYPE string,
+           identifier     TYPE string,
+           parcicipants   TYPE STANDARD TABLE OF string WITH DEFAULT KEY, " todo, handle array
+           shield         TYPE string,
            workstep_index TYPE i,
          END OF workflow.
 
@@ -553,9 +560,9 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 *     application/json, #/components/schemas/Error
   METHODS listaccounts
     IMPORTING
-      page TYPE i OPTIONAL
-      rpp TYPE i OPTIONAL
-    RAISING cx_static_check.
+              page TYPE i OPTIONAL
+              rpp  TYPE i OPTIONAL
+    RAISING   cx_static_check.
 
 * POST - "Create account"
 * Operation id: CreateAccount
@@ -568,8 +575,8 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 * Body ref: #/components/schemas/Account
   METHODS createaccount
     IMPORTING
-      body TYPE account
-    RAISING cx_static_check.
+              body TYPE account
+    RAISING   cx_static_check.
 
 * GET - "Get account details"
 * Operation id: GetAccountDetails
@@ -582,10 +589,10 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 *     application/json, #/components/schemas/Error
   METHODS getaccountdetails
     IMPORTING
-      id TYPE string
+              id                 TYPE string
     RETURNING
-      VALUE(return_data) TYPE account
-    RAISING cx_static_check.
+              VALUE(return_data) TYPE account
+    RAISING   cx_static_check.
 
 * POST - "User authentication"
 * Operation id: Authentication
@@ -595,11 +602,11 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 * Body ref: #/components/schemas/AuthenticationRequest
   METHODS authentication
     IMPORTING
-      body TYPE authenticationrequest
-      iv_tenantid type z100085_prvdtenantid
+              body               TYPE authenticationrequest
+              iv_tenantid        TYPE z100085_prvdtenantid
     RETURNING
-      VALUE(return_data) TYPE authenticationresponse
-    RAISING cx_static_check.
+              VALUE(return_data) TYPE authenticationresponse
+    RAISING   cx_static_check.
 
 
 * POST - "Bearer authentication"
@@ -610,14 +617,14 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 * Body ref: #/components/schemas/AuthenticationRequest
   METHODS bearerauthentication
     IMPORTING
-      body TYPE authenticationrequest
-      iv_tenantid type z100085_prvdtenantid
-    exporting
-      code type i
+              body               TYPE authenticationrequest
+              iv_tenantid        TYPE z100085_prvdtenantid
+    EXPORTING
+              code               TYPE i
     RETURNING
-      "VALUE(return_data) TYPE authenticationresponse
-       value(apiresponse) TYPE REF TO data
-    RAISING cx_static_check.
+              "VALUE(return_data) TYPE authenticationresponse
+              VALUE(apiresponse) TYPE REF TO data
+    RAISING   cx_static_check.
 
 * GET - "List connectors"
 * Operation id: ListConnectors
@@ -632,12 +639,12 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 *     application/json, #/components/schemas/Error
   METHODS listconnectors
     IMPORTING
-      page TYPE i OPTIONAL
-      rpp TYPE i OPTIONAL
-      public TYPE abap_bool OPTIONAL
+              page               TYPE i OPTIONAL
+              rpp                TYPE i OPTIONAL
+              public             TYPE abap_bool OPTIONAL
     RETURNING
-      VALUE(return_data) TYPE response_listconnectors
-    RAISING cx_static_check.
+              VALUE(return_data) TYPE response_listconnectors
+    RAISING   cx_static_check.
 
 * POST - "Create connector"
 * Operation id: CreateConnector
@@ -652,8 +659,8 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 * Body ref: #/components/schemas/Connector
   METHODS createconnector
     IMPORTING
-      body TYPE connector
-    RAISING cx_static_check.
+              body TYPE connector
+    RAISING   cx_static_check.
 
 * GET - "Get connector details"
 * Operation id: GetConnectorDetails
@@ -668,8 +675,8 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 *     application/json, #/components/schemas/Error
   METHODS getconnectordetails
     IMPORTING
-      id TYPE string
-    RAISING cx_static_check.
+              id TYPE string
+    RAISING   cx_static_check.
 
 * DELETE - "Delete connector"
 * Operation id: deleteConnector
@@ -680,8 +687,8 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 *     application/json, #/components/schemas/Error
   METHODS deleteconnector
     IMPORTING
-      id TYPE string
-    RAISING cx_static_check.
+              id TYPE string
+    RAISING   cx_static_check.
 
 * GET - "Retrieve load balancer details"
 * Operation id: GetLoadBalancerDetails
@@ -696,8 +703,8 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 *     application/json, #/components/schemas/Error
   METHODS getloadbalancerdetails
     IMPORTING
-      id TYPE string
-    RAISING cx_static_check.
+              id TYPE string
+    RAISING   cx_static_check.
 
 * GET - "List contracts"
 * Operation id: ListContracts
@@ -715,11 +722,11 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 *     application/json, #/components/schemas/Error
   METHODS listcontracts
     IMPORTING
-      filter_tokens TYPE abap_bool OPTIONAL
-      sort TYPE string OPTIONAL
-      page TYPE i OPTIONAL
-      rpp TYPE i OPTIONAL
-    RAISING cx_static_check.
+              filter_tokens TYPE abap_bool OPTIONAL
+              sort          TYPE string OPTIONAL
+              page          TYPE i OPTIONAL
+              rpp           TYPE i OPTIONAL
+    RAISING   cx_static_check.
 
 * POST - "Deploy contract"
 * Operation id: DeployContract
@@ -734,8 +741,8 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 * Body ref: #/components/schemas/Contract
   METHODS deploycontract
     IMPORTING
-      body TYPE contract
-    RAISING cx_static_check.
+              body TYPE contract
+    RAISING   cx_static_check.
 
 * GET - "Get contract detail"
 * Operation id: GetContractDetail
@@ -750,8 +757,8 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 *     application/json, #/components/schemas/Error
   METHODS getcontractdetail
     IMPORTING
-      id TYPE string
-    RAISING cx_static_check.
+              id TYPE string
+    RAISING   cx_static_check.
 
 * POST - "Execute contract"
 * Operation id: ExecuteContract
@@ -764,9 +771,9 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 * Body ref: #/components/schemas/ExecuteContractRequest
   METHODS executecontract
     IMPORTING
-      id TYPE string
-      body TYPE executecontractrequest
-    RAISING cx_static_check.
+              id   TYPE string
+              body TYPE executecontractrequest
+    RAISING   cx_static_check.
 
 * GET - "List networks"
 * Operation id: ListNetworks
@@ -781,10 +788,10 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 * Response: 503
   METHODS listnetworks
     IMPORTING
-      page TYPE i OPTIONAL
-      rpp TYPE i OPTIONAL
-      public TYPE abap_bool OPTIONAL
-    RAISING cx_static_check.
+              page   TYPE i OPTIONAL
+              rpp    TYPE i OPTIONAL
+              public TYPE abap_bool OPTIONAL
+    RAISING   cx_static_check.
 
 * POST - "Create network"
 * Operation id: CreateNetwork
@@ -797,8 +804,8 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 * Body ref: #/components/schemas/Network
   METHODS createnetwork
     IMPORTING
-      body TYPE network
-    RAISING cx_static_check.
+              body TYPE network
+    RAISING   cx_static_check.
 
 * PUT - "Update network"
 * Operation id: UpdateNetwork
@@ -812,9 +819,9 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 * Body ref: #/components/schemas/Network
   METHODS updatenetwork
     IMPORTING
-      id TYPE string
-      body TYPE network
-    RAISING cx_static_check.
+              id   TYPE string
+              body TYPE network
+    RAISING   cx_static_check.
 
 * GET - "Get network status"
 * Operation id: GetNetworkStatus
@@ -829,8 +836,8 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 *     application/json, #/components/schemas/Error
   METHODS getnetworkstatus
     IMPORTING
-      id TYPE string
-    RAISING cx_static_check.
+              id TYPE string
+    RAISING   cx_static_check.
 
 * GET - "List oracles"
 * Operation id: ListOracles
@@ -843,9 +850,9 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 * Response: 503
   METHODS listoracles
     IMPORTING
-      page TYPE i OPTIONAL
-      rpp TYPE i OPTIONAL
-    RAISING cx_static_check.
+              page TYPE i OPTIONAL
+              rpp  TYPE i OPTIONAL
+    RAISING   cx_static_check.
 
 * POST - "Create oracle"
 * Operation id: CreateOracle
@@ -867,8 +874,8 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 * Response: 503
   METHODS getoracledetail
     IMPORTING
-      id TYPE string
-    RAISING cx_static_check.
+              id TYPE string
+    RAISING   cx_static_check.
 
 * PUT - "Update oracle"
 * Operation id: UpdateOracle
@@ -880,8 +887,8 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 * Response: 503
   METHODS updateoracle
     IMPORTING
-      id TYPE string
-    RAISING cx_static_check.
+              id TYPE string
+    RAISING   cx_static_check.
 
 * DELETE - "Delete oracle"
 * Operation id: DeleteOracle
@@ -893,8 +900,8 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 * Response: 503
   METHODS deleteoracle
     IMPORTING
-      id TYPE string
-    RAISING cx_static_check.
+              id TYPE string
+    RAISING   cx_static_check.
 
 * GET - "List organizations"
 * Operation id: ListOrganizations
@@ -907,9 +914,9 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 * Response: 503
   METHODS listorganizations
     IMPORTING
-      page TYPE i OPTIONAL
-      rpp TYPE i OPTIONAL
-    RAISING cx_static_check.
+              page TYPE i OPTIONAL
+              rpp  TYPE i OPTIONAL
+    RAISING   cx_static_check.
 
 * POST - "Create organization"
 * Operation id: CreateOrganization
@@ -921,8 +928,8 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 * Body ref: #/components/schemas/Organization
   METHODS createorganization
     IMPORTING
-      body TYPE organization
-    RAISING cx_static_check.
+              body TYPE organization
+    RAISING   cx_static_check.
 
 * GET - "Get organization details"
 * Operation id: GetOrganizationDetails
@@ -934,8 +941,8 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 * Response: 503
   METHODS getorganizationdetails
     IMPORTING
-      id TYPE string
-    RAISING cx_static_check.
+              id TYPE string
+    RAISING   cx_static_check.
 
 * PUT - "Update organization details"
 * Operation id: UpdateOrganizationDetails
@@ -948,9 +955,9 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 * Body ref: #/components/schemas/Organization
   METHODS updateorganizationdetails
     IMPORTING
-      id TYPE string
-      body TYPE organization
-    RAISING cx_static_check.
+              id   TYPE string
+              body TYPE organization
+    RAISING   cx_static_check.
 
 * GET - "List revocable tokens"
 * Operation id: ListTokens
@@ -964,11 +971,11 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 * Response: 503
   METHODS listtokens
     IMPORTING
-      page TYPE i OPTIONAL
-      rpp TYPE i OPTIONAL
+              page               TYPE i OPTIONAL
+              rpp                TYPE i OPTIONAL
     RETURNING
-      VALUE(return_data) TYPE response_listtokens
-    RAISING cx_static_check.
+              VALUE(return_data) TYPE response_listtokens
+    RAISING   cx_static_check.
 
 * POST - "Token authorization"
 * Operation id: TokenAuthorization
@@ -981,10 +988,10 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 * Body ref: #/components/schemas/Token
   METHODS tokenauthorization
     IMPORTING
-      body TYPE token
+              body               TYPE token
     RETURNING
-      VALUE(return_data) TYPE token
-    RAISING cx_static_check.
+              VALUE(return_data) TYPE token
+    RAISING   cx_static_check.
 
 * DELETE - "Revoke token"
 * Operation id: RevokeToken
@@ -996,8 +1003,8 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 * Response: 503
   METHODS revoketoken
     IMPORTING
-      id TYPE string
-    RAISING cx_static_check.
+              id TYPE string
+    RAISING   cx_static_check.
 
 * GET - "List transactions"
 * Operation id: ListTransactions
@@ -1013,11 +1020,11 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 * Response: 503
   METHODS listtransactions
     IMPORTING
-      filter_contract_creations TYPE abap_bool OPTIONAL
-      status TYPE string OPTIONAL
-      page TYPE i OPTIONAL
-      rpp TYPE i OPTIONAL
-    RAISING cx_static_check.
+              filter_contract_creations TYPE abap_bool OPTIONAL
+              status                    TYPE string OPTIONAL
+              page                      TYPE i OPTIONAL
+              rpp                       TYPE i OPTIONAL
+    RAISING   cx_static_check.
 
 * POST - "Create transaction"
 * Operation id: CreateTransaction
@@ -1030,8 +1037,8 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 * Body ref: #/components/schemas/Transaction
   METHODS createtransaction
     IMPORTING
-      body TYPE transaction
-    RAISING cx_static_check.
+              body TYPE transaction
+    RAISING   cx_static_check.
 
 * GET - "Get transaction details"
 * Operation id: GetTransactionDetails
@@ -1044,8 +1051,8 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 * Response: 503
   METHODS gettransactiondetails
     IMPORTING
-      id TYPE string
-    RAISING cx_static_check.
+              id TYPE string
+    RAISING   cx_static_check.
 
 * GET - "List users"
 * Operation id: ListUsers
@@ -1059,11 +1066,11 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 * Response: 503
   METHODS listusers
     IMPORTING
-      page TYPE i OPTIONAL
-      rpp TYPE i OPTIONAL
+              page               TYPE i OPTIONAL
+              rpp                TYPE i OPTIONAL
     RETURNING
-      VALUE(return_data) TYPE response_listusers
-    RAISING cx_static_check.
+              VALUE(return_data) TYPE response_listusers
+    RAISING   cx_static_check.
 
 * POST - "Create user"
 * Operation id: CreateUser
@@ -1072,10 +1079,10 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 * Body ref: #/components/schemas/User
   METHODS createuser
     IMPORTING
-      body TYPE user
+              body               TYPE user
     RETURNING
-      VALUE(return_data) TYPE user
-    RAISING cx_static_check.
+              VALUE(return_data) TYPE user
+    RAISING   cx_static_check.
 
 * GET - "Get user detail"
 * Operation id: GetUserDetail
@@ -1090,8 +1097,8 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 *     application/json, #/components/schemas/Error
   METHODS getuserdetail
     IMPORTING
-      id TYPE string
-    RAISING cx_static_check.
+              id TYPE string
+    RAISING   cx_static_check.
 
 * PUT - "Update user"
 * Operation id: UpdateUser
@@ -1105,11 +1112,11 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 * Body ref: #/components/schemas/User
   METHODS updateuser
     IMPORTING
-      id TYPE string
-      body TYPE user
+              id                 TYPE string
+              body               TYPE user
     RETURNING
-      VALUE(return_data) TYPE user
-    RAISING cx_static_check.
+              VALUE(return_data) TYPE user
+    RAISING   cx_static_check.
 
 * DELETE - "Delete user"
 * Operation id: DeleteUserRequest
@@ -1121,8 +1128,8 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 * Response: 503
   METHODS deleteuserrequest
     IMPORTING
-      id TYPE string
-    RAISING cx_static_check.
+              id TYPE string
+    RAISING   cx_static_check.
 
 * POST - "Unseal vault"
 * Operation id: UnsealVault
@@ -1134,8 +1141,8 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 * Body ref: #/components/schemas/UnsealVaultRequest
   METHODS unsealvault
     IMPORTING
-      body TYPE unsealvaultrequest
-    RAISING cx_static_check.
+              body TYPE unsealvaultrequest
+    RAISING   cx_static_check.
 
 * GET - "List vaults"
 * Operation id: ListVaults
@@ -1149,9 +1156,9 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 * Response: 503
   METHODS listvaults
     IMPORTING
-      page TYPE i OPTIONAL
-      rpp TYPE i OPTIONAL
-    RAISING cx_static_check.
+              page TYPE i OPTIONAL
+              rpp  TYPE i OPTIONAL
+    RAISING   cx_static_check.
 
 * POST - "Create a vault"
 * Operation id: CreateVault
@@ -1164,8 +1171,8 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 * Body ref: #/components/schemas/Vault
   METHODS createvault
     IMPORTING
-      body TYPE vault
-    RAISING cx_static_check.
+              body TYPE vault
+    RAISING   cx_static_check.
 
 * GET - "List keys"
 * Operation id: Listkeys
@@ -1180,10 +1187,10 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 * Response: 503
   METHODS listkeys
     IMPORTING
-      id TYPE string
-      page TYPE i OPTIONAL
-      rpp TYPE i OPTIONAL
-    RAISING cx_static_check.
+              id   TYPE string
+              page TYPE i OPTIONAL
+              rpp  TYPE i OPTIONAL
+    RAISING   cx_static_check.
 
 * POST - "Create a key"
 * Operation id: CreateKey
@@ -1197,9 +1204,9 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 * Body ref: #/components/schemas/Key
   METHODS createkey
     IMPORTING
-      id TYPE string
-      body TYPE key
-    RAISING cx_static_check.
+              id   TYPE string
+              body TYPE key
+    RAISING   cx_static_check.
 
 * POST - "Derive a key"
 * Operation id: DeriveaKeyRequest
@@ -1214,10 +1221,10 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 * Body ref: #/components/schemas/Key
   METHODS deriveakeyrequest
     IMPORTING
-      id TYPE string
-      key_id TYPE string
-      body TYPE key
-    RAISING cx_static_check.
+              id     TYPE string
+              key_id TYPE string
+              body   TYPE key
+    RAISING   cx_static_check.
 
 * DELETE - "Delete a key"
 * Operation id: Deleteakey
@@ -1230,9 +1237,9 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 * Response: 503
   METHODS deleteakey
     IMPORTING
-      id TYPE string
-      key_id TYPE string
-    RAISING cx_static_check.
+              id     TYPE string
+              key_id TYPE string
+    RAISING   cx_static_check.
 
 * GET - "List secrets"
 * Operation id: ListSecrets
@@ -1247,10 +1254,10 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 * Response: 503
   METHODS listsecrets
     IMPORTING
-      id TYPE string
-      page TYPE i OPTIONAL
-      rpp TYPE i OPTIONAL
-    RAISING cx_static_check.
+              id   TYPE string
+              page TYPE i OPTIONAL
+              rpp  TYPE i OPTIONAL
+    RAISING   cx_static_check.
 
 * POST - "Store secret"
 * Operation id: StoreSecret
@@ -1264,9 +1271,9 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 * Body ref: #/components/schemas/Secret
   METHODS storesecret
     IMPORTING
-      id TYPE string
-      body TYPE secret
-    RAISING cx_static_check.
+              id   TYPE string
+              body TYPE secret
+    RAISING   cx_static_check.
 
 * GET - "Retrieve secret"
 * Operation id: RetrieveSecret
@@ -1280,9 +1287,9 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 * Response: 503
   METHODS retrievesecret
     IMPORTING
-      id TYPE string
-      secret_id TYPE string
-    RAISING cx_static_check.
+              id        TYPE string
+              secret_id TYPE string
+    RAISING   cx_static_check.
 
 * DELETE - "Delete secret"
 * Operation id: DeleteSecret
@@ -1296,9 +1303,9 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 * Response: 503
   METHODS deletesecret
     IMPORTING
-      id TYPE string
-      secret_id TYPE string
-    RAISING cx_static_check.
+              id        TYPE string
+              secret_id TYPE string
+    RAISING   cx_static_check.
 
 * GET - "List wallets"
 * Operation id: ListWallets
@@ -1312,9 +1319,9 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 * Response: 503
   METHODS listwallets
     IMPORTING
-      page TYPE i OPTIONAL
-      rpp TYPE i OPTIONAL
-    RAISING cx_static_check.
+              page TYPE i OPTIONAL
+              rpp  TYPE i OPTIONAL
+    RAISING   cx_static_check.
 
 * POST - "Create wallet"
 * Operation id: CreateWallet
@@ -1327,8 +1334,8 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 * Body ref: #/components/schemas/Wallet
   METHODS createwallet
     IMPORTING
-      body TYPE wallet
-    RAISING cx_static_check.
+              body TYPE wallet
+    RAISING   cx_static_check.
 
 * GET - "List wallet accounts"
 * Operation id: ListWalletAccounts
@@ -1342,9 +1349,9 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 * Response: 503
   METHODS listwalletaccounts
     IMPORTING
-      id TYPE string
-      rpp TYPE i OPTIONAL
-    RAISING cx_static_check.
+              id  TYPE string
+              rpp TYPE i OPTIONAL
+    RAISING   cx_static_check.
 
 * GET - "List workgroups"
 * Operation id: ListWorkgroups
@@ -1354,11 +1361,11 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 *     application/json, #/components/schemas/response_listworkgroups
   METHODS listworkgroups
     IMPORTING
-      page TYPE i OPTIONAL
-      rpp TYPE i OPTIONAL
+              page               TYPE i OPTIONAL
+              rpp                TYPE i OPTIONAL
     RETURNING
-      VALUE(return_data) TYPE response_listworkgroups
-    RAISING cx_static_check.
+              VALUE(return_data) TYPE response_listworkgroups
+    RAISING   cx_static_check.
 
 * POST - "Create workgroup"
 * Operation id: CreateWorkgroup
@@ -1371,10 +1378,10 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 * Body ref: #/components/schemas/Workgroup
   METHODS createworkgroup
     IMPORTING
-      body TYPE workgroup
+              body               TYPE workgroup
     RETURNING
-      VALUE(return_data) TYPE workgroup
-    RAISING cx_static_check.
+              VALUE(return_data) TYPE workgroup
+    RAISING   cx_static_check.
 
 * GET - "List workgroup users"
 * Operation id: ListWorkgroupUsers
@@ -1389,12 +1396,12 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 * Response: 503
   METHODS listworkgroupusers
     IMPORTING
-      id TYPE string
-      page TYPE i OPTIONAL
-      rpp TYPE i OPTIONAL
+              id                 TYPE string
+              page               TYPE i OPTIONAL
+              rpp                TYPE i OPTIONAL
     RETURNING
-      VALUE(return_data) TYPE response_listworkgroupusers
-    RAISING cx_static_check.
+              VALUE(return_data) TYPE response_listworkgroupusers
+    RAISING   cx_static_check.
 
 * POST - "Associate workgroup user"
 * Operation id: AssociateWorkgroupUser
@@ -1407,9 +1414,9 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 * Body ref: #/components/schemas/AssociateWorkgroupUserRequest
   METHODS associateworkgroupuser
     IMPORTING
-      id TYPE string
-      body TYPE associateworkgroupuserrequest
-    RAISING cx_static_check.
+              id   TYPE string
+              body TYPE associateworkgroupuserrequest
+    RAISING   cx_static_check.
 
 * GET - "Get workgroup details"
 * Operation id: GetWorkgroupDetails
@@ -1421,8 +1428,8 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 * Response: 503
   METHODS getworkgroupdetails
     IMPORTING
-      id TYPE string
-    RAISING cx_static_check.
+              id TYPE string
+    RAISING   cx_static_check.
 
 * PUT - "Update workgroup"
 * Operation id: UpdateWorkgroup
@@ -1435,9 +1442,9 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 * Body ref: #/components/schemas/Workgroup
   METHODS updateworkgroup
     IMPORTING
-      id TYPE string
-      body TYPE workgroup
-    RAISING cx_static_check.
+              id   TYPE string
+              body TYPE workgroup
+    RAISING   cx_static_check.
 
 * DELETE - "Delete workgroup"
 * Operation id: DeleteWorkgroup
@@ -1449,8 +1456,8 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 * Response: 503
   METHODS deleteworkgroup
     IMPORTING
-      id TYPE string
-    RAISING cx_static_check.
+              id TYPE string
+    RAISING   cx_static_check.
 
 * POST - "Create a business object"
 * Operation id: CreateBaselineBusinessObject
@@ -1464,8 +1471,8 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 * Body ref: #/components/schemas/BusinessObject
   METHODS createbaselinebusinessobject
     IMPORTING
-      body TYPE businessobject
-    RAISING cx_static_check.
+              body TYPE businessobject
+    RAISING   cx_static_check.
 
 * PUT - "Update a business object"
 * Operation id: UpdateBaselineBusinessObject
@@ -1478,9 +1485,9 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 * Body ref: #/components/schemas/BusinessObject
   METHODS updatebaselinebusinessobject
     IMPORTING
-      id TYPE string
-      body TYPE businessobject
-    RAISING cx_static_check.
+              id   TYPE string
+              body TYPE businessobject
+    RAISING   cx_static_check.
 
 * GET - "List Circuits"
 * Operation id: ListCircuits
@@ -1497,12 +1504,12 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 * Response: 503
   METHODS listcircuits
     IMPORTING
-      curve TYPE string OPTIONAL
-      identifier TYPE string OPTIONAL
-      provider TYPE string OPTIONAL
-      proving_scheme TYPE string OPTIONAL
-      status TYPE string OPTIONAL
-    RAISING cx_static_check.
+              curve          TYPE string OPTIONAL
+              identifier     TYPE string OPTIONAL
+              provider       TYPE string OPTIONAL
+              proving_scheme TYPE string OPTIONAL
+              status         TYPE string OPTIONAL
+    RAISING   cx_static_check.
 
 * POST - "Create circuit"
 * Operation id: CreateCircuit
@@ -1514,8 +1521,8 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 * Body ref: #/components/schemas/Circuit
   METHODS createcircuit
     IMPORTING
-      body TYPE circuit
-    RAISING cx_static_check.
+              body TYPE circuit
+    RAISING   cx_static_check.
 
 * POST - "Prove circuit"
 * Operation id: Prove
@@ -1529,9 +1536,9 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 * Body ref: #/components/schemas/ProveRequest
   METHODS prove
     IMPORTING
-      id TYPE string
-      body TYPE proverequest
-    RAISING cx_static_check.
+              id   TYPE string
+              body TYPE proverequest
+    RAISING   cx_static_check.
 
 * POST - "Verify"
 * Operation id: Verify
@@ -1544,9 +1551,9 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 * Body ref: #/components/schemas/VerifyProofRequest
   METHODS verify
     IMPORTING
-      id TYPE string
-      body TYPE verifyproofrequest
-    RAISING cx_static_check.
+              id   TYPE string
+              body TYPE verifyproofrequest
+    RAISING   cx_static_check.
 
 * GET - "Retrieve store value"
 * Operation id: GetStoreValue
@@ -1559,9 +1566,9 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 * Response: 503
   METHODS getstorevalue
     IMPORTING
-      id TYPE string
-      index TYPE string
-    RAISING cx_static_check.
+              id    TYPE string
+              index TYPE string
+    RAISING   cx_static_check.
 
 * GET - "JSON Web Key Set (JWK)"
 * Operation id: ListWellKnownKeys
@@ -1583,31 +1590,29 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 
 * POST
 * *https://gist.github.com/kthomas/459381e98c808febea9c1bb51408bbde
-*type Message struct {
-*    ID              *string          `sql:"-" json:"id,omitempty"`
-*    BaselineID      *uuid.UUID       `sql:"-" json:"baseline_id,omitempty"` // don't need this optional; when included, can be used to map outbound message just-in-time
-*    Errors          []*api.Error     `sql:"-" json:"errors,omitempty"`
-*    MessageID       *string          `sql:"-" json:"message_id,omitempty"` dont need this. but
-*    Payload         interface{}      `sql:"-" json:"payload,omitempty"` THE IDOC. need this
-*     payload_mimetype 'application/xml'
-*m    ProtocolMessage *ProtocolMessage `sql:"-" json:"protocol_essage,omitempty"`. don't need this.
-*    Recipients      []*Participant   `sql:"-" json:"recipients"` don't need this
-*    Status          *string          `sql:"-" json:"status,omitempty"` don't need this. shuttle gives this back to us.
-*    Type            *string          `sql:"-" json:"type,omitempty"`
-*}
+  METHODS send_protocol_msg
+    IMPORTING
+              body           TYPE protocolmessage_req
+    EXPORTING
+              statuscode     TYPE i
+              apiresponsestr TYPE string
+              apiresponse    TYPE REF TO data
+    RAISING   cx_static_check.
 
-  methods send_protocol_msg
-    importing
-        body type protocolmessage_req
-    exporting
-        statuscode type i
-        apiresponsestr type string
-        apiresponse type ref to data
-    raising cx_static_check.
+  METHODS status
+    EXPORTING
+              statuscode TYPE i
+    RAISING   cx_static_check.
 
-  methods status
-    exporting
-        statuscode type i
-    raising cx_static_check.
+  METHODS send_bpiobjects_msg
+    IMPORTING
+              body           TYPE bpiobjects_req
+    EXPORTING
+              statuscode     TYPE i
+              apiresponsestr TYPE string
+              apiresponse    TYPE REF TO data
+    RAISING   cx_static_check.
+
+
 
 ENDINTERFACE.
