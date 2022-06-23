@@ -50,6 +50,24 @@
      <MSGNR>006</MSGNR>
      <TEXT>Failed to delete org &amp;</TEXT>
     </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>Z100085_ZCLPROUBCMSG</ARBGB>
+     <MSGNR>007</MSGNR>
+     <TEXT>Ident authentication failure with Tenant &amp; HTTP &amp; Ident core URI &amp;</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>Z100085_ZCLPROUBCMSG</ARBGB>
+     <MSGNR>008</MSGNR>
+     <TEXT>Baseline autentication failure tithe Tenant &amp; HTTP &amp; BPI core URI &amp;</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>Z100085_ZCLPROUBCMSG</ARBGB>
+     <MSGNR>009</MSGNR>
+     <TEXT>Failed to create protocol message with Tenant &amp; HTTP &amp; BPI core URI &amp;</TEXT>
+    </T100>
    </T100>
    <I18N_LANGS>
     <LANGU>1</LANGU>

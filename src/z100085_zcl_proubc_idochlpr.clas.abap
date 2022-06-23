@@ -7,7 +7,6 @@ CLASS z100085_zcl_proubc_idochlpr DEFINITION
     INTERFACES: z100085_zif_proubc_blidochlper.
     TYPES: tty_edidd TYPE TABLE OF edidd.
     DATA: lo_api_helper    TYPE REF TO z100085_zcl_proubc_api_helper,
-          lv_setup_success TYPE boolean,
           selected_idocs   TYPE Z100085_Zif_proubc_blidochlper=>tty_proubc_idocs.
 
     CLASS-METHODS:
@@ -23,6 +22,10 @@ CLASS z100085_zcl_proubc_idochlpr DEFINITION
       constructor IMPORTING iv_tenant TYPE z100085_prvdtenantid,
       launch_idoc_to_baseline.
   PROTECTED SECTION.
+    data: lv_setup_success TYPE boolean,
+          return_messages type table of bapiret2.
+  methods: add_message importing iv_msg type bapiret2,
+           clear_messages.
   PRIVATE SECTION.
 ENDCLASS.
 
@@ -43,7 +46,8 @@ CLASS z100085_zcl_proubc_idochlpr IMPLEMENTATION.
       lo_ident_api         TYPE REF TO z100085_zif_proubc_ident,
       lo_baseline_api      TYPE REF TO z100085_zif_proubc_baseline,
       ls_protocol_msg_req  TYPE z100085_zif_proubc_baseline=>protocolmessage_req,
-      ls_bpiobjects_req    TYPE z100085_zif_proubc_baseline=>bpiobjects_req,
+      "ls_bpiobjects_req    TYPE z100085_zif_proubc_baseline=>bpiobjects_req,
+       ls_bpiobjects_req    TYPE z100085_zif_proubc_baseline=>businessobject,
       lt_updatedbpis       TYPE TABLE OF z100085_bpiobj,
       lt_newbpis           TYPE TABLE OF z100085_bpiobj,
       lt_final_updatedbpis TYPE TABLE OF z100085_bpiobj,
@@ -98,20 +102,24 @@ CLASS z100085_zcl_proubc_idochlpr IMPLEMENTATION.
                                iv_idoc = lv_idoc
                      IMPORTING ev_objid = ls_protocol_msg_req-id ).
 
-      "request to /objects
+      "request to /objects OR       "request to /business_objects
       ls_bpiobjects_req-id = ls_protocol_msg_req-id.
       ls_bpiobjects_req-type =  wa_idoc_control-idoctp. "maybe needs to be purchase_order instead of ORDERS05?
       ls_bpiobjects_req-payload = lv_idocjson.
-
-
 
 *https://gist.github.com/kthomas/459381e98c808febea9c1bb51408bbde
       "call baseline API /api/v1/protocolmessage
       "this method keeps sending 404. is really implemented?
       "lo_api_helper->send_protocol_msg( EXPORTING body = ls_protocol_msg_req IMPORTING statuscode = lv_status  ). "should return 202
+      lo_api_helper->create_businessobjects_msg(
+        EXPORTING
+          body           =  ls_bpiobjects_req
+        IMPORTING
+          statuscode     = lv_status
+      ).
 
       "this appears to be the actual endpoint live today based on https://app.swaggerhub.com/apis/prvd/Baseline/v1.0.0#/info
-      lo_api_helper->send_bpiobjects_msg( exporting body = ls_bpiobjects_req importing statuscode = lv_status ).
+      "lo_api_helper->send_bpiobjects_msg( exporting body = ls_bpiobjects_req importing statuscode = lv_status ).
       IF lv_status = '202'.
         DATA: wa_bpiobj    TYPE z100085_bpiobj,
               lv_timestamp TYPE timestampl.
@@ -254,4 +262,11 @@ CLASS z100085_zcl_proubc_idochlpr IMPLEMENTATION.
       <fs_edidd>-docnum = lv_dummy_idocnum.
     ENDLOOP.
   ENDMETHOD.
+
+  method add_message.
+    append iv_msg to return_messages.
+  endmethod.
+  method clear_messages.
+    clear: return_messages.
+  endmethod.
 ENDCLASS.

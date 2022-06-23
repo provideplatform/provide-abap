@@ -132,7 +132,7 @@ CLASS Z100085_zcl_proubc_ident IMPLEMENTATION.
   METHOD Z100085_zif_proubc_ident~createapplication.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE '/api/v1/applications'.
+    DATA lv_uri TYPE string VALUE '/applications'.
     mi_client->request->set_method( 'POST' ).
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
     mi_client->request->set_header_field( name = 'name' value = name ).
@@ -147,7 +147,7 @@ CLASS Z100085_zcl_proubc_ident IMPLEMENTATION.
   METHOD Z100085_zif_proubc_ident~listapplications.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE '/api/v1/applications'.
+    DATA lv_uri TYPE string VALUE '/applications'.
     mi_client->request->set_method( 'GET' ).
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
     lv_code = send_receive( ).
@@ -160,7 +160,7 @@ CLASS Z100085_zcl_proubc_ident IMPLEMENTATION.
   METHOD Z100085_zif_proubc_ident~associateusertoapplication.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE '/api/v1/applications/{application_id}/users'.
+    DATA lv_uri TYPE string VALUE '/applications/{application_id}/users'.
     lv_temp = application_id.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{application_id}' IN lv_uri WITH lv_temp.
@@ -177,7 +177,7 @@ CLASS Z100085_zcl_proubc_ident IMPLEMENTATION.
   METHOD Z100085_zif_proubc_ident~listapplicationusers.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE '/api/v1/applications/{application_id}/users'.
+    DATA lv_uri TYPE string VALUE '/applications/{application_id}/users'.
     lv_temp = application_id.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{application_id}' IN lv_uri WITH lv_temp.
@@ -194,7 +194,7 @@ CLASS Z100085_zcl_proubc_ident IMPLEMENTATION.
   METHOD Z100085_zif_proubc_ident~getapplicationdetails.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE '/api/v1/applications/{application_id}'.
+    DATA lv_uri TYPE string VALUE '/applications/{application_id}'.
     lv_temp = application_id.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{application_id}' IN lv_uri WITH lv_temp.
@@ -211,7 +211,7 @@ CLASS Z100085_zcl_proubc_ident IMPLEMENTATION.
   METHOD Z100085_zif_proubc_ident~updateapplication.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE '/api/v1/applications/{application_id}'.
+    DATA lv_uri TYPE string VALUE '/applications/{application_id}'.
     lv_temp = application_id.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{application_id}' IN lv_uri WITH lv_temp.
@@ -229,7 +229,7 @@ CLASS Z100085_zcl_proubc_ident IMPLEMENTATION.
   METHOD Z100085_zif_proubc_ident~deleteapplication.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE '/api/v1/applications/{application_id}'.
+    DATA lv_uri TYPE string VALUE '/applications/{application_id}'.
     lv_temp = application_id.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{application_id}' IN lv_uri WITH lv_temp.
@@ -246,7 +246,7 @@ CLASS Z100085_zcl_proubc_ident IMPLEMENTATION.
   METHOD Z100085_zif_proubc_ident~listorganizations.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE '/api/v1/organizations'.
+    DATA lv_uri TYPE string VALUE '/organizations'.
     mi_client->request->set_method( 'GET' ).
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
     mi_client->request->set_header_field( name = 'content-type' value = content_type ).
@@ -260,7 +260,7 @@ CLASS Z100085_zcl_proubc_ident IMPLEMENTATION.
   METHOD Z100085_zif_proubc_ident~createorganization.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE '/api/v1/organizations'.
+    DATA lv_uri TYPE string VALUE '/organizations'.
     mi_client->request->set_method( 'POST' ).
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
     mi_client->request->set_header_field( name = 'name' value = name ).
@@ -275,7 +275,7 @@ CLASS Z100085_zcl_proubc_ident IMPLEMENTATION.
   METHOD Z100085_zif_proubc_ident~getorganizationdetails.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE '/api/v1/organizations/{organization_id}'.
+    DATA lv_uri TYPE string VALUE '/organizations/{organization_id}'.
     lv_temp = organization_id.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{organization_id}' IN lv_uri WITH lv_temp.
@@ -293,7 +293,7 @@ CLASS Z100085_zcl_proubc_ident IMPLEMENTATION.
   METHOD Z100085_zif_proubc_ident~updateorganizationdetails.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE '/api/v1/organizations/{organization_id}'.
+    DATA lv_uri TYPE string VALUE '/organizations/{organization_id}'.
     lv_temp = organization_id.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{organization_id}' IN lv_uri WITH lv_temp.
@@ -311,7 +311,7 @@ CLASS Z100085_zcl_proubc_ident IMPLEMENTATION.
   METHOD Z100085_zif_proubc_ident~listtokens.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE '/api/v1/tokens'.
+    DATA lv_uri TYPE string VALUE '/tokens'.
     mi_client->request->set_method( 'GET' ).
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
     mi_client->request->set_header_field( name = 'content-type' value = content_type ).
@@ -326,7 +326,7 @@ CLASS Z100085_zcl_proubc_ident IMPLEMENTATION.
   METHOD Z100085_zif_proubc_ident~authorizelong_termtoken.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE '/api/v1/tokens'.
+    DATA lv_uri TYPE string VALUE '/tokens'.
     DATA: lv_longtermrequestdata TYPE REF TO data,
           lv_requeststr          TYPE string.
     DATA lv_authresponsestr TYPE string.
@@ -416,7 +416,7 @@ CLASS Z100085_zcl_proubc_ident IMPLEMENTATION.
   METHOD Z100085_zif_proubc_ident~updateuser.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE '/api/v1/tokens'.
+    DATA lv_uri TYPE string VALUE '/tokens'.
     mi_client->request->set_method( 'PUT' ).
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
     mi_client->request->set_header_field( name = 'name' value = name ).
@@ -431,7 +431,7 @@ CLASS Z100085_zcl_proubc_ident IMPLEMENTATION.
   METHOD Z100085_zif_proubc_ident~revoketoken.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE '/api/v1/tokens/f2202ba1-e2af-4505-9b1a-53e1ce8de904'.
+    DATA lv_uri TYPE string VALUE '/tokens/f2202ba1-e2af-4505-9b1a-53e1ce8de904'.
     mi_client->request->set_method( 'DELETE' ).
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
     mi_client->request->set_header_field( name = 'content-type' value = content_type ).
@@ -445,7 +445,7 @@ CLASS Z100085_zcl_proubc_ident IMPLEMENTATION.
   METHOD Z100085_zif_proubc_ident~authentication.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE '/api/v1/authenticate'.
+    DATA lv_uri TYPE string VALUE '/authenticate'.
     DATA lv_basicauthdata TYPE REF TO data.
     DATA lv_authresponsestr TYPE string.
     mi_client->request->set_method( 'POST' ).
@@ -476,7 +476,7 @@ CLASS Z100085_zcl_proubc_ident IMPLEMENTATION.
   METHOD Z100085_zif_proubc_ident~listuserscopy.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE '/api/v1/users'.
+    DATA lv_uri TYPE string VALUE '/users'.
     mi_client->request->set_method( 'GET' ).
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
     mi_client->request->set_header_field( name = 'content-type' value = content_type ).
@@ -490,7 +490,7 @@ CLASS Z100085_zcl_proubc_ident IMPLEMENTATION.
   METHOD Z100085_zif_proubc_ident~createuser.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE '/api/v1/users'.
+    DATA lv_uri TYPE string VALUE '/users'.
     mi_client->request->set_method( 'POST' ).
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
 * todo, set body, #/components/schemas/CreateuserRequest
@@ -504,7 +504,7 @@ CLASS Z100085_zcl_proubc_ident IMPLEMENTATION.
   METHOD Z100085_zif_proubc_ident~getuserdetail.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE '/api/v1/users/{user_id}'.
+    DATA lv_uri TYPE string VALUE '/users/{user_id}'.
     lv_temp = user_id.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{user_id}' IN lv_uri WITH lv_temp.
@@ -522,7 +522,7 @@ CLASS Z100085_zcl_proubc_ident IMPLEMENTATION.
   METHOD Z100085_zif_proubc_ident~deleteuser.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE '/api/v1/tokens/{user_id}'.
+    DATA lv_uri TYPE string VALUE '/tokens/{user_id}'.
     lv_temp = user_id.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{user_id}' IN lv_uri WITH lv_temp.

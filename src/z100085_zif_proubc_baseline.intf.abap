@@ -39,8 +39,9 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 
 * Component schema: BusinessObject, object
   TYPES: BEGIN OF businessobject,
-           type TYPE string,
-           id   TYPE string,
+           type    TYPE string,
+           id      TYPE string,
+           payload TYPE string,
          END OF businessobject.
 
 * Component schema: Chainspec, object
@@ -1471,7 +1472,11 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 * Body ref: #/components/schemas/BusinessObject
   METHODS createbaselinebusinessobject
     IMPORTING
-              body TYPE businessobject
+              body           TYPE businessobject
+    EXPORTING
+              statuscode     TYPE i
+              apiresponsestr TYPE string
+              apiresponse    TYPE REF TO data
     RAISING   cx_static_check.
 
 * PUT - "Update a business object"

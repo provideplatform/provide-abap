@@ -24,7 +24,5 @@ define view Z100085_ZCC_PRVDORGS as select from Z100085_ZC_PRVDORGS {
     lineItem: [{ position: 30, importance: #HIGH}],
     identification: [{position: 30, label: 'Ident Endpoint'}]
   }
-  ident_endpoint,
-  refresh_token, //todo merge these 2 columns into one large string
-  refresh_tokenext 
+  ident_endpoint
 }

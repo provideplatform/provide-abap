@@ -929,7 +929,8 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
         lv_bpiauthreq = <fs_bpiauthreq2>.
         me->set_bpi_token( lv_bpiauthreq ).
       WHEN 401.
-        " todo, raise
+        " todo, raise authorization failure
+      when 404. "check URI, BPI tenant
     ENDCASE.
   ENDMETHOD.
 
@@ -2441,10 +2442,35 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/business_objects'.
+    DATA: lv_requeststr  TYPE string,
+          lv_responsestr TYPE string.
+    DATA lv_busobjmsg TYPE REF TO data.
+
     mi_client->request->set_method( 'POST' ).
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
-* todo, set body, #/components/schemas/BusinessObject
+    me->get_bpi_token( ).
+
+    z100085_zcl_proubc_api_helper=>copy_data_to_ref( EXPORTING is_data = body
+                  CHANGING cr_data = lv_busobjmsg  ).
+
+    lv_requeststr = /ui2/cl_json=>serialize( EXPORTING data =  lv_busobjmsg
+                                       pretty_name = /ui2/cl_json=>pretty_mode-low_case ).
+
+    mi_client->request->set_cdata(
+      EXPORTING
+        data   =  lv_requeststr
+    ).
+
     lv_code = send_receive( ).
+    statuscode = lv_code.
+    lv_responsestr = mi_client->response->get_cdata( ).
+    apiresponsestr = lv_responsestr.
+    /ui2/cl_json=>deserialize(
+      EXPORTING
+        json             = lv_responsestr
+      CHANGING
+        data             = apiresponse
+    ).
     WRITE / lv_code.
     CASE lv_code.
       WHEN 202. " Accepted
@@ -2455,10 +2481,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
       WHEN 403.
         " todo, raise
       WHEN 404. " The specified resource was not found.
-        " application/json,#/components/schemas/Error
-        CREATE OBJECT mo_json EXPORTING iv_json = mi_client->response->get_cdata( ).
-        parse_error( '' ).
-        " todo, raise
+      when 407. "check strust
       WHEN 503.
         " todo, raise
     ENDCASE.
@@ -2669,7 +2692,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
 *https://gist.github.com/kthomas/459381e98c808febea9c1bb51408bbde
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE '/api/v1/protocolmessages'.
+    DATA lv_uri TYPE string VALUE '/api/v1/protocol_messages'.
     DATA: lv_requeststr  TYPE string,
           lv_responsestr TYPE string.
     DATA lv_protocolmsg TYPE REF TO data.
@@ -2701,13 +2724,16 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
     ).
     CASE lv_code.
       WHEN 202. " The request was successful
+      when 401. " check if correct token was provided or was expired
       WHEN 404. " may be more than one reason for this...
       WHEN OTHERS.
     ENDCASE.
 
   ENDMETHOD.
 
+
     METHOD z100085_zif_proubc_baseline~send_bpiobjects_msg.
+    "old version. probably not needed
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/objects'.

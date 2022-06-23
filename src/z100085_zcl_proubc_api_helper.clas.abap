@@ -33,6 +33,10 @@ CLASS z100085_zcl_proubc_api_helper DEFINITION
                         EXPORTING statuscode TYPE i
                                   apiresponsestr TYPE string
                                   apiresponse TYPE REF TO data,
+      create_businessobjects_msg IMPORTING body TYPE z100085_zif_proubc_baseline=>businessobject
+                        EXPORTING statuscode TYPE i
+                                  apiresponsestr TYPE string
+                                  apiresponse TYPE REF TO data,
       get_default_tenant RETURNING VALUE(ev_defaulttenant) TYPE z100085_prvdorgs-organization_id,
       get_default_tenant_bpiendpoint RETURNING VALUE(ev_bpiendpoint) TYPE z100085_prvdorgs-bpi_endpoint,
       build_dummy_idoc_protocol_msg RETURNING VALUE(es_dummy_idoc_msg) TYPE z100085_zif_proubc_baseline=>protocolmessage_req,
@@ -406,13 +410,27 @@ CLASS z100085_zcl_proubc_api_helper IMPLEMENTATION.
   ENDMETHOD.
 
 
-    METHOD send_bpiobjects_msg.
+  METHOD send_bpiobjects_msg.
 
     TRY.
         lo_baseline_client->send_bpiobjects_msg( EXPORTING body = body
                                                IMPORTING statuscode = statuscode
                                                          apiresponsestr = apiresponsestr
                                                          apiresponse = apiresponse ).
+      CATCH cx_static_check.
+        "wat do
+    ENDTRY.
+*    CATCH cx_static_check.
+
+  ENDMETHOD.
+
+  METHOD create_businessobjects_msg.
+
+    TRY.
+        lo_baseline_client->createbaselinebusinessobject( EXPORTING body = body
+                                               IMPORTING statuscode = statuscode
+                                                         apiresponsestr = apiresponsestr
+                                                         apiresponse = apiresponse  ).
       CATCH cx_static_check.
         "wat do
     ENDTRY.
@@ -495,7 +513,7 @@ CLASS z100085_zcl_proubc_api_helper IMPLEMENTATION.
     es_dummy_idoc_msg = ls_dummy_idoc_protocol_msg.
   ENDMETHOD.
 
-    METHOD list_bpi_accounts.
+  METHOD list_bpi_accounts.
 
     TRY.
         lo_baseline_client->listaccounts(

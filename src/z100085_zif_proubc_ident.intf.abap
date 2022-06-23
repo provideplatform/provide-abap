@@ -219,6 +219,16 @@ INTERFACE Z100085_zif_proubc_Ident PUBLIC.
     RAISING   cx_static_check.
 
 
+  METHODS authorizelong_termtoken
+    IMPORTING
+              body        TYPE authorize_access_refreshtoken
+    EXPORTING
+              status      TYPE i
+              apiresponse TYPE REF TO data
+    RAISING   cx_static_check.
+
+
+
 * PUT - "Update user"
 * Operation id: Updateuser
 * Parameter: name, required, header

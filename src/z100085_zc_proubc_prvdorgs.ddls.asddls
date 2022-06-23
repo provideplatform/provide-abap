@@ -20,11 +20,6 @@ define root view entity Z100085_ZC_PROUBC_PRVDORGS as projection on Z100085_ZI_P
   }
   ident_endpoint,
   
-  @UI.hidden: true
-  refresh_token, //todo merge these 2 columns into one large string
-  @UI.hidden: true
-  refresh_tokenext,
-  
   createdby,
   created_at,
   changedby,

@@ -12,8 +12,6 @@ define view Z100085_ZC_PRVDORGS as select from Z100085_ZI_PRVDORGS {
   key organization_id,
   bpi_endpoint,
   ident_endpoint,
-  refresh_token, //todo merge these 2 columns into one large string LCHAR
-  refresh_tokenext,
   createdby,
   created_at,
   changedby,
