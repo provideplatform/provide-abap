@@ -103,20 +103,15 @@ CLASS z100085_zcl_proubc_idochlpr IMPLEMENTATION.
                      IMPORTING ev_objid = ls_protocol_msg_req-id ).
 
       "request to /objects OR       "request to /business_objects
-      ls_bpiobjects_req-id = ls_protocol_msg_req-id.
-      ls_bpiobjects_req-type =  wa_idoc_control-idoctp. "maybe needs to be purchase_order instead of ORDERS05?
-      ls_bpiobjects_req-payload = lv_idocjson.
+      "ls_bpiobjects_req-id = ls_protocol_msg_req-id.
+      "ls_bpiobjects_req-type =  wa_idoc_control-idoctp. "maybe needs to be purchase_order instead of ORDERS05?
+      "ls_bpiobjects_req-payload = lv_idocjson.
 
 *https://gist.github.com/kthomas/459381e98c808febea9c1bb51408bbde
       "call baseline API /api/v1/protocolmessage
       "this method keeps sending 404. is really implemented?
-      "lo_api_helper->send_protocol_msg( EXPORTING body = ls_protocol_msg_req IMPORTING statuscode = lv_status  ). "should return 202
-      lo_api_helper->create_businessobjects_msg(
-        EXPORTING
-          body           =  ls_bpiobjects_req
-        IMPORTING
-          statuscode     = lv_status
-      ).
+      lo_api_helper->send_protocol_msg( EXPORTING body = ls_protocol_msg_req IMPORTING statuscode = lv_status  ). "should return 202
+
 
       "this appears to be the actual endpoint live today based on https://app.swaggerhub.com/apis/prvd/Baseline/v1.0.0#/info
       "lo_api_helper->send_bpiobjects_msg( exporting body = ls_bpiobjects_req importing statuscode = lv_status ).

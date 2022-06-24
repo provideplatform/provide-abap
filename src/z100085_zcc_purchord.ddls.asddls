@@ -33,7 +33,7 @@
 }
 define view Z100085_ZCC_PURCHORD 
     as select from I_PurchaseOrder
-    association[0..1] to Z100085_ZC_BPIOBJ as _BPIObjects on _BPIObjects.object_id = $projection.PurchaseOrder 
+    //association[0..1] to Z100085_ZC_BPIOBJ as _BPIObjects on _BPIObjects.object_id = $projection.PurchaseOrder 
     association[0..1] to I_Supplier_VH as _SupplierVH on _SupplierVH.Supplier = $projection.Supplier
 {
     @UI.lineItem.position: 10
@@ -155,18 +155,18 @@ define view Z100085_ZCC_PURCHORD
       PurgReleaseTimeTotalAmount,
       
       //custom associations
-      @UI.connectedFields.valueQualifier: 'BPIObjects'
-      @UI.connectedFields.groupLabel: 'BPIObjects'
-      @UI.connectedFields.type: #STANDARD
-      @UI.connectedFields.name: 'BPIObjects'
-      @UI.facet.parentId: 'PurchaseOrder'
-      @UI.fieldGroup: [{ 
-                         targetElement: '',
-                         type: #WITH_NAVIGATION_PATH,
-                         value: 'PurchaseOrder',
-                         qualifier: 'BPIObjects',
-                         groupLabel : 'BPIObjects' }]
-      _BPIObjects,
+      //@UI.connectedFields.valueQualifier: 'BPIObjects'
+      //@UI.connectedFields.groupLabel: 'BPIObjects'
+      //@UI.connectedFields.type: #STANDARD
+      //@UI.connectedFields.name: 'BPIObjects'
+      //@UI.facet.parentId: 'PurchaseOrder'
+      //@UI.fieldGroup: [{ 
+      //                   targetElement: '',
+      //                   type: #WITH_NAVIGATION_PATH,
+      //                   value: 'PurchaseOrder',
+      //                   qualifier: 'BPIObjects',
+      //                   groupLabel : 'BPIObjects' }]
+      //_BPIObjects,
       _SupplierVH,
       
       //standard Associations
@@ -187,15 +187,15 @@ define view Z100085_ZCC_PURCHORD
       _PaymentTerms,
       _SupplierAddress,
       _Language,
-      _PurchaseOrderCalcFields,
+      _PurchaseOrderCalcFields
     
     //
-    case _BPIObjects.object_id
-        when '' then
-            cast('-' as abap.char( 1 ))
-        when PurchaseOrder then
-            cast('X' as abap.char( 1 ))
-        else
-            cast('-' as abap.char( 1 ))
-    end as isBaselined
+   // case _BPIObjects.object_id
+   //     when '' then
+   //         cast('-' as abap.char( 1 ))
+   //     when PurchaseOrder then
+   //         cast('X' as abap.char( 1 ))
+   //     else
+   //         cast('-' as abap.char( 1 ))
+   // end as isBaselined
 }

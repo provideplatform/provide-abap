@@ -1597,7 +1597,8 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 * *https://gist.github.com/kthomas/459381e98c808febea9c1bb51408bbde
   METHODS send_protocol_msg
     IMPORTING
-              body           TYPE protocolmessage_req
+              IV_body           TYPE protocolmessage_req
+              IV_bpitoken       type z100085_prvdrefreshtoken
     EXPORTING
               statuscode     TYPE i
               apiresponsestr TYPE string

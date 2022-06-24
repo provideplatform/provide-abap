@@ -45,6 +45,7 @@ CLASS z100085_zcl_proubc_api_helper DEFINITION
     DATA: lv_defaulttenant        TYPE z100085_prvdorgs-organization_id VALUE 'e41dea7b-3510-4ffa-8ff4-53f3b158c8b4',
           lv_defaultidenttoken    TYPE REF TO data,
           lv_defaultbaselinetoken TYPE REF TO data,
+          lv_bpitoken             TYPE z100085_prvdrefreshtoken,
           lv_default_bpiendpoint  TYPE string,
           lo_ident_client         TYPE REF TO Z100085_zif_proubc_ident,
           lo_baseline_client      TYPE REF TO z100085_zif_proubc_baseline.
@@ -184,7 +185,8 @@ CLASS z100085_zcl_proubc_api_helper IMPLEMENTATION.
   METHOD call_baseline_api.
     DATA:
       lo_http_client  TYPE REF TO if_http_client,
-      lo_baseline_api TYPE REF TO z100085_zif_proubc_baseline.
+      lo_baseline_api TYPE REF TO z100085_zif_proubc_baseline,
+      lv_bpitoken     TYPE z100085_prvdrefreshtoken.
     "TODO check validity of current auth token
     "or call me-call_ident_api to get new auth token
 
@@ -205,7 +207,7 @@ CLASS z100085_zcl_proubc_api_helper IMPLEMENTATION.
     lo_http_client->propertytype_accept_cookie = if_http_client=>co_enabled.
     lo_http_client->request->set_header_field( name  = if_http_form_fields_sap=>sap_client value = '100' ).
 
-    lo_baseline_api = NEW z100085_zcl_proubc_baseline( ii_client = lo_http_client iv_bpitenant_url = 'https://baseline.provide.services' ).
+    lo_baseline_api = NEW z100085_zcl_proubc_baseline( ii_client = lo_http_client iv_bpitenant_url = 'https://baseline.provide.services' iv_bpitoken = lv_bpitoken ).
     "TODO - do something useful with the Baseline API
     "lo_baseline_api->authentication( body =  ).
 *    CATCH cx_static_check.
@@ -244,7 +246,7 @@ CLASS z100085_zcl_proubc_api_helper IMPLEMENTATION.
     DATA:
       lo_http_client  TYPE REF TO if_http_client,
       lo_baseline_api TYPE REF TO z100085_zif_proubc_baseline,
-      lv_authreq      TYPE z100085_zif_proubc_baseline=>authenticationrequest,
+      lv_authreq      TYPE z100085_prvdrefreshtoken,
       lv_tenant_jwt   TYPE REF TO data,
       lv_tenant       TYPE z100085_prvdtenantid,
       lv_baseline_jwt TYPE REF TO data,
@@ -291,7 +293,7 @@ CLASS z100085_zcl_proubc_api_helper IMPLEMENTATION.
           lo_http_client->propertytype_accept_cookie = if_http_client=>co_enabled.
           lo_http_client->request->set_header_field( name  = if_http_form_fields_sap=>sap_client value = '100' ).
 
-          lo_baseline_api = NEW z100085_zcl_proubc_baseline( ii_client = lo_http_client iv_bpitenant_url = lv_bpiendpoint ).
+          lo_baseline_api = NEW z100085_zcl_proubc_baseline( ii_client = lo_http_client iv_bpitenant_url = lv_bpiendpoint iv_bpitoken = lv_authreq ).
 
           "lv_authenticationrequest-
 
@@ -332,7 +334,7 @@ CLASS z100085_zcl_proubc_api_helper IMPLEMENTATION.
     DATA:
       lo_http_client  TYPE REF TO if_http_client,
       lo_baseline_api TYPE REF TO z100085_zif_proubc_baseline,
-      lv_authreq      TYPE z100085_zif_proubc_baseline=>authenticationrequest,
+      lv_authreq      TYPE z100085_prvdrefreshtoken,
       lv_tenant_jwt   TYPE REF TO data,
       lv_tenant       TYPE z100085_prvdtenantid,
       lv_baseline_jwt TYPE REF TO data,
@@ -355,7 +357,7 @@ CLASS z100085_zcl_proubc_api_helper IMPLEMENTATION.
           ASSIGN lv_tenant_jwt->* TO FIELD-SYMBOL(<ls_data>). "dereference into field symbol
           ASSIGN COMPONENT 'ACCESS_TOKEN' OF STRUCTURE <ls_data> TO <fs_authreq>.
           ASSIGN <fs_authreq>->* TO <fs_authreq2>.
-          lv_authreq = <fs_authreq2>.
+          lv_bpitoken  = <fs_authreq2>.
           "assign <fs_authreq>->* to lv_authenticationrequest.
           "lv_authenticationrequest = <fs_authreq>.
 
@@ -379,16 +381,12 @@ CLASS z100085_zcl_proubc_api_helper IMPLEMENTATION.
           lo_http_client->propertytype_accept_cookie = if_http_client=>co_enabled.
           lo_http_client->request->set_header_field( name  = if_http_form_fields_sap=>sap_client value = '100' ).
 
-          lo_baseline_api = NEW z100085_zcl_proubc_baseline( ii_client = lo_http_client iv_bpitenant_url = lv_bpiendpoint ).
-          lo_baseline_client = lo_baseline_api.
-
-          lv_baseline_jwt = lo_baseline_api->bearerauthentication( EXPORTING body = lv_authreq iv_tenantid = lv_tenant IMPORTING code = lv_code  ).
-          IF lv_baseline_jwt IS NOT INITIAL.
+          lo_baseline_client = NEW z100085_zcl_proubc_baseline( ii_client = lo_http_client iv_bpitenant_url = lv_bpiendpoint iv_bpitoken =  lv_bpitoken  ).
+          IF sy-subrc = 0.
             setup_success = 'X'.
           ELSE.
             setup_success = '-'.
           ENDIF.
-          lv_defaultbaselinetoken = lv_baseline_jwt.
         CATCH cx_root.
       ENDTRY.
     ELSE.
@@ -398,7 +396,8 @@ CLASS z100085_zcl_proubc_api_helper IMPLEMENTATION.
   METHOD send_protocol_msg.
 
     TRY.
-        lo_baseline_client->send_protocol_msg( EXPORTING body = body
+        lo_baseline_client->send_protocol_msg( EXPORTING IV_body = body
+                                                         IV_bpitoken = lv_bpitoken
                                                IMPORTING statuscode = statuscode
                                                          apiresponsestr = apiresponsestr
                                                          apiresponse = apiresponse ).

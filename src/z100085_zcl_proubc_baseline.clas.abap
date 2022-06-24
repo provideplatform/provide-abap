@@ -3,11 +3,13 @@ CLASS z100085_zcl_proubc_baseline DEFINITION PUBLIC.
 * Baseline API, v1.0.0
   PUBLIC SECTION.
     INTERFACES z100085_zif_proubc_baseline.
-    METHODS constructor IMPORTING ii_client TYPE REF TO if_http_client
-                                  iv_bpitenant_url type string.
+    METHODS constructor IMPORTING ii_client        TYPE REF TO if_http_client
+                                  iv_bpitenant_url TYPE string
+                                  iv_bpitoken      TYPE z100085_prvdrefreshtoken.
+
   PROTECTED SECTION.
     DATA mi_client TYPE REF TO if_http_client.
-    data lv_bpitenant_url type string.
+    DATA lv_bpitenant_url TYPE string.
     DATA mo_json TYPE REF TO z100085_zcl_oapi_json.
     DATA authtoken TYPE z100085_prvdrefreshtoken.
     DATA bpitoken TYPE z100085_prvdrefreshtoken.
@@ -235,7 +237,7 @@ CLASS z100085_zcl_proubc_baseline DEFINITION PUBLIC.
     METHODS set_bearer_token IMPORTING iv_tokenstring TYPE string.
     METHODS get_bearer_token
       RAISING cx_static_check.
-    METHODS set_bpi_token IMPORTING iv_tokenstring TYPE string.
+    METHODS set_bpi_token IMPORTING iv_tokenstring TYPE z100085_prvdrefreshtoken.
     METHODS get_bpi_token
       RAISING cx_static_check.
 ENDCLASS.
@@ -893,7 +895,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
     DATA lv_longtermrequestdata TYPE REF TO data.
     DATA lv_requeststr TYPE string.
     DATA lv_authresponsestr TYPE string.
-    data lv_bpiauthreq      TYPE z100085_zif_proubc_baseline=>authenticationrequest.
+    DATA lv_bpiauthreq      TYPE z100085_zif_proubc_baseline=>authenticationrequest.
     FIELD-SYMBOLS: <fs_bpiauthreq>  TYPE any,
                    <fs_bpiauthreq2> TYPE string.
 
@@ -927,10 +929,10 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
         ASSIGN COMPONENT 'ACCESS_TOKEN' OF STRUCTURE <ls_data> TO <fs_bpiauthreq>.
         ASSIGN <fs_bpiauthreq>->* TO <fs_bpiauthreq2>.
         lv_bpiauthreq = <fs_bpiauthreq2>.
-        me->set_bpi_token( lv_bpiauthreq ).
+        "me->set_bpi_token( lv_bpiauthreq ).
       WHEN 401.
         " todo, raise authorization failure
-      when 404. "check URI, BPI tenant
+      WHEN 404. "check URI, BPI tenant
     ENDCASE.
   ENDMETHOD.
 
@@ -2481,7 +2483,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
       WHEN 403.
         " todo, raise
       WHEN 404. " The specified resource was not found.
-      when 407. "check strust
+      WHEN 407. "check strust
       WHEN 503.
         " todo, raise
     ENDCASE.
@@ -2699,9 +2701,12 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
 
     mi_client->request->set_method( 'POST' ).
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
+    if bpitoken is INITIAL.
+        me->set_bpi_token( EXPORTING iv_tokenstring = IV_bpitoken ).
+    endif.
     me->get_bpi_token( ).
 
-    z100085_zcl_proubc_api_helper=>copy_data_to_ref( EXPORTING is_data = body
+    z100085_zcl_proubc_api_helper=>copy_data_to_ref( EXPORTING is_data = IV_body
                   CHANGING cr_data = lv_protocolmsg  ).
 
     lv_requeststr = /ui2/cl_json=>serialize( EXPORTING data =  lv_protocolmsg
@@ -2724,7 +2729,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
     ).
     CASE lv_code.
       WHEN 202. " The request was successful
-      when 401. " check if correct token was provided or was expired
+      WHEN 401. " check if correct token was provided or was expired
       WHEN 404. " may be more than one reason for this...
       WHEN OTHERS.
     ENDCASE.
@@ -2732,7 +2737,7 @@ CLASS z100085_zcl_proubc_baseline IMPLEMENTATION.
   ENDMETHOD.
 
 
-    METHOD z100085_zif_proubc_baseline~send_bpiobjects_msg.
+  METHOD z100085_zif_proubc_baseline~send_bpiobjects_msg.
     "old version. probably not needed
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
