@@ -234,7 +234,7 @@ CLASS ZCL_PROUBC_API_HELPER IMPLEMENTATION.
       lv_refreshtokenstr TYPE zprvdrefreshtoken,
       lv_identurl        TYPE string,
       lv_apiresponse     TYPE REF TO data,
-      lv_tenant          TYPE zprvdtenants-tenant_id.                                              ).
+      lv_tenant          TYPE zprvdtenants-tenant_id.
 
     IF iv_tenant IS NOT INITIAL.
       lv_tenant = iv_tenant.
@@ -242,7 +242,7 @@ CLASS ZCL_PROUBC_API_HELPER IMPLEMENTATION.
       lv_tenant = lv_defaulttenant.
     ENDIF.
 
-    SELECT SINGLE * FROM zprvdorgs INTO ls_prvdtenant WHERE organization_id = lv_tenant.
+    SELECT SINGLE * FROM zprvdtenants INTO ls_prvdtenant WHERE tenant_id = lv_tenant.
 
     CHECK sy-subrc = 0. "todo send error message, org not found
 
@@ -295,31 +295,31 @@ CLASS ZCL_PROUBC_API_HELPER IMPLEMENTATION.
 
     "try using the tenant id provided by user
     IF iv_tenant IS NOT INITIAL.
-      SELECT organization_id,
+      SELECT tenant_id,
              bpi_endpoint
-          FROM zprvdorgs
-          INTO TABLE @DATA(lt_defaultorg)
-          WHERE organization_id = @iv_tenant.
+          FROM zprvdtenants
+          INTO TABLE @DATA(lt_defaulttenant)
+          WHERE tenant_id = @iv_tenant.
       IF sy-subrc = 0.
-        READ TABLE lt_defaultorg INDEX 1 INTO DATA(wa_defaulttenant).
+        READ TABLE lt_defaulttenant INDEX 1 INTO DATA(wa_defaulttenant).
         IF sy-subrc = 0.
-          lv_defaulttenant = wa_defaulttenant-organization_id.
+          lv_defaulttenant = wa_defaulttenant-tenant_id.
           lv_default_bpiendpoint = wa_defaulttenant-bpi_endpoint.
           RETURN.
         ENDIF.
       ENDIF.
     ENDIF.
 
-    SELECT organization_id,
+    SELECT tenant_id,
            bpi_endpoint
-        FROM zprvdorgs
-        INTO TABLE @lt_defaultorg
+        FROM zprvdtenants
+        INTO TABLE @lt_defaulttenant
         UP TO 1 ROWS
         ORDER BY created_at DESCENDING.
     IF sy-subrc = 0.
-      READ TABLE lt_defaultorg INDEX 1 INTO wa_defaulttenant.
+      READ TABLE lt_defaulttenant INDEX 1 INTO wa_defaulttenant.
       IF sy-subrc = 0.
-        lv_defaulttenant = wa_defaulttenant-organization_id.
+        lv_defaulttenant = wa_defaulttenant-tenant_id.
         lv_default_bpiendpoint = wa_defaulttenant-bpi_endpoint.
       ENDIF.
     ENDIF.
