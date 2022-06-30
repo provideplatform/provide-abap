@@ -17,7 +17,7 @@ CLASS zcl_proubc_ident DEFINITION
         !iv_refreshtoken TYPE zPRVDREFRESHTOKEN .
   PROTECTED SECTION.
     DATA mi_client TYPE REF TO if_http_client.
-    DATA mo_json TYPE REF TO Z100085_zcl_oapi_json.
+    DATA mo_json TYPE REF TO zcl_oapi_json.
     DATA authtoken TYPE zprvdrefreshtoken.
     DATA refreshtoken TYPE zprvdrefreshtoken.
     DATA tenant TYPE zprvdtenantid.
@@ -32,7 +32,7 @@ ENDCLASS.
 
 
 
-CLASS ZCL_PROUBC_IDENT IMPLEMENTATION.
+CLASS zcl_proubc_ident IMPLEMENTATION.
 
 
   METHOD constructor.

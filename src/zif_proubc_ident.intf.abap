@@ -37,29 +37,29 @@ interface ZIF_PROUBC_IDENT
   types:
 * Component schema: Authorizelong-termtokenRequest, object
     BEGIN OF authorize_access_refreshtoken,
-           scope           TYPE z100085_casesensitive_str,
-           organization_id TYPE z100085_casesensitive_str,
+           scope           TYPE zcasesensitive_str,
+           organization_id TYPE zcasesensitive_str,
          END OF authorize_access_refreshtoken .
-  types:
+  TYPES:
 * Component schema: Authorizelong-termtokenRequest, object
     BEGIN OF refresh_accesstoken_request,
-           organization_id TYPE z100085_casesensitive_str,
-           grant_type      TYPE z100085_casesensitive_str,
-         END OF refresh_accesstoken_request .
+      organization_id TYPE zcasesensitive_str,
+      grant_type      TYPE zcasesensitive_str,
+    END OF refresh_accesstoken_request .
   types:
     BEGIN OF authorizelongtermtokenresponse,
-           id            TYPE z100085_casesensitive_str,
-           access_token  TYPE z100085_casesensitive_str,
-           refresh_token TYPE z100085_casesensitive_str,
+           id            TYPE zcasesensitive_str,
+           access_token  TYPE zcasesensitive_str,
+           refresh_token TYPE zcasesensitive_str,
            expires_in    TYPE int4,
-           scope         TYPE z100085_casesensitive_str,
+           scope         TYPE zcasesensitive_str,
            permissions   TYPE int4,
          END OF authorizelongtermtokenresponse .
   types:
 * Component schema: AuthenticationRequest, object
     BEGIN OF authenticationrequest,
            email    TYPE string,
-           password TYPE z100085_casesensitive_str,
+           password TYPE zcasesensitive_str,
          END OF authenticationrequest .
   types:
 * Component schema: CreateuserRequest, object

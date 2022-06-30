@@ -1,13 +1,13 @@
-class ZCL_PROUBC_AUTHAPI definition
-  public
-  inheriting from CL_REST_RESOURCE
-  final
-  create public .
+CLASS zcl_proubc_authapi DEFINITION
+  PUBLIC
+  INHERITING FROM cl_rest_resource
+  FINAL
+  CREATE PUBLIC .
 
-public section.
+  PUBLIC SECTION.
 
-  methods IF_REST_RESOURCE~HEAD
-    redefinition .
+    METHODS if_rest_resource~head
+        REDEFINITION .
   PROTECTED SECTION.
   PRIVATE SECTION.
 ENDCLASS.
@@ -17,7 +17,7 @@ ENDCLASS.
 CLASS ZCL_PROUBC_AUTHAPI IMPLEMENTATION.
 
 
-  METHOD IF_REST_RESOURCE~HEAD.
+  METHOD if_rest_resource~head.
     mo_response->set_status( cl_rest_status_code=>gc_success_no_content ).
   ENDMETHOD.
 ENDCLASS.

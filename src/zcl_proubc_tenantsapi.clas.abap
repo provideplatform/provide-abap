@@ -29,7 +29,7 @@ CLASS ZCL_PROUBC_TENANTSAPI IMPLEMENTATION.
     READ TABLE lt_uriattributes WITH KEY name = 'ID' ASSIGNING FIELD-SYMBOL(<fs_tenantid>).
     IF sy-subrc = 0.
       lv_tenantid = <fs_tenantid>-value.
-      z100085_zcl_proubc_prvdtenants=>delete_prvdtenant( IMPORTING ev_prvdorgid = lv_tenantid ).
+      zcl_proubc_prvdtenants=>delete_prvdtenant( IMPORTING ev_prvdtenantid = lv_tenantid ).
     ENDIF.
     "TODO add a delete response if totally necessary....
     mo_response->set_status( cl_rest_status_code=>gc_success_no_content ).
@@ -42,8 +42,8 @@ CLASS ZCL_PROUBC_TENANTSAPI IMPLEMENTATION.
           lv_mime        TYPE string,
           lv_url         TYPE string,
           lv_tenantid    TYPE zsprvdtenant-tenant_id,
-          lt_prvdtenants TYPE z100085_zif_proubc_tenants=>tty_tenant_wo_token,
-          ls_prvdtenant  TYPE z100085_zif_proubc_tenants=>ty_tenant_wo_token,
+          lt_prvdtenants TYPE zif_proubc_tenants=>tty_tenant_wo_token,
+          ls_prvdtenant  TYPE zif_proubc_tenants=>ty_tenant_wo_token,
           "lo_entity          type ref to if_rest_response,
           lv_tenantdata  TYPE REF TO data.
 
@@ -53,7 +53,7 @@ CLASS ZCL_PROUBC_TENANTSAPI IMPLEMENTATION.
     READ TABLE lt_uriattributes WITH KEY name = 'ID' ASSIGNING FIELD-SYMBOL(<fs_tenantid>).
     IF sy-subrc = 0.
       lv_tenantid = <fs_tenantid>-value.
-      z100085_zcl_proubc_prvdtenants=>get_prvdtenant(
+      zcl_proubc_prvdtenants=>get_prvdtenant(
         EXPORTING
           iv_prvdtenant = lv_tenantid
         IMPORTING
@@ -68,8 +68,8 @@ CLASS ZCL_PROUBC_TENANTSAPI IMPLEMENTATION.
     ELSE.
 
       "TODO: add reachable true/false. call the bpi endpoints
-      z100085_zcl_proubc_prvdtenants=>get_allprvdtenant( IMPORTING et_prvdorg = lt_prvdtenants ).
-      z100085_zcl_proubc_api_helper=>copy_data_to_ref(
+      zcl_proubc_prvdtenants=>get_allprvdtenant( IMPORTING et_prvdtenant = lt_prvdtenants ).
+      zcl_proubc_api_helper=>copy_data_to_ref(
             EXPORTING is_data = lt_prvdtenants
             CHANGING cr_data = lv_tenantdata
       ).
@@ -94,15 +94,12 @@ CLASS ZCL_PROUBC_TENANTSAPI IMPLEMENTATION.
 
     APPEND ls_prvdtenant TO lt_prvdtenants.
 
-    z100085_zcl_proubc_prvdtenants=>create_prvdtenant( EXPORTING it_prvdorg = lt_prvdtenants IMPORTING et_prvdorg = lt_prvdtenants_out ).
+    zcl_proubc_prvdtenants=>create_prvdtenant( EXPORTING it_prvdtenant = lt_prvdtenants IMPORTING et_prvdtenant = lt_prvdtenants_out ).
     "TODO improve error handling
 
     READ TABLE lt_prvdtenants_out INDEX 1 INTO wa_prvdtenant.
     wa_prvdtenant-refresh_token = '***'.
-    z100085_zcl_proubc_api_helper=>copy_data_to_ref(
-          EXPORTING is_data = wa_prvdtenant
-          CHANGING cr_data = lv_tenantdata
-    ).
+    zcl_proubc_api_helper=>copy_data_to_ref( EXPORTING is_data = wa_prvdtenant CHANGING cr_data = lv_tenantdata ).
     DATA(lo_entity) = mo_response->create_entity( ).
     lo_entity->set_content_type( if_rest_media_type=>gc_appl_json ).
     lo_entity->set_string_data( /ui2/cl_json=>serialize( EXPORTING data = lv_tenantdata pretty_name = /ui2/cl_json=>pretty_mode-low_case ) ).
@@ -122,13 +119,10 @@ CLASS ZCL_PROUBC_TENANTSAPI IMPLEMENTATION.
 
     APPEND ls_prvdtenant TO lt_prvdtenants.
 
-    zcl_proubc_prvdtenants=>update_prvdtenant( EXPORTING it_prvdorg = lt_prvdtenants IMPORTING et_prvdorg = lt_prvdtenants_out ).
+    zcl_proubc_prvdtenants=>update_prvdtenant( EXPORTING it_prvdtenant = lt_prvdtenants IMPORTING et_prvdtenant = lt_prvdtenants_out ).
     READ TABLE lt_prvdtenants_out INDEX 1 INTO wa_prvdtenant.
 
-    zcl_proubc_api_helper=>copy_data_to_ref(
-          EXPORTING is_data = wa_prvdtenant
-          CHANGING cr_data = lv_tenantdata
-    ).
+    zcl_proubc_api_helper=>copy_data_to_ref( EXPORTING is_data = wa_prvdtenant CHANGING cr_data = lv_tenantdata ).
     DATA(lo_entity) = mo_response->create_entity( ).
     lo_entity->set_content_type( if_rest_media_type=>gc_appl_json ).
     "lo_entity->set_string_data( /ui2/cl_json=>serialize( exporting data = lv_tenantdata pretty_name = /ui2/cl_json=>pretty_mode-low_case  ) ).

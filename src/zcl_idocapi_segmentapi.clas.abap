@@ -1,13 +1,13 @@
-class ZCL_IDOCAPI_SEGMENTAPI definition
-  public
-  inheriting from CL_REST_RESOURCE
-  final
-  create public .
+CLASS zcl_idocapi_segmentapi DEFINITION
+  PUBLIC
+  INHERITING FROM cl_rest_resource
+  FINAL
+  CREATE PUBLIC .
 
-public section.
+  PUBLIC SECTION.
 
-  methods IF_REST_RESOURCE~GET
-    redefinition .
+    METHODS if_rest_resource~get
+        REDEFINITION .
   PROTECTED SECTION.
   PRIVATE SECTION.
 ENDCLASS.
@@ -17,10 +17,10 @@ ENDCLASS.
 CLASS ZCL_IDOCAPI_SEGMENTAPI IMPLEMENTATION.
 
 
-  METHOD IF_REST_RESOURCE~GET.
+  METHOD if_rest_resource~get.
     DATA: lv_selectedbasictype TYPE string,
-          ls_basictypes        TYPE z100085_zif_idocapi_typelist=>ty_basictype,
-          ls_responsedata      TYPE z100085_zif_idocapi_typelist=>ty_basictype_w_segments,
+          ls_basictypes        TYPE zif_idocapi_typelist=>ty_basictype,
+          ls_responsedata      TYPE zif_idocapi_typelist=>ty_basictype_w_segments,
           lv_idoctype          TYPE ledid_idoctype.
 
     DATA(lt_uriattributes) = mo_request->get_uri_attributes( ).
