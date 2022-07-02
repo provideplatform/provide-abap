@@ -1,0 +1,144 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_DTEL" serializer_version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <DD04V>
+    <ROLLNAME>ZPRVDREFRESHTOKEN</ROLLNAME>
+    <DDLANGUAGE>E</DDLANGUAGE>
+    <DOMNAME>ZPRVDREFRESHTOKEN</DOMNAME>
+    <HEADLEN>13</HEADLEN>
+    <SCRLEN1>10</SCRLEN1>
+    <SCRLEN2>13</SCRLEN2>
+    <SCRLEN3>13</SCRLEN3>
+    <DDTEXT>proUBC Refresh Token</DDTEXT>
+    <REPTEXT>Refresh Token</REPTEXT>
+    <SCRTEXT_S>RefreshTkn</SCRTEXT_S>
+    <SCRTEXT_M>Refresh Token</SCRTEXT_M>
+    <SCRTEXT_L>Refresh Token</SCRTEXT_L>
+    <DTELMASTER>E</DTELMASTER>
+    <REFKIND>D</REFKIND>
+   </DD04V>
+   <I18N_LANGS>
+    <LANGU>1</LANGU>
+    <LANGU>4</LANGU>
+    <LANGU>A</LANGU>
+    <LANGU>C</LANGU>
+    <LANGU>I</LANGU>
+    <LANGU>J</LANGU>
+    <LANGU>K</LANGU>
+    <LANGU>L</LANGU>
+    <LANGU>N</LANGU>
+    <LANGU>P</LANGU>
+    <LANGU>R</LANGU>
+    <LANGU>V</LANGU>
+    <LANGU>묩</LANGU>
+   </I18N_LANGS>
+   <DD04_TEXTS>
+    <item>
+     <DDLANGUAGE>1</DDLANGUAGE>
+     <DDTEXT>proUBC Refresh Token</DDTEXT>
+     <REPTEXT>Refresh Token</REPTEXT>
+     <SCRTEXT_S>RefreshTkn</SCRTEXT_S>
+     <SCRTEXT_M>Refresh Token</SCRTEXT_M>
+     <SCRTEXT_L>Refresh Token</SCRTEXT_L>
+    </item>
+    <item>
+     <DDLANGUAGE>4</DDLANGUAGE>
+     <DDTEXT>proUBC Refresh Token</DDTEXT>
+     <REPTEXT>Refresh Token</REPTEXT>
+     <SCRTEXT_S>RefreshTkn</SCRTEXT_S>
+     <SCRTEXT_M>Refresh Token</SCRTEXT_M>
+     <SCRTEXT_L>Refresh Token</SCRTEXT_L>
+    </item>
+    <item>
+     <DDLANGUAGE>A</DDLANGUAGE>
+     <DDTEXT>proUBC Refresh Token</DDTEXT>
+     <REPTEXT>Refresh Token</REPTEXT>
+     <SCRTEXT_S>RefreshTkn</SCRTEXT_S>
+     <SCRTEXT_M>Refresh Token</SCRTEXT_M>
+     <SCRTEXT_L>Refresh Token</SCRTEXT_L>
+    </item>
+    <item>
+     <DDLANGUAGE>C</DDLANGUAGE>
+     <DDTEXT>proUBC Refresh Token</DDTEXT>
+     <REPTEXT>Refresh Token</REPTEXT>
+     <SCRTEXT_S>RefreshTkn</SCRTEXT_S>
+     <SCRTEXT_M>Refresh Token</SCRTEXT_M>
+     <SCRTEXT_L>Refresh Token</SCRTEXT_L>
+    </item>
+    <item>
+     <DDLANGUAGE>I</DDLANGUAGE>
+     <DDTEXT>proUBC Refresh Token</DDTEXT>
+     <REPTEXT>Refresh Token</REPTEXT>
+     <SCRTEXT_S>RefreshTkn</SCRTEXT_S>
+     <SCRTEXT_M>Refresh Token</SCRTEXT_M>
+     <SCRTEXT_L>Refresh Token</SCRTEXT_L>
+    </item>
+    <item>
+     <DDLANGUAGE>J</DDLANGUAGE>
+     <DDTEXT>proUBC Refresh Token</DDTEXT>
+     <REPTEXT>Refresh Token</REPTEXT>
+     <SCRTEXT_S>RefreshTkn</SCRTEXT_S>
+     <SCRTEXT_M>Refresh Token</SCRTEXT_M>
+     <SCRTEXT_L>Refresh Token</SCRTEXT_L>
+    </item>
+    <item>
+     <DDLANGUAGE>K</DDLANGUAGE>
+     <DDTEXT>proUBC Refresh Token</DDTEXT>
+     <REPTEXT>Refresh Token</REPTEXT>
+     <SCRTEXT_S>RefreshTkn</SCRTEXT_S>
+     <SCRTEXT_M>Refresh Token</SCRTEXT_M>
+     <SCRTEXT_L>Refresh Token</SCRTEXT_L>
+    </item>
+    <item>
+     <DDLANGUAGE>L</DDLANGUAGE>
+     <DDTEXT>proUBC Refresh Token</DDTEXT>
+     <REPTEXT>Refresh Token</REPTEXT>
+     <SCRTEXT_S>RefreshTkn</SCRTEXT_S>
+     <SCRTEXT_M>Refresh Token</SCRTEXT_M>
+     <SCRTEXT_L>Refresh Token</SCRTEXT_L>
+    </item>
+    <item>
+     <DDLANGUAGE>N</DDLANGUAGE>
+     <DDTEXT>proUBC Refresh Token</DDTEXT>
+     <REPTEXT>Refresh Token</REPTEXT>
+     <SCRTEXT_S>RefreshTkn</SCRTEXT_S>
+     <SCRTEXT_M>Refresh Token</SCRTEXT_M>
+     <SCRTEXT_L>Refresh Token</SCRTEXT_L>
+    </item>
+    <item>
+     <DDLANGUAGE>P</DDLANGUAGE>
+     <DDTEXT>proUBC Refresh Token</DDTEXT>
+     <REPTEXT>Refresh Token</REPTEXT>
+     <SCRTEXT_S>RefreshTkn</SCRTEXT_S>
+     <SCRTEXT_M>Refresh Token</SCRTEXT_M>
+     <SCRTEXT_L>Refresh Token</SCRTEXT_L>
+    </item>
+    <item>
+     <DDLANGUAGE>R</DDLANGUAGE>
+     <DDTEXT>proUBC Refresh Token</DDTEXT>
+     <REPTEXT>Refresh Token</REPTEXT>
+     <SCRTEXT_S>RefreshTkn</SCRTEXT_S>
+     <SCRTEXT_M>Refresh Token</SCRTEXT_M>
+     <SCRTEXT_L>Refresh Token</SCRTEXT_L>
+    </item>
+    <item>
+     <DDLANGUAGE>V</DDLANGUAGE>
+     <DDTEXT>proUBC Refresh Token</DDTEXT>
+     <REPTEXT>Refresh Token</REPTEXT>
+     <SCRTEXT_S>RefreshTkn</SCRTEXT_S>
+     <SCRTEXT_M>Refresh Token</SCRTEXT_M>
+     <SCRTEXT_L>Refresh Token</SCRTEXT_L>
+    </item>
+    <item>
+     <DDLANGUAGE>묩</DDLANGUAGE>
+     <DDTEXT>proUBC Refresh Token</DDTEXT>
+     <REPTEXT>Refresh Token</REPTEXT>
+     <SCRTEXT_S>RefreshTkn</SCRTEXT_S>
+     <SCRTEXT_M>Refresh Token</SCRTEXT_M>
+     <SCRTEXT_L>Refresh Token</SCRTEXT_L>
+    </item>
+   </DD04_TEXTS>
+  </asx:values>
+ </asx:abap>
+</abapGit>

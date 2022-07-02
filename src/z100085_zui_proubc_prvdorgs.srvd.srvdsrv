@@ -1,4 +1,0 @@
-@EndUserText.label: 'Service Definition for PRVDORGS data'
-define service Z100085_ZUI_PROUBC_PRVDORGS {
-  expose Z100085_ZC_PROUBC_PRVDORGS;
-}
