@@ -1,9 +1,9 @@
 *&---------------------------------------------------------------------*
-*& Report z100085_proubc_shuttleidocex
+*& Report zproubc_shuttleidocex
 *&---------------------------------------------------------------------*
 *& proUBC iDoc Baseline Example program
 *&---------------------------------------------------------------------*
-REPORT z100085_proubc_shuttleidocex.
+REPORT zproubc_shuttleidocex.
 
 INCLUDE ZPROUBC_SHUTTLEIDOC_EXMPL_TOP.
 *INCLUDE z100085_proubc_shuttleidoc_top.

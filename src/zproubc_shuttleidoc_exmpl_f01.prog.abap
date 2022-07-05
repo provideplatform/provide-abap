@@ -1,23 +1,23 @@
 *&---------------------------------------------------------------------*
-*& Include z100085_proubc_shuttleidoc_f01
+*& Include zproubc_shuttleidoc_f01
 *&---------------------------------------------------------------------*
 
 CLASS lcl_idoc_moni DEFINITION.
   PUBLIC SECTION.
     METHODS: constructor,
       baseline_idocs.
-    DATA: lo_idochlpr TYPE REF TO  z100085_zif_proubc_blidochlper.
+    DATA: lo_idochlpr TYPE REF TO  zif_proubc_blidochlper.
   PROTECTED SECTION.
-    DATA: lt_poebeln TYPE z100085_zif_proubc_blidochlper=>tty_r_ebeln,
-          lt_idocnum TYPE z100085_zif_proubc_blidochlper=>tty_r_idocnum,
-          lt_idoctyp TYPE z100085_zif_proubc_blidochlper=>tty_r_idoctype.
+    DATA: lt_poebeln TYPE zif_proubc_blidochlper=>tty_r_ebeln,
+          lt_idocnum TYPE zif_proubc_blidochlper=>tty_r_idocnum,
+          lt_idoctyp TYPE zif_proubc_blidochlper=>tty_r_idoctype.
 
   PRIVATE SECTION.
 ENDCLASS.
 
 CLASS lcl_idoc_moni IMPLEMENTATION.
   METHOD constructor.
-    me->lo_idochlpr = NEW z100085_zcl_proubc_idochlpr( iv_tenant = p_tenant ).
+    me->lo_idochlpr = NEW zcl_proubc_idochlpr( iv_tenant = p_tenant ).
     MOVE-CORRESPONDING  s_ebeln[] TO lt_poebeln[].
     MOVE-CORRESPONDING s_idoc[] TO lt_idocnum[].
     MOVE-CORRESPONDING s_ityp[] TO lt_idoctyp[].
