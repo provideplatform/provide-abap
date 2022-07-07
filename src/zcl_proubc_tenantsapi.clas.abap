@@ -1,19 +1,19 @@
-class ZCL_PROUBC_TENANTSAPI definition
-  public
-  inheriting from CL_REST_RESOURCE
-  final
-  create public .
+CLASS zcl_proubc_tenantsapi DEFINITION
+  PUBLIC
+  INHERITING FROM cl_rest_resource
+  FINAL
+  CREATE PUBLIC .
 
-public section.
+  PUBLIC SECTION.
 
-  methods IF_REST_RESOURCE~DELETE
-    redefinition .
-  methods IF_REST_RESOURCE~GET
-    redefinition .
-  methods IF_REST_RESOURCE~POST
-    redefinition .
-  methods IF_REST_RESOURCE~PUT
-    redefinition .
+    METHODS if_rest_resource~delete
+        REDEFINITION .
+    METHODS if_rest_resource~get
+        REDEFINITION .
+    METHODS if_rest_resource~post
+        REDEFINITION .
+    METHODS if_rest_resource~put
+        REDEFINITION .
   PROTECTED SECTION.
   PRIVATE SECTION.
 ENDCLASS.
@@ -23,7 +23,7 @@ ENDCLASS.
 CLASS ZCL_PROUBC_TENANTSAPI IMPLEMENTATION.
 
 
-  METHOD IF_REST_RESOURCE~DELETE.
+  METHOD if_rest_resource~delete.
     DATA: lv_tenantid TYPE zsprvdtenant-tenant_id.
     DATA(lt_uriattributes) = mo_request->get_uri_attributes( ).
     READ TABLE lt_uriattributes WITH KEY name = 'ID' ASSIGNING FIELD-SYMBOL(<fs_tenantid>).
@@ -36,7 +36,7 @@ CLASS ZCL_PROUBC_TENANTSAPI IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD IF_REST_RESOURCE~GET.
+  METHOD if_rest_resource~get.
     DATA: li_api         TYPE REF TO if_mr_api,
           lv_data        TYPE string,
           lv_mime        TYPE string,
@@ -82,7 +82,7 @@ CLASS ZCL_PROUBC_TENANTSAPI IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD IF_REST_RESOURCE~POST.
+  METHOD if_rest_resource~post.
     DATA: lt_prvdtenants     TYPE zttprvdtenant,
           ls_prvdtenant      TYPE zsprvdtenant,
           lt_prvdtenants_out TYPE zttprvdtenant,
@@ -107,7 +107,7 @@ CLASS ZCL_PROUBC_TENANTSAPI IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD IF_REST_RESOURCE~PUT.
+  METHOD if_rest_resource~put.
     DATA: lt_prvdtenants     TYPE zttprvdtenant,
           ls_prvdtenant      TYPE ZSPRVDtenant,
           lt_prvdtenants_out TYPE zttprvdtenant,

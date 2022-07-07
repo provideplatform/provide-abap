@@ -1,13 +1,13 @@
-class ZCL_PROUBC_HEALTHAPI definition
-  public
-  inheriting from CL_REST_RESOURCE
-  final
-  create public .
+CLASS zcl_proubc_healthapi DEFINITION
+  PUBLIC
+  INHERITING FROM cl_rest_resource
+  FINAL
+  CREATE PUBLIC .
 
-public section.
+  PUBLIC SECTION.
 
-  methods IF_REST_RESOURCE~GET
-    redefinition .
+    METHODS if_rest_resource~get
+        REDEFINITION .
   PROTECTED SECTION.
   PRIVATE SECTION.
 ENDCLASS.
@@ -17,7 +17,7 @@ ENDCLASS.
 CLASS ZCL_PROUBC_HEALTHAPI IMPLEMENTATION.
 
 
-  METHOD IF_REST_RESOURCE~GET.
+  METHOD if_rest_resource~get.
     mo_response->set_status( cl_rest_status_code=>gc_success_no_content ).
   ENDMETHOD.
 ENDCLASS.

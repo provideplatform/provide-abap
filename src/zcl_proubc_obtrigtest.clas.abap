@@ -1,13 +1,13 @@
-class ZCL_PROUBC_OBTRIGTEST definition
-  public
-  inheriting from CL_REST_RESOURCE
-  final
-  create public .
+CLASS zcl_proubc_obtrigtest DEFINITION
+  PUBLIC
+  INHERITING FROM cl_rest_resource
+  FINAL
+  CREATE PUBLIC .
 
-public section.
+  PUBLIC SECTION.
 
-  methods IF_REST_RESOURCE~POST
-    redefinition .
+    METHODS if_rest_resource~post
+        REDEFINITION .
   PROTECTED SECTION.
   PRIVATE SECTION.
 ENDCLASS.
@@ -17,7 +17,7 @@ ENDCLASS.
 CLASS ZCL_PROUBC_OBTRIGTEST IMPLEMENTATION.
 
 
-  METHOD IF_REST_RESOURCE~POST.
+  METHOD if_rest_resource~post.
     DATA: lo_api_helper             TYPE REF TO zcl_proubc_api_helper,
           lv_status                 TYPE i,
           ls_protocol_msg_req       TYPE zif_proubc_baseline=>protocolmessage_req,

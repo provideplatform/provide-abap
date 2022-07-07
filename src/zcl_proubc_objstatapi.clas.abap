@@ -1,15 +1,15 @@
-class ZCL_PROUBC_OBJSTATAPI definition
-  public
-  inheriting from CL_REST_RESOURCE
-  final
-  create public .
+CLASS zcl_proubc_objstatapi DEFINITION
+  PUBLIC
+  INHERITING FROM cl_rest_resource
+  FINAL
+  CREATE PUBLIC .
 
-public section.
+  PUBLIC SECTION.
 
-  methods IF_REST_RESOURCE~GET
-    redefinition .
-  methods IF_REST_RESOURCE~PUT
-    redefinition .
+    METHODS if_rest_resource~get
+        REDEFINITION .
+    METHODS if_rest_resource~put
+        REDEFINITION .
   PROTECTED SECTION.
   PRIVATE SECTION.
 ENDCLASS.
@@ -19,7 +19,7 @@ ENDCLASS.
 CLASS ZCL_PROUBC_OBJSTATAPI IMPLEMENTATION.
 
 
-  METHOD IF_REST_RESOURCE~GET.
+  METHOD if_rest_resource~get.
     DATA(lt_uriattributes) = mo_request->get_uri_attributes( ).
     DATA(lo_entity) = mo_response->create_entity( ).
     DATA ls_status_response TYPE zif_proubc_object=>ty_update_status_res.
@@ -49,7 +49,7 @@ CLASS ZCL_PROUBC_OBJSTATAPI IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD IF_REST_RESOURCE~PUT.
+  METHOD if_rest_resource~put.
 
     DATA(lo_entity) = mo_response->create_entity( ).
 

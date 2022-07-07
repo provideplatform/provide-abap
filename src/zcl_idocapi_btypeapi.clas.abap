@@ -1,13 +1,13 @@
-class ZCL_IDOCAPI_BTYPEAPI definition
-  public
-  inheriting from CL_REST_RESOURCE
-  final
-  create public .
+CLASS zcl_idocapi_btypeapi DEFINITION
+  PUBLIC
+  INHERITING FROM cl_rest_resource
+  FINAL
+  CREATE PUBLIC .
 
-public section.
+  PUBLIC SECTION.
 
-  methods IF_REST_RESOURCE~GET
-    redefinition .
+    METHODS if_rest_resource~get
+        REDEFINITION .
   PROTECTED SECTION.
   PRIVATE SECTION.
 ENDCLASS.
@@ -17,11 +17,11 @@ ENDCLASS.
 CLASS ZCL_IDOCAPI_BTYPEAPI IMPLEMENTATION.
 
 
-  METHOD IF_REST_RESOURCE~GET.
+  METHOD if_rest_resource~get.
 *CALL METHOD SUPER->IF_REST_RESOURCE~GET
 *    .
 
-    DATA: lt_basictypes TYPE z100085_zif_idocapi_typelist=>tt_basictype.
+    DATA: lt_basictypes TYPE zif_idocapi_typelist=>tt_basictype.
 
     SELECT  a~idoctyp
             b~descrp

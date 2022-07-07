@@ -1,42 +1,42 @@
-class ZCL_PROUBC_IDOCHLPR definition
-  public
-  final
-  create public .
+CLASS zcl_proubc_idochlpr DEFINITION
+  PUBLIC
+  FINAL
+  CREATE PUBLIC .
 
-public section.
+  PUBLIC SECTION.
 
-  interfaces ZIF_PROUBC_BLIDOCHLPER .
+    INTERFACES zif_proubc_blidochlper .
 
-  types:
-    tty_edidd TYPE TABLE OF edidd .
+    TYPES:
+      tty_edidd TYPE TABLE OF edidd .
 
-  data LO_API_HELPER type ref to ZCL_PROUBC_API_HELPER .
-  data SELECTED_IDOCS type ZIF_PROUBC_BLIDOCHLPER=>TTY_PROUBC_IDOCS .
+    DATA lo_api_helper TYPE REF TO zcl_proubc_api_helper .
+    DATA selected_idocs TYPE zif_proubc_blidochlper=>tty_proubc_idocs .
 
-  class-methods GET_OBJID
-    importing
-      !IV_SCHEMA type STRING
-      !IT_EDIDD type TTY_EDIDD
-      !IV_IDOC type ref to DATA
-    exporting
-      !EV_OBJID type zBPIOBJ-OBJECT_ID .
-  class-methods GET_DUMMY_OBJID
-    importing
-      !IV_SCHEMA type STRING
-    exporting
-      !EV_OBJID type zBPIOBJ-OBJECT_ID
-      !EV_NEWIDOCNUM type EDIDD-DOCNUM
-    changing
-      !CT_EDIDD type TTY_EDIDD .
-  methods CONSTRUCTOR
-    importing
-      !IV_TENANT type zPRVDTENANTID .
-  methods LAUNCH_IDOC_TO_BASELINE .
+    CLASS-METHODS get_objid
+      IMPORTING
+        !iv_schema TYPE string
+        !it_edidd  TYPE tty_edidd
+        !iv_idoc   TYPE REF TO data
+      EXPORTING
+        !ev_objid  TYPE zBPIOBJ-object_id .
+    CLASS-METHODS get_dummy_objid
+      IMPORTING
+        !iv_schema     TYPE string
+      EXPORTING
+        !ev_objid      TYPE zBPIOBJ-object_id
+        !ev_newidocnum TYPE edidd-docnum
+      CHANGING
+        !ct_edidd      TYPE tty_edidd .
+    METHODS constructor
+      IMPORTING
+        !iv_tenant TYPE zPRVDTENANTID .
+    METHODS launch_idoc_to_baseline .
   PROTECTED SECTION.
-    data: lv_setup_success TYPE boolean,
-          return_messages type table of bapiret2.
-  methods: add_message importing iv_msg type bapiret2,
-           clear_messages.
+    DATA: lv_setup_success TYPE boolean,
+          return_messages  TYPE TABLE OF bapiret2.
+    METHODS: add_message IMPORTING iv_msg TYPE bapiret2,
+      clear_messages.
   PRIVATE SECTION.
 ENDCLASS.
 
@@ -45,17 +45,17 @@ ENDCLASS.
 CLASS ZCL_PROUBC_IDOCHLPR IMPLEMENTATION.
 
 
-  method ADD_MESSAGE.
-    append iv_msg to return_messages.
-  endmethod.
+  METHOD add_message.
+    APPEND iv_msg TO return_messages.
+  ENDMETHOD.
 
 
-  method CLEAR_MESSAGES.
-    clear: return_messages.
-  endmethod.
+  METHOD clear_messages.
+    CLEAR: return_messages.
+  ENDMETHOD.
 
 
-  METHOD CONSTRUCTOR.
+  METHOD constructor.
     lo_api_helper = NEW zcl_proubc_api_helper( iv_tenant = iv_tenant ).
 
     "sets the default tenant and ident/baseline api tokens
@@ -66,7 +66,7 @@ CLASS ZCL_PROUBC_IDOCHLPR IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD GET_DUMMY_OBJID.
+  METHOD get_dummy_objid.
     CASE iv_schema.
       WHEN 'ORDERS05'.
 
@@ -111,7 +111,7 @@ CLASS ZCL_PROUBC_IDOCHLPR IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD GET_OBJID.
+  METHOD get_objid.
     CASE iv_schema.
       WHEN 'ORDERS05'.
         "data record E1EDK01 - BELNR
@@ -126,13 +126,13 @@ CLASS ZCL_PROUBC_IDOCHLPR IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD LAUNCH_IDOC_TO_BASELINE.
+  METHOD launch_idoc_to_baseline.
     DATA:
       lo_ident_api         TYPE REF TO zif_proubc_ident,
       lo_baseline_api      TYPE REF TO zif_proubc_baseline,
       ls_protocol_msg_req  TYPE zif_proubc_baseline=>protocolmessage_req,
       "ls_bpiobjects_req    TYPE zif_proubc_baseline=>bpiobjects_req,
-       ls_bpiobjects_req    TYPE zif_proubc_baseline=>businessobject,
+      ls_bpiobjects_req    TYPE zif_proubc_baseline=>businessobject,
       lt_updatedbpis       TYPE TABLE OF zbpiobj,
       lt_newbpis           TYPE TABLE OF zbpiobj,
       lt_final_updatedbpis TYPE TABLE OF zbpiobj,
@@ -263,7 +263,7 @@ CLASS ZCL_PROUBC_IDOCHLPR IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD ZIF_PROUBC_BLIDOCHLPER~SHUTTLE_IDOCS.
+  METHOD zif_proubc_blidochlper~shuttle_idocs.
     "object_id  TYPE bpiobj-object_id,
     SELECT docnum,
     idoctp,
