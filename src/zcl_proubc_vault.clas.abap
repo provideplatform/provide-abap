@@ -10,14 +10,14 @@ CLASS zcl_proubc_vault DEFINITION
     DATA mi_client TYPE REF TO if_http_client.
     DATA mo_json TYPE REF TO zcl_oapi_json.
     METHODS send_receive RETURNING VALUE(rv_code) TYPE i.
-  private section.
-    methods sap_auth_check.
+  PRIVATE SECTION.
+    METHODS sap_auth_check.
 ENDCLASS.
 
 
 
 CLASS zcl_proubc_vault IMPLEMENTATION.
-METHOD constructor.
+  METHOD constructor.
     mi_client = ii_client.
   ENDMETHOD.
 
@@ -230,6 +230,6 @@ METHOD constructor.
     ENDCASE.
   ENDMETHOD.
 
-  method sap_auth_check.
+  METHOD sap_auth_check.
   ENDMETHOD.
 ENDCLASS.
