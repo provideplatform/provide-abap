@@ -1,6 +1,5 @@
 CLASS zcl_proubc_api_helper DEFINITION
   PUBLIC
-  FINAL
   CREATE PUBLIC .
 
   PUBLIC SECTION.
