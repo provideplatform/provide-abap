@@ -5,13 +5,18 @@ CLASS zcl_proubc_vault DEFINITION
 
   PUBLIC SECTION.
     INTERFACES zif_proubc_vault.
-    METHODS constructor IMPORTING ii_client TYPE REF TO if_http_client.
+    METHODS constructor IMPORTING ii_client TYPE REF TO if_http_client
+                                  iv_vault_url type string.
   PROTECTED SECTION.
     DATA mi_client TYPE REF TO if_http_client.
+    DATA lv_vault_url TYPE string value 'https://vault.provide.services'.
     DATA mo_json TYPE REF TO zcl_oapi_json.
+    DATA bpitoken TYPE zprvdrefreshtoken.
     METHODS send_receive RETURNING VALUE(rv_code) TYPE i.
   PRIVATE SECTION.
     METHODS sap_auth_check.
+    METHODS get_bpi_token
+      RAISING cx_static_check.
 ENDCLASS.
 
 
@@ -19,6 +24,7 @@ ENDCLASS.
 CLASS zcl_proubc_vault IMPLEMENTATION.
   METHOD constructor.
     mi_client = ii_client.
+    lv_vault_url = iv_vault_url.
   ENDMETHOD.
 
   METHOD send_receive.
@@ -36,7 +42,7 @@ CLASS zcl_proubc_vault IMPLEMENTATION.
     REPLACE ALL OCCURRENCES OF '{vault_id}' IN lv_uri WITH lv_temp.
     mi_client->request->set_method( 'POST' ).
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
-    mi_client->request->set_header_field( name = 'authorization' value = authorization ).
+    me->get_bpi_token( ).
     mi_client->request->set_header_field( name = 'Content-Type' value = content_type ).
     mi_client->request->set_cdata( body ).
     lv_code = send_receive( ).
@@ -55,7 +61,7 @@ CLASS zcl_proubc_vault IMPLEMENTATION.
     REPLACE ALL OCCURRENCES OF '{vault_id}' IN lv_uri WITH lv_temp.
     mi_client->request->set_method( 'GET' ).
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
-    mi_client->request->set_header_field( name = 'authorization' value = authorization ).
+    me->get_bpi_token( ).
     mi_client->request->set_header_field( name = 'Content-Type' value = content_type ).
     mi_client->request->set_cdata( body ).
     lv_code = send_receive( ).
@@ -74,7 +80,7 @@ CLASS zcl_proubc_vault IMPLEMENTATION.
     REPLACE ALL OCCURRENCES OF '{vault_id}' IN lv_uri WITH lv_temp.
     mi_client->request->set_method( 'POST' ).
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
-    mi_client->request->set_header_field( name = 'authorization' value = authorization ).
+    me->get_bpi_token( ).
     mi_client->request->set_header_field( name = 'Content-Type' value = content_type ).
     mi_client->request->set_cdata( body ).
     lv_code = send_receive( ).
@@ -96,7 +102,7 @@ CLASS zcl_proubc_vault IMPLEMENTATION.
     REPLACE ALL OCCURRENCES OF '{key_id}' IN lv_uri WITH lv_temp.
     mi_client->request->set_method( 'DELETE' ).
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
-    mi_client->request->set_header_field( name = 'authorization' value = authorization ).
+    me->get_bpi_token( ).
     mi_client->request->set_header_field( name = 'Content-Type' value = content_type ).
     lv_code = send_receive( ).
     WRITE / lv_code.
@@ -114,7 +120,7 @@ CLASS zcl_proubc_vault IMPLEMENTATION.
     REPLACE ALL OCCURRENCES OF '{vault_id}' IN lv_uri WITH lv_temp.
     mi_client->request->set_method( 'GET' ).
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
-    mi_client->request->set_header_field( name = 'authorization' value = authorization ).
+    me->get_bpi_token( ).
     mi_client->request->set_header_field( name = 'Content-Type' value = content_type ).
     lv_code = send_receive( ).
     WRITE / lv_code.
@@ -135,7 +141,7 @@ CLASS zcl_proubc_vault IMPLEMENTATION.
     REPLACE ALL OCCURRENCES OF '{secret_id}' IN lv_uri WITH lv_temp.
     mi_client->request->set_method( 'POST' ).
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
-    mi_client->request->set_header_field( name = 'authorization' value = authorization ).
+    me->get_bpi_token( ).
     mi_client->request->set_header_field( name = 'Content-Type' value = content_type ).
     mi_client->request->set_cdata( body ).
     lv_code = send_receive( ).
@@ -157,7 +163,7 @@ CLASS zcl_proubc_vault IMPLEMENTATION.
     REPLACE ALL OCCURRENCES OF '{secret_id}' IN lv_uri WITH lv_temp.
     mi_client->request->set_method( 'DELETE' ).
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
-    mi_client->request->set_header_field( name = 'authorization' value = authorization ).
+    me->get_bpi_token( ).
     mi_client->request->set_header_field( name = 'Content-Type' value = content_type ).
     mi_client->request->set_cdata( body ).
     lv_code = send_receive( ).
@@ -175,7 +181,7 @@ CLASS zcl_proubc_vault IMPLEMENTATION.
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
     mi_client->request->set_header_field( name = 'Content-Type' value = content_type ).
     mi_client->request->set_header_field( name = 'content-type' value = content_type ).
-    mi_client->request->set_header_field( name = 'Authorization' value = authorization ).
+    me->get_bpi_token( ).
     mi_client->request->set_cdata( body ).
     lv_code = send_receive( ).
     WRITE / lv_code.
@@ -190,7 +196,7 @@ CLASS zcl_proubc_vault IMPLEMENTATION.
     DATA lv_uri TYPE string VALUE 'https://vault.provide.services/api/v1/vaults'.
     mi_client->request->set_method( 'GET' ).
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
-    mi_client->request->set_header_field( name = 'Authorization' value = authorization ).
+    me->get_bpi_token( ).
     mi_client->request->set_cdata( body ).
     lv_code = send_receive( ).
     WRITE / lv_code.
@@ -205,7 +211,7 @@ CLASS zcl_proubc_vault IMPLEMENTATION.
     DATA lv_uri TYPE string VALUE 'https://vault.provide.services/api/v1/unsealerkey'.
     mi_client->request->set_method( 'POST' ).
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
-    mi_client->request->set_header_field( name = 'authorization' value = authorization ).
+    me->get_bpi_token( ).
     mi_client->request->set_header_field( name = 'Content-Type' value = content_type ).
     lv_code = send_receive( ).
     WRITE / lv_code.
@@ -220,9 +226,10 @@ CLASS zcl_proubc_vault IMPLEMENTATION.
     DATA lv_uri TYPE string VALUE 'https://vault.provide.services/api/v1/unseal'.
     mi_client->request->set_method( 'POST' ).
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
-    mi_client->request->set_header_field( name = 'authorization' value = authorization ).
+    me->get_bpi_token( ).
     mi_client->request->set_header_field( name = 'Content-Type' value = content_type ).
     mi_client->request->set_cdata( body ).
+
     lv_code = send_receive( ).
     WRITE / lv_code.
     CASE lv_code.
@@ -231,5 +238,18 @@ CLASS zcl_proubc_vault IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD sap_auth_check.
+  "TODO create authorization field in su20. need to check default character length for tenant id. SAP auth check limits to 40 chars.
   ENDMETHOD.
+
+  method get_bpi_token.
+    DATA lv_bearertoken TYPE string.
+    CONCATENATE 'Bearer' bpitoken INTO lv_bearertoken SEPARATED BY space.
+    mi_client->request->set_header_field(
+      EXPORTING
+        name  = 'Authorization'    " Name of the header field
+        value = lv_bearertoken    " HTTP header field value
+    ).
+  endmethod.
+
+
 ENDCLASS.

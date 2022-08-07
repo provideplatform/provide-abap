@@ -5,14 +5,17 @@ CLASS zcl_proubc_vault_helper DEFINITION
   CREATE PUBLIC .
 
   PUBLIC SECTION.
-    METHODS: create_key,
+    METHODS:
+      constructor,
+      create_key,
       derive_key,
       list_keys,
       delete_keys,
       encrypt,
       decrypt,
       sign,
-      verify.
+      verify,
+      setup_vault_msgs.
   PROTECTED SECTION.
   PRIVATE SECTION.
 ENDCLASS.
@@ -20,6 +23,9 @@ ENDCLASS.
 
 
 CLASS zcl_proubc_vault_helper IMPLEMENTATION.
+  METHOD constructor.
+    super->constructor( ).
+  ENDMETHOD.
   METHOD create_key.
   ENDMETHOD.
   METHOD derive_key.
@@ -35,5 +41,7 @@ CLASS zcl_proubc_vault_helper IMPLEMENTATION.
   METHOD sign.
   ENDMETHOD.
   METHOD verify.
+  ENDMETHOD.
+  METHOD setup_vault_msgs.
   ENDMETHOD.
 ENDCLASS.
