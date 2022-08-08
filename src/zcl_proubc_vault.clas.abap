@@ -5,11 +5,12 @@ CLASS zcl_proubc_vault DEFINITION
 
   PUBLIC SECTION.
     INTERFACES zif_proubc_vault.
-    METHODS constructor IMPORTING ii_client TYPE REF TO if_http_client
-                                  iv_vault_url type string.
+    METHODS constructor IMPORTING !ii_client   TYPE REF TO if_http_client
+                                  !iv_tenant   TYPE zPRVDTENANTID
+                                  !iv_bpitoken TYPE zPRVDREFRESHTOKEN.
   PROTECTED SECTION.
     DATA mi_client TYPE REF TO if_http_client.
-    DATA lv_vault_url TYPE string value 'https://vault.provide.services'.
+    DATA lv_vault_url TYPE string VALUE 'https://vault.provide.services'.
     DATA mo_json TYPE REF TO zcl_oapi_json.
     DATA bpitoken TYPE zprvdrefreshtoken.
     METHODS send_receive RETURNING VALUE(rv_code) TYPE i.
@@ -24,7 +25,6 @@ ENDCLASS.
 CLASS zcl_proubc_vault IMPLEMENTATION.
   METHOD constructor.
     mi_client = ii_client.
-    lv_vault_url = iv_vault_url.
   ENDMETHOD.
 
   METHOD send_receive.
@@ -238,10 +238,10 @@ CLASS zcl_proubc_vault IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD sap_auth_check.
-  "TODO create authorization field in su20. need to check default character length for tenant id. SAP auth check limits to 40 chars.
+    "TODO create authorization field in su20. need to check default character length for tenant id. SAP auth check limits to 40 chars.
   ENDMETHOD.
 
-  method get_bpi_token.
+  METHOD get_bpi_token.
     DATA lv_bearertoken TYPE string.
     CONCATENATE 'Bearer' bpitoken INTO lv_bearertoken SEPARATED BY space.
     mi_client->request->set_header_field(
@@ -249,7 +249,7 @@ CLASS zcl_proubc_vault IMPLEMENTATION.
         name  = 'Authorization'    " Name of the header field
         value = lv_bearertoken    " HTTP header field value
     ).
-  endmethod.
+  ENDMETHOD.
 
 
 ENDCLASS.
