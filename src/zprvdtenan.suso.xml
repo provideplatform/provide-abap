@@ -5,6 +5,7 @@
    <TOBJ>
     <OBJCT>ZPRVDTENAN</OBJCT>
     <FIEL1>ACTVT</FIEL1>
+    <FIEL2>ZPRVDSHA1</FIEL2>
     <OCLSS>ZPRV</OCLSS>
    </TOBJ>
    <TOBJT>
@@ -28,6 +29,10 @@
     <TACTZ>
      <BROBJ>ZPRVDTENAN</BROBJ>
      <ACTVT>06</ACTVT>
+    </TACTZ>
+    <TACTZ>
+     <BROBJ>ZPRVDTENAN</BROBJ>
+     <ACTVT>16</ACTVT>
     </TACTZ>
    </TACTZ>
   </asx:values>

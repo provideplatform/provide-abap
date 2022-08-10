@@ -16,6 +16,9 @@ CLASS zcl_proubc_api_helper DEFINITION
         !is_data TYPE any
       CHANGING
         !cr_data TYPE REF TO data .
+    CLASS-METHODS prvd_tenant_sap_authcheck
+      IMPORTING
+        !iv_tenant TYPE zPRVDTENANTID.
     METHODS constructor
       IMPORTING
         !iv_tenant TYPE zPRVDTENANTID OPTIONAL .
@@ -461,5 +464,27 @@ CLASS zcl_proubc_api_helper IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD create_vault.
+  ENDMETHOD.
+
+  METHOD prvd_tenant_sap_authcheck.
+    IF iv_tenant IS NOT INITIAL.
+      DATA lo_digest TYPE REF TO cl_abap_message_digest.
+      DATA lv_hash_string TYPE ZCASESENSITIVESHA1.
+      DATA lv_hash_base64 TYPE string.
+
+* create a message digest object with a given hash algo
+      lo_digest = cl_abap_message_digest=>get_instance( 'sha1' ).
+      lo_digest->update( if_data = cl_abap_message_digest=>string_to_xstring( |{ iv_tenant }| ) ).
+      lo_digest->digest( ).
+      lv_hash_string = lo_digest->to_string( ).
+
+      AUTHORITY-CHECK OBJECT 'zprvdtenan'
+        ID 'ACTVT' FIELD '16'
+        ID 'ZPRVDSHA1' field lv_hash_string.
+      IF sy-subrc = 0.
+      ENDIF.
+
+    ELSE.
+    ENDIF.
   ENDMETHOD.
 ENDCLASS.
