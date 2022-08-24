@@ -1,0 +1,757 @@
+{
+	"info": {
+		"_postman_id": "36ae5f81-0acb-4222-9ddf-bc579bf1711f",
+		"name": "proUBC inbound API v1 - exportable",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get details of idoc type",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{sappassword}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{sapuser}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-CSRF-Token",
+						"value": "{{xcsrftoken}}",
+						"type": "default"
+					}
+				],
+				"url": {
+					"raw": "{{sapbaseurl}}/sap/proubc/schemas/ORDERS05",
+					"host": [
+						"{{sapbaseurl}}"
+					],
+					"path": [
+						"sap",
+						"proubc",
+						"schemas",
+						"ORDERS05"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "proUBC tenants read",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{sappassword}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{sapuser}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-CSRF-Token",
+						"value": "{{xcsrftoken}}",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{sapbaseurl}}/sap/proubc/tenants/{{prvdtenantid}}",
+					"host": [
+						"{{sapbaseurl}}"
+					],
+					"path": [
+						"sap",
+						"proubc",
+						"tenants",
+						"{{prvdtenantid}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "proUBC health check",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 204\", function () {\r",
+							"    pm.response.to.have.status(204);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{sappassword}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{sapuser}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-CSRF-Token",
+						"value": "{{xcsrftoken}}",
+						"type": "default"
+					}
+				],
+				"url": {
+					"raw": "{{sapbaseurl}}/sap/proubc/status",
+					"host": [
+						"{{sapbaseurl}}"
+					],
+					"path": [
+						"sap",
+						"proubc",
+						"status"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "proUBC auth - fetch token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"X-CSRF-Token is present\", function () {\r",
+							"    pm.response.to.have.header(\"X-CSRF-Token\");\r",
+							"    var xsrf = pm.response.headers.get(\"X-CSRF-Token\");\r",
+							"    pm.environment.set(\"xcsrftoken\", xsrf);\r",
+							"    //pm.setEnvironmentVariable('xcsrftoken', \"yah\");\r",
+							"    //get X-CSRF-Token and save it to variable\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Status code is 204\", function () {\r",
+							"    pm.response.to.have.status(204);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{sappassword}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{sapuser}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "HEAD",
+				"header": [
+					{
+						"key": "X-CSRF-Token",
+						"value": "Fetch",
+						"type": "default"
+					}
+				],
+				"url": {
+					"raw": "{{sapbaseurl}}/sap/proubc/auth",
+					"host": [
+						"{{sapbaseurl}}"
+					],
+					"path": [
+						"sap",
+						"proubc",
+						"auth"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "proUBC tenants delete entry",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 204\", function () {\r",
+							"    pm.response.to.have.status(204);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{sappassword}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{sapuser}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "X-CSRF-Token",
+						"value": "{{xcsrftoken}}",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{sapbaseurl}}/sap/proubc/tenants/{{prvdtenantid}}",
+					"host": [
+						"{{sapbaseurl}}"
+					],
+					"path": [
+						"sap",
+						"proubc",
+						"tenants",
+						"{{prvdtenantid}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "proUBC tenants create",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 204\", function () {\r",
+							"    pm.response.to.have.status(204);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{sappassword}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{sapuser}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-CSRF-Token",
+						"value": "{{xcsrftoken}}",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"tenant_id\":\"{{prvdtenantid}}\",\"bpi_endpoint\":\"https://baseline.provide.services\",\"ident_endpoint\":\"https://ident.provide.services\",\"refresh_token\":\"{{prvdrefreshtoken}}\"}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{sapbaseurl}}/sap/proubc/tenants",
+					"host": [
+						"{{sapbaseurl}}"
+					],
+					"path": [
+						"sap",
+						"proubc",
+						"tenants"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "proUBC tenants update",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 204\", function () {\r",
+							"    pm.response.to.have.status(204);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{sappassword}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{sapuser}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [
+					{
+						"key": "X-CSRF-Token",
+						"value": "{{xcsrftoken}}",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"organization_id\":\"{{prvdtenantid}}\",\"bpi_endpoint\":\"https://baseline.provide.services\",\"ident_endpoint\":\"https://ident.provide.services\",\"refresh_token\":\"{{prvdrefreshtoken}}\"}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{sapbaseurl}}/sap/proubc/tenants",
+					"host": [
+						"{{sapbaseurl}}"
+					],
+					"path": [
+						"sap",
+						"proubc",
+						"tenants"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get all idoc basic types",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{sappassword}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{sapuser}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-CSRF-Token",
+						"value": "{{xcsrftoken}}",
+						"type": "default"
+					}
+				],
+				"url": {
+					"raw": "{{sapbaseurl}}/sap/proubc/schemas",
+					"host": [
+						"{{sapbaseurl}}"
+					],
+					"path": [
+						"sap",
+						"proubc",
+						"schemas"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get object by ID",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "X-CSRF-Token",
+						"value": "{{xcsrftoken}}",
+						"type": "default"
+					}
+				],
+				"url": {
+					"raw": "{{sapbaseurl}}/sap/proubc/objects/1",
+					"host": [
+						"{{sapbaseurl}}"
+					],
+					"path": [
+						"sap",
+						"proubc",
+						"objects",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create object",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{sappassword}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{sapuser}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "X-CSRF-Token",
+						"value": "{{xcsrftoken}}",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"payload\": {\"IDOC_FIELD\":\"VAL\"}, \"type\": \"ORDERS05\", \"schema_type\": \"IDOC\", \"baseline_id\": \"0000-0000-000244242324-242424\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{sapbaseurl}}/sap/proubc/objects/{{bpiobjectid}}",
+					"host": [
+						"{{sapbaseurl}}"
+					],
+					"path": [
+						"sap",
+						"proubc",
+						"objects",
+						"{{bpiobjectid}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update object",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 204\", function () {\r",
+							"    pm.response.to.have.status(204);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{sappassword}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{sapuser}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [
+					{
+						"key": "X-CSRF-Token",
+						"value": "{{xcsrftoken}}",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"payload\": {\"IDOC_FIELD\":\"VAL\"}, \"type\": \"ORDERS05\", \"baseline_id\": \"0000-0000-000244242324-242425\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{sapbaseurl}}/sap/proubc/objects/{{bpiobjectid}}",
+					"host": [
+						"{{sapbaseurl}}"
+					],
+					"path": [
+						"sap",
+						"proubc",
+						"objects",
+						"{{bpiobjectid}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get object status",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{sappassword}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{sapuser}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{sapbaseurl}}/sap/proubc/objects/{{bpiobjectid}}/status",
+					"host": [
+						"{{sapbaseurl}}"
+					],
+					"path": [
+						"sap",
+						"proubc",
+						"objects",
+						"{{bpiobjectid}}",
+						"status"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update object status",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 204\", function () {\r",
+							"    pm.response.to.have.status(204);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{sappassword}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{sapuser}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [
+					{
+						"key": "X-CSRF-Token",
+						"value": "{{xcsrftoken}}",
+						"type": "default"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"status\": \"updated2\",\r\n    \"baseline_id\" : \"0000-0000-000244242324-242424\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{sapbaseurl}}/sap/proubc/objects/{{bpiobjectid}}/status",
+					"host": [
+						"{{sapbaseurl}}"
+					],
+					"path": [
+						"sap",
+						"proubc",
+						"objects",
+						"{{bpiobjectid}}",
+						"status"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
