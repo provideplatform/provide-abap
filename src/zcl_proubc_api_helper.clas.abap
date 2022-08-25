@@ -1,6 +1,5 @@
 CLASS zcl_proubc_api_helper DEFINITION
   PUBLIC
-  FINAL
   CREATE PUBLIC .
 
   PUBLIC SECTION.
@@ -17,6 +16,9 @@ CLASS zcl_proubc_api_helper DEFINITION
         !is_data TYPE any
       CHANGING
         !cr_data TYPE REF TO data .
+    CLASS-METHODS prvd_tenant_sap_authcheck
+      IMPORTING
+        !iv_tenant TYPE zPRVDTENANTID.
     METHODS constructor
       IMPORTING
         !iv_tenant TYPE zPRVDTENANTID OPTIONAL .
@@ -66,6 +68,7 @@ CLASS zcl_proubc_api_helper DEFINITION
       RETURNING
         VALUE(es_dummy_idoc_msg) TYPE zif_proubc_baseline=>protocolmessage_req .
     METHODS list_bpi_accounts .
+    METHODS create_vault.
   PROTECTED SECTION.
     DATA: lv_defaulttenant        TYPE zprvdtenants-tenant_id,
           lv_defaultidenttoken    TYPE REF TO data,
@@ -80,7 +83,7 @@ ENDCLASS.
 
 
 
-CLASS ZCL_PROUBC_API_HELPER IMPLEMENTATION.
+CLASS zcl_proubc_api_helper IMPLEMENTATION.
 
 
   METHOD baseline_health_check.
@@ -288,7 +291,7 @@ CLASS ZCL_PROUBC_API_HELPER IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD CONSTRUCTOR.
+  METHOD constructor.
     "todo more robust selection criteria - based on sap user authorization/mapping to tenant
 
     "option 1 create ZPRVDTENANT parameter id - and auth check it whenever used
@@ -458,5 +461,30 @@ CLASS ZCL_PROUBC_API_HELPER IMPLEMENTATION.
   METHOD set_default_tenant.
     "TODO add authorization check and mapping to sap user id
     lv_defaulttenant = iv_defaulttenant.
+  ENDMETHOD.
+
+  METHOD create_vault.
+  ENDMETHOD.
+
+  METHOD prvd_tenant_sap_authcheck.
+    IF iv_tenant IS NOT INITIAL.
+      DATA lo_digest TYPE REF TO cl_abap_message_digest.
+      DATA lv_hash_string TYPE ZCASESENSITIVESHA1.
+      DATA lv_hash_base64 TYPE string.
+
+* create a message digest object with a given hash algo
+      lo_digest = cl_abap_message_digest=>get_instance( 'sha1' ).
+      lo_digest->update( if_data = cl_abap_message_digest=>string_to_xstring( |{ iv_tenant }| ) ).
+      lo_digest->digest( ).
+      lv_hash_string = lo_digest->to_string( ).
+
+      AUTHORITY-CHECK OBJECT 'zprvdtenan'
+        ID 'ACTVT' FIELD '16'
+        ID 'ZPRVDSHA1' field lv_hash_string.
+      IF sy-subrc = 0.
+      ENDIF.
+
+    ELSE.
+    ENDIF.
   ENDMETHOD.
 ENDCLASS.

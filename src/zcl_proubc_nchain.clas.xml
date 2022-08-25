@@ -3,14 +3,13 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <VSEOCLASS>
-    <CLSNAME>ZCL_PROUBC_API_HELPER</CLSNAME>
+    <CLSNAME>ZCL_PROUBC_NCHAIN</CLSNAME>
     <LANGU>E</LANGU>
-    <DESCRIPT>Helper class for the Pro UBC API</DESCRIPT>
+    <DESCRIPT>proUBC API Proxy - PRVD nChain</DESCRIPT>
     <STATE>1</STATE>
     <CLSCCINCL>X</CLSCCINCL>
     <FIXPT>X</FIXPT>
     <UNICODE>X</UNICODE>
-    <WITH_UNIT_TESTS>X</WITH_UNIT_TESTS>
    </VSEOCLASS>
   </asx:values>
  </asx:abap>
