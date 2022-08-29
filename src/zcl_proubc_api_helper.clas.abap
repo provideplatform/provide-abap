@@ -68,7 +68,6 @@ CLASS zcl_proubc_api_helper DEFINITION
       RETURNING
         VALUE(es_dummy_idoc_msg) TYPE zif_proubc_baseline=>protocolmessage_req .
     METHODS list_bpi_accounts .
-    METHODS create_vault.
   PROTECTED SECTION.
     DATA: lv_defaulttenant        TYPE zprvdtenants-tenant_id,
           lv_defaultidenttoken    TYPE REF TO data,
@@ -461,9 +460,6 @@ CLASS zcl_proubc_api_helper IMPLEMENTATION.
   METHOD set_default_tenant.
     "TODO add authorization check and mapping to sap user id
     lv_defaulttenant = iv_defaulttenant.
-  ENDMETHOD.
-
-  METHOD create_vault.
   ENDMETHOD.
 
   METHOD prvd_tenant_sap_authcheck.

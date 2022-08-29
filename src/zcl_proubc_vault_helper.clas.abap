@@ -8,6 +8,7 @@ CLASS zcl_proubc_vault_helper DEFINITION
     METHODS:
       constructor IMPORTING  !iv_tenant      TYPE zPRVDTENANTID OPTIONAL,
       create_key,
+      create_vault,
       derive_key,
       list_keys,
       delete_keys,
@@ -60,7 +61,25 @@ CLASS zcl_proubc_vault_helper IMPLEMENTATION.
   ENDMETHOD.
   METHOD create_key.
     lo_vault_api = me->get_vault_client( ).
+*    lo_vault_api->create_key(
+*      EXPORTING
+*        authorization =
+*        content_type  =
+*        vault_id      =
+*        body          =
+*    ).
+*    CATCH cx_static_check.
   ENDMETHOD.
+  method create_vault.
+    lo_vault_api = me->get_vault_client( ).
+*    lo_vault_api->create_vault(
+*      EXPORTING
+*        content_type  =
+*        authorization =
+*        body          =
+*    ).
+*    CATCH cx_static_check.
+  endmethod.
   METHOD derive_key.
   lo_vault_api = me->get_vault_client( ).
   ENDMETHOD.
