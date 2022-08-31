@@ -1,0 +1,106 @@
+*&---------------------------------------------------------------------*
+*& Report zproubc_vault_test
+*&---------------------------------------------------------------------*
+*&
+*&---------------------------------------------------------------------*
+REPORT zproubc_vault_test.
+
+INCLUDE zproubc_vault_test_top.
+INCLUDE zproubc_vault_test_f01.
+
+DATA: lo_vault_helper TYPE REF TO zcl_proubc_vault_helper.
+
+SELECTION-SCREEN BEGIN OF BLOCK frame1 WITH FRAME TITLE TEXT-001.
+  SELECTION-SCREEN ULINE /10(40).
+
+  SELECTION-SCREEN BEGIN OF LINE.
+    SELECTION-SCREEN POSITION 15.
+    PARAMETERS: rb1 RADIOBUTTON GROUP rb.
+    SELECTION-SCREEN COMMENT 20(30) TEXT-002.
+  SELECTION-SCREEN END OF LINE.
+
+  SELECTION-SCREEN BEGIN OF LINE.
+    SELECTION-SCREEN POSITION 15.
+    PARAMETERS: rb2 RADIOBUTTON GROUP rb.
+    SELECTION-SCREEN COMMENT 20(30) TEXT-003.
+  SELECTION-SCREEN END OF LINE.
+
+  SELECTION-SCREEN BEGIN OF LINE.
+    SELECTION-SCREEN POSITION 15.
+    PARAMETERS: rb3 RADIOBUTTON GROUP rb.
+    SELECTION-SCREEN COMMENT 20(30) TEXT-004.
+  SELECTION-SCREEN END OF LINE.
+
+  SELECTION-SCREEN BEGIN OF LINE.
+    SELECTION-SCREEN POSITION 15.
+    PARAMETERS: rb4 RADIOBUTTON GROUP rb.
+    SELECTION-SCREEN COMMENT 20(30) TEXT-005.
+  SELECTION-SCREEN END OF LINE.
+
+  SELECTION-SCREEN BEGIN OF LINE.
+    SELECTION-SCREEN POSITION 15.
+    PARAMETERS: rb5 RADIOBUTTON GROUP rb.
+    SELECTION-SCREEN COMMENT 20(30) TEXT-006.
+  SELECTION-SCREEN END OF LINE.
+  SELECTION-SCREEN BEGIN OF LINE.
+    SELECTION-SCREEN POSITION 15.
+    PARAMETERS: rb6 RADIOBUTTON GROUP rb.
+    SELECTION-SCREEN COMMENT 20(30) TEXT-007.
+  SELECTION-SCREEN END OF LINE.
+
+  SELECTION-SCREEN BEGIN OF LINE.
+    SELECTION-SCREEN POSITION 15.
+    PARAMETERS: rb7 RADIOBUTTON GROUP rb.
+    SELECTION-SCREEN COMMENT 20(30) TEXT-008.
+  SELECTION-SCREEN END OF LINE.
+
+  SELECTION-SCREEN BEGIN OF LINE.
+    SELECTION-SCREEN POSITION 15.
+    PARAMETERS: rb8 RADIOBUTTON GROUP rb.
+    SELECTION-SCREEN COMMENT 20(30) TEXT-009.
+  SELECTION-SCREEN END OF LINE.
+
+  SELECTION-SCREEN BEGIN OF LINE.
+    SELECTION-SCREEN POSITION 15.
+    PARAMETERS: rb9 RADIOBUTTON GROUP rb.
+    SELECTION-SCREEN COMMENT 20(30) TEXT-010.
+  SELECTION-SCREEN END OF LINE.
+
+  SELECTION-SCREEN BEGIN OF LINE.
+    SELECTION-SCREEN POSITION 15.
+    PARAMETERS: rb10 RADIOBUTTON GROUP rb.
+    SELECTION-SCREEN COMMENT 20(30) TEXT-011.
+  SELECTION-SCREEN END OF LINE.
+
+  SELECTION-SCREEN ULINE /10(40).
+SELECTION-SCREEN END OF BLOCK frame1.
+
+
+START-OF-SELECTION.
+  CREATE OBJECT lo_vault_helper.
+
+  lo_vault_helper->setup_protocol_msg( ).
+  lo_vault_helper->setup_vault_msgs( ). "should it be this one or that one?
+
+  CASE abap_true.
+    WHEN rb1.
+      lo_vault_helper->list_vaults( ).
+    WHEN rb2.
+    WHEN rb3.
+    WHEN rb4.
+    WHEN rb5.
+    WHEN rb6.
+    WHEN rb7.
+    WHEN rb8.
+    WHEN rb9.
+    WHEN rb10.
+  ENDCASE.
+*lo_vault_helper->list_keys( ).
+*lo_vault_helper->create_key( ).
+*lo_vault_helper->list_vaults( ).
+*lo_vault_helper->create_vault( ).
+*lo_vault_helper->derive_key( ).
+*lo_vault_helper->encrypt( ).
+*lo_vault_helper->decrypt(  ).
+*lo_vault_helper->sign( ).
+*lo_vault_helper->verify( ).

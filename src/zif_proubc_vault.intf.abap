@@ -6,18 +6,35 @@ INTERFACE zif_proubc_vault
              c_vaultkey_asym TYPE string VALUE 'assymetric'.
 
   "vault key specs - symmetric
-  CONSTANTS: c_vaultkey_spec_aes256 type string value 'AES-256-GCM'.
+  CONSTANTS: c_vaultkey_spec_aes256 TYPE string VALUE 'AES-256-GCM'.
   CONSTANTS: c_vaultkey_spec_chacha20 TYPE string VALUE 'ChaCha20'.
-               "RSA
-  CONSTANTS: c_vaultkey_spec_RSA type string value 'RSA'.
+  "RSA
+  CONSTANTS: c_vaultkey_spec_RSA TYPE string VALUE 'RSA'.
 
   "vault key specs - assymetric
-  CONSTANTS: c_vaultkey_spec_bjj type string value 'babyJubJub'.
-  CONSTANTS: c_vaultkey_spec_C25519 type string value 'C25519'.
-  CONSTANTS: c_vaultkey_spec_Ed25519 type string value 'Ed25519'.
-  CONSTANTS: c_vaultkey_spec_nats_Ed25519 type string value 'Ed25519-nkey'.
-  CONSTANTS: c_vaultkey_spec_secp256k1 type string value 'secp256k1'.
-  CONSTANTS: c_vaultkey_spec_BIP39 type string value 'BIP39'.
+  CONSTANTS: c_vaultkey_spec_bjj TYPE string VALUE 'babyJubJub'.
+  CONSTANTS: c_vaultkey_spec_C25519 TYPE string VALUE 'C25519'.
+  CONSTANTS: c_vaultkey_spec_Ed25519 TYPE string VALUE 'Ed25519'.
+  CONSTANTS: c_vaultkey_spec_nats_Ed25519 TYPE string VALUE 'Ed25519-nkey'.
+  CONSTANTS: c_vaultkey_spec_secp256k1 TYPE string VALUE 'secp256k1'.
+  CONSTANTS: c_vaultkey_spec_BIP39 TYPE string VALUE 'BIP39'.
+
+
+  TYPES: BEGIN OF ty_vault_query,
+           id          TYPE zcasesensitive_str,
+           created_at  TYPE string, "convertable to timestampl
+           name        TYPE string,
+           description TYPE string,
+         END OF ty_vault_query.
+
+  TYPES: tty_vault_query TYPE TABLE OF ty_vault_query.
+
+  TYPES: BEGIN OF ty_vault_create,
+           name        TYPE string,
+           description TYPE string,
+         END OF ty_vault_create.
+
+
 
 * POST - "Create a key: C25519"
 * Operation id: Createakey:C25519
@@ -28,11 +45,11 @@ INTERFACE zif_proubc_vault
 * Body schema: string
   METHODS create_key
     IMPORTING
-      authorization TYPE string
-      content_type TYPE string
-      vault_id TYPE string
-      body TYPE string
-    RAISING cx_static_check.
+              authorization TYPE string
+              content_type  TYPE string
+              vault_id      TYPE string
+              body          TYPE string
+    RAISING   cx_static_check.
 
 * GET - "List keys"
 * Operation id: Listkeys
@@ -43,11 +60,11 @@ INTERFACE zif_proubc_vault
 * Body schema: string
   METHODS list_keys
     IMPORTING
-      authorization TYPE string
-      content_type TYPE string
-      vault_id TYPE string
-      body TYPE string
-    RAISING cx_static_check.
+              authorization TYPE string
+              content_type  TYPE string
+              vault_id      TYPE string
+              body          TYPE string
+    RAISING   cx_static_check.
 
 * POST - "Derive a key: ChaCha20"
 * Operation id: Deriveakey:ChaCha20
@@ -58,11 +75,11 @@ INTERFACE zif_proubc_vault
 * Body schema: string
   METHODS derive_key
     IMPORTING
-      authorization TYPE string
-      content_type TYPE string
-      vault_id TYPE string
-      body TYPE string
-    RAISING cx_static_check.
+              authorization TYPE string
+              content_type  TYPE string
+              vault_id      TYPE string
+              body          TYPE string
+    RAISING   cx_static_check.
 
 * DELETE - "Delete a key"
 * Operation id: Deleteakey
@@ -73,11 +90,11 @@ INTERFACE zif_proubc_vault
 * Response: 200
   METHODS delete_key
     IMPORTING
-      authorization TYPE string
-      content_type TYPE string
-      vault_id TYPE string
-      key_id TYPE string
-    RAISING cx_static_check.
+              authorization TYPE string
+              content_type  TYPE string
+              vault_id      TYPE string
+              key_id        TYPE string
+    RAISING   cx_static_check.
 
 * GET - "List secrets"
 * Operation id: Listsecrets
@@ -87,10 +104,10 @@ INTERFACE zif_proubc_vault
 * Response: 200
   METHODS list_secrets
     IMPORTING
-      authorization TYPE string
-      content_type TYPE string
-      vault_id TYPE string
-    RAISING cx_static_check.
+              authorization TYPE string
+              content_type  TYPE string
+              vault_id      TYPE string
+    RAISING   cx_static_check.
 
 * POST - "Retreive secret"
 * Operation id: Retreivesecret
@@ -102,12 +119,12 @@ INTERFACE zif_proubc_vault
 * Body schema: string
   METHODS retreive_secret
     IMPORTING
-      authorization TYPE string
-      content_type TYPE string
-      vault_id TYPE string
-      secret_id TYPE string
-      body TYPE string
-    RAISING cx_static_check.
+              authorization TYPE string
+              content_type  TYPE string
+              vault_id      TYPE string
+              secret_id     TYPE string
+              body          TYPE string
+    RAISING   cx_static_check.
 
 * DELETE - "Delete secret"
 * Operation id: Deletesecret
@@ -119,12 +136,12 @@ INTERFACE zif_proubc_vault
 * Body schema: string
   METHODS delete_secret
     IMPORTING
-      authorization TYPE string
-      content_type TYPE string
-      vault_id TYPE string
-      secret_id TYPE string
-      body TYPE string
-    RAISING cx_static_check.
+              authorization TYPE string
+              content_type  TYPE string
+              vault_id      TYPE string
+              secret_id     TYPE string
+              body          TYPE string
+    RAISING   cx_static_check.
 
 * POST - "Create Vault"
 * Operation id: CreateVault
@@ -135,10 +152,10 @@ INTERFACE zif_proubc_vault
 * Body schema: string
   METHODS create_vault
     IMPORTING
-      content_type TYPE string
-      authorization TYPE string
-      body TYPE string
-    RAISING cx_static_check.
+              content_type  TYPE string
+              authorization TYPE string
+              body          TYPE string
+    RAISING   cx_static_check.
 
 * GET - "List Vaults"
 * Operation id: ListVaults
@@ -147,9 +164,9 @@ INTERFACE zif_proubc_vault
 * Body schema: string
   METHODS list_vaults
     IMPORTING
-      authorization TYPE string
-      body TYPE string
-    RAISING cx_static_check.
+              authorization TYPE string
+              body          TYPE string
+    RAISING   cx_static_check.
 
 * POST - "Create Seal/Unseal key"
 * Operation id: CreateSeal/Unsealkey
@@ -158,9 +175,9 @@ INTERFACE zif_proubc_vault
 * Response: 200
   METHODS createseal_unsealkey
     IMPORTING
-      authorization TYPE string
-      content_type TYPE string
-    RAISING cx_static_check.
+              authorization TYPE string
+              content_type  TYPE string
+    RAISING   cx_static_check.
 
 * POST - "Unseal vault"
 * Operation id: Unsealvault
@@ -170,9 +187,9 @@ INTERFACE zif_proubc_vault
 * Body schema: string
   METHODS unseal_vault
     IMPORTING
-      authorization TYPE string
-      content_type TYPE string
-      body TYPE string
-    RAISING cx_static_check.
+              authorization TYPE string
+              content_type  TYPE string
+              body          TYPE string
+    RAISING   cx_static_check.
 
 ENDINTERFACE.
