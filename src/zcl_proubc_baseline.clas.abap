@@ -16,7 +16,6 @@ CLASS zcl_proubc_baseline DEFINITION
   PROTECTED SECTION.
     DATA mi_client TYPE REF TO if_http_client.
     DATA lv_bpitenant_url TYPE string.
-    DATA mo_json TYPE REF TO zcl_oapi_json.
     DATA authtoken TYPE zprvdrefreshtoken.
     DATA bpitoken TYPE zprvdrefreshtoken.
     METHODS send_receive RETURNING VALUE(rv_code) TYPE i.
@@ -158,7 +157,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     CASE lv_code.
       WHEN 201. " Created
         " application/json,#/components/schemas/AuthenticationResponse
-        CREATE OBJECT mo_json EXPORTING iv_json = mi_client->response->get_cdata( ).
+
       WHEN 401.
         " todo, raise
     ENDCASE.
@@ -471,7 +470,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     CASE lv_code.
       WHEN 201. " User created
         " application/json,#/components/schemas/User
-        CREATE OBJECT mo_json EXPORTING iv_json = mi_client->response->get_cdata( ).
+
     ENDCASE.
   ENDMETHOD.
 
@@ -537,7 +536,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     CASE lv_code.
       WHEN 200. " The request was successful
         " application/json,#/components/schemas/Workgroup
-        CREATE OBJECT mo_json EXPORTING iv_json = mi_client->response->get_cdata( ).
+
       WHEN 401.
         " todo, raise
       WHEN 403.
@@ -727,7 +726,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
         " todo, raise
       WHEN 422. " Unprocessable Entity.
         " application/json,#/components/schemas/Error
-        CREATE OBJECT mo_json EXPORTING iv_json = mi_client->response->get_cdata( ).
+
         " todo, raise
       WHEN 503.
         " todo, raise
@@ -809,7 +808,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     CASE lv_code.
       WHEN 200. " OK
         " application/json,#/components/schemas/Account
-        CREATE OBJECT mo_json EXPORTING iv_json = mi_client->response->get_cdata( ).
+
       WHEN 403.
         " todo, raise
       WHEN 404.
@@ -1182,10 +1181,10 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     CASE lv_code.
       WHEN 200. " OK
         " application/json,#/components/schemas/response_listconnectors
-        CREATE OBJECT mo_json EXPORTING iv_json = mi_client->response->get_cdata( ).
+
       WHEN 422. " Unprocessable Entity
         " application/json,#/components/schemas/Error
-        CREATE OBJECT mo_json EXPORTING iv_json = mi_client->response->get_cdata( ).
+
         " todo, raise
       WHEN OTHERS.
     ENDCASE.
@@ -1448,7 +1447,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     CASE lv_code.
       WHEN 200. " The request was successful.
         " application/json,#/components/schemas/response_listtokens
-        CREATE OBJECT mo_json EXPORTING iv_json = mi_client->response->get_cdata( ).
+
       WHEN 401.
         " todo, raise
       WHEN 403.
@@ -1524,7 +1523,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     CASE lv_code.
       WHEN 200. " The request was successful
         " application/json,#/components/schemas/response_listusers
-        CREATE OBJECT mo_json EXPORTING iv_json = mi_client->response->get_cdata( ).
+
       WHEN 401.
         " todo, raise
       WHEN 403.
@@ -1672,7 +1671,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     CASE lv_code.
       WHEN 200. " The request was successful
         " application/json,#/components/schemas/response_listworkgroups
-        CREATE OBJECT mo_json EXPORTING iv_json = mi_client->response->get_cdata( ).
+
     ENDCASE.
   ENDMETHOD.
 
@@ -1702,7 +1701,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     CASE lv_code.
       WHEN 200. " The request was successful
         " application/json,#/components/schemas/response_listworkgroupusers
-        CREATE OBJECT mo_json EXPORTING iv_json = mi_client->response->get_cdata( ).
+
       WHEN 401.
         " todo, raise
       WHEN 403.
@@ -1941,7 +1940,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     CASE lv_code.
       WHEN 201. " Request successfully authorized a `Token`
         " application/json,#/components/schemas/Token
-        CREATE OBJECT mo_json EXPORTING iv_json = mi_client->response->get_cdata( ).
+
       WHEN 401.
         " todo, raise
       WHEN 403.
@@ -2102,7 +2101,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     CASE lv_code.
       WHEN 200. " The request was successful
         " application/json,#/components/schemas/User
-        CREATE OBJECT mo_json EXPORTING iv_json = mi_client->response->get_cdata( ).
+
       WHEN 401.
         " todo, raise
       WHEN 403.
