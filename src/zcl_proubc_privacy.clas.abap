@@ -1,15 +1,21 @@
 CLASS zcl_proubc_privacy DEFINITION PUBLIC.
   PUBLIC SECTION.
     INTERFACES zif_proubc_privacy.
-    METHODS constructor IMPORTING ii_client TYPE REF TO if_http_client.
+    METHODS constructor IMPORTING !ii_client   TYPE REF TO if_http_client
+                                  !iv_tenant   TYPE zPRVDTENANTID
+                                  !iv_bpitoken TYPE zPRVDREFRESHTOKEN..
   PROTECTED SECTION.
-    DATA mi_client TYPE REF TO if_http_client..
+    DATA mi_client TYPE REF TO if_http_client.
+    DATA lv_bpitoken TYPE zprvdrefreshtoken.
+    DATA lv_tenantid TYPE zcasesensitive_str.
     METHODS send_receive RETURNING VALUE(rv_code) TYPE i.
 ENDCLASS.
 
 CLASS zcl_proubc_privacy IMPLEMENTATION.
   METHOD constructor.
     mi_client = ii_client.
+    lv_bpitoken = iv_bpitoken.
+    lv_tenantid = iv_tenant.
   ENDMETHOD.
 
   METHOD send_receive.

@@ -12,7 +12,8 @@ CLASS zcl_proubc_vault DEFINITION
     DATA mi_client TYPE REF TO if_http_client.
     DATA lv_vault_url TYPE string VALUE 'https://vault.provide.services'.
     DATA mo_json TYPE REF TO zcl_oapi_json.
-    DATA bpitoken TYPE zprvdrefreshtoken.
+    DATA lv_bpitoken TYPE zprvdrefreshtoken.
+    data lv_tenantid type zcasesensitive_str.
     METHODS send_receive RETURNING VALUE(rv_code) TYPE i.
   PRIVATE SECTION.
     METHODS sap_auth_check.
@@ -27,12 +28,14 @@ CLASS ZCL_PROUBC_VAULT IMPLEMENTATION.
 
   METHOD constructor.
     mi_client = ii_client.
+    lv_bpitoken = iv_bpitoken.
+    lv_tenantid = iv_tenant.
   ENDMETHOD.
 
 
   METHOD get_bpi_token.
     DATA lv_bearertoken TYPE string.
-    CONCATENATE 'Bearer' bpitoken INTO lv_bearertoken SEPARATED BY space.
+    CONCATENATE 'Bearer' lv_bpitoken INTO lv_bearertoken SEPARATED BY space.
     mi_client->request->set_header_field(
       EXPORTING
         name  = 'Authorization'    " Name of the header field
@@ -218,7 +221,7 @@ CLASS ZCL_PROUBC_VAULT IMPLEMENTATION.
     mi_client->request->set_method( 'GET' ).
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
     me->get_bpi_token( ).
-    mi_client->request->set_cdata( body ).
+    "mi_client->request->set_cdata( body ).
     lv_code = send_receive( ).
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.

@@ -8,7 +8,7 @@ CLASS zcl_proubc_vault_helper DEFINITION
     METHODS:
       constructor IMPORTING  !iv_tenant      TYPE zPRVDTENANTID OPTIONAL,
       create_key,
-      list_vaults,
+      list_vaults exporting !et_vault_list type zif_proubc_vault=>tty_vault_query,
       create_vault,
       derive_key,
       list_keys,
@@ -21,10 +21,10 @@ CLASS zcl_proubc_vault_helper DEFINITION
   PROTECTED SECTION.
     DATA: lv_tenant        TYPE zprvdtenantid,
           lo_http_client   TYPE REF TO if_http_client,
-          lo_vault_api     TYPE REF TO zif_proubc_vault,
+          lo_vault_api     TYPE REF TO zcl_proubc_vault,
           lv_vault_api_url TYPE string.
   PRIVATE SECTION.
-    METHODS: get_vault_client RETURNING VALUE(ro_vault_client) TYPE REF TO zif_proubc_vault.
+    METHODS: get_vault_client RETURNING VALUE(ro_vault_client) TYPE REF TO zcl_proubc_vault.
 ENDCLASS.
 
 
@@ -62,11 +62,10 @@ CLASS zcl_proubc_vault_helper IMPLEMENTATION.
   ENDMETHOD.
   method list_vaults.
     lo_vault_api = me->get_vault_client( ).
-*    lo_vault_api->list_vaults(
-*      EXPORTING
-*        authorization =
-*        body          =
-*    ).
+    lo_vault_api->zif_proubc_vault~list_vaults( importing
+        "authorization =
+        et_vault_list = et_vault_list
+    ).
 *    CATCH cx_static_check.
   endmethod.
   METHOD create_key.

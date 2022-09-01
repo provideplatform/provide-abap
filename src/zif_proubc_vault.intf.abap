@@ -49,6 +49,10 @@ INTERFACE zif_proubc_vault
               content_type  TYPE string
               vault_id      TYPE string
               body          TYPE string
+    exporting
+              ev_apiresponsestr type string
+              ev_apiresonse type ref to data
+              ev_httpresponsecode type i
     RAISING   cx_static_check.
 
 * GET - "List keys"
@@ -64,6 +68,10 @@ INTERFACE zif_proubc_vault
               content_type  TYPE string
               vault_id      TYPE string
               body          TYPE string
+    EXPORTING
+              ev_apiresponsestr type string
+              ev_apiresonse type ref to data
+              ev_httpresponsecode type i
     RAISING   cx_static_check.
 
 * POST - "Derive a key: ChaCha20"
@@ -79,6 +87,10 @@ INTERFACE zif_proubc_vault
               content_type  TYPE string
               vault_id      TYPE string
               body          TYPE string
+    exporting
+              ev_apiresponsestr type string
+              ev_apiresonse type ref to data
+              ev_httpresponsecode type i
     RAISING   cx_static_check.
 
 * DELETE - "Delete a key"
@@ -94,6 +106,10 @@ INTERFACE zif_proubc_vault
               content_type  TYPE string
               vault_id      TYPE string
               key_id        TYPE string
+    exporting
+              ev_apiresponsestr type string
+              ev_apiresonse type ref to data
+              ev_httpresponsecode type i
     RAISING   cx_static_check.
 
 * GET - "List secrets"
@@ -107,6 +123,10 @@ INTERFACE zif_proubc_vault
               authorization TYPE string
               content_type  TYPE string
               vault_id      TYPE string
+    exporting
+              ev_apiresponsestr type string
+              ev_apiresonse type ref to data
+              ev_httpresponsecode type i
     RAISING   cx_static_check.
 
 * POST - "Retreive secret"
@@ -124,6 +144,10 @@ INTERFACE zif_proubc_vault
               vault_id      TYPE string
               secret_id     TYPE string
               body          TYPE string
+    exporting
+              ev_apiresponsestr type string
+              ev_apiresonse type ref to data
+              ev_httpresponsecode type i
     RAISING   cx_static_check.
 
 * DELETE - "Delete secret"
@@ -141,6 +165,10 @@ INTERFACE zif_proubc_vault
               vault_id      TYPE string
               secret_id     TYPE string
               body          TYPE string
+    EXPORTING
+              ev_apiresponsestr type string
+              ev_apiresonse type ref to data
+              ev_httpresponsecode type i
     RAISING   cx_static_check.
 
 * POST - "Create Vault"
@@ -155,6 +183,10 @@ INTERFACE zif_proubc_vault
               content_type  TYPE string
               authorization TYPE string
               body          TYPE string
+    EXPORTING
+              ev_apiresponsestr type string
+              ev_apiresonse type ref to data
+              ev_httpresponsecode type i
     RAISING   cx_static_check.
 
 * GET - "List Vaults"
@@ -163,9 +195,10 @@ INTERFACE zif_proubc_vault
 * Response: 200
 * Body schema: string
   METHODS list_vaults
-    IMPORTING
-              authorization TYPE string
-              body          TYPE string
+    exporting et_vault_list type zif_proubc_vault=>tty_vault_query
+              ev_apiresponsestr type string
+              ev_apiresonse type ref to data
+              ev_httpresponsecode type i
     RAISING   cx_static_check.
 
 * POST - "Create Seal/Unseal key"
@@ -177,6 +210,9 @@ INTERFACE zif_proubc_vault
     IMPORTING
               authorization TYPE string
               content_type  TYPE string
+    exporting
+              ev_apiresonse type ref to data
+              ev_httpresponsecode type i
     RAISING   cx_static_check.
 
 * POST - "Unseal vault"
@@ -190,6 +226,10 @@ INTERFACE zif_proubc_vault
               authorization TYPE string
               content_type  TYPE string
               body          TYPE string
+    EXPORTING
+              ev_apiresponsestr type string
+              ev_apiresonse type ref to data
+              ev_httpresponsecode type i
     RAISING   cx_static_check.
 
 ENDINTERFACE.
