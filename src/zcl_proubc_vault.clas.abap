@@ -11,7 +11,6 @@ CLASS zcl_proubc_vault DEFINITION
   PROTECTED SECTION.
     DATA mi_client TYPE REF TO if_http_client.
     DATA lv_vault_url TYPE string VALUE 'https://vault.provide.services'.
-    DATA mo_json TYPE REF TO zcl_oapi_json.
     DATA lv_bpitoken TYPE zprvdrefreshtoken.
     data lv_tenantid type zcasesensitive_str.
     METHODS send_receive RETURNING VALUE(rv_code) TYPE i.
@@ -218,11 +217,20 @@ CLASS ZCL_PROUBC_VAULT IMPLEMENTATION.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE 'https://vault.provide.services/api/v1/vaults'.
+    DATA lv_responsestr.
     mi_client->request->set_method( 'GET' ).
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
     me->get_bpi_token( ).
     "mi_client->request->set_cdata( body ).
     lv_code = send_receive( ).
+    lv_responsestr = mi_client->response->get_cdata( ).
+    ev_apiresponsestr = lv_responsestr.
+*    /ui2/cl_json=>deserialize(
+*      EXPORTING
+*        json             = lv_responsestr
+*      CHANGING
+*        data             = ev_apiresponse
+*    ).
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
