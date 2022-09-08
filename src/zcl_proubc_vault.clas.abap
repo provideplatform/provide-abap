@@ -64,6 +64,14 @@ CLASS ZCL_PROUBC_VAULT IMPLEMENTATION.
     me->get_bpi_token( ).
     mi_client->request->set_header_field( name = 'Content-Type' value = content_type ).
     lv_code = send_receive( ).
+    ev_httpresponsecode = lv_code.
+    ev_apiresponsestr = mi_client->response->get_cdata( ).
+    /ui2/cl_json=>deserialize(
+      EXPORTING
+        json             = ev_apiresponsestr
+      CHANGING
+        data             = ev_apiresponse
+    ).
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
@@ -84,6 +92,14 @@ CLASS ZCL_PROUBC_VAULT IMPLEMENTATION.
     mi_client->request->set_header_field( name = 'Content-Type' value = content_type ).
     mi_client->request->set_cdata( body ).
     lv_code = send_receive( ).
+    ev_httpresponsecode = lv_code.
+    ev_apiresponsestr = mi_client->response->get_cdata( ).
+    /ui2/cl_json=>deserialize(
+      EXPORTING
+        json             = ev_apiresponsestr
+      CHANGING
+        data             = ev_apiresponse
+    ).
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
@@ -102,6 +118,14 @@ CLASS ZCL_PROUBC_VAULT IMPLEMENTATION.
     me->get_bpi_token( ).
     mi_client->request->set_cdata( body ).
     lv_code = send_receive( ).
+    ev_httpresponsecode = lv_code.
+    ev_apiresponsestr = mi_client->response->get_cdata( ).
+    /ui2/cl_json=>deserialize(
+      EXPORTING
+        json             = ev_apiresponsestr
+      CHANGING
+        data             = ev_apiresponse
+    ).
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
@@ -124,6 +148,14 @@ CLASS ZCL_PROUBC_VAULT IMPLEMENTATION.
     me->get_bpi_token( ).
     mi_client->request->set_header_field( name = 'Content-Type' value = content_type ).
     lv_code = send_receive( ).
+    ev_httpresponsecode = lv_code.
+    ev_apiresponsestr = mi_client->response->get_cdata( ).
+    /ui2/cl_json=>deserialize(
+      EXPORTING
+        json             = ev_apiresponsestr
+      CHANGING
+        data             = ev_apiresponse
+    ).
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
@@ -147,6 +179,14 @@ CLASS ZCL_PROUBC_VAULT IMPLEMENTATION.
     mi_client->request->set_header_field( name = 'Content-Type' value = content_type ).
     mi_client->request->set_cdata( body ).
     lv_code = send_receive( ).
+    ev_httpresponsecode = lv_code.
+    ev_apiresponsestr = mi_client->response->get_cdata( ).
+    /ui2/cl_json=>deserialize(
+      EXPORTING
+        json             = ev_apiresponsestr
+      CHANGING
+        data             = ev_apiresponse
+    ).
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
@@ -167,6 +207,14 @@ CLASS ZCL_PROUBC_VAULT IMPLEMENTATION.
     mi_client->request->set_header_field( name = 'Content-Type' value = content_type ).
     mi_client->request->set_cdata( body ).
     lv_code = send_receive( ).
+    ev_httpresponsecode = lv_code.
+    ev_apiresponsestr = mi_client->response->get_cdata( ).
+    /ui2/cl_json=>deserialize(
+      EXPORTING
+        json             = ev_apiresponsestr
+      CHANGING
+        data             = ev_apiresponse
+    ).
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
@@ -187,6 +235,14 @@ CLASS ZCL_PROUBC_VAULT IMPLEMENTATION.
     mi_client->request->set_header_field( name = 'Content-Type' value = content_type ).
     mi_client->request->set_cdata( body ).
     lv_code = send_receive( ).
+    ev_httpresponsecode = lv_code.
+    ev_apiresponsestr = mi_client->response->get_cdata( ).
+    /ui2/cl_json=>deserialize(
+      EXPORTING
+        json             = ev_apiresponsestr
+      CHANGING
+        data             = ev_apiresponse
+    ).
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
@@ -206,6 +262,14 @@ CLASS ZCL_PROUBC_VAULT IMPLEMENTATION.
     me->get_bpi_token( ).
     mi_client->request->set_header_field( name = 'Content-Type' value = content_type ).
     lv_code = send_receive( ).
+    ev_httpresponsecode = lv_code.
+    ev_apiresponsestr = mi_client->response->get_cdata( ).
+    /ui2/cl_json=>deserialize(
+      EXPORTING
+        json             = ev_apiresponsestr
+      CHANGING
+        data             = ev_apiresponse
+    ).
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
@@ -254,6 +318,14 @@ CLASS ZCL_PROUBC_VAULT IMPLEMENTATION.
     mi_client->request->set_header_field( name = 'Content-Type' value = content_type ).
     mi_client->request->set_cdata( body ).
     lv_code = send_receive( ).
+    ev_httpresponsecode = lv_code.
+    ev_apiresponsestr = mi_client->response->get_cdata( ).
+    /ui2/cl_json=>deserialize(
+      EXPORTING
+        json             = ev_apiresponsestr
+      CHANGING
+        data             = ev_apiresponse
+    ).
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
@@ -270,8 +342,15 @@ CLASS ZCL_PROUBC_VAULT IMPLEMENTATION.
     me->get_bpi_token( ).
     mi_client->request->set_header_field( name = 'Content-Type' value = content_type ).
     mi_client->request->set_cdata( body ).
-
     lv_code = send_receive( ).
+    ev_httpresponsecode = lv_code.
+    ev_apiresponsestr = mi_client->response->get_cdata( ).
+    /ui2/cl_json=>deserialize(
+      EXPORTING
+        json             = ev_apiresponsestr
+      CHANGING
+        data             = ev_apiresponse
+    ).
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.

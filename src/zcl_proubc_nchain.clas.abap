@@ -630,5 +630,28 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     ENDCASE.
   ENDMETHOD.
 
+  METHOD zif_proubc_nchain~createpricefeedcontract.
+    DATA lv_code TYPE i.
+    DATA lv_temp TYPE string.
+    DATA lv_uri TYPE string VALUE '/api/v1/contracts/{contract_id}/execute'.
+    mi_client->request->set_method( 'POST' ).
+    mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
+* todo, set body, #/components/schemas/ExecutereadonlycontractRequest
+    me->get_bpi_token( ).
+    lv_code = send_receive( ).
+    ev_httpresponsecode = lv_code.
+    ev_apiresponsestr = mi_client->response->get_cdata( ).
+    /ui2/cl_json=>deserialize(
+      EXPORTING
+        json             = ev_apiresponsestr
+      CHANGING
+        data             = ev_apiresponse
+    ).
+    "WRITE / lv_code. ~replace with logging call
+    CASE lv_code.
+      WHEN 200.
+    ENDCASE.
+  ENDMETHOD.
+
 ENDCLASS.
 

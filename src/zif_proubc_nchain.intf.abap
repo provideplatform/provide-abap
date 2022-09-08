@@ -141,6 +141,11 @@ INTERFACE zif_proubc_nchain
            source       TYPE string,
          END OF ty_compiledartifact.
 
+  TYPES: BEGIN OF ty_pricefeed_compiledartifact,
+           name TYPE zcasesensitive_str,
+           abi  TYPE zcasesensitive_str,
+         END OF ty_pricefeed_compiledartifact.
+
 * Component schema: Params, object
   TYPES: BEGIN OF ty_params,
            account_id        TYPE string,
@@ -397,6 +402,21 @@ INTERFACE zif_proubc_nchain
            account_id TYPE string,
          END OF ty_executereadonlycontractreq.
 
+  TYPES: BEGIN OF ty_pricefeed_req_params,
+           argv              TYPE STANDARD TABLE OF string WITH DEFAULT KEY,
+           wallet_id         TYPE zcasesensitive_str,
+           compiled_artifact TYPE ty_pricefeed_compiledartifact,
+         END OF ty_pricefeed_req_params.
+
+  TYPES: BEGIN OF ty_chainlinkpricefeed_req,
+           address    TYPE zcasesensitive_str,
+           name       TYPE zcasesensitive_str,
+           network_id TYPE zcasesensitive_str,
+           params     TYPE ty_pricefeed_req_params,
+           type       TYPE zcasesensitive_str,
+         END OF ty_chainlinkpricefeed_req.
+
+
 * GET - "List connectors"
 * Operation id: Listconnectors
 * Parameter: public, required, query
@@ -408,7 +428,7 @@ INTERFACE zif_proubc_nchain
               content_type        TYPE string
     EXPORTING
               ev_apiresponsestr   TYPE string
-              ev_apiresponse       TYPE REF TO data
+              ev_apiresponse      TYPE REF TO data
               ev_httpresponsecode TYPE i
     RAISING   cx_static_check.
 
@@ -421,7 +441,7 @@ INTERFACE zif_proubc_nchain
               body                TYPE ty_createconnectorrequest
     EXPORTING
               ev_apiresponsestr   TYPE string
-              ev_apiresponse       TYPE REF TO data
+              ev_apiresponse      TYPE REF TO data
               ev_httpresponsecode TYPE i
     RAISING   cx_static_check.
 
@@ -434,7 +454,7 @@ INTERFACE zif_proubc_nchain
               connector_id        TYPE string
     EXPORTING
               ev_apiresponsestr   TYPE string
-              ev_apiresponse       TYPE REF TO data
+              ev_apiresponse      TYPE REF TO data
               ev_httpresponsecode TYPE i
     RAISING   cx_static_check.
 
@@ -447,7 +467,7 @@ INTERFACE zif_proubc_nchain
               connector_id        TYPE string
     EXPORTING
               ev_apiresponsestr   TYPE string
-              ev_apiresponse       TYPE REF TO data
+              ev_apiresponse      TYPE REF TO data
               ev_httpresponsecode TYPE i
     RAISING   cx_static_check.
 
@@ -460,7 +480,7 @@ INTERFACE zif_proubc_nchain
               connector_id        TYPE string
     EXPORTING
               ev_apiresponsestr   TYPE string
-              ev_apiresponse       TYPE REF TO data
+              ev_apiresponse      TYPE REF TO data
               ev_httpresponsecode TYPE i
     RAISING   cx_static_check.
 
@@ -473,7 +493,7 @@ INTERFACE zif_proubc_nchain
               connector_id        TYPE string
     EXPORTING
               ev_apiresponsestr   TYPE string
-              ev_apiresponse       TYPE REF TO data
+              ev_apiresponse      TYPE REF TO data
               ev_httpresponsecode TYPE i
     RAISING   cx_static_check.
 
@@ -486,7 +506,7 @@ INTERFACE zif_proubc_nchain
               network_id          TYPE string
     EXPORTING
               ev_apiresponsestr   TYPE string
-              ev_apiresponse       TYPE REF TO data
+              ev_apiresponse      TYPE REF TO data
               ev_httpresponsecode TYPE i
     RAISING   cx_static_check.
 
@@ -499,7 +519,7 @@ INTERFACE zif_proubc_nchain
               connector_id        TYPE string
     EXPORTING
               ev_apiresponsestr   TYPE string
-              ev_apiresponse       TYPE REF TO data
+              ev_apiresponse      TYPE REF TO data
               ev_httpresponsecode TYPE i
     RAISING   cx_static_check.
 
@@ -512,7 +532,7 @@ INTERFACE zif_proubc_nchain
               network_id          TYPE string
     EXPORTING
               ev_apiresponsestr   TYPE string
-              ev_apiresponse       TYPE REF TO data
+              ev_apiresponse      TYPE REF TO data
               ev_httpresponsecode TYPE i
     RAISING   cx_static_check.
 
@@ -525,7 +545,7 @@ INTERFACE zif_proubc_nchain
               body                TYPE ty_createnetworkrequest
     EXPORTING
               ev_apiresponsestr   TYPE string
-              ev_apiresponse       TYPE REF TO data
+              ev_apiresponse      TYPE REF TO data
               ev_httpresponsecode TYPE i
     RAISING   cx_static_check.
 
@@ -538,7 +558,7 @@ INTERFACE zif_proubc_nchain
               body                TYPE ty_createaccountsrequest
     EXPORTING
               ev_apiresponsestr   TYPE string
-              ev_apiresponse       TYPE REF TO data
+              ev_apiresponse      TYPE REF TO data
               ev_httpresponsecode TYPE i
     RAISING   cx_static_check.
 
@@ -551,7 +571,7 @@ INTERFACE zif_proubc_nchain
               content_type        TYPE string
     EXPORTING
               ev_apiresponsestr   TYPE string
-              ev_apiresponse       TYPE REF TO data
+              ev_apiresponse      TYPE REF TO data
               ev_httpresponsecode TYPE i
     RAISING   cx_static_check.
 
@@ -566,7 +586,7 @@ INTERFACE zif_proubc_nchain
               account_id          TYPE string
     EXPORTING
               ev_apiresponsestr   TYPE string
-              ev_apiresponse       TYPE REF TO data
+              ev_apiresponse      TYPE REF TO data
               ev_httpresponsecode TYPE i
     RAISING   cx_static_check.
 
@@ -579,7 +599,7 @@ INTERFACE zif_proubc_nchain
               content_type        TYPE string
     EXPORTING
               ev_apiresponsestr   TYPE string
-              ev_apiresponse       TYPE REF TO data
+              ev_apiresponse      TYPE REF TO data
               ev_httpresponsecode TYPE i
     RAISING   cx_static_check.
 
@@ -592,7 +612,7 @@ INTERFACE zif_proubc_nchain
               is_walletrequest    TYPE ty_createhdwalletrequest
     EXPORTING
               ev_apiresponsestr   TYPE string
-              ev_apiresponse       TYPE REF TO data
+              ev_apiresponse      TYPE REF TO data
               ev_httpresponsecode TYPE i
     RAISING   cx_static_check.
 
@@ -609,7 +629,7 @@ INTERFACE zif_proubc_nchain
               wallet_id           TYPE string
     EXPORTING
               ev_apiresponsestr   TYPE string
-              ev_apiresponse       TYPE REF TO data
+              ev_apiresponse      TYPE REF TO data
               ev_httpresponsecode TYPE i
     RAISING   cx_static_check.
 
@@ -622,7 +642,7 @@ INTERFACE zif_proubc_nchain
               content_type        TYPE string
     EXPORTING
               ev_apiresponsestr   TYPE string
-              ev_apiresponse       TYPE REF TO data
+              ev_apiresponse      TYPE REF TO data
               ev_httpresponsecode TYPE i
     RAISING   cx_static_check.
 
@@ -633,7 +653,7 @@ INTERFACE zif_proubc_nchain
   METHODS create_broadcast_txn_ac
     EXPORTING
               ev_apiresponsestr   TYPE string
-              ev_apiresponse       TYPE REF TO data
+              ev_apiresponse      TYPE REF TO data
               ev_httpresponsecode TYPE i
     RAISING   cx_static_check.
 
@@ -648,7 +668,7 @@ INTERFACE zif_proubc_nchain
               transaction_id      TYPE string
     EXPORTING
               ev_apiresponsestr   TYPE string
-              ev_apiresponse       TYPE REF TO data
+              ev_apiresponse      TYPE REF TO data
               ev_httpresponsecode TYPE i
     RAISING   cx_static_check.
 
@@ -661,7 +681,7 @@ INTERFACE zif_proubc_nchain
               content_type        TYPE string
     EXPORTING
               ev_apiresponsestr   TYPE string
-              ev_apiresponse       TYPE REF TO data
+              ev_apiresponse      TYPE REF TO data
               ev_httpresponsecode TYPE i
     RAISING   cx_static_check.
 
@@ -674,7 +694,7 @@ INTERFACE zif_proubc_nchain
               body                TYPE ty_deploycontractrequest
     EXPORTING
               ev_apiresponsestr   TYPE string
-              ev_apiresponse       TYPE REF TO data
+              ev_apiresponse      TYPE REF TO data
               ev_httpresponsecode TYPE i
     RAISING   cx_static_check.
 
@@ -689,7 +709,7 @@ INTERFACE zif_proubc_nchain
               contract_id         TYPE string
     EXPORTING
               ev_apiresponsestr   TYPE string
-              ev_apiresponse       TYPE REF TO data
+              ev_apiresponse      TYPE REF TO data
               ev_httpresponsecode TYPE i
     RAISING   cx_static_check.
 
@@ -704,7 +724,7 @@ INTERFACE zif_proubc_nchain
               body                TYPE ty_executecontractrequest
     EXPORTING
               ev_apiresponsestr   TYPE string
-              ev_apiresponse       TYPE REF TO data
+              ev_apiresponse      TYPE REF TO data
               ev_httpresponsecode TYPE i
     RAISING   cx_static_check.
 
@@ -717,8 +737,17 @@ INTERFACE zif_proubc_nchain
               body                TYPE ty_executereadonlycontractreq
     EXPORTING
               ev_apiresponsestr   TYPE string
-              ev_apiresponse       TYPE REF TO data
+              ev_apiresponse      TYPE REF TO data
               ev_httpresponsecode TYPE i
+    RAISING   cx_static_check.
+
+  METHODS createpricefeedcontract
+    IMPORTING
+              is_pricefeedcontract TYPE ty_chainlinkpricefeed_req
+    EXPORTING
+              ev_apiresponsestr    TYPE string
+              ev_apiresponse       TYPE REF TO data
+              ev_httpresponsecode  TYPE i
     RAISING   cx_static_check.
 
 
