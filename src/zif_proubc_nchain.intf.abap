@@ -392,7 +392,7 @@ INTERFACE zif_proubc_nchain
            method     TYPE string,
            params     TYPE STANDARD TABLE OF string WITH DEFAULT KEY, " todo, handle array
            value      TYPE i,
-           account_id TYPE string,
+           wallet_id TYPE string,
          END OF ty_executecontractrequest.
 
 * Component schema: ExecutereadonlycontractRequest, object
@@ -720,8 +720,8 @@ INTERFACE zif_proubc_nchain
 * Body ref: #/components/schemas/ExecutecontractRequest
   METHODS executecontract
     IMPORTING
-              contract_id         TYPE string
-              body                TYPE ty_executecontractrequest
+              iv_contract_id         TYPE zcasesensitive_str
+              is_execcontractreq     TYPE ty_executecontractrequest
     EXPORTING
               ev_apiresponsestr   TYPE string
               ev_apiresponse      TYPE REF TO data

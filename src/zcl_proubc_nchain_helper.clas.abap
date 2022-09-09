@@ -7,7 +7,10 @@ CLASS zcl_proubc_nchain_helper DEFINITION
   PUBLIC SECTION.
     METHODS:
       constructor IMPORTING !iv_tenant      TYPE zPRVDTENANTID OPTIONAL,
-      call_chainlink_pricefeed.
+      call_chainlink_pricefeed IMPORTING !iv_inputcurrency  TYPE string
+                                         !iv_inputamount    TYPE  string
+                                         !iv_outputcurrency TYPE string
+                               EXPORTING !ev_outputamount   TYPE string.
   PROTECTED SECTION.
     DATA: lv_tenant         TYPE zprvdtenantid,
           lo_http_client    TYPE REF TO if_http_client,
@@ -70,7 +73,12 @@ CLASS zcl_proubc_nchain_helper IMPLEMENTATION.
           ls_selectedcontract           TYPE zif_proubc_nchain=>ty_chainlinkpricefeed_req,
           lv_createdcontract_str        TYPE string,
           lv_createdcontract_data       TYPE REF TO data,
-          lv_createdcontract_responsecd TYPE i.
+          lv_createdcontract_responsecd TYPE i,
+          ls_executecontract            TYPE zif_proubc_nchain=>ty_executecontractrequest,
+          lv_executecontract_str        TYPE string,
+          lv_executecontract_data       TYPE REF TO data,
+          lv_executecontract_responsecd TYPE i.
+
     ls_pricefeedwallet-purpose = 44.
     me->lo_nchain_api->zif_proubc_nchain~createhdwallet( EXPORTING is_walletrequest = ls_pricefeedwallet
                                                          IMPORTING ev_apiresponsestr   = lv_getwallet_str
@@ -103,7 +111,16 @@ CLASS zcl_proubc_nchain_helper IMPLEMENTATION.
       WHEN OTHERS.
     ENDCASE.
 *
-    "me->lo_nchain_api->zif_proubc_nchain~executecontract( ).
+    me->lo_nchain_api->zif_proubc_nchain~executecontract(
+      EXPORTING
+        iv_contract_id      = '0xD4a33860578De61DBAbDc8BFdb98FD742fA7028e'
+        is_execcontractreq  = ls_executecontract
+      IMPORTING
+        ev_apiresponsestr   = lv_executecontract_str
+        ev_apiresponse      =  lv_executecontract_data
+        ev_httpresponsecode =  lv_executecontract_responsecd
+    ).
+*    CATCH cx_static_check.
   ENDMETHOD.
 
   METHOD smartcontract_factory.

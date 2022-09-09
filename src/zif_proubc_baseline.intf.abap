@@ -417,6 +417,7 @@ INTERFACE zif_proubc_baseline
       "recipients type ref to data,
       "status type string,
       type             TYPE string, "e.g. ORDERS05
+      subject_account_id type zprvdtenantid,
     END OF protocolmessage_req .
   TYPES:
     BEGIN OF bpiobjects_req,

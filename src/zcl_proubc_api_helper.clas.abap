@@ -21,7 +21,8 @@ CLASS zcl_proubc_api_helper DEFINITION
         !iv_tenant TYPE zPRVDTENANTID.
     METHODS constructor
       IMPORTING
-        !iv_tenant TYPE zPRVDTENANTID OPTIONAL .
+        !iv_tenant TYPE zPRVDTENANTID OPTIONAL
+        !iv_subject_acct_id type zprvdtenantid OPTIONAL.
     METHODS call_ident_api
       IMPORTING
         !iv_tenant      TYPE zPRVDTENANTID
@@ -60,7 +61,7 @@ CLASS zcl_proubc_api_helper DEFINITION
         !apiresponse    TYPE REF TO data .
     METHODS get_default_tenant
       RETURNING
-        VALUE(ev_defaulttenant) TYPE Zprvdtenants-tenant_ID .
+        VALUE(ev_defaulttenant) TYPE ZprvdtenantID .
     METHODS get_default_tenant_bpiendpoint
       RETURNING
         VALUE(ev_bpiendpoint) TYPE Zprvdtenants-bpi_endpoint .
@@ -69,14 +70,15 @@ CLASS zcl_proubc_api_helper DEFINITION
         VALUE(es_dummy_idoc_msg) TYPE zif_proubc_baseline=>protocolmessage_req .
     METHODS list_bpi_accounts .
   PROTECTED SECTION.
-    DATA: lv_defaulttenant        TYPE zprvdtenants-tenant_id,
+    DATA: lv_defaulttenant        TYPE zprvdtenants-organization_id,
+          lv_defaultsubjectacct   type zprvdtenantid,
           lv_defaultidenttoken    TYPE REF TO data,
           lv_defaultbaselinetoken TYPE REF TO data,
           lv_bpitoken             TYPE zprvdrefreshtoken,
           lv_default_bpiendpoint  TYPE string,
           lo_ident_client         TYPE REF TO zif_proubc_ident,
           lo_baseline_client      TYPE REF TO zif_proubc_baseline.
-    METHODS: set_default_tenant IMPORTING iv_defaulttenant TYPE zprvdtenants-tenant_id OPTIONAL.
+    METHODS: set_default_tenant IMPORTING iv_defaulttenant TYPE zprvdtenants-organization_id OPTIONAL.
   PRIVATE SECTION.
 ENDCLASS.
 
@@ -236,7 +238,7 @@ CLASS zcl_proubc_api_helper IMPLEMENTATION.
       lv_refreshtokenstr TYPE zprvdrefreshtoken,
       lv_identurl        TYPE string,
       lv_apiresponse     TYPE REF TO data,
-      lv_tenant          TYPE zprvdtenants-tenant_id.
+      lv_tenant          TYPE zprvdtenantid.
 
     IF iv_tenant IS NOT INITIAL.
       lv_tenant = iv_tenant.
@@ -244,7 +246,8 @@ CLASS zcl_proubc_api_helper IMPLEMENTATION.
       lv_tenant = lv_defaulttenant.
     ENDIF.
 
-    SELECT SINGLE * FROM zprvdtenants INTO ls_prvdtenant WHERE tenant_id = lv_tenant.
+    "todo add subject account id
+    SELECT SINGLE * FROM zprvdtenants INTO ls_prvdtenant WHERE organization_id = lv_tenant.
 
     CHECK sy-subrc = 0. "todo send error message, org not found
 
@@ -297,22 +300,26 @@ CLASS zcl_proubc_api_helper IMPLEMENTATION.
 
     "try using the tenant id provided by user
     IF iv_tenant IS NOT INITIAL.
-      SELECT tenant_id,
+      SELECT organization_id,
+             subject_account_id,
              bpi_endpoint
           FROM zprvdtenants
           INTO TABLE @DATA(lt_defaulttenant)
-          WHERE tenant_id = @iv_tenant.
+          WHERE organization_id = @iv_tenant
+            and subject_account_id = @iv_subject_acct_id.
       IF sy-subrc = 0.
         READ TABLE lt_defaulttenant INDEX 1 INTO DATA(wa_defaulttenant).
         IF sy-subrc = 0.
-          lv_defaulttenant = wa_defaulttenant-tenant_id.
+          lv_defaulttenant = wa_defaulttenant-organization_id.
+          lv_defaultsubjectacct = wa_defaulttenant-subject_account_id.
           lv_default_bpiendpoint = wa_defaulttenant-bpi_endpoint.
           RETURN.
         ENDIF.
       ENDIF.
     ENDIF.
 
-    SELECT tenant_id,
+    SELECT organization_id,
+           subject_account_id,
            bpi_endpoint
         FROM zprvdtenants
         INTO TABLE @lt_defaulttenant
@@ -321,7 +328,8 @@ CLASS zcl_proubc_api_helper IMPLEMENTATION.
     IF sy-subrc = 0.
       READ TABLE lt_defaulttenant INDEX 1 INTO wa_defaulttenant.
       IF sy-subrc = 0.
-        lv_defaulttenant = wa_defaulttenant-tenant_id.
+        lv_defaulttenant = wa_defaulttenant-organization_id.
+        lv_defaultsubjectacct = wa_defaulttenant-subject_account_id.
         lv_default_bpiendpoint = wa_defaulttenant-bpi_endpoint.
       ENDIF.
     ENDIF.
@@ -385,8 +393,12 @@ CLASS zcl_proubc_api_helper IMPLEMENTATION.
 
 
   METHOD send_protocol_msg.
+    data: ls_finalized_protocol_msg type zif_proubc_baseline=>protocolmessage_req.
+
+          ls_finalized_protocol_msg = body.
+          ls_finalized_protocol_msg-subject_account_id = lv_defaultsubjectacct.
     TRY.
-        lo_baseline_client->send_protocol_msg( EXPORTING IV_body = body
+        lo_baseline_client->send_protocol_msg( EXPORTING IV_body = ls_finalized_protocol_msg
                                                          IV_bpitoken = lv_bpitoken
                                                IMPORTING statuscode = statuscode
                                                          apiresponsestr = apiresponsestr

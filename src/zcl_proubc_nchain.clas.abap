@@ -390,9 +390,23 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/api/v1/wallets'.
+    DATA lv_requestdata TYPE REF TO data.
+    DATA lv_requeststr TYPE string.
+
     mi_client->request->set_method( 'POST' ).
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
-* todo, set body, #/components/schemas/CreateHDwalletRequest
+
+    zcl_proubc_api_helper=>copy_data_to_ref( EXPORTING is_data = is_walletrequest
+                  CHANGING cr_data = lv_REQUESTDATA  ).
+
+    lv_requeststr = /ui2/cl_json=>serialize( EXPORTING data = lv_REQUESTDATA
+                                       pretty_name = /ui2/cl_json=>pretty_mode-low_case ).
+
+    mi_client->request->set_cdata(
+      EXPORTING
+        data   =  lv_requeststr
+    ).
+
     me->get_bpi_token( ).
     lv_code = send_receive( ).
     ev_httpresponsecode = lv_code.
@@ -585,7 +599,7 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/api/v1/contracts/{contract_id}/execute'.
-    lv_temp = contract_id.
+    lv_temp = IV_contract_id.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{contract_id}' IN lv_uri WITH lv_temp.
     mi_client->request->set_method( 'POST' ).
@@ -634,9 +648,23 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/api/v1/contracts/{contract_id}/execute'.
+    DATA LV_REQUESTSTR TYPE STRING.
+    DATA LV_REQUESTDATA TYPE REF TO DATA.
+
     mi_client->request->set_method( 'POST' ).
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
-* todo, set body, #/components/schemas/ExecutereadonlycontractRequest
+
+    zcl_proubc_api_helper=>copy_data_to_ref( EXPORTING is_data = is_PRICEFEEDCONTRACT
+                  CHANGING cr_data = lv_REQUESTDATA  ).
+
+    lv_requeststr = /ui2/cl_json=>serialize( EXPORTING data = lv_REQUESTDATA
+                                       pretty_name = /ui2/cl_json=>pretty_mode-low_case ).
+
+    mi_client->request->set_cdata(
+      EXPORTING
+        data   =  lv_requeststr
+    ).
+
     me->get_bpi_token( ).
     lv_code = send_receive( ).
     ev_httpresponsecode = lv_code.

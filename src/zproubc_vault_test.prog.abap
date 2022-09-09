@@ -185,10 +185,19 @@ MODULE pai INPUT.
 *   no flush here:
 *   the automatic flush at the end of PBO does the job
     WHEN 'VAULT'.
-      CASE ABAP_TRUE.
-        when 'LISTVAULTS'.
+      CASE abap_true.
+        WHEN 'LISTVAULTS'.
           lo_vault_helper->list_vaults( ).
         WHEN 'CREATEVAULT'.
+        WHEN 'UNSEALVAULT'.
+        WHEN 'DELETEVAULT'.
+        WHEN 'RETRIEVESECRET'.
+        WHEN 'DELETESECRET'.
+        WHEN 'LISTKEYS'.
+        WHEN 'CREATEKEYS'.
+        WHEN 'UNSEALKEY'.
+        WHEN 'DERIVEKEY'.
+        WHEN 'DELETEKEY'.
 
       ENDCASE.
     WHEN 'NCHAIN'.
