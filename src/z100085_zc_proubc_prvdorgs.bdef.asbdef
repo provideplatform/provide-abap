@@ -1,0 +1,8 @@
+projection;
+
+define behavior for Z100085_ZC_PROUBC_PRVDORGS alias proUBCOrgs
+{
+  use create;
+  use update;
+  use delete;
+}

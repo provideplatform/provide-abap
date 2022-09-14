@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_IWMO" serializer_version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <_-IWBEP_-I_MGW_OHD>
+    <_-IWBEP_-I_MGW_OHD>
+     <TECHNICAL_NAME>Z100085_ZUI_PROUBC_PRVDORG</TECHNICAL_NAME>
+     <VERSION>0001</VERSION>
+     <CLASS_NAME>CL_SADL_GW_RAP_EXPOSURE_MPC</CLASS_NAME>
+     <CREATED_BY>STUDENT085</CREATED_BY>
+     <CREATED_TIMESTMP>20220421131848</CREATED_TIMESTMP>
+    </_-IWBEP_-I_MGW_OHD>
+   </_-IWBEP_-I_MGW_OHD>
+   <_-IWBEP_-I_MGW_OHT>
+    <_-IWBEP_-I_MGW_OHT>
+     <TECHNICAL_NAME>Z100085_ZUI_PROUBC_PRVDORG</TECHNICAL_NAME>
+     <VERSION>0001</VERSION>
+     <LANGUAGE>E</LANGUAGE>
+     <DESCRIPTION>Service Binding for PRVD ORGS data</DESCRIPTION>
+    </_-IWBEP_-I_MGW_OHT>
+   </_-IWBEP_-I_MGW_OHT>
+  </asx:values>
+ </asx:abap>
+</abapGit>
