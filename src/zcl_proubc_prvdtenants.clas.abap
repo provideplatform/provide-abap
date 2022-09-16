@@ -25,13 +25,13 @@ CLASS zcl_proubc_prvdtenants DEFINITION
         !ET_prvdtenant TYPE ZTTprvdtenant .
     CLASS-METHODS delete_prvdtenant
       EXPORTING
-        !EV_prvdtenantID TYPE ZSprvdtenant-tenant_id .
+        !EV_prvdtenantID TYPE Zprvdtenantid.
     METHODS get_refreshtoken
       EXPORTING
-        !EV_prvdtenantID TYPE ZSprvdtenant-tenant_id .
+        !EV_prvdtenantID TYPE Zprvdtenantid .
     METHODS get_authtoken
       EXPORTING
-        !EV_prvdtenantID TYPE ZSprvdtenant-tenant_id .
+        !EV_prvdtenantID TYPE Zprvdtenantid .
   PROTECTED SECTION.
   PRIVATE SECTION.
 ENDCLASS.
@@ -52,19 +52,21 @@ CLASS ZCL_PROUBC_PRVDTENANTS IMPLEMENTATION.
 
     "duplicate check
 
+    "TODO improve data validation process, add subject account id
     "throw out error message if the tenant already exists
-    SELECT * FROM zprvdtenants INTO TABLE lt_existingprvdtenant
-        FOR ALL ENTRIES IN it_prvdtenant WHERE tenant_id = it_prvdtenant-tenant_id.
-    IF sy-dbcnt > 0.
-      MESSAGE e004(zclproubcmsg) WITH 'orgid'.
-    ENDIF.
+*    SELECT * FROM zprvdtenants INTO TABLE lt_existingprvdtenant
+*        FOR ALL ENTRIES IN it_prvdtenant WHERE tenant_id = it_prvdtenant-tenant_id.
+*    IF sy-dbcnt > 0.
+*      MESSAGE e004(zclproubcmsg) WITH 'orgid'.
+*    ENDIF.
 
     GET TIME STAMP FIELD lv_timestamp.
 
     LOOP AT it_prvdtenant ASSIGNING FIELD-SYMBOL(<fs_prvdtenant>).
       CLEAR: ls_prvdtenant.
       ls_prvdtenant-mandt = sy-mandt.
-      ls_prvdtenant-tenant_id = <fs_prvdtenant>-tenant_id.
+      ls_prvdtenant-organization_id = <fs_prvdtenant>-organization_id.
+      ls_prvdtenant-subject_account_id = <fs_prvdtenant>-subject_account_id.
       ls_prvdtenant-bpi_endpoint = <fs_prvdtenant>-bpi_endpoint.
       ls_prvdtenant-ident_endpoint = <fs_prvdtenant>-ident_endpoint.
       DATA(lv_tokenlength) = strlen( <fs_prvdtenant>-refresh_token ).
@@ -97,7 +99,7 @@ CLASS ZCL_PROUBC_PRVDTENANTS IMPLEMENTATION.
     "TODO add SAP auth
 
     IF ev_prvdtenantid IS NOT INITIAL.
-      DELETE FROM zprvdtenants WHERE tenant_id = ev_prvdtenantid.
+      DELETE FROM zprvdtenants WHERE organization_id = ev_prvdtenantid.
       IF sy-subrc = 0.
         "todo Add some logging for this
       ELSE. "delete failed. why?
@@ -130,7 +132,8 @@ CLASS ZCL_PROUBC_PRVDTENANTS IMPLEMENTATION.
     LOOP AT lt_prvdtenant ASSIGNING FIELD-SYMBOL(<fs_prvdtenant>).
       CLEAR ls_prvdtenant.
       ls_prvdtenant-mandt = <fs_prvdtenant>-mandt.
-      ls_prvdtenant-tenant_id = <fs_prvdtenant>-tenant_id.
+      ls_prvdtenant-organization_id = <fs_prvdtenant>-organization_id.
+      ls_prvdtenant-subject_account_id = <fs_prvdtenant>-subject_account_id.
       ls_prvdtenant-ident_endpoint = <fs_prvdtenant>-ident_endpoint.
       ls_prvdtenant-bpi_endpoint = <fs_prvdtenant>-bpi_endpoint.
       ls_prvdtenant-created_by = <fs_prvdtenant>-createdby.
@@ -154,7 +157,7 @@ CLASS ZCL_PROUBC_PRVDTENANTS IMPLEMENTATION.
           lo_api_helper TYPE REF TO zcl_proubc_api_helper.
 
     lo_api_helper = NEW zcl_proubc_api_helper( ).
-    SELECT SINGLE * FROM zprvdtenants INTO ls_prvdtenant WHERE tenant_id = iv_prvdtenant.
+    SELECT SINGLE * FROM zprvdtenants INTO ls_prvdtenant WHERE organization_id = iv_prvdtenant.
     IF sy-subrc = 0.
       ev_prvdtenant-bpi_endpoint = ls_prvdtenant-bpi_endpoint.
       ev_prvdtenant-changed_at = ls_prvdtenant-changed_at.
@@ -163,10 +166,11 @@ CLASS ZCL_PROUBC_PRVDTENANTS IMPLEMENTATION.
       ev_prvdtenant-created_by = ls_prvdtenant-createdby.
       ev_prvdtenant-ident_endpoint = ls_prvdtenant-ident_endpoint.
       ev_prvdtenant-mandt = ls_prvdtenant-mandt.
-      ev_prvdtenant-tenant_id = ls_prvdtenant-tenant_id.
+      ev_prvdtenant-organization_id = ls_prvdtenant-organization_id.
+      ev_prvdtenant-subject_account_id = ls_prvdtenant-subject_account_id.
       lo_api_helper->baseline_health_check(
         EXPORTING
-          iv_tenant      =  ls_prvdtenant-tenant_id
+          iv_tenant      =  ls_prvdtenant-subject_account_id "todo do we need an additional param?
         IMPORTING
           ev_isreachable = ev_prvdtenant-reachable
       ).
@@ -231,27 +235,23 @@ CLASS ZCL_PROUBC_PRVDTENANTS IMPLEMENTATION.
     GET TIME STAMP FIELD lv_timestamp.
 
     SELECT * FROM zprvdtenants INTO TABLE lt_targettenants
-        FOR ALL ENTRIES IN it_prvdtenant WHERE tenant_id = it_prvdtenant-tenant_id.
+        FOR ALL ENTRIES IN it_prvdtenant WHERE organization_id = it_prvdtenant-organization_id.
 
     LOOP AT it_prvdtenant ASSIGNING FIELD-SYMBOL(<fs_prvdtenant>).
       CLEAR: ls_prvdtenant.
       ls_prvdtenant-mandt = sy-mandt.
-      ls_prvdtenant-tenant_id = <fs_prvdtenant>-tenant_id.
+      ls_prvdtenant-organization_id = <fs_prvdtenant>-organization_id.
+      ls_prvdtenant-subject_account_id = <fs_prvdtenant>-subject_account_id.
       ls_prvdtenant-bpi_endpoint = <fs_prvdtenant>-bpi_endpoint.
       ls_prvdtenant-ident_endpoint = <fs_prvdtenant>-ident_endpoint.
-      "ls_prvdtenant-refresh_token = <fs_prvdtenant>-refresh_token.
-      "ls_prvdtenant-refresh_tokenext = <fs_prvdtenant>-refresh_tokenext.
       DATA(lv_tokenlength) = strlen( <fs_prvdtenant>-refresh_token ).
       IF lv_tokenlength LE 1024 .
         ls_prvdtenant-refresh_token = <fs_prvdtenant>-refresh_token(lv_tokenlength).
       ELSE.
-*        DATA(lv_remaininglength) = 2048 - lv_tokenlength.
         ls_prvdtenant-refresh_token = <fs_prvdtenant>-refresh_token(1024).
         ls_prvdtenant-refresh_tokenext = <fs_prvdtenant>-refresh_token+1024(1024).
-        "ls_prvdtenant-refresh_token = substring( val = <fs_prvdtenant>-refresh_token off = 0 len = 1024 ).
-        "ls_prvdtenant-refresh_token = substring( val = <fs_prvdtenant>-refresh_token off = 1024 len = 1024 ).
       ENDIF.
-      READ TABLE lt_targettenants ASSIGNING FIELD-SYMBOL(<fs_olddata>) WITH KEY tenant_id = <fs_prvdtenant>-tenant_id.
+      READ TABLE lt_targettenants ASSIGNING FIELD-SYMBOL(<fs_olddata>) WITH KEY organization_id = <fs_prvdtenant>-organization_id.
       IF sy-subrc = 0.
         ls_prvdtenant-createdby = <fs_olddata>-createdby.
         ls_prvdtenant-created_at = <fs_olddata>-created_at.

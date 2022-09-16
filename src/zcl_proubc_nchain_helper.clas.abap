@@ -24,8 +24,9 @@ CLASS zcl_proubc_nchain_helper DEFINITION
                                              !iv_nchain_networkid     TYPE zcasesensitive_str
                                              !iv_contracttype         TYPE zcasesensitive_str OPTIONAL
                                    EXPORTING !es_selectedContract     TYPE zif_proubc_nchain=>ty_chainlinkpricefeed_req, "
-      get_smartcontract_abi IMPORTING !iv_abi_index TYPE zcasesensitive_str
-                            EXPORTING !ev_abi_str   TYPE zcasesensitive_str .
+      get_smartcontract_abi IMPORTING !iv_nchain_networkid      TYPE zproubc_smartcontract_addr
+                                      !iv_smartcontract_address TYPE zproubc_smartcontract_addr
+                            EXPORTING !ev_abi_str               TYPE zcasesensitive_str .
   PRIVATE SECTION.
 ENDCLASS.
 
@@ -130,13 +131,31 @@ CLASS zcl_proubc_nchain_helper IMPLEMENTATION.
     ls_contract-network_id = iv_nchain_networkid.
     ls_contract-params-wallet_id = iv_walletaddress.
     ls_contract-params-compiled_artifact-name = 'EACAggregatorProxy'.
-    me->get_smartcontract_abi( EXPORTING iv_abi_index = iv_abi_index
+    me->get_smartcontract_abi( EXPORTING iv_nchain_networkid = '1b16996e-3595-4985-816c-043345d22f8c'
+                                         iv_smartcontract_address = '0xD4a33860578De61DBAbDc8BFdb98FD742fA7028e'
                                IMPORTING ev_abi_str   = ls_contract-params-compiled_artifact-abi ).
     ls_contract-type = iv_contracttype.
 
   ENDMETHOD.
 
   METHOD get_smartcontract_abi.
+    DATA: ls_abi_registry TYPE zprvdabiregistry,
+          lv_abifile_path TYPE zprvdabiregistry-abi_location,
+          lt_abifile_contents type table of string.
+    SELECT SINGLE * FROM zprvdabiregistry
+       INTO @ls_abi_registry
+       WHERE nchain_networkid = @iv_nchain_networkid
+       AND smartcontract_address = @iv_smartcontract_address.
+    IF sy-subrc = 0.
+      CALL FUNCTION 'GUI_UPLOAD'
+        EXPORTING
+          filename            = lv_abifile_path
+          filetype            = 'TXT'
+          has_field_separator = 'X'
+        TABLES
+          data_tab            = lt_abifile_contents.
+    ELSE.
+    ENDIF.
   ENDMETHOD.
 
 ENDCLASS.
