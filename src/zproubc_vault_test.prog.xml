@@ -82,11 +82,43 @@
        <NAME>PRVDTENANTID</NAME>
        <TEXT>___________________________________________________________</TEXT>
        <LINE>001</LINE>
-       <COLUMN>016</COLUMN>
+       <COLUMN>022</COLUMN>
        <LENGTH>059</LENGTH>
        <VISLENGTH>059</VISLENGTH>
        <HEIGHT>001</HEIGHT>
        <FORMAT>CHAR</FORMAT>
+       <PARAM_ID>ZPRVDTENANTID</PARAM_ID>
+       <INPUT_FLD>X</INPUT_FLD>
+       <OUTPUT_FLD>X</OUTPUT_FLD>
+      </RPY_DYFATC>
+      <RPY_DYFATC>
+       <CONT_TYPE>SCREEN</CONT_TYPE>
+       <CONT_NAME>SCREEN</CONT_NAME>
+       <TYPE>TEXT</TYPE>
+       <NAME>LBL_SUBJACCT</NAME>
+       <TEXT>Subject_Account_ID</TEXT>
+       <LINE>002</LINE>
+       <COLUMN>001</COLUMN>
+       <LENGTH>018</LENGTH>
+       <VISLENGTH>018</VISLENGTH>
+       <HEIGHT>001</HEIGHT>
+       <FORMAT>CHAR</FORMAT>
+       <REQU_ENTRY>N</REQU_ENTRY>
+      </RPY_DYFATC>
+      <RPY_DYFATC>
+       <CONT_TYPE>SCREEN</CONT_TYPE>
+       <CONT_NAME>SCREEN</CONT_NAME>
+       <TYPE>TEMPLATE</TYPE>
+       <NAME>P_SUBJECT_ACCOUNTID</NAME>
+       <TEXT>___________________________________________________________</TEXT>
+       <LINE>002</LINE>
+       <COLUMN>022</COLUMN>
+       <LENGTH>059</LENGTH>
+       <VISLENGTH>059</VISLENGTH>
+       <HEIGHT>001</HEIGHT>
+       <FORMAT>CHAR</FORMAT>
+       <PARAM_ID>ZPRVDSUBJACCTID</PARAM_ID>
+       <GET_PARAM>X</GET_PARAM>
        <INPUT_FLD>X</INPUT_FLD>
        <OUTPUT_FLD>X</OUTPUT_FLD>
       </RPY_DYFATC>

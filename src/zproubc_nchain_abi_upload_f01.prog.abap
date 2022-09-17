@@ -76,6 +76,113 @@ CLASS lcl_proubc_nchain_abi_upload IMPLEMENTATION.
   ENDMETHOD.
   METHOD zif_proubc_nchain_abi_upload~update_validfrom.
   ENDMETHOD.
+  method zif_proubc_nchain_abi_upload~validate_registry.
+  ENDMETHOD.
 ENDCLASS.
+
+form exit_program.
+
+* Destroy Control.
+  IF NOT l_validto_calendar IS INITIAL.
+    CALL METHOD l_validto_calendar->free
+      EXCEPTIONS
+          OTHERS = 1.
+    IF sy-subrc NE 0.
+      CALL FUNCTION 'POPUP_TO_INFORM'
+           EXPORTING
+                titel = g_repid
+                txt2  = space
+                txt1  = 'error destroying cal 1'.
+    ENDIF.
+*   free ABAP object also
+    FREE l_validto_calendar.
+  ENDIF.
+
+
+* destroy container
+  IF NOT  l_validto_container IS INITIAL.
+    CALL METHOD l_validto_container->free
+      EXCEPTIONS
+        OTHERS = 1.
+    IF sy-subrc <> 0.
+*         MESSAGE E002 WITH F_RETURN.
+    ENDIF.
+*   free ABAP object also
+    FREE l_validto_container.
+  ENDIF.
+
+* Destroy Control.
+  IF NOT l_validfrom_calendar IS INITIAL.
+    CALL METHOD l_validfrom_calendar->free
+      EXCEPTIONS
+          OTHERS = 1.
+    IF sy-subrc NE 0.
+      CALL FUNCTION 'POPUP_TO_INFORM'
+           EXPORTING
+                titel = g_repid
+                txt2  = space
+                txt1  = 'error destroyin cal 2'.
+    ENDIF.
+*   free ABAP object also
+    FREE l_validfrom_calendar.
+  ENDIF.
+
+
+* destroy container
+  IF NOT  l_validfrom_container IS INITIAL.
+    CALL METHOD  l_validfrom_container->free
+      EXCEPTIONS
+        OTHERS = 1.
+    IF sy-subrc <> 0.
+*         MESSAGE E002 WITH F_RETURN.
+    ENDIF.
+*   free ABAP object also
+    FREE  l_validfrom_container.
+  ENDIF.
+
+* Destroy Control.
+  IF NOT l_abitext_area IS INITIAL.
+    CALL METHOD l_abitext_area->free
+      EXCEPTIONS
+          OTHERS = 1.
+    IF sy-subrc NE 0.
+      CALL FUNCTION 'POPUP_TO_INFORM'
+           EXPORTING
+                titel = g_repid
+                txt2  = space
+                txt1  = 'err destroying text area'.
+    ENDIF.
+*   free ABAP object also
+    FREE l_abitext_area.
+  ENDIF.
+
+
+* destroy container
+  IF NOT l_abitext_container IS INITIAL.
+    CALL METHOD l_abitext_container->free
+      EXCEPTIONS
+        OTHERS = 1.
+    IF sy-subrc <> 0.
+*         MESSAGE E002 WITH F_RETURN.
+    ENDIF.
+*   free ABAP object also
+    FREE l_abitext_container.
+  ENDIF.
+
+* finally flush
+  CALL METHOD cl_gui_cfw=>flush
+      EXCEPTIONS
+          OTHERS = 1.
+  IF sy-subrc NE 0.
+    CALL FUNCTION 'POPUP_TO_INFORM'
+         EXPORTING
+              titel = g_repid
+              txt2  = space
+              txt1  = 'exit error'.
+  ENDIF.
+
+  clear: b_init.
+  LEAVE PROGRAM.
+ENDFORM.
 
 DATA: lo_proubc_nchain_abi_upload TYPE REF TO lcl_proubc_nchain_abi_upload.

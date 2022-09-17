@@ -2,7 +2,17 @@
 *& Include zproubc_nchain_abi_upload_top
 *&---------------------------------------------------------------------*
 
-DATA: ok_code LIKE sy-ucomm.
+DATA: ok_code LIKE sy-ucomm,
+      g_repid LIKE sy-repid,
+      b_init type c,
+      l_validto_calendar TYPE REF TO cl_gui_calendar,
+      l_validfrom_calendar TYPE REF TO cl_gui_calendar,
+      l_abitext_area type ref to  cl_gui_textedit,
+      l_validto_container TYPE REF TO cl_gui_custom_container,
+      l_validfrom_container TYPE REF TO cl_gui_custom_container,
+      l_abitext_container type ref to cl_gui_custom_container.
+
+CONSTANTS: c_basiccalendar_style             TYPE i VALUE 1.
 
 CLASS lcl_proubc_nchain_abi_upload DEFINITION.
   PUBLIC SECTION.

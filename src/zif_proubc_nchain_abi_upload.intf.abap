@@ -1,7 +1,9 @@
-INTERFACE zif_proubc_nchain_abi_upload
-  PUBLIC .
+interface ZIF_PROUBC_NCHAIN_ABI_UPLOAD
+  public .
 
-  TYPES: BEGIN OF ty_abi_registry,
+
+  types:
+    BEGIN OF ty_abi_registry,
            nchain_networkid      TYPE zproubc_smartcontract_addr,
            smartcontract_address TYPE zproubc_smartcontract_addr,
            valid_from            TYPE timestampl,
@@ -12,17 +14,25 @@ INTERFACE zif_proubc_nchain_abi_upload
            changed_by            TYPE uname,
            changed_on            TYPE timestampl,
            production_mainnet    TYPE char1,
-         END OF ty_abi_registry.
+         END OF ty_abi_registry .
+  types:
+    tty_abi_registry TYPE STANDARD TABLE OF ty_abi_registry .
 
-  TYPES: tty_abi_registry TYPE STANDARD TABLE OF ty_abi_registry.
-
-  METHODS:  upload_abi_file,
-    verify_abi_file,
-    register_abi_file EXPORTING ev_success type abap_bool,
-    unregister_abi_file EXPORTING ev_success type abap_bool,
-    delete_file EXPORTING ev_success type abap_bool,
-    delete_registry EXPORTING ev_success type abap_bool,
-    update_validto,
-    update_validfrom.
-
-ENDINTERFACE.
+  methods UPLOAD_ABI_FILE .
+  methods VERIFY_ABI_FILE .
+  methods REGISTER_ABI_FILE
+    exporting
+      !EV_SUCCESS type ABAP_BOOL .
+  methods UNREGISTER_ABI_FILE
+    exporting
+      !EV_SUCCESS type ABAP_BOOL .
+  methods DELETE_FILE
+    exporting
+      !EV_SUCCESS type ABAP_BOOL .
+  methods DELETE_REGISTRY
+    exporting
+      !EV_SUCCESS type ABAP_BOOL .
+  methods UPDATE_VALIDTO .
+  methods UPDATE_VALIDFROM .
+  methods VALIDATE_REGISTRY .
+endinterface.
