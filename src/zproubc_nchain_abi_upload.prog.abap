@@ -15,67 +15,70 @@ START-OF-SELECTION.
 MODULE pbo OUTPUT.
   SET PF-STATUS 'MAIN100'.
   SET TITLEBAR '001'.
-  if b_init is INITIAL.
+  IF b_init IS INITIAL.
 
     "Valid from date picker
     CREATE OBJECT l_validfrom_container
-       EXPORTING
-         container_name = 'P_VALIDFROM_DATE'.
+      EXPORTING
+        container_name = 'P_VALIDFROM_DATE'.
 
     CREATE OBJECT l_validfrom_calendar
-       EXPORTING
-         parent     = l_validfrom_container
-         view_style = c_basiccalendar_style.
+      EXPORTING
+        parent     = l_validfrom_container
+        view_style = c_basiccalendar_style.
     "Valid from time entry
     "TODO
 
     "Valid to date picker
     CREATE OBJECT l_validto_container
-       EXPORTING
-         container_name = 'P_VALIDTO_DATE'.
+      EXPORTING
+        container_name = 'P_VALIDTO_DATE'.
 
     CREATE OBJECT l_validto_calendar
-       EXPORTING
-         parent     = l_validto_container
-         view_style = c_basiccalendar_style.
+      EXPORTING
+        parent     = l_validto_container
+        view_style = c_basiccalendar_style.
     "Valid to time entry
     "TODO
 
     "ABI text preview area
-     CREATE OBJECT l_abitext_container
-       EXPORTING
-         container_name = 'P_ABI_PREVIEW'.
+    CREATE OBJECT l_abitext_container
+      EXPORTING
+        container_name = 'P_ABI_PREVIEW'.
 
     CREATE OBJECT l_abitext_area
-       EXPORTING
-        parent     = l_abitext_container
+      EXPORTING
+        parent                     = l_abitext_container
         wordwrap_mode              = cl_gui_textedit=>wordwrap_at_fixed_position
         wordwrap_to_linebreak_mode = cl_gui_textedit=>true.
 
     b_init = 'X'.
-  endif.
+  ENDIF.
 
 ENDMODULE.
 
 MODULE pai INPUT.
   ok_code = sy-ucomm.
   CASE ok_code.
-    when 'BACK'.
+    WHEN 'BACK'.
       IF NOT b_init IS INITIAL.
-        perform exit_program.
+        PERFORM exit_program.
       ENDIF.
-    when 'EXIT'.
+    WHEN 'EXIT'.
       IF NOT b_init IS INITIAL.
-        perform exit_program.
+        PERFORM exit_program.
       ENDIF.
     WHEN 'SAVE'.
       lo_proubc_nchain_abi_upload->save_data( ).
     WHEN 'LOAD'.
       "lo_proubc_nchain_abi_upload->loa
+    WHEN 'UPLOAD'.
+
     WHEN 'DELETE'.
+
       lo_proubc_nchain_abi_upload->delete_abi( ).
     WHEN 'REFRESH'.
-    when 'CLEAR'.
+    WHEN 'CLEAR'.
   ENDCASE.
   CLEAR ok_code.
 ENDMODULE.
