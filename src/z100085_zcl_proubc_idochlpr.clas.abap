@@ -164,11 +164,21 @@ CLASS z100085_zcl_proubc_idochlpr IMPLEMENTATION.
     <segmentdata> = <fs_segment_raw>.
 
 
-*    ASSIGN COMPONENT 'SEGMENT_TYPE' OF STRUCTURE <fs_segment_raw> to <segment_type>.
+    ASSIGN COMPONENT 'SEGMENT_TYPE' OF STRUCTURE <segmentdata> TO <segment_type>.
+    <segment_type> = iv_rawsegment-segnam.
+    ASSIGN COMPONENT 'DOCNUM' OF STRUCTURE <segmentdata> TO <docnum>.
+    <docnum> = iv_rawsegment-docnum.
+    ASSIGN COMPONENT 'SEGNUM' OF STRUCTURE <segmentdata> TO <segnum>.
+    <segnum> = iv_rawsegment-segnUm.
+
+
+
+
+    ev_json_segmentdata = dataref.
+
+*    ASSIGN iv_rawsegment-segnam to <segment_type> casting type edilsegtyp.
 *    <segment_type> = iv_rawsegment-segnam.
 
-    ASSIGN iv_rawsegment-segnam to <segment_type> casting type edilsegtyp.
-    <segment_type> = iv_rawsegment-segnam.
 
 *    ASSIGN dataref->* to <docnum>.
 *    ASSIGN iv_rawsegment-docnum TO <docnum> CASTING TYPE (iv_rawsegment-docnum).
@@ -244,17 +254,23 @@ CLASS z100085_zcl_proubc_idochlpr IMPLEMENTATION.
       "lv_idoc_data = lt_edidd.
 
       DATA: lv_idocjson TYPE string.
-      lv_idocjson = /ui2/cl_json=>serialize(
-         EXPORTING
-           data             = lt_edidd
-       ).
+*      lv_idocjson = /ui2/cl_json=>serialize(
+*         EXPORTING
+*           data             = lt_edidd
+*       ).
 
+
+      DATA: lv_flattened_idoc TYPE REF TO data.
       me->idoc_to_json(
         EXPORTING
           iv_idoc_basictype = 'ORDERS05'
           it_idoc_segments  =  lt_edidd
-*         IMPORTING
-*           ev_flattened_idoc =
+         IMPORTING
+           ev_flattened_idoc = lv_flattened_idoc
+      ).
+      lv_idocjson = /ui2/cl_json=>serialize(
+        EXPORTING
+            data = lv_flattened_idoc
       ).
 
       "request to /api/v1/protocol_messages
@@ -609,6 +625,23 @@ CLASS z100085_zcl_proubc_idochlpr IMPLEMENTATION.
       APPEND ls_idoc_struct_parent_child TO lt_idoc_struct_parent_child.
     ENDLOOP.
 
+    "needed for generating structure of the idoc json
+    DATA: comp_tab   TYPE cl_abap_structdescr=>component_table,
+          comp_tab_b TYPE cl_abap_structdescr=>component_table,
+          comp_wa    LIKE LINE OF comp_tab.
+    "lt_idoc_json_segment type any table.
+    DATA lr_ref TYPE REF TO data.
+    FIELD-SYMBOLS: <fs_flattened_idoc> TYPE any,
+                   <fs_ls_idoc_json>   TYPE any,
+                   <fs_lt_idoc_json>   TYPE STANDARD TABLE.
+
+    "CREATE DATA lr_ref LIKE STANDARD TABLE OF <fs_ls_idoc_json>.
+    "ASSIGN lr_ref->* TO <fs_lt_idoc_json>.
+
+    DATA: struct_type   TYPE REF TO cl_abap_structdescr,
+          struct_type_b TYPE REF TO cl_abap_structdescr.
+
+
     LOOP AT lt_idoc_struct ASSIGNING <fs_idoc_struct> WHERE syntax_attrib-parseg IS INITIAL. "top level segments only
       "handle multiple children
 
@@ -637,13 +670,107 @@ CLASS z100085_zcl_proubc_idochlpr IMPLEMENTATION.
             ev_json_segmentid = lv_json_segmentid
         ).
 
+        ASSIGN ls_json_segmentdata->* TO <fs_ls_idoc_json>.
+
+        DATA: dataref   TYPE REF TO data,
+              dataref_b TYPE REF TO data.
+        FIELD-SYMBOLS: <segmentdata>   TYPE any,
+                       <segmentdata_b> TYPE any,
+                       <mappedsegment> TYPE any,
+                       <targetsegment> TYPE any.
+        "IF lr_ref IS INITIAL.
+
+        IF dataref IS INITIAL AND dataref_b IS INITIAL.
+          comp_wa-name = lv_json_segmentid.
+          comp_wa-type ?= cl_abap_datadescr=>describe_by_data( ls_json_segmentdata ).
+          APPEND comp_wa TO comp_tab.
+          comp_tab_b = comp_tab.
+
+          struct_type = cl_abap_structdescr=>create( comp_tab ).
+          "struct_type_b = struct_type.
+          CREATE DATA dataref TYPE HANDLE struct_type.
+          ASSIGN dataref->* TO <segmentdata>.
+          ASSIGN COMPONENT lv_json_segmentid OF STRUCTURE <segmentdata> TO <targetsegment>.
+          <targetsegment> = ls_json_segmentdata.
+          UNASSIGN <targetsegment>.
+        ELSEIF dataref IS NOT INITIAL AND dataref_b IS INITIAL.
+          comp_wa-name = lv_json_segmentid.
+          comp_wa-type ?= cl_abap_datadescr=>describe_by_data( ls_json_segmentdata ).
+          APPEND comp_wa TO comp_tab_b.
+
+          struct_type_b = cl_abap_structdescr=>create( comp_tab_b ).
+          CREATE DATA dataref_b TYPE HANDLE struct_type_b.
+          ASSIGN dataref_b->* TO <segmentdata_b>.
+          "<segmentdata_b> = <segmentdata>. dumps
+          "UNASSIGN <segmentdata>.
+          "FREE: dataref, struct_type.
+*          DATA(components) = "dumpy
+*            CAST cl_abap_structdescr(
+*            cl_abap_typedescr=>describe_by_data( dataref )
+*          )->components.
+*          LOOP AT components ASSIGNING FIELD-SYMBOL(<fs_component>).
+*          ENDLOOP.
+          LOOP AT comp_tab ASSIGNING FIELD-SYMBOL(<fs_component>).
+            ASSIGN COMPONENT <fs_component>-name OF STRUCTURE <segmentdata_b> TO <targetsegment>.
+            IF <targetsegment> IS ASSIGNED.
+              ASSIGN COMPONENT <fs_component>-name OF STRUCTURE <segmentdata> TO <mappedsegment>.
+              IF <mappedsegment> IS ASSIGNED.
+                <targetsegment> = <mappedsegment>.
+              ENDIF.
+            ENDIF.
+          ENDLOOP.
+          comp_tab = comp_tab_b.
+
+          ASSIGN COMPONENT lv_json_segmentid OF STRUCTURE <segmentdata_b> TO <targetsegment>.
+          IF <targetsegment> IS ASSIGNED.
+            <targetsegment> = ls_json_segmentdata.
+            UNASSIGN <targetsegment>.
+          ENDIF.
+
+          UNASSIGN <segmentdata>.
+          FREE dataref.
+          CREATE DATA dataref TYPE HANDLE struct_type_b.
+          ASSIGN dataref->* TO <segmentdata>.
+          <segmentdata> = <segmentdata_b>.
+          UNASSIGN <segmentdata_b>.
+          FREE dataref_b.
+          ASSIGN dataref->* TO <segmentdata>.
+
+*        ELSEIF dataref IS NOT INITIAL AND dataref_b IS NOT INITIAL.
+*          struct_type_b = cl_abap_structdescr=>create( comp_tab_b ).
+*          comp_wa-name = lv_json_segmentid.
+*          comp_wa-type ?= cl_abap_datadescr=>describe_by_data( ls_json_segmentdata ).
+*          APPEND comp_wa TO comp_tab.
+*          struct_type = cl_abap_structdescr=>create( comp_tab ).
+*          CREATE DATA dataref TYPE HANDLE struct_type.
+*          ASSIGN dataref->* TO <segmentdata>.
+**          <segmentdata_b> = <segmentdata>.
+**          UNASSIGN <segmentdata>.
+**          free: dataref, struct_type.
+        ELSEIF dataref IS NOT INITIAL AND dataref_b IS NOT INITIAL.
+          "should be last segment ~maybe not needed?
+        ELSE.
+        ENDIF.
+*
+*          lr_ref = dataref.
+*        ELSE.
+*        ENDIF.
+*
+*        "since each type ref to data differs - internal table may have trouble working?
+*        APPEND <fs_ls_idoc_json> TO <fs_lt_idoc_json>.
+
+        "append ls_json_segmentdata to lt_idoc_json_segment.
+
+
+        "lv_flattened_idoc
+
         "cool off brain a sec
 *        DATA: ls_json_child_segment   TYPE REF TO data,
 *              lv_json_child_segmentid TYPE string.
-*        LOOP AT lt_idoc_struct_parent_child
-*            ASSIGNING FIELD-SYMBOL(<fs_idoc_struct_parent_child>) WHERE parent = <fs_idoc_struct>-segment_type.
-*
-*          LOOP AT it_idoc_segments INTO wa_rawsegment WHERE segnam = <fs_idoc_struct_parent_child>-child.
+        LOOP AT lt_idoc_struct_parent_child
+                    ASSIGNING FIELD-SYMBOL(<fs_idoc_struct_parent_child>) WHERE parent = <fs_idoc_struct>-segment_type.
+
+          LOOP AT it_idoc_segments INTO wa_rawsegment WHERE segnam = <fs_idoc_struct_parent_child>-child.
 *            me->generate_child_idoc_segdata(
 *              EXPORTING
 *                iv_childsegmenttype = <fs_idoc_struct_parent_child>-child
@@ -656,9 +783,9 @@ CLASS z100085_zcl_proubc_idochlpr IMPLEMENTATION.
 *               ev_child_json_segmentid  = lv_json_child_segmentid
 *               ev_child_json_segment    = ls_json_child_segment
 *            ).
-*          ENDLOOP.
-*
-*        ENDLOOP.
+          ENDLOOP.
+
+        ENDLOOP.
 
         "ssign COMPONENT lv_json_segmentid
 
@@ -668,6 +795,13 @@ CLASS z100085_zcl_proubc_idochlpr IMPLEMENTATION.
       "ENDIF.
 
     ENDLOOP.
+
+    FIELD-SYMBOLS: <fs_final_flattened_idoc> TYPE any.
+
+    CREATE DATA lv_flattened_idoc TYPE HANDLE struct_type_b.
+    ASSIGN lv_flattened_idoc->* TO <fs_final_flattened_idoc>.
+
+    <fs_final_flattened_idoc> = <segmentdata>.
 
     ev_flattened_idoc = lv_flattened_idoc.
 
