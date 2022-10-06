@@ -3,9 +3,9 @@
 For outbound connectivity to PRVD stack services you will need the relevant client and root certificates maintained in transaction code STRUST. The default proUBC delivery has no dependency to any middleware components - so API calls take place directly from SAP to the PRVD stack. However this does require certificate maintenance to ensure secure connectivity between SAP and PRVD stack. The instructions below refer to the PRVD stack APIs that are operated as subdomains from [provide.services](https://provide.services). 
 
 ## Client certificate
-The provide.services client certificate is provided here (provideapis.cer) for your convenience.
+The provide.services client certificate is provided here (provideservices.cer) for your convenience.
 
-You can check the authenticity of this cert by downloading the client cert used by visiting any subdomain at provide.services. Make sure the root CA on the cert matches (sometimes antivirus programs may overwrite the root ca with their own for client certs)
+You can check the authenticity of this cert by downloading the client cert used by visiting any API subdomain (e.g. ident.provide.services) at provide.services. Make sure the root CA on the cert matches (sometimes antivirus programs may overwrite the root ca with their own for client certs)
 
 ## Root certificate
 The Starfield (SFSRootCAG2.cer) and Amazon Root CA (AmazonRootCA1.cer) root certs are provided here for your convenience.
@@ -20,7 +20,7 @@ In STRUST, upload the certificates using this process
     3. Click "Add to certificate list"
     4. Click save
 
-![cert steps](/cert%20steps.PNG)
+![cert steps](/certsteps.PNG)
 
 Complete this process for all 3 certs named here. Reccomended to follow this process in each folder on the left-hand side in STRUST.
 
