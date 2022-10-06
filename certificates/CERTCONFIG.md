@@ -20,7 +20,7 @@ In STRUST, upload the certificates using this process
     3. Click "Add to certificate list"
     4. Click save
 
-![cert steps](/cert%20steps.PNG)
+![cert steps](/cert steps.PNG)
 
 Complete this process for all 3 certs named here. Reccomended to follow this process in each folder on the left-hand side in STRUST.
 
