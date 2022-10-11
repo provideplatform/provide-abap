@@ -44,6 +44,8 @@ In Postman - select the 'Environments' tab. Select the 'Import' button and selec
 Refer to the proUBC gitbook docs for complete info on using the REST endpoints along with the PRVD CLI.
 
 Additional documentation on the API endpoints is provided within the requests in the Postman collection. Select the three dots next to the request in a collection to view documentation
+
+
 ![image](viewdocumentation.PNG)
 
 ## Version
