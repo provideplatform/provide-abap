@@ -71,14 +71,17 @@ MODULE pai INPUT.
     WHEN 'SAVE'.
       lo_proubc_nchain_abi_upload->save_data( ).
     WHEN 'LOAD'.
-      "lo_proubc_nchain_abi_upload->loa
+      lo_proubc_nchain_abi_upload->load_abi( ).
+    WHEN 'SSELECT'.
+      lo_proubc_nchain_abi_upload->zif_proubc_nchain_abi_upload~set_al11_abi_file_path( ).
     WHEN 'UPLOAD'.
-
+      lo_proubc_nchain_abi_upload->zif_proubc_nchain_abi_upload~upload_abi_file( ).
     WHEN 'DELETE'.
 
       lo_proubc_nchain_abi_upload->delete_abi( ).
     WHEN 'REFRESH'.
     WHEN 'CLEAR'.
+
   ENDCASE.
   CLEAR ok_code.
 ENDMODULE.

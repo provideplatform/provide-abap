@@ -28,6 +28,7 @@ CLASS ZCL_PROUBC_API_SICF IMPLEMENTATION.
     DATA(lo_router) = NEW cl_rest_router( ).
     lo_router->attach( iv_template = '/tenants'   iv_handler_class = 'ZCL_PROUBC_TENANTSAPI' ).
     lo_router->attach( iv_template = '/tenants/{ID}' iv_handler_class = 'ZCL_PROUBC_TENANTSAPI' ).
+    lo_router->attach( iv_template = '/tenants/{ID}/{SUBJACCTID}' iv_handler_class = 'ZCL_PROUBC_TENANTSAPI' ).
     lo_router->attach( iv_template = '/status' iv_handler_class = 'ZCL_PROUBC_HEALTHAPI' ).
 
     "middleware tells SAP to create a new object (ex: sales order)

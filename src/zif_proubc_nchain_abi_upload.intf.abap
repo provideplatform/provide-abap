@@ -35,4 +35,5 @@ interface ZIF_PROUBC_NCHAIN_ABI_UPLOAD
   methods UPDATE_VALIDTO .
   methods UPDATE_VALIDFROM .
   methods VALIDATE_REGISTRY .
+  methods SET_AL11_ABI_FILE_PATH .
 endinterface.

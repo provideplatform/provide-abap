@@ -20,16 +20,23 @@ ENDCLASS.
 
 
 
-CLASS ZCL_PROUBC_TENANTSAPI IMPLEMENTATION.
+CLASS zcl_proubc_tenantsapi IMPLEMENTATION.
 
 
   METHOD if_rest_resource~delete.
-    DATA: lv_tenantid TYPE zsprvdtenant-tenant_id.
+    DATA: lv_tenantid TYPE zsprvdtenant-organization_id,
+          lv_subj_acct_id TYPE zsprvdtenant-subject_account_id.
     DATA(lt_uriattributes) = mo_request->get_uri_attributes( ).
     READ TABLE lt_uriattributes WITH KEY name = 'ID' ASSIGNING FIELD-SYMBOL(<fs_tenantid>).
-    IF sy-subrc = 0.
+    READ TABLE lt_uriattributes WITH KEY name = 'SUBJACCTID' ASSIGNING FIELD-SYMBOL(<fs_subj_acct_id>).
+    IF <fs_tenantid> IS ASSIGNED AND <fs_subj_acct_id> IS ASSIGNED.
       lv_tenantid = <fs_tenantid>-value.
-      zcl_proubc_prvdtenants=>delete_prvdtenant( IMPORTING ev_prvdtenantid = lv_tenantid ).
+      lv_subj_acct_id = <fs_subj_acct_id>-value.
+      zcl_proubc_prvdtenants=>delete_prvdtenant( IMPORTING ev_prvdtenantid = lv_tenantid
+                                                           ev_subj_acct_id = lv_subj_acct_id ).
+    ELSEIF <fs_tenantid> IS ASSIGNED.
+      lv_subj_acct_id = <fs_tenantid>-value.
+      zcl_proubc_prvdtenants=>delete_prvdtenant( IMPORTING ev_subj_acct_id = lv_subj_acct_id ).
     ENDIF.
     "TODO add a delete response if totally necessary....
     mo_response->set_status( cl_rest_status_code=>gc_success_no_content ).
@@ -41,7 +48,8 @@ CLASS ZCL_PROUBC_TENANTSAPI IMPLEMENTATION.
           lv_data        TYPE string,
           lv_mime        TYPE string,
           lv_url         TYPE string,
-          lv_tenantid    TYPE zsprvdtenant-tenant_id,
+          lv_tenantid    TYPE zsprvdtenant-organization_id,
+          lv_subj_acct_id TYPE zsprvdtenant-subject_account_id,
           lt_prvdtenants TYPE zif_proubc_tenants=>tty_tenant_wo_token,
           ls_prvdtenant  TYPE zif_proubc_tenants=>ty_tenant_wo_token,
           "lo_entity          type ref to if_rest_response,
@@ -51,16 +59,30 @@ CLASS ZCL_PROUBC_TENANTSAPI IMPLEMENTATION.
 
     DATA(lt_uriattributes) = mo_request->get_uri_attributes( ).
     READ TABLE lt_uriattributes WITH KEY name = 'ID' ASSIGNING FIELD-SYMBOL(<fs_tenantid>).
-    IF sy-subrc = 0.
+    READ TABLE lt_uriattributes WITH KEY name = 'SUBJACCTID' ASSIGNING FIELD-SYMBOL(<fs_subj_acct_id>).
+    IF <fs_tenantid> IS ASSIGNED AND <fs_subj_acct_id> IS ASSIGNED.
       lv_tenantid = <fs_tenantid>-value.
+      lv_subj_acct_id = <fs_subj_acct_id>-value.
       zcl_proubc_prvdtenants=>get_prvdtenant(
         EXPORTING
           iv_prvdtenant = lv_tenantid
+          iv_subjacctid = lv_subj_acct_id
         IMPORTING
           ev_prvdtenant = ls_prvdtenant
       ).
-
-      DATA(lo_entity) = mo_response->create_entity( ).
+            DATA(lo_entity) = mo_response->create_entity( ).
+      lo_entity->set_content_type( if_rest_media_type=>gc_appl_json ).
+      lo_entity->set_string_data( /ui2/cl_json=>serialize( EXPORTING data = ls_prvdtenant pretty_name = /ui2/cl_json=>pretty_mode-low_case ) ).
+      mo_response->set_status( cl_rest_status_code=>gc_success_ok ).
+    ELSEIF <fs_tenantid> IS ASSIGNED.
+      lv_tenantid = <fs_tenantid>-value.
+      zcl_proubc_prvdtenants=>get_prvdtenant(
+        EXPORTING
+          iv_subjacctid = lv_tenantid
+        IMPORTING
+          ev_prvdtenant = ls_prvdtenant
+      ).
+      lo_entity = mo_response->create_entity( ).
       lo_entity->set_content_type( if_rest_media_type=>gc_appl_json ).
       lo_entity->set_string_data( /ui2/cl_json=>serialize( EXPORTING data = ls_prvdtenant pretty_name = /ui2/cl_json=>pretty_mode-low_case ) ).
       mo_response->set_status( cl_rest_status_code=>gc_success_ok ).

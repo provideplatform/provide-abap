@@ -7,7 +7,8 @@ CLASS zcl_proubc_prvdtenants DEFINITION
 
     CLASS-METHODS get_prvdtenant
       IMPORTING
-        !iv_prvdtenant TYPE zPRVDTENANTID
+        !iv_prvdtenant TYPE zPRVDTENANTID OPTIONAL
+        !iv_subjacctid TYPE zprvdtenantid
       EXPORTING
         !ev_prvdtenant TYPE zif_proubc_tenants=>ty_tenant_wo_token .
     CLASS-METHODS get_allprvdtenant
@@ -25,7 +26,8 @@ CLASS zcl_proubc_prvdtenants DEFINITION
         !ET_prvdtenant TYPE ZTTprvdtenant .
     CLASS-METHODS delete_prvdtenant
       EXPORTING
-        !EV_prvdtenantID TYPE Zprvdtenantid.
+        !EV_prvdtenantID TYPE Zprvdtenantid
+        !EV_subj_acct_id TYPE zprvdtenantid.
     METHODS get_refreshtoken
       EXPORTING
         !EV_prvdtenantID TYPE Zprvdtenantid .
@@ -38,7 +40,7 @@ ENDCLASS.
 
 
 
-CLASS ZCL_PROUBC_PRVDTENANTS IMPLEMENTATION.
+CLASS zcl_proubc_prvdtenants IMPLEMENTATION.
 
 
   METHOD create_prvdtenant.
@@ -99,7 +101,8 @@ CLASS ZCL_PROUBC_PRVDTENANTS IMPLEMENTATION.
     "TODO add SAP auth
 
     IF ev_prvdtenantid IS NOT INITIAL.
-      DELETE FROM zprvdtenants WHERE organization_id = ev_prvdtenantid.
+      DELETE FROM zprvdtenants WHERE organization_id = ev_prvdtenantid
+                                 AND subject_account_id = EV_subj_acct_id.
       IF sy-subrc = 0.
         "todo Add some logging for this
       ELSE. "delete failed. why?
@@ -157,7 +160,12 @@ CLASS ZCL_PROUBC_PRVDTENANTS IMPLEMENTATION.
           lo_api_helper TYPE REF TO zcl_proubc_api_helper.
 
     lo_api_helper = NEW zcl_proubc_api_helper( ).
-    SELECT SINGLE * FROM zprvdtenants INTO ls_prvdtenant WHERE organization_id = iv_prvdtenant.
+    IF iv_prvdtenant IS NOT INITIAL.
+        SELECT SINGLE * FROM zprvdtenants INTO ls_prvdtenant WHERE organization_id = iv_prvdtenant
+                                                           AND subject_account_id = iv_subjacctid.
+    ELSE.
+        SELECT SINGLE * FROM zprvdtenants INTO ls_prvdtenant WHERE subject_account_id = iv_subjacctid.
+    ENDIF.
     IF sy-subrc = 0.
       ev_prvdtenant-bpi_endpoint = ls_prvdtenant-bpi_endpoint.
       ev_prvdtenant-changed_at = ls_prvdtenant-changed_at.

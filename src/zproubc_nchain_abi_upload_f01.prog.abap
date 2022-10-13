@@ -24,6 +24,34 @@ CLASS lcl_proubc_nchain_abi_upload IMPLEMENTATION.
   METHOD new_abi.
   ENDMETHOD.
   METHOD load_abi.
+    DATA: lv_rc TYPE i.
+    CALL METHOD cl_gui_frontend_services=>file_open_dialog
+    EXPORTING
+      window_title            = 'Load ABI File from Desktop'
+*    default_extension       =
+*    default_filename        =
+*    file_filter             =
+*    with_encoding           =
+*    initial_directory       =
+*    multiselection          =
+    CHANGING
+      file_table              = it_filetable
+      rc                      = lv_rc
+*    user_action             =
+*    file_encoding           =
+*  EXCEPTIONS
+*    file_open_dialog_failed = 1
+*    cntl_error              = 2
+*    error_no_gui            = 3
+*    not_supported_by_gui    = 4
+*    others                  = 5
+          .
+  IF sy-subrc <> 0.
+* Implement suitable error handling here
+  ELSE.
+    READ TABLE it_filetable INTO ls_filetable INDEX 1.
+    "p_file = ls_filetable-filename.
+  ENDIF.
   ENDMETHOD.
   METHOD zif_proubc_nchain_abi_upload~upload_abi_file.
   ENDMETHOD.
@@ -76,11 +104,16 @@ CLASS lcl_proubc_nchain_abi_upload IMPLEMENTATION.
   ENDMETHOD.
   METHOD zif_proubc_nchain_abi_upload~update_validfrom.
   ENDMETHOD.
-  method zif_proubc_nchain_abi_upload~validate_registry.
+  METHOD zif_proubc_nchain_abi_upload~validate_registry.
+  ENDMETHOD.
+  METHOD zif_proubc_nchain_abi_upload~set_al11_abi_file_path.
+    DATA: lv_selected_folder TYPE string.
+    cl_gui_frontend_services=>directory_browse( EXPORTING window_title = 'Select ABI File Directory'
+                                                  CHANGING selected_folder = lv_selected_folder ).
   ENDMETHOD.
 ENDCLASS.
 
-form exit_program.
+FORM exit_program.
 
 * Destroy Control.
   IF NOT l_validto_calendar IS INITIAL.
@@ -181,7 +214,7 @@ form exit_program.
               txt1  = 'exit error'.
   ENDIF.
 
-  clear: b_init.
+  CLEAR: b_init.
   LEAVE PROGRAM.
 ENDFORM.
 
