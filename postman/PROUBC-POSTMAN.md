@@ -6,7 +6,7 @@ Postman is used to define the REST API tests and expected inputs/outputs for the
 You can download Postman from https://www.postman.com/downloads/
 
 ## Overview
-Following the initial install and configuration of proUBC, you can use this API test suite along with PRVD CLI and shuttle to configure and test PRVD tenants as well as PRVD tenant's baseline protocol messages and object status updates
+Following the initial install and configuration of proUBC, you can use this API test suite along with PRVD CLI to configure and test PRVD tenants as well as PRVD tenant's baseline protocol messages and object status updates. Many of these activities are more easily done via [Shuttle](https://shuttle.provide.services). Shuttle uses this same API for the SAP user unboarding - nonetheless both ways produce the same result!
 
 It is assumed you will test this API on SAP system with basic authentication, typically in an on-premise environment
 
@@ -19,6 +19,7 @@ See the provided proUBC Inbound Api.postman_collection file
 To import it:
 In Postman - select the 'Collections' tab. Select the 'Import' button and select the postman_collection file
 ![image](importpostman1.PNG)
+
 You should see a list of the REST API tests after the import
 
 ## Postman Environment Variables
