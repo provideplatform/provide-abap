@@ -23,11 +23,7 @@ CLASS zcl_proubc_nchain_helper DEFINITION
                                              !iv_abi_index            TYPE zcasesensitive_str
                                              !iv_nchain_networkid     TYPE zcasesensitive_str
                                              !iv_contracttype         TYPE zcasesensitive_str OPTIONAL
-                                   EXPORTING !es_selectedContract     TYPE zif_proubc_nchain=>ty_chainlinkpricefeed_req, "
-      get_smartcontract_abi IMPORTING !iv_nchain_networkid      TYPE zproubc_smartcontract_addr
-                                      !iv_smartcontract_address TYPE zproubc_smartcontract_addr
-                            EXPORTING !ev_abi_str               TYPE zcasesensitive_str ,
-      open_abiregistry IMPORTING !is_abi_registry TYPE zprvdabiregistry.
+                                   EXPORTING !es_selectedContract     TYPE zif_proubc_nchain=>ty_chainlinkpricefeed_req.
   PRIVATE SECTION.
 ENDCLASS.
 
@@ -137,38 +133,6 @@ CLASS zcl_proubc_nchain_helper IMPLEMENTATION.
                                IMPORTING ev_abi_str   = ls_contract-params-compiled_artifact-abi ).
     ls_contract-type = iv_contracttype.
 
-  ENDMETHOD.
-
-  METHOD get_smartcontract_abi.
-    DATA: ls_abi_registry TYPE zprvdabiregistry,
-          lv_abifile_path TYPE zprvdabiregistry-abi_location,
-          lt_abifile_contents TYPE TABLE OF string.
-    SELECT SINGLE * FROM zprvdabiregistry
-       INTO @ls_abi_registry
-       WHERE nchain_networkid = @iv_nchain_networkid
-       AND smartcontract_address = @iv_smartcontract_address.
-    IF sy-subrc = 0.
-        me->open_abiregistry( EXPORTING is_abi_registry = ls_abi_registry ).
-    ELSE.
-    ENDIF.
-  ENDMETHOD.
-
-  METHOD open_abiregistry.
-
-    DATA: it_filecontent TYPE TABLE OF ty_filecontent.
-    DATA: wa_tab TYPE ty_filecontent.
-
-    OPEN DATASET is_abi_registry-abi_location FOR INPUT IN TEXT MODE ENCODING DEFAULT.
-    IF sy-subrc = 0.
-    DO.
-      READ DATASET is_abi_registry-abi_location INTO wa_tab.
-      IF sy-subrc <> 0.
-        EXIT.
-      ENDIF.
-      APPEND wa_tab TO it_filecontent.
-    ENDDO.
-    ENDIF.
-    CLOSE DATASET is_abi_registry-abi_location.
   ENDMETHOD.
 
 ENDCLASS.

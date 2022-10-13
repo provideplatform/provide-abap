@@ -223,9 +223,19 @@ CLASS zcl_proubc_ident IMPLEMENTATION.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/users'.
+    DATA lv_requestdata TYPE REF TO data.
+    DATA lv_requeststr TYPE string.
     mi_client->request->set_method( 'POST' ).
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
-* todo, set body, #/components/schemas/CreateuserRequest
+    zcl_proubc_api_helper=>copy_data_to_ref( EXPORTING is_data = body
+                  CHANGING cr_data = lv_REQUESTDATA  ).
+    lv_requeststr = /ui2/cl_json=>serialize( EXPORTING data = lv_requestdata
+                                       pretty_name = /ui2/cl_json=>pretty_mode-low_case ).
+
+    mi_client->request->set_cdata(
+      EXPORTING
+        data   =  lv_requeststr
+    ).
     lv_code = send_receive( ).
     WRITE / lv_code.
     CASE lv_code.
