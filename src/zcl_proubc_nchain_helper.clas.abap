@@ -26,7 +26,8 @@ CLASS zcl_proubc_nchain_helper DEFINITION
                                    EXPORTING !es_selectedContract     TYPE zif_proubc_nchain=>ty_chainlinkpricefeed_req, "
       get_smartcontract_abi IMPORTING !iv_nchain_networkid      TYPE zproubc_smartcontract_addr
                                       !iv_smartcontract_address TYPE zproubc_smartcontract_addr
-                            EXPORTING !ev_abi_str               TYPE zcasesensitive_str .
+                            EXPORTING !ev_abi_str               TYPE zcasesensitive_str ,
+      open_abiregistry IMPORTING !is_abi_registry TYPE zprvdabiregistry.
   PRIVATE SECTION.
 ENDCLASS.
 
@@ -131,7 +132,7 @@ CLASS zcl_proubc_nchain_helper IMPLEMENTATION.
     ls_contract-network_id = iv_nchain_networkid.
     ls_contract-params-wallet_id = iv_walletaddress.
     ls_contract-params-compiled_artifact-name = 'EACAggregatorProxy'.
-    me->get_smartcontract_abi( EXPORTING iv_nchain_networkid = '1b16996e-3595-4985-816c-043345d22f8c'
+    zcl_proubc_file_helper=>get_smartcontract_abi( EXPORTING iv_nchain_networkid = '1b16996e-3595-4985-816c-043345d22f8c'
                                          iv_smartcontract_address = '0xD4a33860578De61DBAbDc8BFdb98FD742fA7028e'
                                IMPORTING ev_abi_str   = ls_contract-params-compiled_artifact-abi ).
     ls_contract-type = iv_contracttype.
@@ -141,21 +142,33 @@ CLASS zcl_proubc_nchain_helper IMPLEMENTATION.
   METHOD get_smartcontract_abi.
     DATA: ls_abi_registry TYPE zprvdabiregistry,
           lv_abifile_path TYPE zprvdabiregistry-abi_location,
-          lt_abifile_contents type table of string.
+          lt_abifile_contents TYPE TABLE OF string.
     SELECT SINGLE * FROM zprvdabiregistry
        INTO @ls_abi_registry
        WHERE nchain_networkid = @iv_nchain_networkid
        AND smartcontract_address = @iv_smartcontract_address.
     IF sy-subrc = 0.
-      CALL FUNCTION 'GUI_UPLOAD'
-        EXPORTING
-          filename            = lv_abifile_path
-          filetype            = 'TXT'
-          has_field_separator = 'X'
-        TABLES
-          data_tab            = lt_abifile_contents.
+        me->open_abiregistry( EXPORTING is_abi_registry = ls_abi_registry ).
     ELSE.
     ENDIF.
+  ENDMETHOD.
+
+  METHOD open_abiregistry.
+
+    DATA: it_filecontent TYPE TABLE OF ty_filecontent.
+    DATA: wa_tab TYPE ty_filecontent.
+
+    OPEN DATASET is_abi_registry-abi_location FOR INPUT IN TEXT MODE ENCODING DEFAULT.
+    IF sy-subrc = 0.
+    DO.
+      READ DATASET is_abi_registry-abi_location INTO wa_tab.
+      IF sy-subrc <> 0.
+        EXIT.
+      ENDIF.
+      APPEND wa_tab TO it_filecontent.
+    ENDDO.
+    ENDIF.
+    CLOSE DATASET is_abi_registry-abi_location.
   ENDMETHOD.
 
 ENDCLASS.
