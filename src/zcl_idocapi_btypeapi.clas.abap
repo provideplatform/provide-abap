@@ -14,7 +14,7 @@ ENDCLASS.
 
 
 
-CLASS ZCL_IDOCAPI_BTYPEAPI IMPLEMENTATION.
+CLASS zcl_idocapi_btypeapi IMPLEMENTATION.
 
 
   METHOD if_rest_resource~get.
@@ -38,6 +38,7 @@ CLASS ZCL_IDOCAPI_BTYPEAPI IMPLEMENTATION.
             a~ltime
             a~applrel
       FROM edbas AS a
+      "INNER JOIN zprvdtraflight AS c ON a~idoctyp = c~schema_name AND c~schema_type = 'IDOC' AND c~schema_tlight NE 'R'
       LEFT OUTER JOIN edbast AS b ON a~idoctyp = b~idoctyp
                                   AND b~langua = 'E'
       INTO TABLE lt_basictypes.

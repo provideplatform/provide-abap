@@ -21,6 +21,16 @@ INTERFACE zif_idocapi_typelist
     END OF ty_basictype .
   TYPES:
     tt_basictype TYPE TABLE OF ty_basictype .
+
+  TYPES:
+    BEGIN OF ty_schema_trafficlight,
+      schema_datetime TYPE zprvdtraflight-schema_datetime,
+      schema_id       TYPE zprvdtraflight-schema_id,
+      schema_name     TYPE zprvdtraflight-schema_name,
+      schema_type     TYPE zprvdtraflight-schema_type,
+      schema_tlight   TYPE zprvdtraflight-schema_tlight,
+    END OF ty_schema_trafficlight.
+
   TYPES:
     BEGIN OF ty_basictype_w_segments,
       basictype     TYPE ty_basictype,
