@@ -1,16 +1,16 @@
 *&---------------------------------------------------------------------*
-*& Report z100085_proubc_shuttleidocex
+*& Report ZPROUBC_SHUTTLEIDOC_EXMPL
 *&---------------------------------------------------------------------*
 *& proUBC iDoc Baseline Example program
 *&---------------------------------------------------------------------*
-REPORT ZPROUBC_SHUTTLEIDOC_EXMPL.
+REPORT zproubc_shuttleidoc_exmpl.
 
-INCLUDE ZPROUBC_SHUTTLEIDOC_EXMPL_TOP.
-*INCLUDE z100085_proubc_shuttleidoc_top.
-INCLUDE ZPROUBC_SHUTTLEIDOC_EXMPL_F01.
-*INCLUDE z100085_proubc_shuttleidoc_f01.
+INCLUDE zproubc_shuttleidoc_exmpl_top.
+INCLUDE zproubc_shuttleidoc_exmpl_f01.
 
 INITIALIZATION.
+GET PARAMETER ID 'ZPRVDTENANT' FIELD p_tenant.
+GET PARAMETER ID 'ZPRVDSUBJACCTID' FIELD p_sbjact.
 
 START-OF-SELECTION.
 
@@ -18,6 +18,3 @@ START-OF-SELECTION.
 
   lo_idoc_moni = NEW lcl_idoc_moni( ).
   lo_idoc_moni->baseline_idocs( ).
-
-  "WRITE: 'idocs baselined!'.
-  "todo write messages to spool
