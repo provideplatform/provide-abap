@@ -44,32 +44,40 @@ CLASS z100085_zcl_proubc_prvdtenants IMPLEMENTATION.
   METHOD create_prvdtenant.
     DATA: ls_prvdorg         TYPE z100085_prvdorgs,
           lt_prvdorg         TYPE TABLE OF z100085_prvdorgs,
+          ls_existingprvdorg TYPE z100085_prvdorgs,
           lt_existingprvdorg TYPE TABLE OF z100085_prvdorgs,
           lv_timestamp       TYPE timestampl.
     "TODO add SAP auth check
 
     CHECK it_prvdorg IS NOT INITIAL.
 
-    "duplicate check
-
-    "throw out error message if the tenant already exists
-    SELECT * FROM z100085_prvdorgs INTO TABLE lt_existingprvdorg
-        FOR ALL ENTRIES IN it_prvdorg WHERE organization_id = it_prvdorg-organization_id.
-    IF sy-dbcnt > 0.
-      MESSAGE e004(z100085_zclproubcmsg) WITH 'orgid'.
-    ENDIF.
-
-
-
     GET TIME STAMP FIELD lv_timestamp.
 
     LOOP AT it_prvdorg ASSIGNING FIELD-SYMBOL(<fs_prvdorg>).
+
+      IF <fs_prvdorg>-organization_id IS INITIAL.
+      ENDIF.
+      IF <fs_prvdorg>-subject_account_id IS INITIAL.
+      ENDIF.
+
+      "duplicate check
+
+      "throw out error message if the tenant already exists
+      SELECT SINGLE * FROM z100085_prvdorgs INTO ls_existingprvdorg
+          WHERE organization_id = <fs_prvdorg>-organization_id
+                                          AND subject_account_id = <fs_prvdorg>-subject_account_id.
+      IF sy-dbcnt > 0.
+        MESSAGE e004(z100085_zclproubcmsg) WITH ls_existingprvdorg-organization_id ls_existingprvdorg-subject_account_id.
+      ENDIF.
+
       CLEAR: ls_prvdorg.
       ls_prvdorg-mandt = sy-mandt.
       ls_prvdorg-organization_id = <fs_prvdorg>-organization_id.
       ls_prvdorg-subject_account_id = <fs_prvdorg>-subject_account_id. "added 9/9/2022
       ls_prvdorg-bpi_endpoint = <fs_prvdorg>-bpi_endpoint.
       ls_prvdorg-ident_endpoint = <fs_prvdorg>-ident_endpoint.
+      if <fs_prvdorg>-refresh_token is INITIAL. "throw error
+      ENDIF.
       DATA(lv_tokenlength) = strlen( <fs_prvdorg>-refresh_token ).
       IF lv_tokenlength LE 1024 .
         ls_prvdorg-refresh_token = <fs_prvdorg>-refresh_token(lv_tokenlength).
@@ -77,8 +85,6 @@ CLASS z100085_zcl_proubc_prvdtenants IMPLEMENTATION.
         ls_prvdorg-refresh_token = <fs_prvdorg>-refresh_token(1024).
         ls_prvdorg-refresh_tokenext = <fs_prvdorg>-refresh_token+1024(1024).
       ENDIF.
-
-
 
       ls_prvdorg-createdby = sy-uname.
       ls_prvdorg-created_at = lv_timestamp.
@@ -100,7 +106,7 @@ CLASS z100085_zcl_proubc_prvdtenants IMPLEMENTATION.
     "TODO add SAP auth
 
     IF ev_prvdorgid IS NOT INITIAL.
-      DELETE FROM z100085_prvdorgs WHERE organization_id = ev_prvdorgid.
+      DELETE FROM z100085_prvdorgs WHERE subject_account_id = ev_prvdorgid.
       IF sy-subrc = 0.
         "todo Add some logging for this
       ELSE. "delete failed. why?
@@ -284,6 +290,7 @@ CLASS z100085_zcl_proubc_prvdtenants IMPLEMENTATION.
 
 
   ENDMETHOD.
+
 
   METHOD get_authtoken.
     "use the refresh token to get a new authtoken to use in other prvd Baseline APIs
