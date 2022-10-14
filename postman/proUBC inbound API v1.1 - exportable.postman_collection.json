@@ -1,8 +1,10 @@
 {
 	"info": {
-		"_postman_id": "36ae5f81-0acb-4222-9ddf-bc579bf1711f",
-		"name": "proUBC inbound API v1 - exportable",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+		"_postman_id": "74d6718a-4873-4cd1-a7f8-febcd8424762",
+		"name": "proUBC inbound API v1.1 - exportable",
+		"description": "Last updated Oct 14 2022",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "22975745"
 	},
 	"item": [
 		{
@@ -117,7 +119,8 @@
 						"tenants",
 						"{{prvdtenantid}}"
 					]
-				}
+				},
+				"description": "Retrieves details of a configured PRVD user in S/4 HANA based on the subject account id"
 			},
 			"response": []
 		},
@@ -170,7 +173,8 @@
 						"proubc",
 						"status"
 					]
-				}
+				},
+				"description": "Simply implies whether the SAP instance is up or not"
 			},
 			"response": []
 		},
@@ -231,7 +235,8 @@
 						"proubc",
 						"auth"
 					]
-				}
+				},
+				"description": "Given a set of SAP credentials, authenticates to SAP to retrieve an x-csrf-token. The xcsrftoken is later needed in the request header for POST and PUT REST API operations to SAP ."
 			},
 			"response": []
 		},
@@ -294,7 +299,8 @@
 						"tenants",
 						"{{prvdtenantid}}"
 					]
-				}
+				},
+				"description": "Deletes a PRVD subject account configuration in SAP based on the provided subject account id"
 			},
 			"response": []
 		},
@@ -339,7 +345,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\"tenant_id\":\"{{prvdtenantid}}\",\"bpi_endpoint\":\"https://baseline.provide.services\",\"ident_endpoint\":\"https://ident.provide.services\",\"refresh_token\":\"{{prvdrefreshtoken}}\"}\r\n",
+					"raw": "{\"organization_id\":\"{{prvdtenantid}}\", \"subject_account_id\" : \"{{prvdsubjectacctid}}\", \"bpi_endpoint\":\"https://baseline.provide.services\",\"ident_endpoint\":\"https://ident.provide.services\",\"refresh_token\":\"{{prvdrefreshtoken}}\"}\r\n",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -356,7 +362,8 @@
 						"proubc",
 						"tenants"
 					]
-				}
+				},
+				"description": "Creates a PRVD Subject Account configuration based on the payload of data provided\n\nxcsrftoken value required in the header - refer to the proUBC auth endpoint. Note: embedded Postman test scripts store this value following a successful call to the auth endpoint."
 			},
 			"response": []
 		},
@@ -401,7 +408,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\"organization_id\":\"{{prvdtenantid}}\",\"bpi_endpoint\":\"https://baseline.provide.services\",\"ident_endpoint\":\"https://ident.provide.services\",\"refresh_token\":\"{{prvdrefreshtoken}}\"}\r\n",
+					"raw": "{\"organization_id\":\"{{prvdtenantid}}\", \"subject_account_id\" : \"{{prvdsubjectacctid}}\", \"bpi_endpoint\":\"https://baseline.provide.services\",\"ident_endpoint\":\"https://ident.provide.services\",\"refresh_token\":\"{{prvdrefreshtoken}}\"}\r\n",
 					"options": {
 						"raw": {
 							"language": "json"
