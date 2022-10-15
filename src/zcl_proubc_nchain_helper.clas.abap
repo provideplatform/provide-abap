@@ -118,6 +118,10 @@ CLASS zcl_proubc_nchain_helper IMPLEMENTATION.
         ev_apiresponse      =  lv_executecontract_data
         ev_httpresponsecode =  lv_executecontract_responsecd
     ).
+    CASE lv_executecontract_responsecd.
+        WHEN 202.
+        WHEN OTHERS.
+    ENDCASE.
 *    CATCH cx_static_check.
   ENDMETHOD.
 
