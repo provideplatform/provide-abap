@@ -5,8 +5,7 @@ CLASS z100085_zcl_proubc_api_sicf DEFINITION
 
   PUBLIC SECTION.
     "INTERFACES: if_http_extension .
-    METHODS: if_rest_application~get_root_handler REDEFINITION,
-      handle_request_old.
+    METHODS: if_rest_application~get_root_handler REDEFINITION.
     CONSTANTS: c_json TYPE string VALUE 'application/json'.
   PROTECTED SECTION.
     METHODS:
@@ -253,141 +252,6 @@ CLASS z100085_zcl_proubc_api_sicf IMPLEMENTATION.
 
   ENDMETHOD.
 
-
-  METHOD handle_request_old.
-    "    DATA: lv_path          TYPE string,
-    "         lv_pathfull      TYPE string,
-    "          lv_query_string  TYPE string,
-    "          lv_httpverb      TYPE string,
-    "          lv_payload       TYPE string,
-    "          lv_name          TYPE string,
-    "          li_http          TYPE REF TO if_http_extension,
-    "          lt_fields        TYPE tihttpnvp,
-    "          lv_returncode    TYPE string,
-    "          lv_returnpayload TYPE string,
-    "          lt_tenants_in type Z100085_ZTT_PRVDORG.
-    "
-    "
-    "    " get URL info - will be used for finding matching URL patterns and specified controllers
-    "    lv_pathfull = server->request->get_header_field( name = '~path_translated' ).
-    "    lv_path = server->request->get_header_field( '~path' ).
-    "    lv_httpverb = server->request->get_header_field( '~request_method' ).
-    "    lv_query_string = cl_http_utility=>unescape_url( server->request->get_header_field( name = '~query_string' ) ).
-    "
-    "    server->request->get_header_fields(
-    "      CHANGING
-    "        fields = lt_fields    " Header fields
-    "    ).
-    "
-    "    "get payload if put or post
-    "    "maybe too generic - maybe should handle in specific routes rather than generically
-    "*    IF lv_httpverb = 'PUT' OR lv_httpverb = 'POST'.
-    "*        data lv_payloaddata type ref to data.
-    "*        data(lv_maybepayload) = server->request->get_cdata( ).
-    "*       /UI2/CL_JSON=>deserialize( exporting json = lv_maybepayload
-    "*                                  changing data = lv_payloaddata ).
-    "*    ENDIF.
-    "
-    "    " get requested content type
-    "    DATA(lv_req_content_type) = server->request->get_content_type( ).
-    "
-    "    " if not specified, initial content type is set to JSON
-    "    IF lv_req_content_type IS INITIAL.
-    "      lv_req_content_type = c_json.
-    "    ENDIF.
-    "
-    "*
-    "*        case lv_path.
-    "*            when 'tenants'.
-    "*            when 'status'.
-    "*            when 'business_objects'.
-    "*            when 'business_object_models'.
-    "*            when 'proxies'.
-    "*            when 'auth'.
-    "*        endcase.
-    "
-    "    "lousy code, but gotta go fast here
-    "    "may need to write this into multiple handlers depending on complexity
-    "    TRY.
-    "        IF lv_path EQ '/sap/proubc/tenants'.
-    "
-    "          IF lv_httpverb = 'PUT' OR lv_httpverb = 'POST'.
-    "            DATA lv_payloaddata TYPE REF TO data.
-    "            DATA(lv_maybepayload) = server->request->get_cdata( ).
-    "            /ui2/cl_json=>deserialize( EXPORTING json = lv_maybepayload
-    "                                       CHANGING data = lv_payloaddata ).
-    "          ENDIF.
-    "
-    "          me->tenants( EXPORTING ii_server = server
-    "                                 iv_httpverb = lv_httpverb
-    "                                 iv_payload = lv_payload
-    "                                 iv_payloaddata = lv_payloaddata
-    "                                 iv_url = lv_path
-    "                       IMPORTING  ev_payload  = lv_returnpayload
-    "                                  ev_returncode = lv_returncode ).
-    "
-    "        ELSEIF lv_path EQ '/sap/proubc/status'.
-    "          me->status( EXPORTING ii_server = server
-    "                                 iv_httpverb = lv_httpverb
-    "                                 iv_payload = lv_payload
-    "                                       iv_url = lv_path
-    "                       IMPORTING  ev_payload  = lv_returnpayload
-    "                                  ev_returncode = lv_returncode  ).
-    "        ELSEIF lv_path+28 EQ '/sap/proubc/business_objects'.
-    "          me->business_objects( EXPORTING ii_server = server
-    "                                          iv_httpverb = lv_httpverb
-    "                                          iv_payload = lv_payload
-    "                                          iv_url = lv_path
-    "                       IMPORTING  ev_payload  = lv_returnpayload
-    "                                  ev_returncode = lv_returncode ).
-    "        ELSEIF lv_path EQ '/sap/proubc/business_object_models'.
-    "          me->business_object_models( EXPORTING ii_server = server
-    "                                                iv_httpverb = lv_httpverb
-    "                                                iv_payload = lv_payload
-    "                                                iv_url = lv_path
-    "                       IMPORTING  ev_payload  = lv_returnpayload
-    "                                  ev_returncode = lv_returncode ).
-    "          " We replaced this with tenants right?
-    "*        elseif lv_path cp 'proxies'.
-    "*            me->proxies( exporting ii_server = server
-    "*                                         iv_httpverb = lv_httpverb
-    "*                                         iv_payload = lv_payload
-    "*                                         iv_url = lv_path
-    "*                         importing  ev_payload  = lv_returnpayload
-    "*                                    ev_returncode = lv_returncode ).
-    "        ELSEIF lv_path CP '/sap/proubc/auth'.
-    "          me->auth( EXPORTING ii_server = server
-    "                              iv_httpverb = lv_httpverb
-    "                              iv_payload = lv_payload
-    "                                       iv_url = lv_path
-    "                       IMPORTING  ev_payload  = lv_returnpayload
-    "                                  ev_returncode = lv_returncode ).
-    "        ELSE. "default redirect to swagger doc / error?
-    "*            "server->response->set_cdata( '404' ).
-    "*            data: lv_errorpage type xstring value 'error finding path binding'.
-    "*            server->response->set_data( lv_errorpage  ).
-    "*            server->response->set_status( code = 404 reason = '404' ).
-    "
-    "          me->auth( EXPORTING ii_server = server
-    "                              iv_httpverb = lv_httpverb
-    "                              iv_payload = lv_payload
-    "                                       iv_url = lv_path
-    "                       IMPORTING  ev_payload  = lv_returnpayload
-    "                                  ev_returncode = lv_returncode ).
-    "        ENDIF.
-    "      CATCH cx_root.
-    "        "todo add more exception handling
-    "    ENDTRY.
-    "
-    "    " /proubc/tenants/{id}/proxy handler
-    "    " /proubc/status health check
-    "    " /proubc/business_objects/{id}/status
-    "    " /proubc/business_object_models/?=recordType
-    "    " /proubc/proxies
-    "    " /proubc/auth
-  ENDMETHOD.
-
-
   METHOD if_rest_application~get_root_handler.
      DATA(lo_router) = NEW cl_rest_router( ).
        lo_router->attach( iv_template = '/tenants'   iv_handler_class = 'Z100085_ZCL_PROUBC_TENANTSAPI' ).
@@ -402,11 +266,13 @@ CLASS z100085_zcl_proubc_api_sicf IMPLEMENTATION.
        "middleware tells SAP to update status in BPI table
        lo_router->attach( iv_template = '/objects/{ID}/status' iv_handler_class = 'Z100085_ZCL_PROUBC_OBJSTATAPI' ).
 
-       " { status: "something", baseline_id: ""}
-
        lo_router->attach( iv_template = '/auth' iv_handler_class = 'Z100085_ZCL_PROUBC_AUTHAPI').
        lo_router->attach( iv_template = '/schemas'   iv_handler_class = 'Z100085_ZCL_IDOCAPI_BTYPEAPI' ).
        lo_router->attach( iv_template = '/schemas/{basictypeid}'   iv_handler_class = 'Z100085_ZCL_IDOCAPI_SEGMENTAPI' ).
+
+       "v2
+       lo_router->attach( iv_template = '/schemas_v2/{schematype}' iv_handler_class = 'Z100085_ZCL_PROUBC_SCHEMAS' ).
+       lo_router->attach( iv_template = '/schemas_v2/{schematype}/{schemadetailsid}' iv_handler_class = 'Z100085_ZCL_PROUBC_SCHEMADET' ).
 
        lo_router->attach( iv_template = '/test/trigger_outbound' iv_handler_class = 'Z100085_ZCL_PROUBC_OBTRIGTEST' ).
        "triggers update

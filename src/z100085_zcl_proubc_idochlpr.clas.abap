@@ -17,7 +17,13 @@ CLASS z100085_zcl_proubc_idochlpr DEFINITION
       get_DUMMY_objid IMPORTING iv_schema     TYPE string
                       EXPORTING ev_objid      TYPE z100085_bpiobj-object_id
                                 ev_newidocnum TYPE edidd-docnum
-                      CHANGING  Ct_edidd      TYPE tty_edidd.
+                      CHANGING  Ct_edidd      TYPE tty_edidd,
+      idoc_schema_to_json_tree  IMPORTING !it_IDOC_STRUCT           TYPE ledid_t_idoc_struct
+                                          !it_SEGMENTS              TYPE ledid_t_segment
+                                          !it_SEGMENT_STRUCT        TYPE ledid_t_segment_struct
+                                EXPORTING !ev_idoc_schema_json_tree TYPE REF TO data,
+      generate_segment_schema,
+      generate_child_segment_schema.
     METHODS:
       constructor IMPORTING iv_tenant          TYPE z100085_prvdtenantid
                             iv_subject_acct_id TYPE z100085_prvdtenantid,
@@ -123,27 +129,6 @@ CLASS z100085_zcl_proubc_idochlpr IMPLEMENTATION.
     ev_child_json_segmentid = lv_json_child_segmentid.
     ev_child_json_segment = ls_json_child_segment.
 
-
-    "DATA(components) =
-    "  CAST cl_abap_structdescr(
-    "  cl_abap_typedescr=>describe_by_data( ls_json_child_segment )
-    ")->components.
-
-    "need the components of the parent json segment here
-    "might be to just pass it
-*    DATA: lv_parent_segmentjson_type TYPE REF TO cl_abap_datadescr,
-*          lv_psegmentjson_structdesc type ref to cl_abap_structdescr.
-*
-*    lv_parent_segmentjson_type ?= cl_abap_typedescr=>describe_by_data( ls_json_child_segment ).
-*    CREATE DATA dataref TYPE HANDLE lv_parent_segmentjson_type.
-*
-*    lv_psegmentjson_structdesc ?= CAST cl_abap_structdescr(
-*    lv_parent_segmentjson_type
-*    ).
-
-    "cl_abap_structdescr=>
-    "comp_tab = cl_abap_datadescr=>describe_by_data( ls_json_child_segment )->c.
-
     comp_tab_parent_upd = ct_parent_comp_tab.
 
     "add a component to json type the child segment type
@@ -175,11 +160,6 @@ CLASS z100085_zcl_proubc_idochlpr IMPLEMENTATION.
 
     ct_parent_comp_tab = comp_tab_parent_upd.
 
-    "generate child segment type attached to parent
-*    struct_type_child = cl_abap_structdescr=>create( comp_tab_child ).
-*    CREATE DATA dataref_child TYPE HANDLE struct_type_child.
-*    dataref_child = ls_json_child_segment.
-
 * grandkids!
     LOOP AT it_parentchild
         ASSIGNING FIELD-SYMBOL(<fs_parentchild>) WHERE parent = iv_childsegmenttype.
@@ -204,65 +184,12 @@ CLASS z100085_zcl_proubc_idochlpr IMPLEMENTATION.
       ENDLOOP.
     ENDLOOP.
 
-
-
-    "ASSIGN dataref_child->* TO <segmentdata_child>.
     ASSIGN ls_json_child_segment->* TO <segmentdata_child>.
 
     ASSIGN COMPONENT lv_json_child_segmentid  OF STRUCTURE <segmentdata_b> TO <segment_type_b>.
 
     <segment_type_b> = <segmentdata_child>.
-
-
-
-
-
-
     cv_parent_segment = dataref_b.
-
-*    LOOP AT comp_tab_child ASSIGNING FIELD-SYMBOL(<fs_child_segment_comp>).
-*      IF <segment_type_child> IS ASSIGNED.
-*        UNASSIGN <segment_type_child>.
-*      ENDIF.
-*      IF <segment_type_child_clone> IS ASSIGNED.
-*        UNASSIGN <segment_type_child_clone>.
-*      ENDIF.
-*      ASSIGN COMPONENT <fs_child_segment_comp>-name OF STRUCTURE <segmentdata_child> TO <segment_type_child>.
-*      ASSIGN COMPONENT <fs_child_segment_comp>-name of STRUCTURE <segment_type_b> to <segment_type_child_clone>.
-*      <segment_type_child_clone> = <segment_type_child>.
-*      UNASSIGN: <segment_type_child>, <segment_type_child_clone>.
-*    ENDLOOP.
-*
-*
-
-
-*    DATA:  dataref TYPE REF TO data.
-*    DATA: comp_tab    TYPE cl_abap_structdescr=>component_table,
-*          comp_wa     LIKE LINE OF comp_tab,
-*          struct_type TYPE REF TO cl_abap_structdescr. "Structure
-*    FIELD-SYMBOLS: <segmentdata>  TYPE any,
-*                   <segment_type> TYPE any,
-*                   <docnum>       TYPE any,
-*                   <segnum>       TYPE any.
-*
-*    comp_wa-name = ev_json_segmentid .
-*    comp_wa-type ?= cl_abap_datadescr=>describe_by_name( iv_rawsegment-segnam ).
-*    APPEND comp_wa TO comp_tab.
-*    comp_wa-name = 'segment_type'.
-*    comp_wa-type ?= cl_abap_datadescr=>describe_by_data( iv_rawsegment-segnam )  .
-*    APPEND comp_wa TO comp_tab.
-*    comp_wa-name = 'docnum'.
-*    comp_wa-type ?= cl_abap_datadescr=>describe_by_data( iv_rawsegment-docnum ).
-*    APPEND comp_wa TO comp_tab.
-*    comp_wa-name = 'segnum'.
-*    comp_wa-type ?= cl_abap_datadescr=>describe_by_data( iv_rawsegment-segnum ).
-*    APPEND comp_wa TO comp_tab.
-*
-*    "Create Dynamic table using component table
-*    struct_type = cl_abap_structdescr=>create( comp_tab ).
-*    CREATE DATA dataref TYPE HANDLE struct_type.
-*    ASSIGN dataref->* TO <segmentdata>. "Dyanmic Structure
-
 
   ENDMETHOD.
 
@@ -401,16 +328,7 @@ CLASS z100085_zcl_proubc_idochlpr IMPLEMENTATION.
         EXCEPTIONS
           OTHERS          = 1.
 
-      "only keeping this around in case I need to change the payload string yet
-      "data: lv_idoc_data type ref to data.
-      "lv_idoc_data = lt_edidd.
-
       DATA: lv_idocjson TYPE string.
-*      lv_idocjson = /ui2/cl_json=>serialize(
-*         EXPORTING
-*           data             = lt_edidd
-*       ).
-
 
       DATA: lv_flattened_idoc TYPE REF TO data.
       me->idoc_to_json(
@@ -939,6 +857,58 @@ CLASS z100085_zcl_proubc_idochlpr IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD get_component_tab.
+  ENDMETHOD.
+
+  METHOD idoc_schema_to_json_tree.
+
+  "map the parent-child relationships
+      DATA: lt_idoc_struct_parent_child TYPE TABLE OF ty_idoc_struct_parent_child.
+
+    "summarize parent-child structure of the idoc
+    LOOP AT it_idoc_struct ASSIGNING FIELD-SYMBOL(<fs_idoc_struct>) WHERE syntax_attrib-parseg IS NOT INITIAL.
+      DATA ls_idoc_struct_parent_child TYPE ty_idoc_struct_parent_child.
+      CLEAR ls_idoc_struct_parent_child.
+      ls_idoc_struct_parent_child-parent = <fs_idoc_struct>-syntax_attrib-parseg.
+      ls_idoc_struct_parent_child-child = <fs_idoc_struct>-segment_type.
+      APPEND ls_idoc_struct_parent_child TO lt_idoc_struct_parent_child.
+    ENDLOOP.
+
+    "build out tree structure from parent level down
+
+
+
+
+  "Segment type
+  "Min occurs
+  "Max occurs
+  "Parent segment
+  "Child segments
+  "Description
+
+  "**** Field-level data ****
+  "Position - sort the fields by this
+  "## segmentstruct/field_attrib/position
+  "Fieldname
+  "## segmentstruct/fieldname
+  "Field description
+  "## segmentstruct/field_attrib/descrp
+  "ABAP Dictionary type
+  "Length
+  " ## segmentstruct/field_attrib/intlen
+  "Decimals ~ only applies to some numeric types
+  "## segmentstruct/field_attrib/decimals
+
+  "Bonus field level data (future enh)
+  "value helper table
+  "## segmentstruct/field_attrib/valuetab
+  "offset ~ used for EDI-native handling
+
+  ENDMETHOD.
+
+  method generate_segment_schema.
+  ENDMETHOD.
+
+  method generate_child_segment_schema.
   ENDMETHOD.
 
 ENDCLASS.
