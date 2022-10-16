@@ -5,7 +5,7 @@ CLASS z100085_zcl_proubc_schemadet DEFINITION
   CREATE PUBLIC .
 
   PUBLIC SECTION.
-   METHODS if_rest_resource~get
+    METHODS if_rest_resource~get
         REDEFINITION .
   PROTECTED SECTION.
   PRIVATE SECTION.
@@ -14,8 +14,8 @@ ENDCLASS.
 
 
 CLASS z100085_zcl_proubc_schemadet IMPLEMENTATION.
-    METHOD if_rest_resource~get.
-        DATA: lv_selectedbasictype TYPE string,
+  METHOD if_rest_resource~get.
+    DATA: lv_selectedbasictype TYPE string,
           ls_basictypes        TYPE z100085_zif_idocapi_typelist=>ty_basictype,
           ls_responsedata      TYPE z100085_zif_idocapi_typelist=>ty_basictype_w_segments,
           lv_idoctype          TYPE ledid_idoctype.
@@ -80,14 +80,26 @@ CLASS z100085_zcl_proubc_schemadet IMPLEMENTATION.
       EXCEPTIONS
         OTHERS         = 1.
 
-    ls_responsedata-idocstruct = lt_idoc_struct.
-    ls_responsedata-idocsegments = lt_segments.
-    ls_responsedata-segmentstruct = lt_segment_struct.
+    DATA: lv_idoc_schema_json_tree TYPE REF TO data.
+    z100085_zcl_proubc_idochlpr=>idoc_schema_to_json_tree(
+      EXPORTING
+        it_idoc_struct           = lt_idoc_struct
+        it_segments              = lt_segments
+        it_segment_struct        = lt_segment_struct
+      IMPORTING
+        ev_idoc_schema_json_tree =  lv_idoc_schema_json_tree
+    ).
+
+    DATA: lv_responsejson TYPE string.
+    lv_responsejson = /ui2/cl_json=>serialize(
+         EXPORTING
+          data = lv_idoc_schema_json_tree
+    ).
 
     "create the json HTTP response
     DATA(lo_entity) = mo_response->create_entity( ).
     lo_entity->set_content_type( if_rest_media_type=>gc_appl_json ).
-    lo_entity->set_string_data( /ui2/cl_json=>serialize( EXPORTING data = ls_responsedata pretty_name = /ui2/cl_json=>pretty_mode-low_case ) ).
+    lo_entity->set_string_data( lv_responsejson ).
     mo_response->set_status( cl_rest_status_code=>gc_success_ok ).
-    endmethod.
+  ENDMETHOD.
 ENDCLASS.

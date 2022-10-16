@@ -15,13 +15,13 @@ CLASS z100085_zcl_proubc_api_helper DEFINITION
         CHANGING
           !cr_data TYPE REF TO data.
     METHODS:
-      constructor   IMPORTING iv_tenant          TYPE z100085_prvdtenantid OPTIONAL
-                              iv_subject_acct_id TYPE z100085_prvdtenantid OPTIONAL,
-      call_ident_api IMPORTING iv_tenant      TYPE z100085_prvdtenantid
-                               iv_subjacct    TYPE z100085_prvdtenantid
-                     EXPORTING ev_authtoken   TYPE REF TO data
-                               status         TYPE i
-                               ev_bpiendpoint TYPE string,
+      constructor   IMPORTING !iv_tenant          TYPE z100085_prvdtenantid OPTIONAL
+                              !iv_subject_acct_id TYPE z100085_prvdtenantid OPTIONAL,
+      call_ident_api IMPORTING !iv_tenant      TYPE z100085_prvdtenantid
+                               !iv_subjacct    TYPE z100085_prvdtenantid
+                     EXPORTING !ev_authtoken   TYPE REF TO data
+                               !status         TYPE i
+                               !ev_bpiendpoint TYPE string,
       call_baseline_api,
       authenticate_ident_api_basic IMPORTING iv_userid   TYPE string
                                              iv_password TYPE z100085_casesensitive_str
