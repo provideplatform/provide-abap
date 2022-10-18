@@ -61,8 +61,10 @@ INTERFACE z100085_zif_proubc_blidochlper
            length           TYPE i,
          END OF ty_idoc_segment_field.
 
+  types: tty_idoc_segment_field type STANDARD TABLE OF ty_idoc_segment_field.
+
   TYPES: BEGIN OF ty_idoc_segment,
-           segmenttype   TYPE string,
+           segment_type   TYPE string,
            minoccurs     TYPE i,
            maxoccurs     TYPE i,
            parentsegment TYPE ref to data,
