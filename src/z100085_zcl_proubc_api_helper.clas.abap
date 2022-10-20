@@ -16,7 +16,8 @@ CLASS z100085_zcl_proubc_api_helper DEFINITION
           !cr_data TYPE REF TO data.
     METHODS:
       constructor   IMPORTING !iv_tenant          TYPE z100085_prvdtenantid OPTIONAL
-                              !iv_subject_acct_id TYPE z100085_prvdtenantid OPTIONAL,
+                              !iv_subject_acct_id TYPE z100085_prvdtenantid OPTIONAL
+                              !iv_workgroup_id    type z100085_prvdtenantid optional,
       call_ident_api IMPORTING !iv_tenant      TYPE z100085_prvdtenantid
                                !iv_subjacct    TYPE z100085_prvdtenantid
                      EXPORTING !ev_authtoken   TYPE REF TO data
@@ -54,7 +55,8 @@ CLASS z100085_zcl_proubc_api_helper DEFINITION
           lv_bpitoken             TYPE z100085_prvdrefreshtoken,
           lv_default_bpiendpoint  TYPE string,
           lo_ident_client         TYPE REF TO Z100085_zif_proubc_ident,
-          lo_baseline_client      TYPE REF TO z100085_zif_proubc_baseline.
+          lo_baseline_client      TYPE REF TO z100085_zif_proubc_baseline,
+          lv_selected_workgroupid type z100085_prvdtenantid.
     METHODS: set_default_tenant IMPORTING iv_defaulttenant TYPE z100085_prvdorgs-organization_id OPTIONAL.
   PRIVATE SECTION.
 ENDCLASS.
@@ -66,6 +68,8 @@ CLASS z100085_zcl_proubc_api_helper IMPLEMENTATION.
     "todo more robust selection criteria - based on sap user authorization/mapping to tenant
 
     "option 1 create ZPRVDTENANT parameter id - and auth check it whenever used
+
+    lv_selected_workgroupid = iv_workgroup_id.
 
     "try using the tenant id provided by user
     IF iv_tenant IS NOT INITIAL AND iv_subject_acct_id IS NOT INITIAL.
@@ -426,7 +430,8 @@ CLASS z100085_zcl_proubc_api_helper IMPLEMENTATION.
     DATA: ls_finalized_request TYPE  z100085_zif_proubc_baseline=>protocolmessage_req.
     TRY.
         ls_finalized_request = body.
-        ls_finalized_request-subjectaccount = lv_defaultsubjaccount.
+        ls_finalized_request-subject_account_id = lv_defaultsubjaccount.
+        ls_finalized_request-workgroup_id = lv_selected_workgroupid.
         lo_baseline_client->send_protocol_msg( EXPORTING IV_body = ls_finalized_request
                                                          IV_bpitoken = lv_bpitoken
                                                IMPORTING statuscode = statuscode
@@ -538,7 +543,7 @@ CLASS z100085_zcl_proubc_api_helper IMPLEMENTATION.
        EXPORTING
          data             = lt_edidd
      ).
-    ls_dummy_idoc_protocol_msg-payload = lv_idocjson.
+    "ls_dummy_idoc_protocol_msg-payload = lv_idocjson.
 
     es_dummy_idoc_msg = ls_dummy_idoc_protocol_msg.
   ENDMETHOD.

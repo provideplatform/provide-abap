@@ -398,16 +398,17 @@ INTERFACE Z100085_zif_proubc_baseline PUBLIC.
 
   TYPES: BEGIN OF protocolmessage_req,
            id               TYPE z100085_bpiobj-object_id, "object id, e.g PO number
-           BaselineID       TYPE z100085_bpiobj-baseline_id, "optional
+           "BaselineID       TYPE z100085_bpiobj-baseline_id, "optional
            "errors type table of string,
            "messageid type string, "ok to leave this empty
-           payload          TYPE string, "the idoc payload
+           payload          TYPE ref to data, "the idoc payload
            payload_mimetype TYPE string, " 'application/xml or json
            "protocolmessage type ref to data,
            "recipients type ref to data,
            "status type string,
+           workgroup_id type string,
            type             TYPE string, "e.g. ORDERS05
-           subjectaccount type z100085_prvdtenantid,
+           subject_account_id type z100085_prvdtenantid,
          END OF protocolmessage_req.
 
 

@@ -27,7 +27,8 @@ CLASS z100085_zcl_proubc_idochlpr DEFINITION
       generate_child_segment_schema CHANGING cs_segment_schema TYPE z100085_zif_proubc_blidochlper=>ty_idoc_segment.
     METHODS:
       constructor IMPORTING iv_tenant          TYPE z100085_prvdtenantid
-                            iv_subject_acct_id TYPE z100085_prvdtenantid,
+                            iv_subject_acct_id TYPE z100085_prvdtenantid
+                            iv_workgroup_id    type z100085_prvdtenantid OPTIONAL,
       launch_idoc_to_baseline,
       create_mock_bpiobjs.
   PROTECTED SECTION.
@@ -81,7 +82,7 @@ CLASS z100085_zcl_proubc_idochlpr IMPLEMENTATION.
 
 
   METHOD constructor.
-    lo_api_helper = NEW z100085_zcl_proubc_api_helper( iv_tenant = iv_tenant iv_subject_acct_id = iv_subject_acct_id ).
+    lo_api_helper = NEW z100085_zcl_proubc_api_helper( iv_tenant = iv_tenant iv_subject_acct_id = iv_subject_acct_id iv_workgroup_id = iv_workgroup_id ).
 
     "sets the default tenant and ident/baseline api tokens
     lo_api_helper->setup_protocol_msg( IMPORTING setup_success = lv_setup_success ).
@@ -339,13 +340,13 @@ CLASS z100085_zcl_proubc_idochlpr IMPLEMENTATION.
          IMPORTING
            ev_flattened_idoc = lv_flattened_idoc
       ).
-      lv_idocjson = /ui2/cl_json=>serialize(
-        EXPORTING
-            data = lv_flattened_idoc
-      ).
+      "lv_idocjson = /ui2/cl_json=>serialize(
+      "  EXPORTING
+      "      data = lv_flattened_idoc
+      ").
 
       "request to /api/v1/protocol_messages
-      ls_protocol_msg_req-payload = lv_idocjson.
+      ls_protocol_msg_req-payload = lv_flattened_idoc.
       ls_protocol_msg_req-payload_mimetype = 'json'.
       ls_protocol_msg_req-type = wa_idoc_control-idoctp. "should be orders05 for demo purposes
 
@@ -428,107 +429,7 @@ CLASS z100085_zcl_proubc_idochlpr IMPLEMENTATION.
 
 
   METHOD create_mock_bpiobjs.
-    DATA:
-      lo_ident_api         TYPE REF TO z100085_zif_proubc_ident,
-      lo_baseline_api      TYPE REF TO z100085_zif_proubc_baseline,
-      ls_protocol_msg_req  TYPE z100085_zif_proubc_baseline=>protocolmessage_req,
-      lt_updatedbpis       TYPE TABLE OF z100085_bpiobj,
-      lt_newbpis           TYPE TABLE OF z100085_bpiobj,
-      lt_final_updatedbpis TYPE TABLE OF z100085_bpiobj,
-      lt_final_newbpis     TYPE TABLE OF z100085_bpiobj.
 
-
-    LOOP AT selected_idocs ASSIGNING FIELD-SYMBOL(<fs_selected_idoc>).
-      DATA: lv_idoc TYPE REF TO data.
-      CLEAR: ls_protocol_msg_req.
-
-
-      DATA:
-        lv_idocnum      TYPE edidc-docnum,
-        lt_edids        TYPE TABLE OF edids,
-        lt_edidd        TYPE TABLE OF edidd,
-        wa_idoc_control TYPE edidc,
-        lv_status       TYPE i.
-
-      CLEAR: lt_edids, lt_edidd, lv_idocnum.
-
-      lv_idocnum = <fs_selected_idoc>-idocnum.
-      CALL FUNCTION 'IDOC_READ_COMPLETELY'
-        EXPORTING
-          document_number = lv_idocnum
-        IMPORTING
-          idoc_control    = wa_idoc_control
-        TABLES
-          int_edids       = lt_edids
-          int_edidd       = lt_edidd
-        EXCEPTIONS
-          OTHERS          = 1.
-
-
-      DATA: lv_idocjson TYPE string.
-      lv_idocjson = /ui2/cl_json=>serialize(
-         EXPORTING
-           data             = lt_edidd
-       ).
-
-      "request to /api/v1/protocol_messages
-      ls_protocol_msg_req-payload = lv_idocjson.
-      ls_protocol_msg_req-payload_mimetype = 'json'.
-      ls_protocol_msg_req-type = wa_idoc_control-idoctp. "should be orders05 for demo purposes
-
-
-      "TODO handle errors if mapping to id is not implemented yet
-      z100085_zcl_proubc_idochlpr=>get_objid( EXPORTING iv_schema = ls_protocol_msg_req-type
-                               it_edidd = lt_edidd
-                               iv_idoc = lv_idoc
-                     IMPORTING ev_objid = ls_protocol_msg_req-id ).
-
-      "Baseline API should be able to determine this on its w/o SAP help
-      SELECT SINGLE * FROM z100085_bpiobj INTO @DATA(wa_bpiobj) WHERE object_id = @ls_protocol_msg_req-id.
-      DATA: lv_update TYPE char1.
-      IF sy-subrc EQ 0.
-        ls_protocol_msg_req-baselineid = wa_bpiobj-baseline_id.
-        lv_update = 'X'.
-        "append ls_protocol_msg_req to lt_updatedbpis.
-      ELSE.
-        "just for demo purposes we'll make baseline = purch order. should be globally unique
-        ls_protocol_msg_req-baselineid = ls_protocol_msg_req-id.
-        lv_update = ''.
-        "append ls_protocol_msg_req to lt_newbpis.
-      ENDIF.
-
-      IF lv_update = 'X'.
-        z100085_zcl_proubc_busobjhlpr=>validate_object_update(
-          EXPORTING
-            it_objects = lt_updatedbpis
-          IMPORTING
-            et_objects = lt_final_updatedbpis
-        ).
-        z100085_zcl_proubc_busobjhlpr=>update_mock_object(
-          EXPORTING
-            it_objects = lt_final_updatedbpis
-            iv_payload = lv_idocjson
-*      IMPORTING
-*        et_objects =
-        ).
-      ELSE.
-        z100085_zcl_proubc_busobjhlpr=>validate_object_create(
-           EXPORTING
-             it_objects = lt_newbpis
-           IMPORTING
-             et_objects = lt_final_newbpis
-         ).
-        z100085_zcl_proubc_busobjhlpr=>create_mock_object(
-          EXPORTING
-            it_objects = lt_final_newbpis
-            iv_payload = lv_idocjson
-*      IMPORTING
-*        et_objects =
-        ).
-      ENDIF.
-      CLEAR: ls_protocol_msg_req, lt_updatedbpis, lt_newbpis.
-
-    ENDLOOP.
   ENDMETHOD.
 
 
@@ -918,12 +819,14 @@ CLASS z100085_zcl_proubc_idochlpr IMPLEMENTATION.
       FIELD-SYMBOLS: <fs_targetsegment> TYPE any,
                      <fs_mappedsegment> TYPE any.
       "TODO this is dumpin but why?
-      ASSIGN COMPONENT <fs_idoc_struct>-segment_type OF STRUCTURE dataref TO <fs_targetsegment>.
+      ASSIGN COMPONENT <fs_idoc_struct>-segment_type OF STRUCTURE <fs_dataref> TO <fs_targetsegment>.
       DATA: ls_mappedsegment_data TYPE REF TO data.
       GET REFERENCE OF ls_idoc_struct INTO ls_mappedsegment_data.
       ASSIGN ls_mappedsegment_data->* TO <fs_mappedsegment>.
       <fs_targetsegment> = <fs_mappedsegment>.
     ENDLOOP.
+
+    GET REFERENCE OF dataref INTO lv_idoc_json_tree_data.
 
     ASSIGN lv_idoc_json_tree_data->* TO <fs_idoc_json_tree_data>.
     <fs_idoc_json_tree_data> = <fs_dataref>.

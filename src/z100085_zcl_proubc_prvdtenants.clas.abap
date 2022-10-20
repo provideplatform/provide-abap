@@ -74,6 +74,7 @@ CLASS z100085_zcl_proubc_prvdtenants IMPLEMENTATION.
       ls_prvdorg-mandt = sy-mandt.
       ls_prvdorg-organization_id = <fs_prvdorg>-organization_id.
       ls_prvdorg-subject_account_id = <fs_prvdorg>-subject_account_id. "added 9/9/2022
+      ls_prvdorg-workgroup_id = <fs_prvdorg>-workgroup_id.
       ls_prvdorg-bpi_endpoint = <fs_prvdorg>-bpi_endpoint.
       ls_prvdorg-ident_endpoint = <fs_prvdorg>-ident_endpoint.
       if <fs_prvdorg>-refresh_token is INITIAL. "throw error
@@ -247,6 +248,7 @@ CLASS z100085_zcl_proubc_prvdtenants IMPLEMENTATION.
         ls_prvdorg-mandt = sy-mandt.
         ls_prvdorg-organization_id = <fs_prvdorg>-organization_id.
         ls_prvdorg-subject_account_id = <fs_prvdorg>-subject_account_id.
+        ls_prvdorg-workgroup_id = <fs_prvdorg>-workgroup_id.
         IF <fs_prvdorg>-refresh_token IS NOT INITIAL.
           DATA(lv_tokenlength) = strlen( <fs_prvdorg>-refresh_token ).
           IF lv_tokenlength LE 1024 .

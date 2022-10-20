@@ -62,6 +62,12 @@
     </item>
     <item>
      <ID>S</ID>
+     <KEY>P_WRKGRP</KEY>
+     <ENTRY>PRVD Workgroup ID</ENTRY>
+     <LENGTH>25</LENGTH>
+    </item>
+    <item>
+     <ID>S</ID>
      <KEY>S_EBELN</KEY>
      <ENTRY>Purchase Order</ENTRY>
      <LENGTH>22</LENGTH>
