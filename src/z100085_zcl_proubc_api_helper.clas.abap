@@ -17,7 +17,7 @@ CLASS z100085_zcl_proubc_api_helper DEFINITION
     METHODS:
       constructor   IMPORTING !iv_tenant          TYPE z100085_prvdtenantid OPTIONAL
                               !iv_subject_acct_id TYPE z100085_prvdtenantid OPTIONAL
-                              !iv_workgroup_id    type z100085_prvdtenantid optional,
+                              !iv_workgroup_id    TYPE z100085_prvdtenantid OPTIONAL,
       call_ident_api IMPORTING !iv_tenant      TYPE z100085_prvdtenantid
                                !iv_subjacct    TYPE z100085_prvdtenantid
                      EXPORTING !ev_authtoken   TYPE REF TO data
@@ -56,7 +56,7 @@ CLASS z100085_zcl_proubc_api_helper DEFINITION
           lv_default_bpiendpoint  TYPE string,
           lo_ident_client         TYPE REF TO Z100085_zif_proubc_ident,
           lo_baseline_client      TYPE REF TO z100085_zif_proubc_baseline,
-          lv_selected_workgroupid type z100085_prvdtenantid.
+          lv_selected_workgroupid TYPE z100085_prvdtenantid.
     METHODS: set_default_tenant IMPORTING iv_defaulttenant TYPE z100085_prvdorgs-organization_id OPTIONAL.
   PRIVATE SECTION.
 ENDCLASS.
@@ -131,7 +131,7 @@ CLASS z100085_zcl_proubc_api_helper IMPLEMENTATION.
       lv_identurl        TYPE string,
       lv_apiresponse     TYPE REF TO data,
       lv_tenant          TYPE z100085_prvdorgs-organization_id,
-      lv_subjacct       TYPE z100085_prvdorgs-subject_account_id.
+      lv_subjacct        TYPE z100085_prvdorgs-subject_account_id.
 
     "z100085_zcl_proubc_prvdtenants=>get_prvdtenant( EXPORTING iv_prvdtenant = iv_tenant
     "                                               IMPORTING ev_prvdtenant = ls_prvdtenant
@@ -156,6 +156,11 @@ CLASS z100085_zcl_proubc_api_helper IMPLEMENTATION.
 
     CONCATENATE ls_prvdtenant-refresh_token ls_prvdtenant-refresh_tokenext INTO lv_refreshtokenstr.
     lv_identurl = ls_prvdtenant-ident_endpoint.
+
+    IF lv_identurl IS INITIAL.
+      lv_identurl = 'https://ident.provide.services'.
+    ENDIF.
+
 
     ev_bpiendpoint = ls_prvdtenant-bpi_endpoint.
 
@@ -396,6 +401,10 @@ CLASS z100085_zcl_proubc_api_helper IMPLEMENTATION.
 
           "TODO check validity of current auth token
           "or call me-call_ident_api to get new auth token
+
+          IF lv_bpiendpoint IS INITIAL.
+            lv_bpiendpoint = 'https://baseline.provide.services'.
+          ENDIF.
 
           cl_http_client=>create_by_url(
           EXPORTING

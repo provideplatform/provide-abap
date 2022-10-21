@@ -72,10 +72,10 @@ CLASS z100085_zcl_proubc_tenantsapi IMPLEMENTATION.
     DATA(lv_request_body) = mo_request->get_entity( )->get_string_data( ).
     /ui2/cl_json=>deserialize( EXPORTING json = lv_request_body CHANGING data = ls_prvdtenant ).
 
-    if ls_prvdtenant-organization_id is initial.
-    endif.
-    if ls_prvdtenant-subject_account_id is initial.
-    endif.
+    IF ls_prvdtenant-organization_id IS INITIAL.
+    ENDIF.
+    IF ls_prvdtenant-subject_account_id IS INITIAL.
+    ENDIF.
 
     APPEND ls_prvdtenant TO lt_prvdtenants.
 
