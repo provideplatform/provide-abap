@@ -16,12 +16,12 @@ CLASS zcl_proubc_nchain_helper DEFINITION
           lo_http_client    TYPE REF TO if_http_client,
           lo_nchain_api     TYPE REF TO zcl_proubc_nchain,
           lv_nchain_api_url TYPE string.
-    METHODS: smartcontract_factory IMPORTING !iv_smartcontractaddress TYPE zcasesensitive_str
+    METHODS: smartcontract_factory IMPORTING !iv_smartcontractaddress TYPE zproubc_smartcontract_addr
                                              !iv_name                 TYPE string
                                              !iv_contract             TYPE zcasesensitive_str
                                              !iv_walletaddress        TYPE zcasesensitive_str
                                              !iv_abi_index            TYPE zcasesensitive_str
-                                             !iv_nchain_networkid     TYPE zcasesensitive_str
+                                             !iv_nchain_networkid     TYPE zprvd_nchain_networkid
                                              !iv_contracttype         TYPE zcasesensitive_str OPTIONAL
                                    EXPORTING !es_selectedContract     TYPE zif_proubc_nchain=>ty_chainlinkpricefeed_req.
   PRIVATE SECTION.
@@ -132,8 +132,8 @@ CLASS zcl_proubc_nchain_helper IMPLEMENTATION.
     ls_contract-network_id = iv_nchain_networkid.
     ls_contract-params-wallet_id = iv_walletaddress.
     ls_contract-params-compiled_artifact-name = 'EACAggregatorProxy'.
-    zcl_proubc_file_helper=>get_smartcontract_abi( EXPORTING iv_nchain_networkid = '1b16996e-3595-4985-816c-043345d22f8c'
-                                         iv_smartcontract_address = '0xD4a33860578De61DBAbDc8BFdb98FD742fA7028e'
+    zcl_proubc_file_helper=>get_smartcontract_abi( EXPORTING iv_nchain_networkid = iv_nchain_networkid
+                                         iv_smartcontract_address = iv_smartcontractaddress
                                IMPORTING ev_abi_str   = ls_contract-params-compiled_artifact-abi ).
     ls_contract-type = iv_contracttype.
 

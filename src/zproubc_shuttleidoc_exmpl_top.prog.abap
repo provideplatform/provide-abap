@@ -9,7 +9,8 @@ SELECTION-SCREEN BEGIN OF BLOCK 1 WITH FRAME TITLE TEXT-001.
               p_mestyp TYPE edidc-mestyp DEFAULT 'ORDERS',
               p_idoctp TYPE edidc-idoctp DEFAULT 'ORDERS05',
               p_tenant type zprvdtenantid,
-              p_sbjact type zprvdtenantid.
+              p_sbjact type zprvdtenantid,
+              p_wrkgrp type zprvdtenantid.
   RANGES: r_poebeln FOR ekko-ebeln,
           r_idocnum FOR edidc-docnum,
           r_idoctype FOR edidc-idoctp. "default to ORDERS05

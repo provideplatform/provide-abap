@@ -5,7 +5,7 @@ CLASS zcl_proubc_file_helper DEFINITION
 
 PUBLIC SECTION.
 CLASS-METHODS:
-      get_smartcontract_abi IMPORTING !iv_nchain_networkid      TYPE zproubc_smartcontract_addr
+      get_smartcontract_abi IMPORTING !iv_nchain_networkid      TYPE zprvd_nchain_networkid
                                       !iv_smartcontract_address TYPE zproubc_smartcontract_addr
                             EXPORTING !ev_abi_str               TYPE zcasesensitive_str ,
       open_abiregistry IMPORTING !is_abi_registry TYPE zprvdabiregistry

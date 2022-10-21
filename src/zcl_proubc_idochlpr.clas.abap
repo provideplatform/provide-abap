@@ -13,24 +13,33 @@ CLASS zcl_proubc_idochlpr DEFINITION
     DATA lo_api_helper TYPE REF TO zcl_proubc_api_helper .
     DATA selected_idocs TYPE zif_proubc_blidochlper=>tty_proubc_idocs .
 
-    CLASS-METHODS get_objid
+    CLASS-METHODS:
+    get_objid
       IMPORTING
         !iv_schema TYPE string
         !it_edidd  TYPE tty_edidd
         !iv_idoc   TYPE REF TO data
       EXPORTING
-        !ev_objid  TYPE zBPIOBJ-object_id .
-    CLASS-METHODS get_dummy_objid
+        !ev_objid  TYPE zBPIOBJ-object_id,
+    idoc_schema_to_json_tree  IMPORTING !it_IDOC_STRUCT           TYPE ledid_t_idoc_struct
+                                          !it_SEGMENTS              TYPE ledid_t_segment
+                                          !it_SEGMENT_STRUCT        TYPE ledid_t_segment_struct
+                                EXPORTING !ev_idoc_schema_json_tree TYPE REF TO data,
+    get_dummy_objid
       IMPORTING
         !iv_schema     TYPE string
       EXPORTING
         !ev_objid      TYPE zBPIOBJ-object_id
         !ev_newidocnum TYPE edidd-docnum
       CHANGING
-        !ct_edidd      TYPE tty_edidd .
+        !ct_edidd      TYPE tty_edidd,
+          generate_segment_fields IMPORTING it_target_segment_struct TYPE ledid_t_segment_struct EXPORTING et_field_data TYPE zif_proubc_blidochlper=>tty_idoc_segment_field,
+      generate_child_segment_schema CHANGING cs_segment_schema TYPE zif_proubc_blidochlper=>ty_idoc_segment.
     METHODS constructor
       IMPORTING
-        !iv_tenant TYPE zPRVDTENANTID .
+        !iv_tenant TYPE zPRVDTENANTID OPTIONAL
+        !iv_subject_acct_id TYPE zprvdtenantid OPTIONAL
+        !iv_workgroup_id    type zprvdtenantid OPTIONAL.
     METHODS launch_idoc_to_baseline .
   PROTECTED SECTION.
       TYPES: BEGIN OF ty_idoc_struct_parent_child,
@@ -49,7 +58,7 @@ CLASS zcl_proubc_idochlpr DEFINITION
       EXPORTING
         !ev_flattened_idoc TYPE REF TO data.
   PRIVATE SECTION.
-    methods generate_child_idoc_segdata IMPORTING !iv_childsegmenttype      TYPE edilsegtyp
+    METHODS generate_child_idoc_segdata IMPORTING !iv_childsegmenttype      TYPE edilsegtyp
                                                   !iv_childrawsegment       TYPE edidd
                                                   !it_segmentstruct         TYPE ledid_t_segment_struct
                                                   !it_parentchild           TYPE tty_idoc_struct_parent_child
@@ -71,7 +80,7 @@ ENDCLASS.
 
 
 
-CLASS ZCL_PROUBC_IDOCHLPR IMPLEMENTATION.
+CLASS zcl_proubc_idochlpr IMPLEMENTATION.
 
 
   METHOD add_message.
@@ -86,6 +95,7 @@ CLASS ZCL_PROUBC_IDOCHLPR IMPLEMENTATION.
 
   METHOD constructor.
     lo_api_helper = NEW zcl_proubc_api_helper( iv_tenant = iv_tenant ).
+    "lo_api_helper = NEW zcl_proubc_api_helper( iv_tenant = iv_tenant iv_subject_acct_id = iv_subject_acct_id iv_workgroup_id = iv_workgroup_id ).
 
     "sets the default tenant and ident/baseline api tokens
     lo_api_helper->setup_protocol_msg( IMPORTING setup_success = lv_setup_success ).
@@ -153,6 +163,84 @@ CLASS ZCL_PROUBC_IDOCHLPR IMPLEMENTATION.
       WHEN OTHERS. "TODO configure object id determinations, throw errors if missing
     ENDCASE.
   ENDMETHOD.
+
+  METHOD idoc_schema_to_json_tree.
+
+    DATA: lv_idoc_json_tree_data TYPE REF TO data,
+          comp_tab               TYPE cl_abap_structdescr=>component_table,
+          comp_wa                LIKE LINE OF comp_tab,
+          struct_type            TYPE REF TO cl_abap_structdescr,
+          dataref                TYPE REF TO data.
+
+    "map the parent-child relationships
+    DATA: lt_idoc_struct_parent_child TYPE TABLE OF ty_idoc_struct_parent_child,
+          lt_idoc_struct_copy         TYPE ledid_t_idoc_struct.
+
+    "summarize parent-child structure of the idoc
+    LOOP AT it_idoc_struct ASSIGNING FIELD-SYMBOL(<fs_idoc_struct>) WHERE syntax_attrib-parseg IS NOT INITIAL.
+      DATA ls_idoc_struct_parent_child TYPE ty_idoc_struct_parent_child.
+      CLEAR ls_idoc_struct_parent_child.
+      ls_idoc_struct_parent_child-parent = <fs_idoc_struct>-syntax_attrib-parseg.
+      ls_idoc_struct_parent_child-child = <fs_idoc_struct>-segment_type.
+      APPEND ls_idoc_struct_parent_child TO lt_idoc_struct_parent_child.
+    ENDLOOP.
+
+    "get the type descriptor for zif_proubc_blidochlper=>ty_idoc_segment
+    DATA: ls_dummy_segment TYPE zif_proubc_blidochlper=>ty_idoc_segment.
+
+    "create top level components
+    LOOP AT it_idoc_struct ASSIGNING <fs_idoc_struct> WHERE syntax_attrib-parseg IS INITIAL.
+      comp_wa-name = <fs_idoc_struct>-segment_type.
+      comp_wa-type ?= cl_abap_datadescr=>describe_by_data( ls_dummy_segment )  .
+      APPEND comp_wa TO comp_tab.
+      CLEAR comp_wa.
+    ENDLOOP.
+
+    FIELD-SYMBOLS: <fs_idoc_json_tree_data> TYPE any,
+                   <fs_dataref>             TYPE any.
+
+    struct_type = cl_abap_structdescr=>create( comp_tab ).
+    CREATE DATA dataref TYPE HANDLE struct_type.
+    ASSIGN dataref->* TO <fs_dataref>.
+
+    "assign data from tree structure from parent level down
+    LOOP AT it_idoc_struct ASSIGNING <fs_idoc_struct> WHERE syntax_attrib-parseg IS INITIAL.
+      "map the data
+      DATA: ls_idoc_struct TYPE zif_proubc_blidochlper=>ty_idoc_segment.
+      ls_idoc_struct-segment_type = <fs_idoc_struct>-segment_type.
+      ls_idoc_struct-description = <fs_idoc_struct>-segment_type_attrib-descrp.
+      ls_idoc_struct-minoccurs = <fs_idoc_struct>-syntax_attrib-occmin.
+      ls_idoc_struct-maxoccurs = <fs_idoc_struct>-syntax_attrib-occmax.
+      "parent segment ~ not needed here
+      "generate child segments TODO
+      "generate fields
+      DATA: lt_mapped_segment_struct TYPE ledid_t_segment_struct.
+      lt_mapped_segment_struct = VALUE ledid_t_segment_struct( FOR line IN it_SEGMENT_STRUCT WHERE ( segment_type EQ <fs_idoc_struct>-segment_type  ) ( line ) ).
+      zcl_proubc_idochlpr=>generate_segment_fields(
+        EXPORTING
+          it_target_segment_struct =  lt_mapped_segment_struct
+        IMPORTING
+          et_field_data            = ls_idoc_struct-fields
+      ).
+      FIELD-SYMBOLS: <fs_targetsegment> TYPE any,
+                     <fs_mappedsegment> TYPE any.
+      "TODO this is dumpin but why?
+      ASSIGN COMPONENT <fs_idoc_struct>-segment_type OF STRUCTURE <fs_dataref> TO <fs_targetsegment>.
+      DATA: ls_mappedsegment_data TYPE REF TO data.
+      GET REFERENCE OF ls_idoc_struct INTO ls_mappedsegment_data.
+      ASSIGN ls_mappedsegment_data->* TO <fs_mappedsegment>.
+      <fs_targetsegment> = <fs_mappedsegment>.
+    ENDLOOP.
+
+    GET REFERENCE OF dataref INTO lv_idoc_json_tree_data.
+
+    ASSIGN lv_idoc_json_tree_data->* TO <fs_idoc_json_tree_data>.
+    <fs_idoc_json_tree_data> = <fs_dataref>.
+
+    ev_idoc_schema_json_tree = lv_idoc_json_tree_data.
+
+  ENDMETHOD.
+
 
 
   METHOD launch_idoc_to_baseline.
@@ -661,4 +749,43 @@ CLASS ZCL_PROUBC_IDOCHLPR IMPLEMENTATION.
     ev_flattened_idoc = lv_flattened_idoc.
 
   ENDMETHOD.
+
+    METHOD generate_segment_fields.
+    DATA: ls_field_data TYPE zif_proubc_blidochlper=>ty_idoc_segment_field,
+          lt_field_data TYPE zif_proubc_blidochlper=>tty_idoc_segment_field.
+
+    LOOP AT it_target_segment_struct ASSIGNING FIELD-SYMBOL(<fs_target_segment>).
+      "**** Field-level data ****
+      "Position - sort the fields by this
+      "## segmentstruct/field_attrib/position
+      ls_field_data-position = <fs_target_segment>-field_attrib-position.
+      "Fieldname
+      "## segmentstruct/fieldname
+      ls_field_data-fieldname = <fs_target_segment>-fieldname.
+      "Field description
+      "## segmentstruct/field_attrib/descrp
+      ls_field_data-fielddescription = <fs_target_segment>-field_attrib-descrp.
+      "ABAP Dictionary type
+      "Length
+      " ## segmentstruct/field_attrib/intlen
+      ls_field_data-length = <fs_target_segment>-field_attrib-intlen.
+      "Decimals ~ only applies to some numeric types
+      "## segmentstruct/field_attrib/decimals
+      "ls_field_data- TODO add decimals to the types
+
+      "Bonus field level data (future enh)
+      "value helper table
+      "## segmentstruct/field_attrib/valuetab
+      "offset ~ used for EDI-native handling
+      APPEND ls_field_data TO lt_field_data.
+      CLEAR ls_field_data.
+    ENDLOOP.
+
+    et_field_data = lt_field_data.
+
+  ENDMETHOD.
+
+  METHOD generate_child_segment_schema.
+  ENDMETHOD.
+
 ENDCLASS.
