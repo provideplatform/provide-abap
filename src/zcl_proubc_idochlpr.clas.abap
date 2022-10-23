@@ -94,8 +94,8 @@ CLASS zcl_proubc_idochlpr IMPLEMENTATION.
 
 
   METHOD constructor.
-    lo_api_helper = NEW zcl_proubc_api_helper( iv_tenant = iv_tenant ).
-    "lo_api_helper = NEW zcl_proubc_api_helper( iv_tenant = iv_tenant iv_subject_acct_id = iv_subject_acct_id iv_workgroup_id = iv_workgroup_id ).
+    "lo_api_helper = NEW zcl_proubc_api_helper( iv_tenant = iv_tenant ).
+    lo_api_helper = NEW zcl_proubc_api_helper( iv_tenant = iv_tenant iv_subject_acct_id = iv_subject_acct_id iv_workgroup_id = iv_workgroup_id ).
 
     "sets the default tenant and ident/baseline api tokens
     lo_api_helper->setup_protocol_msg( IMPORTING setup_success = lv_setup_success ).

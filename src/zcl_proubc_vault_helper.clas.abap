@@ -17,7 +17,8 @@ CLASS zcl_proubc_vault_helper DEFINITION
       decrypt,
       sign,
       verify,
-      setup_vault_msgs.
+      setup_vault_msgs,
+      get_wallet_address EXPORTING ev_wallet_address type zproubc_smartcontract_addr.
   PROTECTED SECTION.
     DATA: lv_tenant        TYPE zprvdtenantid,
           lo_http_client   TYPE REF TO if_http_client,
@@ -136,5 +137,7 @@ CLASS zcl_proubc_vault_helper IMPLEMENTATION.
     ELSE.
       ro_vault_client = lo_vault_api.
     ENDIF.
+  ENDMETHOD.
+  METHOD get_wallet_address.
   ENDMETHOD.
 ENDCLASS.

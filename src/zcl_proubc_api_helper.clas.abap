@@ -73,6 +73,8 @@ CLASS zcl_proubc_api_helper DEFINITION
       RETURNING
         VALUE(es_dummy_idoc_msg) TYPE zif_proubc_baseline=>protocolmessage_req .
     METHODS list_bpi_accounts .
+    methods get_nchain_helper EXPORTING eo_prvd_nchain_helper type REF TO zcl_proubc_nchain_helper.
+
   PROTECTED SECTION.
     DATA: lv_defaulttenant        TYPE zprvdtenants-organization_id,
           lv_defaultsubjectacct   TYPE zprvdtenantid,
@@ -520,5 +522,11 @@ CLASS zcl_proubc_api_helper IMPLEMENTATION.
 
     ELSE.
     ENDIF.
+  ENDMETHOD.
+
+  method get_nchain_helper.
+    data: lo_prvd_nchain_helper type REF TO zcl_proubc_nchain_helper.
+          lo_prvd_nchain_helper ?= me.
+          eo_prvd_nchain_helper = lo_prvd_nchain_helper.
   ENDMETHOD.
 ENDCLASS.

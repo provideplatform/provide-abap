@@ -10,20 +10,22 @@ CLASS zcl_proubc_nchain_helper DEFINITION
       call_chainlink_pricefeed IMPORTING !iv_inputcurrency  TYPE string
                                          !iv_inputamount    TYPE  string
                                          !iv_outputcurrency TYPE string
-                               EXPORTING !ev_outputamount   TYPE string.
+                               EXPORTING !ev_outputamount   TYPE string,
+      smartcontract_factory IMPORTING !iv_smartcontractaddress TYPE zproubc_smartcontract_addr
+                                             !iv_name                 TYPE string
+                                             !iv_contract             TYPE zcasesensitive_str
+                                             !iv_walletaddress        TYPE zcasesensitive_str
+                                             !iv_nchain_networkid     TYPE zprvd_nchain_networkid
+                                             !iv_contracttype         TYPE zcasesensitive_str OPTIONAL
+                                   EXPORTING !es_selectedContract     TYPE zif_proubc_nchain=>ty_chainlinkpricefeed_req,
+      get_wallet_address exporting ev_wallet_address type zproubc_smartcontract_addr.
   PROTECTED SECTION.
     DATA: lv_tenant         TYPE zprvdtenantid,
           lo_http_client    TYPE REF TO if_http_client,
           lo_nchain_api     TYPE REF TO zcl_proubc_nchain,
-          lv_nchain_api_url TYPE string.
-    METHODS: smartcontract_factory IMPORTING !iv_smartcontractaddress TYPE zproubc_smartcontract_addr
-                                             !iv_name                 TYPE string
-                                             !iv_contract             TYPE zcasesensitive_str
-                                             !iv_walletaddress        TYPE zcasesensitive_str
-                                             !iv_abi_index            TYPE zcasesensitive_str
-                                             !iv_nchain_networkid     TYPE zprvd_nchain_networkid
-                                             !iv_contracttype         TYPE zcasesensitive_str OPTIONAL
-                                   EXPORTING !es_selectedContract     TYPE zif_proubc_nchain=>ty_chainlinkpricefeed_req.
+          lv_nchain_api_url TYPE string,
+          lo_prvd_vault_helper type REF TO zcl_proubc_vault_helper.
+    methods: get_vault_helper.
   PRIVATE SECTION.
 ENDCLASS.
 
@@ -92,7 +94,6 @@ CLASS zcl_proubc_nchain_helper IMPLEMENTATION.
                                           iv_name                 = 'ETH/USD'
                                           iv_contract             = '' "this is more complex
                                           iv_walletaddress        = '' "from the wallet we created earlier
-                                          iv_abi_index            = '' "might have been alread declared in iv_contract
                                           iv_nchain_networkid     = '1b16996e-3595-4985-816c-043345d22f8c' "goerli testnet nchain id, check if this always same
                                           iv_contracttype         = 'price-feed'
                                 IMPORTING es_selectedContract = ls_selectedcontract ).
@@ -137,6 +138,17 @@ CLASS zcl_proubc_nchain_helper IMPLEMENTATION.
                                IMPORTING ev_abi_str   = ls_contract-params-compiled_artifact-abi ).
     ls_contract-type = iv_contracttype.
 
+  ENDMETHOD.
+
+  METHOD get_vault_helper.
+    if lo_prvd_vault_helper is not bound.
+        lo_prvd_vault_helper = new zcl_proubc_vault_helper(  ).
+    endif.
+  ENDMETHOD.
+
+  method get_wallet_address.
+    me->get_vault_helper( ).
+    ev_wallet_address = ''.
   ENDMETHOD.
 
 ENDCLASS.
