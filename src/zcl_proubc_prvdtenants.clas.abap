@@ -44,6 +44,8 @@ CLASS zcl_proubc_prvdtenants IMPLEMENTATION.
 
 
   METHOD create_prvdtenant.
+    CONSTANTS: c_default_identurl TYPE string VALUE 'https://ident.provide.services',
+               c_default_bpiurl TYPE string VALUE 'https://baseline.provide.services'.
     DATA: ls_prvdtenant         TYPE zprvdtenants,
           lt_prvdtenant         TYPE TABLE OF zprvdtenants,
           lt_existingprvdtenant TYPE TABLE OF zprvdtenants,
@@ -68,9 +70,18 @@ CLASS zcl_proubc_prvdtenants IMPLEMENTATION.
       CLEAR: ls_prvdtenant.
       ls_prvdtenant-mandt = sy-mandt.
       ls_prvdtenant-organization_id = <fs_prvdtenant>-organization_id.
+      ls_prvdtenant-workgroup_id = <fs_prvdtenant>-workgroup_id.
       ls_prvdtenant-subject_account_id = <fs_prvdtenant>-subject_account_id.
-      ls_prvdtenant-bpi_endpoint = <fs_prvdtenant>-bpi_endpoint.
-      ls_prvdtenant-ident_endpoint = <fs_prvdtenant>-ident_endpoint.
+      IF <fs_prvdtenant>-bpi_endpoint IS NOT INITIAL.
+        ls_prvdtenant-bpi_endpoint = <fs_prvdtenant>-bpi_endpoint.
+      ELSE.
+        ls_prvdtenant-bpi_endpoint = c_default_bpiurl.
+      ENDIF.
+      IF <fs_prvdtenant>-ident_endpoint IS NOT INITIAL.
+        ls_prvdtenant-ident_endpoint = <fs_prvdtenant>-ident_endpoint.
+      ELSE.
+        ls_prvdtenant-ident_endpoint = c_default_identurl.
+      ENDIF.
       DATA(lv_tokenlength) = strlen( <fs_prvdtenant>-refresh_token ).
       IF lv_tokenlength LE 1024 .
         ls_prvdtenant-refresh_token = <fs_prvdtenant>-refresh_token(lv_tokenlength).
@@ -78,9 +89,6 @@ CLASS zcl_proubc_prvdtenants IMPLEMENTATION.
         ls_prvdtenant-refresh_token = <fs_prvdtenant>-refresh_token(1024).
         ls_prvdtenant-refresh_tokenext = <fs_prvdtenant>-refresh_token+1024(1024).
       ENDIF.
-
-
-
       ls_prvdtenant-createdby = sy-uname.
       ls_prvdtenant-created_at = lv_timestamp.
       APPEND ls_prvdtenant TO lt_prvdtenant.
@@ -92,7 +100,6 @@ CLASS zcl_proubc_prvdtenants IMPLEMENTATION.
     ELSE.
       MOVE-CORRESPONDING lt_prvdtenant TO et_prvdtenant.
     ENDIF.
-
 
   ENDMETHOD.
 
@@ -250,6 +257,7 @@ CLASS zcl_proubc_prvdtenants IMPLEMENTATION.
       ls_prvdtenant-mandt = sy-mandt.
       ls_prvdtenant-organization_id = <fs_prvdtenant>-organization_id.
       ls_prvdtenant-subject_account_id = <fs_prvdtenant>-subject_account_id.
+      ls_prvdtenant-workgroup_id = <fs_prvdtenant>-workgroup_id.
       ls_prvdtenant-bpi_endpoint = <fs_prvdtenant>-bpi_endpoint.
       ls_prvdtenant-ident_endpoint = <fs_prvdtenant>-ident_endpoint.
       DATA(lv_tokenlength) = strlen( <fs_prvdtenant>-refresh_token ).

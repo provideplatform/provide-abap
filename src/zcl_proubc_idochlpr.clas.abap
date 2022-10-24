@@ -160,6 +160,13 @@ CLASS zcl_proubc_idochlpr IMPLEMENTATION.
           lv_headersegment = <fs_header>-sdata.
           ev_objid = lv_headersegment-belnr.
         ENDIF.
+      when  'INTERNAL_ORDER01'.
+        DATA: lv_intordersegment type e1bp2075_masterdata_ale.
+        read TABLE it_edidd with key segnam = 'E1EBP2075_MASTERDATA_ALE' ASSIGNING FIELD-SYMBOL(<fs_header_INTORD>).
+        IF SY-SUBRC = 0.
+            lv_intordersegment = <FS_HEADER_INTORD>-SDATA.
+            EV_OBJID = LV_INTORDERSEGMENT-ORDERID.
+        ENDIF.
       WHEN OTHERS. "TODO configure object id determinations, throw errors if missing
     ENDCASE.
   ENDMETHOD.
