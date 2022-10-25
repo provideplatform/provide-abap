@@ -97,7 +97,7 @@ ENDCLASS.
 
 
 
-CLASS zcl_proubc_api_helper IMPLEMENTATION.
+CLASS ZCL_PROUBC_API_HELPER IMPLEMENTATION.
 
 
   METHOD baseline_health_check.
@@ -237,11 +237,11 @@ CLASS zcl_proubc_api_helper IMPLEMENTATION.
                     CHANGING ct_edidd = lt_edidd ).
 
     DATA: lv_idocjson TYPE string.
-    lv_idocjson = /ui2/cl_json=>serialize(
-       EXPORTING
-         data             = lt_edidd
-     ).
-    ls_dummy_idoc_protocol_msg-payload = lv_idocjson.
+*    lv_idocjson = /ui2/cl_json=>serialize(
+*       EXPORTING
+*         data             = lt_edidd
+*     ).
+*    ls_dummy_idoc_protocol_msg-payload = lv_idocjson.
 
     es_dummy_idoc_msg = ls_dummy_idoc_protocol_msg.
   ENDMETHOD.
@@ -430,6 +430,7 @@ CLASS zcl_proubc_api_helper IMPLEMENTATION.
 
           ls_finalized_protocol_msg = body.
           ls_finalized_protocol_msg-subject_account_id = lv_defaultsubjectacct.
+          ls_finalized_protocol_msg-workgroup_id = lv_selected_workgroupid.
     TRY.
         lo_baseline_client->send_protocol_msg( EXPORTING IV_body = ls_finalized_protocol_msg
                                                          IV_bpitoken = lv_bpitoken
@@ -508,6 +509,7 @@ CLASS zcl_proubc_api_helper IMPLEMENTATION.
     lv_defaulttenant = iv_defaulttenant.
   ENDMETHOD.
 
+
   METHOD prvd_tenant_sap_authcheck.
     IF iv_tenant IS NOT INITIAL.
       DATA lo_digest TYPE REF TO cl_abap_message_digest.
@@ -530,11 +532,13 @@ CLASS zcl_proubc_api_helper IMPLEMENTATION.
     ENDIF.
   ENDMETHOD.
 
+
   METHOD get_nchain_helper.
     DATA: lo_prvd_nchain_helper TYPE REF TO zcl_proubc_nchain_helper.
           lo_prvd_nchain_helper ?= me.
           eo_prvd_nchain_helper = lo_prvd_nchain_helper.
   ENDMETHOD.
+
 
   METHOD get_subject_account_id.
     DATA: lv_unhashed_subject_account_id TYPE string,

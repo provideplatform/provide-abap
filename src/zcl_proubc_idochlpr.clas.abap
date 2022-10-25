@@ -1,46 +1,57 @@
-CLASS zcl_proubc_idochlpr DEFINITION
-  PUBLIC
-  FINAL
-  CREATE PUBLIC .
+class ZCL_PROUBC_IDOCHLPR definition
+  public
+  final
+  create public .
 
-  PUBLIC SECTION.
+public section.
 
-    INTERFACES zif_proubc_blidochlper .
+  interfaces ZIF_PROUBC_BLIDOCHLPER .
 
-    TYPES:
-      tty_edidd TYPE TABLE OF edidd .
+  types:
+    tty_edidd TYPE TABLE OF edidd .
 
-    DATA lo_api_helper TYPE REF TO zcl_proubc_api_helper .
-    DATA selected_idocs TYPE zif_proubc_blidochlper=>tty_proubc_idocs .
+  data LO_API_HELPER type ref to ZCL_PROUBC_API_HELPER .
+  data SELECTED_IDOCS type ZIF_PROUBC_BLIDOCHLPER=>TTY_PROUBC_IDOCS .
 
-    CLASS-METHODS:
-    get_objid
-      IMPORTING
-        !iv_schema TYPE string
-        !it_edidd  TYPE tty_edidd
-        !iv_idoc   TYPE REF TO data
-      EXPORTING
-        !ev_objid  TYPE zBPIOBJ-object_id,
-    idoc_schema_to_json_tree  IMPORTING !it_IDOC_STRUCT           TYPE ledid_t_idoc_struct
-                                          !it_SEGMENTS              TYPE ledid_t_segment
-                                          !it_SEGMENT_STRUCT        TYPE ledid_t_segment_struct
-                                EXPORTING !ev_idoc_schema_json_tree TYPE REF TO data,
-    get_dummy_objid
-      IMPORTING
-        !iv_schema     TYPE string
-      EXPORTING
-        !ev_objid      TYPE zBPIOBJ-object_id
-        !ev_newidocnum TYPE edidd-docnum
-      CHANGING
-        !ct_edidd      TYPE tty_edidd,
-          generate_segment_fields IMPORTING it_target_segment_struct TYPE ledid_t_segment_struct EXPORTING et_field_data TYPE zif_proubc_blidochlper=>tty_idoc_segment_field,
-      generate_child_segment_schema CHANGING cs_segment_schema TYPE zif_proubc_blidochlper=>ty_idoc_segment.
-    METHODS constructor
-      IMPORTING
-        !iv_tenant TYPE zPRVDTENANTID OPTIONAL
-        !iv_subject_acct_id TYPE zprvdtenantid OPTIONAL
-        !iv_workgroup_id    type zprvdtenantid OPTIONAL.
-    METHODS launch_idoc_to_baseline .
+  class-methods GET_OBJID
+    importing
+      !IV_SCHEMA type STRING
+      !IT_EDIDD type TTY_EDIDD
+      !IV_IDOC type ref to DATA
+    exporting
+      !EV_OBJID type ZBPIOBJ-OBJECT_ID .
+  class-methods IDOC_SCHEMA_TO_JSON_TREE
+    importing
+      !IT_IDOC_STRUCT type LEDID_T_IDOC_STRUCT
+      !IT_SEGMENTS type LEDID_T_SEGMENT
+      !IT_SEGMENT_STRUCT type LEDID_T_SEGMENT_STRUCT
+    exporting
+      !EV_IDOC_SCHEMA_JSON_TREE type ref to DATA .
+  class-methods GET_DUMMY_OBJID
+    importing
+      !IV_SCHEMA type STRING
+    exporting
+      !EV_OBJID type ZBPIOBJ-OBJECT_ID
+      !EV_NEWIDOCNUM type EDIDD-DOCNUM
+    changing
+      !CT_EDIDD type TTY_EDIDD .
+  class-methods GENERATE_SEGMENT_FIELDS
+    importing
+      !IT_TARGET_SEGMENT_STRUCT type LEDID_T_SEGMENT_STRUCT
+    exporting
+      !ET_FIELD_DATA type ZIF_PROUBC_BLIDOCHLPER=>TTY_IDOC_SEGMENT_FIELD .
+  class-methods GENERATE_CHILD_SEGMENT_SCHEMA
+    changing
+      !CS_SEGMENT_SCHEMA type ZIF_PROUBC_BLIDOCHLPER=>TY_IDOC_SEGMENT .
+  methods CONSTRUCTOR
+    importing
+      !IV_TENANT type ZPRVDTENANTID optional
+      !IV_SUBJECT_ACCT_ID type ZPRVDTENANTID optional
+      !IV_WORKGROUP_ID type ZPRVDTENANTID optional .
+  methods LAUNCH_IDOC_TO_BASELINE
+    importing
+      value(IV_IDOCMESTY) type EDI_MESTYP
+      value(IV_IDOCTP) type EDI_IDOCTP .
   PROTECTED SECTION.
       TYPES: BEGIN OF ty_idoc_struct_parent_child,
              parent TYPE edilsegtyp,
@@ -80,7 +91,7 @@ ENDCLASS.
 
 
 
-CLASS zcl_proubc_idochlpr IMPLEMENTATION.
+CLASS ZCL_PROUBC_IDOCHLPR IMPLEMENTATION.
 
 
   METHOD add_message.
@@ -171,6 +182,7 @@ CLASS zcl_proubc_idochlpr IMPLEMENTATION.
     ENDCASE.
   ENDMETHOD.
 
+
   METHOD idoc_schema_to_json_tree.
 
     DATA: lv_idoc_json_tree_data TYPE REF TO data,
@@ -249,7 +261,6 @@ CLASS zcl_proubc_idochlpr IMPLEMENTATION.
   ENDMETHOD.
 
 
-
   METHOD launch_idoc_to_baseline.
     DATA:
       lo_ident_api         TYPE REF TO zif_proubc_ident,
@@ -289,22 +300,21 @@ CLASS zcl_proubc_idochlpr IMPLEMENTATION.
         EXCEPTIONS
           OTHERS          = 1.
 
-      DATA: lv_idocjson TYPE string.
       DATA: lv_flattened_idoc TYPE REF TO data.
+      data: lv_idoc_basictype type string.
+      "write iv_idocmesty to lv_idoc_basictype.
+      "lv_idoc_basictype = iv_idocmesty.
+      lv_idoc_basictype = wa_idoc_control-idoctp.
       me->idoc_to_json(
         EXPORTING
-          iv_idoc_basictype = 'ORDERS05'
+          iv_idoc_basictype = lv_idoc_basictype
           it_idoc_segments  =  lt_edidd
          IMPORTING
            ev_flattened_idoc = lv_flattened_idoc
       ).
-      lv_idocjson = /ui2/cl_json=>serialize(
-        EXPORTING
-            data = lv_flattened_idoc
-      ).
 
       "request to /api/v1/protocol_messages
-      ls_protocol_msg_req-payload = lv_idocjson.
+      ls_protocol_msg_req-payload = lv_flattened_idoc.
       ls_protocol_msg_req-payload_mimetype = 'json'.
       ls_protocol_msg_req-type = wa_idoc_control-idoctp. "should be orders05 for demo purposes
 
@@ -403,10 +413,13 @@ CLASS zcl_proubc_idochlpr IMPLEMENTATION.
     AND docnum IN @it_idocnum.
 
     IF sy-subrc EQ 0.
-      me->launch_idoc_to_baseline(  ).
+      me->launch_idoc_to_baseline( EXPORTING iv_idoctp = iv_idoctp
+                                             iv_idocmesty = iv_idocmestyp  ).
     ENDIF.
 
   ENDMETHOD.
+
+
    METHOD generate_child_idoc_segdata.
     DATA: ls_json_child_segment    TYPE REF TO data,
           lv_json_child_segmentid  TYPE string,
@@ -508,6 +521,7 @@ CLASS zcl_proubc_idochlpr IMPLEMENTATION.
 
   ENDMETHOD.
 
+
   METHOD generate_idoc_segdata.
     "create a variable of the data type of the segment
     DATA: lv_json_segment TYPE REF TO data.
@@ -567,6 +581,8 @@ CLASS zcl_proubc_idochlpr IMPLEMENTATION.
     ev_json_segmentdata = dataref.
 
   ENDMETHOD.
+
+
    METHOD idoc_to_json.
 
     DATA: lv_flattened_idoc TYPE REF TO data.
@@ -695,7 +711,7 @@ CLASS zcl_proubc_idochlpr IMPLEMENTATION.
         "IF lr_ref IS INITIAL.
 
         IF dataref IS INITIAL AND dataref_b IS INITIAL.
-          comp_wa-name = lv_json_segmentid.
+          comp_wa-name = lv_json_segmentid. "TODO only handle up to 30 chars
           comp_wa-type ?= cl_abap_datadescr=>describe_by_data( ls_json_segmentdata ).
           APPEND comp_wa TO comp_tab.
           comp_tab_b = comp_tab.
@@ -757,6 +773,7 @@ CLASS zcl_proubc_idochlpr IMPLEMENTATION.
 
   ENDMETHOD.
 
+
     METHOD generate_segment_fields.
     DATA: ls_field_data TYPE zif_proubc_blidochlper=>ty_idoc_segment_field,
           lt_field_data TYPE zif_proubc_blidochlper=>tty_idoc_segment_field.
@@ -792,7 +809,7 @@ CLASS zcl_proubc_idochlpr IMPLEMENTATION.
 
   ENDMETHOD.
 
+
   METHOD generate_child_segment_schema.
   ENDMETHOD.
-
 ENDCLASS.

@@ -408,16 +408,11 @@ INTERFACE zif_proubc_baseline
 *}
     BEGIN OF protocolmessage_req,
       id               TYPE zbpiobj-object_id, "object id, e.g PO number
-      BaselineID       TYPE zbpiobj-baseline_id, "optional
-      "errors type table of string,
-      "messageid type string, "ok to leave this empty
-      payload          TYPE string, "the idoc payload
+      payload          TYPE ref to data, "the idoc payload
       payload_mimetype TYPE string, " 'application/xml or json
-      "protocolmessage type ref to data,
-      "recipients type ref to data,
-      "status type string,
       type             TYPE string, "e.g. ORDERS05
       subject_account_id type zprvdtenantid,
+      workgroup_id type zprvdtenantid,
     END OF protocolmessage_req .
   TYPES:
     BEGIN OF bpiobjects_req,
