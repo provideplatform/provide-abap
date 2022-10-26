@@ -334,6 +334,7 @@ CLASS ZCL_PROUBC_API_HELPER IMPLEMENTATION.
     IF iv_tenant IS NOT INITIAL AND iv_subject_acct_id IS NOT INITIAL.
       SELECT organization_id,
              subject_account_id,
+             workgroup_id,
              bpi_endpoint
           FROM zprvdtenants
           INTO TABLE @DATA(lt_defaultorg)
@@ -344,6 +345,7 @@ CLASS ZCL_PROUBC_API_HELPER IMPLEMENTATION.
         IF sy-subrc = 0.
           lv_defaulttenant = wa_defaulttenant-organization_id.
           lv_defaultsubjectacct = wa_defaulttenant-subject_account_id.
+          lv_selected_workgroupid = wa_defaulttenant-workgroup_id.
           lv_default_bpiendpoint = wa_defaulttenant-bpi_endpoint.
           RETURN.
         ENDIF.
@@ -352,6 +354,7 @@ CLASS ZCL_PROUBC_API_HELPER IMPLEMENTATION.
 
     SELECT organization_id,
            subject_account_id,
+           workgroup_id,
            bpi_endpoint
         FROM zprvdtenants
         INTO TABLE @lt_defaultorg
@@ -362,6 +365,7 @@ CLASS ZCL_PROUBC_API_HELPER IMPLEMENTATION.
       IF sy-subrc = 0.
         lv_defaulttenant = wa_defaulttenant-organization_id.
         lv_defaultsubjectacct  = wa_defaulttenant-subject_account_id.
+        lv_selected_workgroupid = wa_defaulttenant-workgroup_id.
         lv_default_bpiendpoint = wa_defaulttenant-bpi_endpoint.
       ENDIF.
     ENDIF.

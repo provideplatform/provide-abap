@@ -52,6 +52,18 @@ public section.
     importing
       value(IV_IDOCMESTY) type EDI_MESTYP
       value(IV_IDOCTP) type EDI_IDOCTP .
+  methods check_for_illegal_characters
+    importing
+      iv_string type string
+    exporting
+      ev_illegal_char_index type i
+      ev_illegal_char_found type c
+      ev_safestring type char30.
+  methods build_safestring
+    importing
+      iv_string type string
+    exporting
+      ev_safestring type char30.
   PROTECTED SECTION.
       TYPES: BEGIN OF ty_idoc_struct_parent_child,
              parent TYPE edilsegtyp,
@@ -325,40 +337,44 @@ CLASS ZCL_PROUBC_IDOCHLPR IMPLEMENTATION.
                                iv_idoc = lv_idoc
                      IMPORTING ev_objid = ls_protocol_msg_req-id ).
 
-
-*https://gist.github.com/kthomas/459381e98c808febea9c1bb51408bbde
-      "call baseline API /api/v1/protocolmessage
-      "need updates on witness generation
-      lo_api_helper->send_protocol_msg( EXPORTING body = ls_protocol_msg_req IMPORTING statuscode = lv_status  ). "should return 202
+      "creates the Baseline Protocol / zk-proof of the idoc
+      data: lv_apiresponse type ref to data,
+            lv_apiresponsestr type string.
+      lo_api_helper->send_protocol_msg( EXPORTING body = ls_protocol_msg_req IMPORTING statuscode = lv_status
+                                                                                       apiresponse = lv_apiresponse
+                                                                                       apiresponsestr = lv_apiresponsestr  ). "should return 202
 
       IF lv_status = '202'.
-        DATA: wa_bpiobj    TYPE zbpiobj,
-              lv_timestamp TYPE timestampl.
-        CLEAR: wa_bpiobj.
-        SELECT SINGLE * FROM zbpiobj INTO wa_bpiobj WHERE object_id = ls_protocol_msg_req-id.
-        IF sy-subrc = 0.
-          "todo validate same baseline_id is received for this object
-          "wa_bpiobj-baseline_id = ''. "To be provided by api
-          wa_bpiobj-proof = ''. "To be provided by api
-          wa_bpiobj-status = ''. "To be determined by api response
-          wa_bpiobj-object_id = ls_protocol_msg_req-id.
-          wa_bpiobj-created_by = sy-uname.
-          wa_bpiobj-created_at = lv_timestamp.
-          wa_bpiobj-schematype = 'IDOC'.
-          wa_bpiobj-schema_id = wa_idoc_control-mestyp.
-          APPEND wa_bpiobj TO lt_updatedbpis.
-        ELSE.
-          GET TIME STAMP FIELD lv_timestamp.
-          wa_bpiobj-baseline_id = ''. "To be provided by api
-          wa_bpiobj-proof = ''. "To be provided by api
-          wa_bpiobj-status = ''. "To be determined by api response
-          wa_bpiobj-object_id = ls_protocol_msg_req-id.
-          wa_bpiobj-created_by = sy-uname.
-          wa_bpiobj-created_at = lv_timestamp.
-          wa_bpiobj-schematype = 'IDOC'.
-          wa_bpiobj-schema_id = wa_idoc_control-mestyp.
-          APPEND wa_bpiobj TO lt_newbpis.
-        ENDIF.
+*        data: ls_protocol_msg_resp type zif_proubc_baseline=>protocolmessage_resp.
+*        /ui2/cl_json=>deserialize( EXPORTING json = lv_apiresponsestr  CHANGING data = ls_protocol_msg_resp ).
+*
+*        DATA: wa_bpiobj    TYPE zbpiobj,
+*              lv_timestamp TYPE timestampl.
+*        CLEAR: wa_bpiobj.
+*        SELECT SINGLE * FROM zbpiobj INTO wa_bpiobj WHERE object_id = ls_protocol_msg_req-id.
+*        IF sy-subrc = 0.
+*          "todo validate same baseline_id is received for this object
+*          "wa_bpiobj-baseline_id = ''. "To be provided by api
+*          wa_bpiobj-proof = ''. "To be provided by api
+*          wa_bpiobj-status = ''. "To be determined by api response
+*          wa_bpiobj-object_id = ls_protocol_msg_req-id.
+*          wa_bpiobj-created_by = sy-uname.
+*          wa_bpiobj-created_at = lv_timestamp.
+*          wa_bpiobj-schematype = 'IDOC'.
+*          wa_bpiobj-schema_id = wa_idoc_control-mestyp.
+*          APPEND wa_bpiobj TO lt_updatedbpis.
+*        ELSE.
+*          GET TIME STAMP FIELD lv_timestamp.
+*          wa_bpiobj-baseline_id = ''. "To be provided by api
+*          wa_bpiobj-proof = ''. "To be provided by api
+*          wa_bpiobj-status = ''. "To be determined by api response
+*          wa_bpiobj-object_id = ls_protocol_msg_req-id.
+*          wa_bpiobj-created_by = sy-uname.
+*          wa_bpiobj-created_at = lv_timestamp.
+*          wa_bpiobj-schematype = 'IDOC'.
+*          wa_bpiobj-schema_id = wa_idoc_control-mestyp.
+*          APPEND wa_bpiobj TO lt_newbpis.
+*        ENDIF.
       ELSE. "log error message
       ENDIF.
 
@@ -528,9 +544,30 @@ CLASS ZCL_PROUBC_IDOCHLPR IMPLEMENTATION.
     FIELD-SYMBOLS: <fs_json_segment> TYPE any.
     DATA(lv_segment_type) = cl_abap_classdescr=>describe_by_name( iv_segmenttype ). "cast #( iv_segmenttype ).
     DATA: lv_segment TYPE REF TO data.
+    data: lv_segnumint type i.
+    data: lv_segnumstring type string,
+          lv_segnam type string,
+          lv_json_segmentid type string.
     CREATE DATA lv_segment TYPE (iv_segmenttype).
 
-    CONCATENATE iv_rawsegment-segnam '_' iv_rawsegment-segnum INTO ev_json_segmentid.
+    lv_segnumint = iv_rawsegment-segnum.
+    lv_segnumstring = lv_segnumint.
+    lv_segnam = iv_rawsegment-segnam.
+    "replace all occurrences of '_' in lv_segnam with ''.
+    "translate lv_segnam to lower case.
+    select single segnam from edid4 where segnam = @lv_segnam into @data(lv_encodedsegnmam).
+    replace all occurrences of '_' in lv_encodedsegnmam with ''.
+    CONCATENATE lv_encodedsegnmam lv_segnumstring INTO lv_json_segmentid separated by '_'.
+    data: lv_safestring type char30.
+    me->CHECK_FOR_ILLEGAL_CHARACTERS(
+      EXPORTING
+        IV_STRING             = lv_json_segmentid
+      IMPORTING
+*        EV_ILLEGAL_CHAR_INDEX =
+*        EV_ILLEGAL_CHAR_FOUND =
+        EV_SAFESTRING         =  lv_safestring
+    ).
+    ev_json_segmentid = lv_safestring.
 
     DATA:  dataref TYPE REF TO data.
     DATA: comp_tab    TYPE cl_abap_structdescr=>component_table,
@@ -560,7 +597,15 @@ CLASS ZCL_PROUBC_IDOCHLPR IMPLEMENTATION.
 
 
     "Create Dynamic table using component table
-    struct_type = cl_abap_structdescr=>create( comp_tab ).
+    "struct_type = cl_abap_structdescr=>create( comp_tab ).
+    cl_abap_structdescr=>CREATE( "TODO discover wth this dumps on component name
+      EXPORTING
+        P_COMPONENTS = comp_tab
+        P_STRICT     = ''
+      RECEIVING
+        P_RESULT     = struct_type
+    ).
+
     CREATE DATA dataref TYPE HANDLE struct_type.
     ASSIGN dataref->* TO <segmentdata>. "Dyanmic Structure
 
@@ -812,4 +857,54 @@ CLASS ZCL_PROUBC_IDOCHLPR IMPLEMENTATION.
 
   METHOD generate_child_segment_schema.
   ENDMETHOD.
+
+  method check_for_illegal_characters.
+  data: lv_safestring type char30,
+        lv_checkedstring type string.
+  if iv_string cn 'ABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789#$%&*-/;<=>?@^{|}'.
+  "do something to fix it!
+    lv_checkedstring = iv_string.
+    me->build_safestring( exporting iv_string = lv_checkedstring
+                          importing ev_safestring = lv_safestring ).
+    ev_safestring = lv_safestring.
+  else.
+    data(lv_string_len) = strlen( lv_checkedstring ).
+    if lv_string_len ge 30.
+    ev_safestring = iv_string(30).
+    else.
+    ev_safestring = iv_string.
+    endif.
+  endif.
+
+*  data: lv_strlen type i.
+*        lv_strlen = strlen( iv_string ).
+*  data: lv_offset type i.
+*  lv_offset = lv_strlen.
+
+  endmethod.
+  method build_safestring.
+    data: it_split TYPE TABLE OF string,
+          it_safestring type table of string,
+          wa_safestring type string.
+    CALL FUNCTION 'SOTR_SERV_STRING_TO_TABLE'
+        EXPORTING
+            text = iv_string
+            line_length = 1
+        TABLES
+            text_tab = it_split.
+    loop at it_split assigning field-symbol(<fs_split>).
+        if <fs_split> co 'ABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789#$%&*-/;<=>?@^{|}'.
+            wa_safestring = <fs_split>.
+            append wa_safestring to it_safestring.
+        endif.
+    endloop.
+    data: lv_safestring type string.
+    concatenate lines of it_safestring into lv_safestring.
+    data(lv_safestring_len) = strlen( lv_safestring ).
+    if lv_safestring_len ge 30.
+    ev_safestring = lv_safestring(30).
+    else.
+    ev_safestring = lv_safestring.
+    endif.
+  endmethod.
 ENDCLASS.
