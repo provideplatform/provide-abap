@@ -143,7 +143,8 @@ INTERFACE zif_proubc_nchain
 
   TYPES: BEGIN OF ty_pricefeed_compiledartifact,
            name TYPE zcasesensitive_str,
-           abi  TYPE zcasesensitive_str,
+           "abi  TYPE zcasesensitive_str,
+           abi type ref to data,
          END OF ty_pricefeed_compiledartifact.
 
 * Component schema: Params, object
@@ -389,9 +390,9 @@ INTERFACE zif_proubc_nchain
 
 * Component schema: ExecutecontractRequest, object
   TYPES: BEGIN OF ty_executecontractrequest,
-           method     TYPE string,
-           params     TYPE STANDARD TABLE OF string WITH DEFAULT KEY, " todo, handle array
-           value      TYPE i,
+           method    TYPE string,
+           params    TYPE STANDARD TABLE OF string WITH DEFAULT KEY, " todo, handle array
+           value     TYPE i,
            wallet_id TYPE string,
          END OF ty_executecontractrequest.
 
@@ -415,6 +416,16 @@ INTERFACE zif_proubc_nchain
            params     TYPE ty_pricefeed_req_params,
            type       TYPE zcasesensitive_str,
          END OF ty_chainlinkpricefeed_req.
+
+  TYPES: BEGIN OF ty_hdwalletcreate_resp,
+           id              TYPE string, "0e6ecd82-8d0e-4c45-bc45-8040be313f3e",
+           created_at      TYPE string, "2022-10-27T19:14:00.574634616Z",
+           organization_id TYPE string, ": "1e59736f-16d8-4d90-8ed0-755f15c9f573",
+           vault_id        TYPE string, ": "190822c9-62f5-4caf-a419-df735a793b2f",
+           key_id          TYPE string, ": "1252219c-d475-4cd7-ade3-66ae1e09745e",
+           purpose         TYPE i, "44,
+           public_key      TYPE string, ": "xpub661MyMwAqRbcFh4eaatbKy99k8qhPBdQWYUSPnmaeA14S6aVnZANoMzA1vDzwWeY8o7ax7gdHYbQLQv4QNabnsovT4SWFTLUPZAv2Jz9g9c"
+         END OF ty_hdwalletcreate_resp.
 
 
 * GET - "List connectors"
@@ -720,8 +731,8 @@ INTERFACE zif_proubc_nchain
 * Body ref: #/components/schemas/ExecutecontractRequest
   METHODS executecontract
     IMPORTING
-              iv_contract_id         TYPE zcasesensitive_str
-              is_execcontractreq     TYPE ty_executecontractrequest
+              iv_contract_id      TYPE zcasesensitive_str
+              is_execcontractreq  TYPE ty_executecontractrequest
     EXPORTING
               ev_apiresponsestr   TYPE string
               ev_apiresponse      TYPE REF TO data

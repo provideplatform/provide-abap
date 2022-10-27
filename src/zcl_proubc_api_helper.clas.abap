@@ -32,8 +32,8 @@ CLASS zcl_proubc_api_helper DEFINITION
         !iv_workgroup_id TYPE zprvdtenantid OPTIONAL.
     METHODS call_ident_api
       IMPORTING
-        !iv_tenant      TYPE zPRVDTENANTID
-        !iv_subjacct    TYPE zprvdtenantid
+        !iv_tenant      TYPE zPRVDTENANTID OPTIONAL
+        !iv_subjacct    TYPE zprvdtenantid OPTIONAL
         !iv_wrkgrpid    TYPE zprvdtenantid OPTIONAL
       EXPORTING
         !ev_authtoken   TYPE REF TO data
@@ -539,10 +539,9 @@ CLASS ZCL_PROUBC_API_HELPER IMPLEMENTATION.
 
   METHOD get_nchain_helper.
     DATA: lo_prvd_nchain_helper TYPE REF TO zcl_proubc_nchain_helper.
-          lo_prvd_nchain_helper ?= me.
+          lo_prvd_nchain_helper = new zcl_proubc_nchain_helper( io_prvd_api_helper = me  ).
           eo_prvd_nchain_helper = lo_prvd_nchain_helper.
   ENDMETHOD.
-
 
   METHOD get_subject_account_id.
     DATA: lv_unhashed_subject_account_id TYPE string,

@@ -6,13 +6,13 @@ CLASS zcl_proubc_vault DEFINITION
   PUBLIC SECTION.
     INTERFACES zif_proubc_vault.
     METHODS constructor IMPORTING !ii_client   TYPE REF TO if_http_client
-                                  !iv_tenant   TYPE zPRVDTENANTID
-                                  !iv_bpitoken TYPE zPRVDREFRESHTOKEN.
+                                  !iv_tenant   TYPE zprvdtenantid
+                                  !iv_bpitoken TYPE zprvdrefreshtoken.
   PROTECTED SECTION.
     DATA mi_client TYPE REF TO if_http_client.
     DATA lv_vault_url TYPE string VALUE 'https://vault.provide.services'.
     DATA lv_bpitoken TYPE zprvdrefreshtoken.
-    data lv_tenantid type zcasesensitive_str.
+    DATA lv_tenantid TYPE zcasesensitive_str.
     METHODS send_receive RETURNING VALUE(rv_code) TYPE i.
   PRIVATE SECTION.
     METHODS sap_auth_check.
@@ -22,7 +22,7 @@ ENDCLASS.
 
 
 
-CLASS ZCL_PROUBC_VAULT IMPLEMENTATION.
+CLASS zcl_proubc_vault IMPLEMENTATION.
 
 
   METHOD constructor.
