@@ -1,71 +1,71 @@
-class ZCL_PROUBC_IDOCHLPR definition
-  public
-  final
-  create public .
+CLASS zcl_proubc_idochlpr DEFINITION
+  PUBLIC
+  FINAL
+  CREATE PUBLIC .
 
-public section.
+  PUBLIC SECTION.
 
-  interfaces ZIF_PROUBC_BLIDOCHLPER .
+    INTERFACES zif_proubc_blidochlper .
 
-  types:
-    tty_edidd TYPE TABLE OF edidd .
+    TYPES:
+      tty_edidd TYPE TABLE OF edidd .
 
-  data LO_API_HELPER type ref to ZCL_PROUBC_API_HELPER .
-  data SELECTED_IDOCS type ZIF_PROUBC_BLIDOCHLPER=>TTY_PROUBC_IDOCS .
+    DATA lo_api_helper TYPE REF TO zcl_proubc_api_helper .
+    DATA selected_idocs TYPE zif_proubc_blidochlper=>tty_proubc_idocs .
 
-  class-methods GET_OBJID
-    importing
-      !IV_SCHEMA type STRING
-      !IT_EDIDD type TTY_EDIDD
-      !IV_IDOC type ref to DATA
-    exporting
-      !EV_OBJID type ZBPIOBJ-OBJECT_ID .
-  class-methods IDOC_SCHEMA_TO_JSON_TREE
-    importing
-      !IT_IDOC_STRUCT type LEDID_T_IDOC_STRUCT
-      !IT_SEGMENTS type LEDID_T_SEGMENT
-      !IT_SEGMENT_STRUCT type LEDID_T_SEGMENT_STRUCT
-    exporting
-      !EV_IDOC_SCHEMA_JSON_TREE type ref to DATA .
-  class-methods GET_DUMMY_OBJID
-    importing
-      !IV_SCHEMA type STRING
-    exporting
-      !EV_OBJID type ZBPIOBJ-OBJECT_ID
-      !EV_NEWIDOCNUM type EDIDD-DOCNUM
-    changing
-      !CT_EDIDD type TTY_EDIDD .
-  class-methods GENERATE_SEGMENT_FIELDS
-    importing
-      !IT_TARGET_SEGMENT_STRUCT type LEDID_T_SEGMENT_STRUCT
-    exporting
-      !ET_FIELD_DATA type ZIF_PROUBC_BLIDOCHLPER=>TTY_IDOC_SEGMENT_FIELD .
-  class-methods GENERATE_CHILD_SEGMENT_SCHEMA
-    changing
-      !CS_SEGMENT_SCHEMA type ZIF_PROUBC_BLIDOCHLPER=>TY_IDOC_SEGMENT .
-  methods CONSTRUCTOR
-    importing
-      !IV_TENANT type ZPRVDTENANTID optional
-      !IV_SUBJECT_ACCT_ID type ZPRVDTENANTID optional
-      !IV_WORKGROUP_ID type ZPRVDTENANTID optional .
-  methods LAUNCH_IDOC_TO_BASELINE
-    importing
-      value(IV_IDOCMESTY) type EDI_MESTYP
-      value(IV_IDOCTP) type EDI_IDOCTP .
-  methods check_for_illegal_characters
-    importing
-      iv_string type string
-    exporting
-      ev_illegal_char_index type i
-      ev_illegal_char_found type c
-      ev_safestring type char30.
-  methods build_safestring
-    importing
-      iv_string type string
-    exporting
-      ev_safestring type char30.
+    CLASS-METHODS get_objid
+      IMPORTING
+        !iv_schema TYPE string
+        !it_edidd  TYPE tty_edidd
+        !iv_idoc   TYPE REF TO data
+      EXPORTING
+        !ev_objid  TYPE zbpiobj-object_id .
+    CLASS-METHODS idoc_schema_to_json_tree
+      IMPORTING
+        !it_idoc_struct           TYPE ledid_t_idoc_struct
+        !it_segments              TYPE ledid_t_segment
+        !it_segment_struct        TYPE ledid_t_segment_struct
+      EXPORTING
+        !ev_idoc_schema_json_tree TYPE REF TO data .
+    CLASS-METHODS get_dummy_objid
+      IMPORTING
+        !iv_schema     TYPE string
+      EXPORTING
+        !ev_objid      TYPE zbpiobj-object_id
+        !ev_newidocnum TYPE edidd-docnum
+      CHANGING
+        !ct_edidd      TYPE tty_edidd .
+    CLASS-METHODS generate_segment_fields
+      IMPORTING
+        !it_target_segment_struct TYPE ledid_t_segment_struct
+      EXPORTING
+        !et_field_data            TYPE zif_proubc_blidochlper=>tty_idoc_segment_field .
+    CLASS-METHODS generate_child_segment_schema
+      CHANGING
+        !cs_segment_schema TYPE zif_proubc_blidochlper=>ty_idoc_segment .
+    METHODS constructor
+      IMPORTING
+        !iv_tenant          TYPE zprvdtenantid OPTIONAL
+        !iv_subject_acct_id TYPE zprvdtenantid OPTIONAL
+        !iv_workgroup_id    TYPE zprvdtenantid OPTIONAL .
+    METHODS launch_idoc_to_baseline
+      IMPORTING
+        VALUE(iv_idocmesty) TYPE edi_mestyp
+        VALUE(iv_idoctp)    TYPE edi_idoctp .
+    METHODS check_for_illegal_characters
+      IMPORTING
+        iv_string             TYPE string
+      EXPORTING
+        ev_illegal_char_index TYPE i
+        ev_illegal_char_found TYPE c
+        ev_safestring         TYPE char30.
+    METHODS build_safestring
+      IMPORTING
+        iv_string     TYPE string
+      EXPORTING
+        ev_safestring TYPE char30.
   PROTECTED SECTION.
-      TYPES: BEGIN OF ty_idoc_struct_parent_child,
+    TYPES: BEGIN OF ty_idoc_struct_parent_child,
              parent TYPE edilsegtyp,
              child  TYPE edilsegtyp,
            END OF ty_idoc_struct_parent_child.
@@ -74,12 +74,12 @@ public section.
           return_messages  TYPE TABLE OF bapiret2.
     METHODS: add_message IMPORTING iv_msg TYPE bapiret2,
       clear_messages,
-     idoc_to_json
-      IMPORTING
-        !iv_idoc_basictype TYPE string
-        !it_idoc_segments  TYPE idoc_data
-      EXPORTING
-        !ev_flattened_idoc TYPE REF TO data.
+      idoc_to_json
+        IMPORTING
+          !iv_idoc_basictype TYPE string
+          !it_idoc_segments  TYPE idoc_data
+        EXPORTING
+          !ev_flattened_idoc TYPE REF TO data.
   PRIVATE SECTION.
     METHODS generate_child_idoc_segdata IMPORTING !iv_childsegmenttype      TYPE edilsegtyp
                                                   !iv_childrawsegment       TYPE edidd
@@ -103,7 +103,7 @@ ENDCLASS.
 
 
 
-CLASS ZCL_PROUBC_IDOCHLPR IMPLEMENTATION.
+CLASS zcl_proubc_idochlpr IMPLEMENTATION.
 
 
   METHOD add_message.
@@ -146,7 +146,7 @@ CLASS ZCL_PROUBC_IDOCHLPR IMPLEMENTATION.
         "data record E1EDK01 - BELNR
         DATA: lv_headersegment  TYPE e1edk01,
               lv_headersegment2 TYPE e1edk02.
-        READ TABLE Ct_edidd WITH KEY segnam = 'E1EDK01' ASSIGNING FIELD-SYMBOL(<fs_header>).
+        READ TABLE ct_edidd WITH KEY segnam = 'E1EDK01' ASSIGNING FIELD-SYMBOL(<fs_header>).
         IF sy-subrc = 0.
           lv_headersegment = <fs_header>-sdata.
           DATA lv_belnr_int TYPE int8.
@@ -161,7 +161,7 @@ CLASS ZCL_PROUBC_IDOCHLPR IMPLEMENTATION.
           lv_idoc_int += r2->get_next( ).
           lv_dummy_idocnum = lv_idoc_int.
         ENDIF.
-        READ TABLE ct_edidd WITH KEY segnam = 'E1EDK02' ASSIGNING FIELD-SYMBOL(<fs_header_EXT>).
+        READ TABLE ct_edidd WITH KEY segnam = 'E1EDK02' ASSIGNING FIELD-SYMBOL(<fs_header_ext>).
         lv_headersegment2 = <fs_header>-sdata.
         lv_headersegment2-belnr = lv_dummy_po.
       WHEN OTHERS.
@@ -183,12 +183,12 @@ CLASS ZCL_PROUBC_IDOCHLPR IMPLEMENTATION.
           lv_headersegment = <fs_header>-sdata.
           ev_objid = lv_headersegment-belnr.
         ENDIF.
-      when  'INTERNAL_ORDER01'.
-        DATA: lv_intordersegment type e1bp2075_masterdata_ale.
-        read TABLE it_edidd with key segnam = 'E1EBP2075_MASTERDATA_ALE' ASSIGNING FIELD-SYMBOL(<fs_header_INTORD>).
-        IF SY-SUBRC = 0.
-            lv_intordersegment = <FS_HEADER_INTORD>-SDATA.
-            EV_OBJID = LV_INTORDERSEGMENT-ORDERID.
+      WHEN  'INTERNAL_ORDER01'.
+        DATA: lv_intordersegment TYPE e1bp2075_masterdata_ale.
+        READ TABLE it_edidd WITH KEY segnam = 'E1BP2075_MASTERDATA_ALE' ASSIGNING FIELD-SYMBOL(<fs_header_intord>).
+        IF sy-subrc = 0.
+          lv_intordersegment = <fs_header_intord>-sdata.
+          ev_objid = lv_intordersegment-orderid.
         ENDIF.
       WHEN OTHERS. "TODO configure object id determinations, throw errors if missing
     ENDCASE.
@@ -246,7 +246,7 @@ CLASS ZCL_PROUBC_IDOCHLPR IMPLEMENTATION.
       "generate child segments TODO
       "generate fields
       DATA: lt_mapped_segment_struct TYPE ledid_t_segment_struct.
-      lt_mapped_segment_struct = VALUE ledid_t_segment_struct( FOR line IN it_SEGMENT_STRUCT WHERE ( segment_type EQ <fs_idoc_struct>-segment_type  ) ( line ) ).
+      lt_mapped_segment_struct = VALUE ledid_t_segment_struct( FOR line IN it_segment_struct WHERE ( segment_type EQ <fs_idoc_struct>-segment_type  ) ( line ) ).
       zcl_proubc_idochlpr=>generate_segment_fields(
         EXPORTING
           it_target_segment_struct =  lt_mapped_segment_struct
@@ -313,7 +313,7 @@ CLASS ZCL_PROUBC_IDOCHLPR IMPLEMENTATION.
           OTHERS          = 1.
 
       DATA: lv_flattened_idoc TYPE REF TO data.
-      data: lv_idoc_basictype type string.
+      DATA: lv_idoc_basictype TYPE string.
       "write iv_idocmesty to lv_idoc_basictype.
       "lv_idoc_basictype = iv_idocmesty.
       lv_idoc_basictype = wa_idoc_control-idoctp.
@@ -338,43 +338,47 @@ CLASS ZCL_PROUBC_IDOCHLPR IMPLEMENTATION.
                      IMPORTING ev_objid = ls_protocol_msg_req-id ).
 
       "creates the Baseline Protocol / zk-proof of the idoc
-      data: lv_apiresponse type ref to data,
-            lv_apiresponsestr type string.
+      DATA: lv_apiresponse    TYPE REF TO data,
+            lv_apiresponsestr TYPE string.
       lo_api_helper->send_protocol_msg( EXPORTING body = ls_protocol_msg_req IMPORTING statuscode = lv_status
                                                                                        apiresponse = lv_apiresponse
                                                                                        apiresponsestr = lv_apiresponsestr  ). "should return 202
 
       IF lv_status = '202'.
-*        data: ls_protocol_msg_resp type zif_proubc_baseline=>protocolmessage_resp.
-*        /ui2/cl_json=>deserialize( EXPORTING json = lv_apiresponsestr  CHANGING data = ls_protocol_msg_resp ).
-*
-*        DATA: wa_bpiobj    TYPE zbpiobj,
-*              lv_timestamp TYPE timestampl.
-*        CLEAR: wa_bpiobj.
-*        SELECT SINGLE * FROM zbpiobj INTO wa_bpiobj WHERE object_id = ls_protocol_msg_req-id.
-*        IF sy-subrc = 0.
-*          "todo validate same baseline_id is received for this object
-*          "wa_bpiobj-baseline_id = ''. "To be provided by api
-*          wa_bpiobj-proof = ''. "To be provided by api
-*          wa_bpiobj-status = ''. "To be determined by api response
-*          wa_bpiobj-object_id = ls_protocol_msg_req-id.
-*          wa_bpiobj-created_by = sy-uname.
-*          wa_bpiobj-created_at = lv_timestamp.
-*          wa_bpiobj-schematype = 'IDOC'.
-*          wa_bpiobj-schema_id = wa_idoc_control-mestyp.
-*          APPEND wa_bpiobj TO lt_updatedbpis.
-*        ELSE.
-*          GET TIME STAMP FIELD lv_timestamp.
-*          wa_bpiobj-baseline_id = ''. "To be provided by api
-*          wa_bpiobj-proof = ''. "To be provided by api
-*          wa_bpiobj-status = ''. "To be determined by api response
-*          wa_bpiobj-object_id = ls_protocol_msg_req-id.
-*          wa_bpiobj-created_by = sy-uname.
-*          wa_bpiobj-created_at = lv_timestamp.
-*          wa_bpiobj-schematype = 'IDOC'.
-*          wa_bpiobj-schema_id = wa_idoc_control-mestyp.
-*          APPEND wa_bpiobj TO lt_newbpis.
-*        ENDIF.
+        DATA: ls_protocol_msg_resp TYPE zif_proubc_baseline=>protocolmessage_resp.
+        /ui2/cl_json=>deserialize( EXPORTING json = lv_apiresponsestr  CHANGING data = ls_protocol_msg_resp ).
+
+        DATA: wa_bpiobj    TYPE zbpiobj,
+              lv_timestamp TYPE timestampl.
+        CLEAR: wa_bpiobj.
+        SELECT SINGLE * FROM zbpiobj INTO wa_bpiobj WHERE object_id = ls_protocol_msg_req-id
+                                                      and baseline_id = ls_protocol_msg_resp-baseline_id.
+        IF sy-subrc = 0.
+          wa_bpiobj-baseline_id = ls_protocol_msg_resp-baseline_id. "To be provided by api
+          wa_bpiobj-proof = ls_protocol_msg_resp-proof. "To be provided by api
+          "wa_bpiobj-status = ls_protocol_msg_resp-. "To be determined by api response
+          wa_bpiobj-object_id = ls_protocol_msg_req-id.
+          wa_bpiobj-changed_by = sy-uname.
+          wa_bpiobj-changed_at = lv_timestamp.
+          wa_bpiobj-schematype = 'IDOC'.
+          wa_bpiobj-schema_id = wa_idoc_control-mestyp.
+          wa_bpiobj-workgroup_id = ls_protocol_msg_resp-workgroup_id.
+          wa_bpiobj-subject_account_id = ls_protocol_msg_resp-subject_account_id.
+          APPEND wa_bpiobj TO lt_updatedbpis.
+        ELSE.
+          GET TIME STAMP FIELD lv_timestamp.
+          wa_bpiobj-baseline_id = ls_protocol_msg_resp-baseline_id. "To be provided by api
+          wa_bpiobj-proof = ls_protocol_msg_resp-proof. "To be provided by api
+          "wa_bpiobj-status = ''. "To be determined by api response
+          wa_bpiobj-object_id = ls_protocol_msg_req-id.
+          wa_bpiobj-created_by = sy-uname.
+          wa_bpiobj-created_at = lv_timestamp.
+          wa_bpiobj-schematype = 'IDOC'.
+          wa_bpiobj-schema_id = wa_idoc_control-mestyp.
+          wa_bpiobj-workgroup_id = ls_protocol_msg_resp-workgroup_id.
+          wa_bpiobj-subject_account_id = ls_protocol_msg_resp-subject_account_id.
+          APPEND wa_bpiobj TO lt_newbpis.
+        ENDIF.
       ELSE. "log error message
       ENDIF.
 
@@ -436,7 +440,7 @@ CLASS ZCL_PROUBC_IDOCHLPR IMPLEMENTATION.
   ENDMETHOD.
 
 
-   METHOD generate_child_idoc_segdata.
+  METHOD generate_child_idoc_segdata.
     DATA: ls_json_child_segment    TYPE REF TO data,
           lv_json_child_segmentid  TYPE string,
           ls_json_gchild_segment   TYPE REF TO data,
@@ -544,10 +548,10 @@ CLASS ZCL_PROUBC_IDOCHLPR IMPLEMENTATION.
     FIELD-SYMBOLS: <fs_json_segment> TYPE any.
     DATA(lv_segment_type) = cl_abap_classdescr=>describe_by_name( iv_segmenttype ). "cast #( iv_segmenttype ).
     DATA: lv_segment TYPE REF TO data.
-    data: lv_segnumint type i.
-    data: lv_segnumstring type string,
-          lv_segnam type string,
-          lv_json_segmentid type string.
+    DATA: lv_segnumint TYPE i.
+    DATA: lv_segnumstring   TYPE string,
+          lv_segnam         TYPE string,
+          lv_json_segmentid TYPE string.
     CREATE DATA lv_segment TYPE (iv_segmenttype).
 
     lv_segnumint = iv_rawsegment-segnum.
@@ -555,17 +559,17 @@ CLASS ZCL_PROUBC_IDOCHLPR IMPLEMENTATION.
     lv_segnam = iv_rawsegment-segnam.
     "replace all occurrences of '_' in lv_segnam with ''.
     "translate lv_segnam to lower case.
-    select single segnam from edid4 where segnam = @lv_segnam into @data(lv_encodedsegnmam).
-    replace all occurrences of '_' in lv_encodedsegnmam with ''.
-    CONCATENATE lv_encodedsegnmam lv_segnumstring INTO lv_json_segmentid separated by '_'.
-    data: lv_safestring type char30.
-    me->CHECK_FOR_ILLEGAL_CHARACTERS(
+    SELECT SINGLE segnam FROM edid4 WHERE segnam = @lv_segnam INTO @DATA(lv_encodedsegnmam).
+    REPLACE ALL OCCURRENCES OF '_' IN lv_encodedsegnmam WITH ''.
+    CONCATENATE lv_encodedsegnmam lv_segnumstring INTO lv_json_segmentid SEPARATED BY '_'.
+    DATA: lv_safestring TYPE char30.
+    me->check_for_illegal_characters(
       EXPORTING
-        IV_STRING             = lv_json_segmentid
+        iv_string             = lv_json_segmentid
       IMPORTING
 *        EV_ILLEGAL_CHAR_INDEX =
 *        EV_ILLEGAL_CHAR_FOUND =
-        EV_SAFESTRING         =  lv_safestring
+        ev_safestring         =  lv_safestring
     ).
     ev_json_segmentid = lv_safestring.
 
@@ -598,12 +602,12 @@ CLASS ZCL_PROUBC_IDOCHLPR IMPLEMENTATION.
 
     "Create Dynamic table using component table
     "struct_type = cl_abap_structdescr=>create( comp_tab ).
-    cl_abap_structdescr=>CREATE( "TODO discover wth this dumps on component name
+    cl_abap_structdescr=>create( "TODO discover wth this dumps on component name
       EXPORTING
-        P_COMPONENTS = comp_tab
-        P_STRICT     = ''
+        p_components = comp_tab
+        p_strict     = ''
       RECEIVING
-        P_RESULT     = struct_type
+        p_result     = struct_type
     ).
 
     CREATE DATA dataref TYPE HANDLE struct_type.
@@ -618,7 +622,7 @@ CLASS ZCL_PROUBC_IDOCHLPR IMPLEMENTATION.
     ASSIGN COMPONENT 'DOCNUM' OF STRUCTURE <segmentdata> TO <docnum>.
     <docnum> = iv_rawsegment-docnum.
     ASSIGN COMPONENT 'SEGNUM' OF STRUCTURE <segmentdata> TO <segnum>.
-    <segnum> = iv_rawsegment-segnUm.
+    <segnum> = iv_rawsegment-segnum.
     ASSIGN COMPONENT 'PSGNUM' OF STRUCTURE <segmentdata> TO <psgnum>.
     <psgnum> = iv_rawsegment-psgnum.
 
@@ -628,7 +632,7 @@ CLASS ZCL_PROUBC_IDOCHLPR IMPLEMENTATION.
   ENDMETHOD.
 
 
-   METHOD idoc_to_json.
+  METHOD idoc_to_json.
 
     DATA: lv_flattened_idoc TYPE REF TO data.
 
@@ -638,9 +642,9 @@ CLASS ZCL_PROUBC_IDOCHLPR IMPLEMENTATION.
           ls_responsedata      TYPE zif_idocapi_typelist=>ty_basictype_w_segments,
           lv_idoc_type_in      TYPE ledid_idoctype,
           lv_idoc_type_out     TYPE ledid_idoc_type,
-          lt_IDOC_STRUCT       TYPE ledid_t_idoc_struct,
-          lt_SEGMENTS          TYPE ledid_t_segment,
-          lt_SEGMENT_STRUCT    TYPE ledid_t_segment_struct.
+          lt_idoc_struct       TYPE ledid_t_idoc_struct,
+          lt_segments          TYPE ledid_t_segment,
+          lt_segment_struct    TYPE ledid_t_segment_struct.
 
     lv_idoc_type_in = iv_idoc_basictype.
 
@@ -819,7 +823,7 @@ CLASS ZCL_PROUBC_IDOCHLPR IMPLEMENTATION.
   ENDMETHOD.
 
 
-    METHOD generate_segment_fields.
+  METHOD generate_segment_fields.
     DATA: ls_field_data TYPE zif_proubc_blidochlper=>ty_idoc_segment_field,
           lt_field_data TYPE zif_proubc_blidochlper=>tty_idoc_segment_field.
 
@@ -858,53 +862,53 @@ CLASS ZCL_PROUBC_IDOCHLPR IMPLEMENTATION.
   METHOD generate_child_segment_schema.
   ENDMETHOD.
 
-  method check_for_illegal_characters.
-  data: lv_safestring type char30,
-        lv_checkedstring type string.
-  if iv_string cn 'ABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789#$%&*-/;<=>?@^{|}'.
-  "do something to fix it!
-    lv_checkedstring = iv_string.
-    me->build_safestring( exporting iv_string = lv_checkedstring
-                          importing ev_safestring = lv_safestring ).
-    ev_safestring = lv_safestring.
-  else.
-    data(lv_string_len) = strlen( lv_checkedstring ).
-    if lv_string_len ge 30.
-    ev_safestring = iv_string(30).
-    else.
-    ev_safestring = iv_string.
-    endif.
-  endif.
+  METHOD check_for_illegal_characters.
+    DATA: lv_safestring    TYPE char30,
+          lv_checkedstring TYPE string.
+    IF iv_string CN 'ABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789#$%&*-/;<=>?@^{|}'.
+      "do something to fix it!
+      lv_checkedstring = iv_string.
+      me->build_safestring( EXPORTING iv_string = lv_checkedstring
+                            IMPORTING ev_safestring = lv_safestring ).
+      ev_safestring = lv_safestring.
+    ELSE.
+      DATA(lv_string_len) = strlen( lv_checkedstring ).
+      IF lv_string_len GE 30.
+        ev_safestring = iv_string(30).
+      ELSE.
+        ev_safestring = iv_string.
+      ENDIF.
+    ENDIF.
 
 *  data: lv_strlen type i.
 *        lv_strlen = strlen( iv_string ).
 *  data: lv_offset type i.
 *  lv_offset = lv_strlen.
 
-  endmethod.
-  method build_safestring.
-    data: it_split TYPE TABLE OF string,
-          it_safestring type table of string,
-          wa_safestring type string.
+  ENDMETHOD.
+  METHOD build_safestring.
+    DATA: it_split      TYPE TABLE OF string,
+          it_safestring TYPE TABLE OF string,
+          wa_safestring TYPE string.
     CALL FUNCTION 'SOTR_SERV_STRING_TO_TABLE'
-        EXPORTING
-            text = iv_string
-            line_length = 1
-        TABLES
-            text_tab = it_split.
-    loop at it_split assigning field-symbol(<fs_split>).
-        if <fs_split> co 'ABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789#$%&*-/;<=>?@^{|}'.
-            wa_safestring = <fs_split>.
-            append wa_safestring to it_safestring.
-        endif.
-    endloop.
-    data: lv_safestring type string.
-    concatenate lines of it_safestring into lv_safestring.
-    data(lv_safestring_len) = strlen( lv_safestring ).
-    if lv_safestring_len ge 30.
-    ev_safestring = lv_safestring(30).
-    else.
-    ev_safestring = lv_safestring.
-    endif.
-  endmethod.
+      EXPORTING
+        text        = iv_string
+        line_length = 1
+      TABLES
+        text_tab    = it_split.
+    LOOP AT it_split ASSIGNING FIELD-SYMBOL(<fs_split>).
+      IF <fs_split> CO 'ABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789#$%&*-/;<=>?@^{|}'.
+        wa_safestring = <fs_split>.
+        APPEND wa_safestring TO it_safestring.
+      ENDIF.
+    ENDLOOP.
+    DATA: lv_safestring TYPE string.
+    CONCATENATE LINES OF it_safestring INTO lv_safestring.
+    DATA(lv_safestring_len) = strlen( lv_safestring ).
+    IF lv_safestring_len GE 30.
+      ev_safestring = lv_safestring(30).
+    ELSE.
+      ev_safestring = lv_safestring.
+    ENDIF.
+  ENDMETHOD.
 ENDCLASS.
