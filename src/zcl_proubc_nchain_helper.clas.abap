@@ -15,7 +15,8 @@ CLASS zcl_proubc_nchain_helper DEFINITION
       call_chainlink_pricefeed IMPORTING !iv_inputcurrency  TYPE string
                                          !iv_inputamount    TYPE  string
                                          !iv_outputcurrency TYPE string
-                               EXPORTING !ev_outputamount   TYPE string,
+                               EXPORTING !es_contract_resp type zif_proubc_nchain=>ty_executecontract_resp
+                                         !ev_outputamount   TYPE string,
       smartcontract_factory IMPORTING !iv_smartcontractaddress TYPE zproubc_smartcontract_addr
                                       !iv_name                 TYPE string
                                       !iv_contract             TYPE zcasesensitive_str
@@ -117,7 +118,10 @@ CLASS zcl_proubc_nchain_helper IMPLEMENTATION.
           ls_executecontract            TYPE zif_proubc_nchain=>ty_executecontractrequest,
           lv_executecontract_str        TYPE string,
           lv_executecontract_data       TYPE REF TO data,
-          lv_executecontract_responsecd TYPE i.
+          lv_executecontract_responsecd TYPE i,
+          lv_network_contract_id        TYPE zproubc_smartcontract_addr,
+          lv_prvd_stack_contract_id     TYPE zcasesensitive_str,
+          ls_execute_contract_resp      TYPE zif_proubc_nchain=>ty_executecontract_resp.
 
     ls_pricefeedwallet-purpose = 44.
     me->lo_nchain_api->zif_proubc_nchain~createhdwallet( EXPORTING is_walletrequest = ls_pricefeedwallet
@@ -149,6 +153,17 @@ CLASS zcl_proubc_nchain_helper IMPLEMENTATION.
     ).
     CASE lv_createdcontract_responsecd.
       WHEN 201.
+
+        FIELD-SYMBOLS: <fs_prvd_stack_contractid>     TYPE any,
+                       <fs_prvd_stack_contractid_str> TYPE string.
+
+        IF lv_createdcontract_data IS NOT INITIAL.
+          "TODO add try catch here
+          ASSIGN lv_createdcontract_data->* TO FIELD-SYMBOL(<ls_contractdata>).
+          ASSIGN COMPONENT 'ID' OF STRUCTURE <ls_contractdata> TO <fs_prvd_stack_contractid>.
+          ASSIGN <fs_prvd_stack_contractid>->* TO <fs_prvd_stack_contractid_str>.
+          lv_prvd_stack_contract_id = <fs_prvd_stack_contractid_str>.
+        ENDIF.
         ls_executecontract-method = 'latestRoundData'.
         ls_executecontract-value = 0.
         ls_executecontract-wallet_id = ls_wallet_created-id.
@@ -158,7 +173,7 @@ CLASS zcl_proubc_nchain_helper IMPLEMENTATION.
 *
     me->lo_nchain_api->zif_proubc_nchain~executecontract(
       EXPORTING
-        iv_contract_id      = '0xD4a33860578De61DBAbDc8BFdb98FD742fA7028e'
+        iv_contract_id      = lv_prvd_stack_contract_id
         is_execcontractreq  = ls_executecontract
       IMPORTING
         ev_apiresponsestr   = lv_executecontract_str
@@ -166,7 +181,36 @@ CLASS zcl_proubc_nchain_helper IMPLEMENTATION.
         ev_httpresponsecode =  lv_executecontract_responsecd
     ).
     CASE lv_executecontract_responsecd.
-      WHEN 202.
+      WHEN 200.
+        "TODO - losing response values when deserializing
+         /ui2/cl_json=>deserialize( EXPORTING json = lv_executecontract_str CHANGING data = ls_execute_contract_resp  ).
+        es_contract_resp = ls_execute_contract_resp.
+        "PRVD Nchain response may look like this:
+        "{
+*    "confidence": null,
+*    "ref": "e71f3955-77e7-4a39-8abd-ee129c9f28b1",
+*    "response": [
+*        18446744073709652396,
+*        155343681484,
+*        1666975920,
+*        1666975920,
+*        18446744073709652396
+*    ]
+*}
+* data values in response align in sequest to the returns in latest round outputs
+        "latestRoundData outputs - see https://mumbai.polygonscan.com/address/0x0715A7794a1dc8e42615F059dD6e406A6594651A#code
+*       function latestRoundData()
+*    public
+*    view
+*    virtual
+*    override
+*    returns (
+*      uint80 roundId,
+*      int256 answer, <-- this is your price, still needs some unit conversions for SAP
+*      uint256 startedAt,
+*      uint256 updatedAt,
+*      uint80 answeredInRound
+*    ) "log the other data - important reference data point for checking later if oracle behaved as expected
       WHEN OTHERS.
     ENDCASE.
 *    CATCH cx_static_check.

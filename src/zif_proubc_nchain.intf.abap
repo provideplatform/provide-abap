@@ -144,7 +144,7 @@ INTERFACE zif_proubc_nchain
   TYPES: BEGIN OF ty_pricefeed_compiledartifact,
            name TYPE zcasesensitive_str,
            "abi  TYPE zcasesensitive_str,
-           abi type ref to data,
+           abi  TYPE REF TO data,
          END OF ty_pricefeed_compiledartifact.
 
 * Component schema: Params, object
@@ -426,6 +426,12 @@ INTERFACE zif_proubc_nchain
            purpose         TYPE i, "44,
            public_key      TYPE string, ": "xpub661MyMwAqRbcFh4eaatbKy99k8qhPBdQWYUSPnmaeA14S6aVnZANoMzA1vDzwWeY8o7ax7gdHYbQLQv4QNabnsovT4SWFTLUPZAv2Jz9g9c"
          END OF ty_hdwalletcreate_resp.
+
+  TYPES: BEGIN OF ty_executecontract_resp,
+           confidence TYPE zcasesensitive_str,
+           ref        TYPE zcasesensitive_str, "e71f3955-77e7-4a39-8abd-ee129c9f28b1",
+           response   TYPE tab_string, ":  "comma separated array of values, some strings some ints
+         END OF ty_executecontract_resp.
 
 
 * GET - "List connectors"
@@ -754,7 +760,7 @@ INTERFACE zif_proubc_nchain
 
   METHODS createpricefeedcontract
     IMPORTING
-              IV_SMARTCONTRACTADDR TYPE ZPROUBC_SMARTCONTRACT_ADDR
+              iv_smartcontractaddr TYPE zproubc_smartcontract_addr
               is_pricefeedcontract TYPE ty_chainlinkpricefeed_req
     EXPORTING
               ev_apiresponsestr    TYPE string
