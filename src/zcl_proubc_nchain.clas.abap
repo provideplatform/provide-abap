@@ -2,8 +2,8 @@ CLASS zcl_proubc_nchain DEFINITION PUBLIC.
   PUBLIC SECTION.
     INTERFACES zif_proubc_nchain.
     METHODS constructor IMPORTING !ii_client   TYPE REF TO if_http_client
-                                  !iv_tenant   TYPE zPRVDTENANTID
-                                  !iv_bpitoken TYPE zPRVDREFRESHTOKEN.
+                                  !iv_tenant   TYPE zprvdtenantid
+                                  !iv_bpitoken TYPE zprvdrefreshtoken.
   PROTECTED SECTION.
     DATA: mi_client   TYPE REF TO if_http_client,
           lv_bpitoken TYPE zprvdrefreshtoken,
@@ -397,9 +397,9 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
 
     zcl_proubc_api_helper=>copy_data_to_ref( EXPORTING is_data = is_walletrequest
-                  CHANGING cr_data = lv_REQUESTDATA  ).
+                  CHANGING cr_data = lv_requestdata  ).
 
-    lv_requeststr = /ui2/cl_json=>serialize( EXPORTING data = lv_REQUESTDATA
+    lv_requeststr = /ui2/cl_json=>serialize( EXPORTING data = lv_requestdata
                                        pretty_name = /ui2/cl_json=>pretty_mode-low_case ).
 
     mi_client->request->set_cdata(
@@ -599,12 +599,25 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/api/v1/contracts/{contract_id}/execute'.
-    lv_temp = IV_contract_id.
+    DATA lv_requeststr TYPE string.
+    DATA lv_requestdata TYPE REF TO data.
+    lv_temp = iv_contract_id.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{contract_id}' IN lv_uri WITH lv_temp.
     mi_client->request->set_method( 'POST' ).
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
-* todo, set body, #/components/schemas/ExecutecontractRequest
+
+    zcl_proubc_api_helper=>copy_data_to_ref( EXPORTING is_data = is_execcontractreq
+                  CHANGING cr_data = lv_requestdata  ).
+
+    lv_requeststr = /ui2/cl_json=>serialize( EXPORTING data = lv_requestdata
+                                       pretty_name = /ui2/cl_json=>pretty_mode-low_case ).
+
+    mi_client->request->set_cdata(
+      EXPORTING
+        data   =  lv_requeststr
+    ).
+
     me->get_bpi_token( ).
     lv_code = send_receive( ).
     ev_httpresponsecode = lv_code.
@@ -647,17 +660,18 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
   METHOD zif_proubc_nchain~createpricefeedcontract.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE '/api/v1/contracts/{contract_id}/execute'.
-    DATA LV_REQUESTSTR TYPE STRING.
-    DATA LV_REQUESTDATA TYPE REF TO DATA.
-
+    DATA lv_uri TYPE string VALUE '/api/v1/contracts'.
+    DATA lv_requeststr TYPE string.
+    DATA lv_requestdata TYPE REF TO data.
+    lv_temp = iv_smartcontractaddr.
+    REPLACE ALL OCCURRENCES OF '{contract_id}' IN lv_uri WITH lv_temp.
     mi_client->request->set_method( 'POST' ).
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
 
-    zcl_proubc_api_helper=>copy_data_to_ref( EXPORTING is_data = is_PRICEFEEDCONTRACT
-                  CHANGING cr_data = lv_REQUESTDATA  ).
+    zcl_proubc_api_helper=>copy_data_to_ref( EXPORTING is_data = is_pricefeedcontract
+                  CHANGING cr_data = lv_requestdata  ).
 
-    lv_requeststr = /ui2/cl_json=>serialize( EXPORTING data = lv_REQUESTDATA
+    lv_requeststr = /ui2/cl_json=>serialize( EXPORTING data = lv_requestdata
                                        pretty_name = /ui2/cl_json=>pretty_mode-low_case ).
 
     mi_client->request->set_cdata(

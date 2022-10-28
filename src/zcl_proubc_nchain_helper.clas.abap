@@ -130,16 +130,17 @@ CLASS zcl_proubc_nchain_helper IMPLEMENTATION.
       WHEN OTHERS. "add error handling
     ENDCASE.
     "eth/usd pair -- see https://docs.chain.link/docs/consuming-data-feeds/
-    "https://goerli.etherscan.io/address/{{iv_smartcontractaddress}}#code
-    me->smartcontract_factory(  EXPORTING iv_smartcontractaddress = '0xD4a33860578De61DBAbDc8BFdb98FD742fA7028e'
+    "https://docs.chain.link/docs/data-feeds/price-feeds/addresses/?network=polygon#Mumbai%20Testnet
+    me->smartcontract_factory(  EXPORTING iv_smartcontractaddress = '0x0715A7794a1dc8e42615F059dD6e406A6594651A'
                                           iv_name                 = 'ETH/USD'
                                           iv_contract             = '' "this is more complex
                                           iv_walletaddress        = ls_wallet_created-id  "from the wallet we created earlier
-                                          iv_nchain_networkid     = '1b16996e-3595-4985-816c-043345d22f8c' "goerli testnet nchain id, check if this always same
+                                          iv_nchain_networkid     = '4251b6fd-c98d-4017-87a3-d691a77a52a7' " polygon mumbai testnet nchain id
                                           iv_contracttype         = 'price-feed'
                                 IMPORTING es_selectedcontract = ls_selectedcontract ).
     me->lo_nchain_api->zif_proubc_nchain~createpricefeedcontract(
       EXPORTING
+        iv_smartcontractaddr = '0x0715A7794a1dc8e42615F059dD6e406A6594651A'
         is_pricefeedcontract = ls_selectedcontract
       IMPORTING
         ev_apiresponsestr    = lv_createdcontract_str
@@ -147,8 +148,11 @@ CLASS zcl_proubc_nchain_helper IMPLEMENTATION.
         ev_httpresponsecode  = lv_createdcontract_responsecd
     ).
     CASE lv_createdcontract_responsecd.
-      WHEN 202.
-      when 404. "contract not found - but why?
+      WHEN 201.
+        ls_executecontract-method = 'latestRoundData'.
+        ls_executecontract-value = 0.
+        ls_executecontract-wallet_id = ls_wallet_created-id.
+      WHEN 404. "contract not found - might not be deployed
       WHEN OTHERS.
     ENDCASE.
 *

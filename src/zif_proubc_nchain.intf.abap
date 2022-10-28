@@ -754,6 +754,7 @@ INTERFACE zif_proubc_nchain
 
   METHODS createpricefeedcontract
     IMPORTING
+              IV_SMARTCONTRACTADDR TYPE ZPROUBC_SMARTCONTRACT_ADDR
               is_pricefeedcontract TYPE ty_chainlinkpricefeed_req
     EXPORTING
               ev_apiresponsestr    TYPE string
