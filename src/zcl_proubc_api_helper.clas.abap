@@ -97,7 +97,7 @@ ENDCLASS.
 
 
 
-CLASS ZCL_PROUBC_API_HELPER IMPLEMENTATION.
+CLASS zcl_proubc_api_helper IMPLEMENTATION.
 
 
   METHOD baseline_health_check.
@@ -368,6 +368,8 @@ CLASS ZCL_PROUBC_API_HELPER IMPLEMENTATION.
         lv_selected_workgroupid = wa_defaulttenant-workgroup_id.
         lv_default_bpiendpoint = wa_defaulttenant-bpi_endpoint.
       ENDIF.
+    ELSE.
+        MESSAGE e010(zclproubcmsg) WITH iv_tenant iv_subject_acct_id lv_selected_workgroupid.
     ENDIF.
 
 
@@ -539,7 +541,7 @@ CLASS ZCL_PROUBC_API_HELPER IMPLEMENTATION.
 
   METHOD get_nchain_helper.
     DATA: lo_prvd_nchain_helper TYPE REF TO zcl_proubc_nchain_helper.
-          lo_prvd_nchain_helper = new zcl_proubc_nchain_helper( io_prvd_api_helper = me  ).
+          lo_prvd_nchain_helper = NEW zcl_proubc_nchain_helper( io_prvd_api_helper = me  ).
           eo_prvd_nchain_helper = lo_prvd_nchain_helper.
   ENDMETHOD.
 
