@@ -15,7 +15,7 @@ CLASS zcl_proubc_nchain_helper DEFINITION
       call_chainlink_pricefeed IMPORTING !iv_inputcurrency  TYPE string
                                          !iv_inputamount    TYPE  string
                                          !iv_outputcurrency TYPE string
-                               EXPORTING !es_contract_resp type zif_proubc_nchain=>ty_executecontract_resp
+                               EXPORTING !es_contract_resp TYPE zif_proubc_nchain=>ty_executecontract_resp
                                          !ev_outputamount   TYPE string,
       smartcontract_factory IMPORTING !iv_smartcontractaddress TYPE zproubc_smartcontract_addr
                                       !iv_name                 TYPE string
@@ -158,7 +158,6 @@ CLASS zcl_proubc_nchain_helper IMPLEMENTATION.
                        <fs_prvd_stack_contractid_str> TYPE string.
 
         IF lv_createdcontract_data IS NOT INITIAL.
-          "TODO add try catch here
           ASSIGN lv_createdcontract_data->* TO FIELD-SYMBOL(<ls_contractdata>).
           ASSIGN COMPONENT 'ID' OF STRUCTURE <ls_contractdata> TO <fs_prvd_stack_contractid>.
           ASSIGN <fs_prvd_stack_contractid>->* TO <fs_prvd_stack_contractid_str>.
@@ -182,8 +181,9 @@ CLASS zcl_proubc_nchain_helper IMPLEMENTATION.
     ).
     CASE lv_executecontract_responsecd.
       WHEN 200.
-        "TODO - losing response values when deserializing
+        "TODO - losing response values when deserializing. Round IDs surpass p8 type
          /ui2/cl_json=>deserialize( EXPORTING json = lv_executecontract_str CHANGING data = ls_execute_contract_resp  ).
+        ASSIGN COMPONENT 'RESPONSE' OF STRUCTURE lv_executecontract_data TO FIELD-SYMBOL(<fs_executecontract_resp>).
         es_contract_resp = ls_execute_contract_resp.
         "PRVD Nchain response may look like this:
         "{
