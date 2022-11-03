@@ -92,6 +92,12 @@
      <MSGNR>013</MSGNR>
      <TEXT>User &amp;1 is not authorized to create tenants</TEXT>
     </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZCLPROUBCMSG</ARBGB>
+     <MSGNR>014</MSGNR>
+     <TEXT>ABI File for Nchain Network &amp;1 and Smart Contract Addr &amp;2 not registered</TEXT>
+    </T100>
    </T100>
   </asx:values>
  </asx:abap>

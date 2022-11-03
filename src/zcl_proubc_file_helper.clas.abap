@@ -33,6 +33,7 @@ CLASS zcl_proubc_file_helper IMPLEMENTATION.
         /ui2/cl_json=>deserialize( EXPORTING json = lv_filestr CHANGING data = lv_abi_data ).
         ev_abi_data = lv_abi_data.
     ELSE.
+        message e014(zclproubcmsg) with iv_nchain_networkid iv_smartcontract_address.
     ENDIF.
   ENDMETHOD.
 

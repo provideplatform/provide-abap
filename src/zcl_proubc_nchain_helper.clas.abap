@@ -183,7 +183,8 @@ CLASS zcl_proubc_nchain_helper IMPLEMENTATION.
       WHEN 200.
         "TODO - losing response values when deserializing. Round IDs surpass p8 type
          /ui2/cl_json=>deserialize( EXPORTING json = lv_executecontract_str CHANGING data = ls_execute_contract_resp  ).
-        ASSIGN COMPONENT 'RESPONSE' OF STRUCTURE lv_executecontract_data TO FIELD-SYMBOL(<fs_executecontract_resp>).
+        ASSIGN lv_executecontract_data->* TO FIELD-SYMBOL(<ls_contractoutputs>).
+        ASSIGN COMPONENT 'RESPONSE' OF STRUCTURE <ls_contractoutputs> TO FIELD-SYMBOL(<fs_executecontract_resp>).
         es_contract_resp = ls_execute_contract_resp.
         "PRVD Nchain response may look like this:
         "{

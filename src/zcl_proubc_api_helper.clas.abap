@@ -10,7 +10,7 @@ CLASS zcl_proubc_api_helper DEFINITION
         !iv_refreshtoken2 TYPE string
       EXPORTING
         !ev_tokenlength   TYPE int4
-        !ev_refreshtoken  TYPE zPRVDREFRESHTOKEN .
+        !ev_refreshtoken  TYPE zprvdrefreshtoken .
     CLASS-METHODS copy_data_to_ref
       IMPORTING
         !is_data TYPE any
@@ -18,21 +18,21 @@ CLASS zcl_proubc_api_helper DEFINITION
         !cr_data TYPE REF TO data .
     CLASS-METHODS prvd_tenant_sap_authcheck
       IMPORTING
-        !iv_tenant TYPE zPRVDTENANTID.
+        !iv_tenant TYPE zprvdtenantid.
     CLASS-METHODS get_subject_account_id
       IMPORTING
-        !iv_organization TYPE zprvdtenantid
-        !iv_workgroup_id TYPE zprvdtenantid
+        !iv_organization       TYPE zprvdtenantid
+        !iv_workgroup_id       TYPE zprvdtenantid
       EXPORTING
         !ev_subject_account_id TYPE zprvdtenantid.
     METHODS constructor
       IMPORTING
-        !iv_tenant TYPE zPRVDTENANTID OPTIONAL
+        !iv_tenant          TYPE zprvdtenantid OPTIONAL
         !iv_subject_acct_id TYPE zprvdtenantid OPTIONAL
-        !iv_workgroup_id TYPE zprvdtenantid OPTIONAL.
+        !iv_workgroup_id    TYPE zprvdtenantid OPTIONAL.
     METHODS call_ident_api
       IMPORTING
-        !iv_tenant      TYPE zPRVDTENANTID OPTIONAL
+        !iv_tenant      TYPE zprvdtenantid OPTIONAL
         !iv_subjacct    TYPE zprvdtenantid OPTIONAL
         !iv_wrkgrpid    TYPE zprvdtenantid OPTIONAL
       EXPORTING
@@ -41,8 +41,8 @@ CLASS zcl_proubc_api_helper DEFINITION
         !ev_bpiendpoint TYPE string .
     METHODS baseline_health_check
       IMPORTING
-        !iv_tenant      TYPE zPRVDTENANTID OPTIONAL
-        iv_subjacct    TYPE zprvdtenantid OPTIONAL
+        !iv_tenant      TYPE zprvdtenantid OPTIONAL
+        iv_subjacct     TYPE zprvdtenantid OPTIONAL
       EXPORTING
         !ev_isreachable TYPE boolean .
     METHODS setup_protocol_msg
@@ -71,10 +71,10 @@ CLASS zcl_proubc_api_helper DEFINITION
         !apiresponse    TYPE REF TO data .
     METHODS get_default_tenant
       RETURNING
-        VALUE(ev_defaulttenant) TYPE ZprvdtenantID .
+        VALUE(ev_defaulttenant) TYPE zprvdtenantid .
     METHODS get_default_tenant_bpiendpoint
       RETURNING
-        VALUE(ev_bpiendpoint) TYPE Zprvdtenants-bpi_endpoint .
+        VALUE(ev_bpiendpoint) TYPE zprvdtenants-bpi_endpoint .
     METHODS build_dummy_idoc_protocol_msg
       RETURNING
         VALUE(es_dummy_idoc_msg) TYPE zif_proubc_baseline=>protocolmessage_req .
@@ -231,7 +231,7 @@ CLASS zcl_proubc_api_helper IMPLEMENTATION.
     ls_dummy_idoc_protocol_msg-payload_mimetype = 'json'.
     ls_dummy_idoc_protocol_msg-type = 'ORDERS05'.
 
-    zcl_proubc_idochlpr=>get_DUMMY_objid( EXPORTING iv_schema = 'ORDERS05'
+    zcl_proubc_idochlpr=>get_dummy_objid( EXPORTING iv_schema = 'ORDERS05'
                    IMPORTING ev_objid = ls_dummy_idoc_protocol_msg-id
                              ev_newidocnum = lv_newidocnum
                     CHANGING ct_edidd = lt_edidd ).
@@ -261,7 +261,7 @@ CLASS zcl_proubc_api_helper IMPLEMENTATION.
       lv_identurl        TYPE string,
       lv_apiresponse     TYPE REF TO data,
       lv_tenant          TYPE zprvdtenantid,
-       lv_subjacct       TYPE zprvdtenants-subject_account_id.
+      lv_subjacct        TYPE zprvdtenants-subject_account_id.
 
     IF iv_tenant IS NOT INITIAL.
       lv_tenant = iv_tenant.
@@ -269,7 +269,7 @@ CLASS zcl_proubc_api_helper IMPLEMENTATION.
       lv_tenant = lv_defaulttenant.
     ENDIF.
 
-        IF iv_subjacct IS NOT INITIAL.
+    IF iv_subjacct IS NOT INITIAL.
       lv_subjacct = iv_subjacct.
     ELSE.
       lv_subjacct = lv_defaultsubjectacct.
@@ -369,9 +369,15 @@ CLASS zcl_proubc_api_helper IMPLEMENTATION.
         lv_default_bpiendpoint = wa_defaulttenant-bpi_endpoint.
       ENDIF.
     ELSE.
-        MESSAGE e010(zclproubcmsg) WITH iv_tenant iv_subject_acct_id lv_selected_workgroupid.
+      MESSAGE e010(zclproubcmsg) WITH iv_tenant iv_subject_acct_id lv_selected_workgroupid.
     ENDIF.
 
+    "core authority check - is user allowed to use this subject account
+    AUTHORITY-CHECK OBJECT 'ZPRVDTENAN' ID 'ACTVT' FIELD '16'
+    ID 'ZPRVDSHA1' FIELD lv_defaultsubjectacct.
+    IF sy-subrc <> 0.
+      MESSAGE e012(zclproubcmsg) WITH sy-uname lv_defaultsubjectacct lv_defaulttenant lv_selected_workgroupid.
+    ENDIF.
 
   ENDMETHOD.
 
@@ -434,12 +440,12 @@ CLASS zcl_proubc_api_helper IMPLEMENTATION.
   METHOD send_protocol_msg.
     DATA: ls_finalized_protocol_msg TYPE zif_proubc_baseline=>protocolmessage_req.
 
-          ls_finalized_protocol_msg = body.
-          ls_finalized_protocol_msg-subject_account_id = lv_defaultsubjectacct.
-          ls_finalized_protocol_msg-workgroup_id = lv_selected_workgroupid.
+    ls_finalized_protocol_msg = body.
+    ls_finalized_protocol_msg-subject_account_id = lv_defaultsubjectacct.
+    ls_finalized_protocol_msg-workgroup_id = lv_selected_workgroupid.
     TRY.
-        lo_baseline_client->send_protocol_msg( EXPORTING IV_body = ls_finalized_protocol_msg
-                                                         IV_bpitoken = lv_bpitoken
+        lo_baseline_client->send_protocol_msg( EXPORTING iv_body = ls_finalized_protocol_msg
+                                                         iv_bpitoken = lv_bpitoken
                                                IMPORTING statuscode = statuscode
                                                          apiresponsestr = apiresponsestr
                                                          apiresponse = apiresponse ).
@@ -541,14 +547,14 @@ CLASS zcl_proubc_api_helper IMPLEMENTATION.
 
   METHOD get_nchain_helper.
     DATA: lo_prvd_nchain_helper TYPE REF TO zcl_proubc_nchain_helper.
-          lo_prvd_nchain_helper = NEW zcl_proubc_nchain_helper( io_prvd_api_helper = me  ).
-          eo_prvd_nchain_helper = lo_prvd_nchain_helper.
+    lo_prvd_nchain_helper = NEW zcl_proubc_nchain_helper( io_prvd_api_helper = me  ).
+    eo_prvd_nchain_helper = lo_prvd_nchain_helper.
   ENDMETHOD.
 
   METHOD get_subject_account_id.
     DATA: lv_unhashed_subject_account_id TYPE string,
-          lv_hashed_subject_account_id TYPE string,
-          lo_digest TYPE REF TO cl_abap_message_digest.
+          lv_hashed_subject_account_id   TYPE string,
+          lo_digest                      TYPE REF TO cl_abap_message_digest.
     CONCATENATE iv_organization iv_workgroup_id INTO lv_unhashed_subject_account_id SEPARATED BY '.'.
 
     lo_digest = cl_abap_message_digest=>get_instance( 'sha256' ).
