@@ -15,7 +15,7 @@ CLASS zcl_proubc_nchain_helper DEFINITION
       call_chainlink_pricefeed IMPORTING !iv_inputcurrency  TYPE string
                                          !iv_inputamount    TYPE  string
                                          !iv_outputcurrency TYPE string
-                               EXPORTING !es_contract_resp TYPE zif_proubc_nchain=>ty_executecontract_resp
+                               EXPORTING !es_contract_resp  TYPE zif_proubc_nchain=>ty_executecontract_resp
                                          !ev_outputamount   TYPE string,
       smartcontract_factory IMPORTING !iv_smartcontractaddress TYPE zproubc_smartcontract_addr
                                       !iv_name                 TYPE string
@@ -117,6 +117,7 @@ CLASS zcl_proubc_nchain_helper IMPLEMENTATION.
           lv_createdcontract_responsecd TYPE i,
           ls_executecontract            TYPE zif_proubc_nchain=>ty_executecontractrequest,
           lv_executecontract_str        TYPE string,
+          lv_executecontract_xstr       TYPE xstring,
           lv_executecontract_data       TYPE REF TO data,
           lv_executecontract_responsecd TYPE i,
           lv_network_contract_id        TYPE zproubc_smartcontract_addr,
@@ -176,13 +177,23 @@ CLASS zcl_proubc_nchain_helper IMPLEMENTATION.
         is_execcontractreq  = ls_executecontract
       IMPORTING
         ev_apiresponsestr   = lv_executecontract_str
+        ev_apiresponsexstr  = lv_executecontract_xstr
         ev_apiresponse      =  lv_executecontract_data
         ev_httpresponsecode =  lv_executecontract_responsecd
     ).
     CASE lv_executecontract_responsecd.
       WHEN 200.
+
+*        cl_bcs_convert=>xstring_to_string(
+*          EXPORTING
+*            iv_xstr   = lv_executecontract_xstr
+*            iv_cp     =  1100                " SAP character set identification
+*          RECEIVING
+*            rv_string = DATA(lv_string)
+*        ).
+
         "TODO - losing response values when deserializing. Round IDs surpass p8 type
-         /ui2/cl_json=>deserialize( EXPORTING json = lv_executecontract_str CHANGING data = ls_execute_contract_resp  ).
+        /ui2/cl_json=>deserialize( EXPORTING jsonx = lv_executecontract_xstr CHANGING data = ls_execute_contract_resp  ).
         ASSIGN lv_executecontract_data->* TO FIELD-SYMBOL(<ls_contractoutputs>).
         ASSIGN COMPONENT 'RESPONSE' OF STRUCTURE <ls_contractoutputs> TO FIELD-SYMBOL(<fs_executecontract_resp>).
         es_contract_resp = ls_execute_contract_resp.

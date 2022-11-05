@@ -622,6 +622,17 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     lv_code = send_receive( ).
     ev_httpresponsecode = lv_code.
     ev_apiresponsestr = mi_client->response->get_cdata( ).
+    DATA: lv_response_xstring TYPE xstring.
+    lv_response_xstring = mi_client->response->get_data(
+*      EXPORTING
+*        offset             = 0
+*        length             = -1
+*        virus_scan_profile = '/SIHTTP/HTTP_UPLOAD'
+*        vscan_scan_always  = if_http_entity=>co_content_check_profile
+*      RECEIVING
+*        data               =
+    ).
+    ev_apiresponsexstr = lv_response_xstring.
     /ui2/cl_json=>deserialize(
       EXPORTING
         json             = ev_apiresponsestr

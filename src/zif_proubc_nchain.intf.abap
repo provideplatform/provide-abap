@@ -430,7 +430,7 @@ INTERFACE zif_proubc_nchain
   TYPES: BEGIN OF ty_executecontract_resp,
            confidence TYPE zcasesensitive_str,
            ref        TYPE zcasesensitive_str, "e71f3955-77e7-4a39-8abd-ee129c9f28b1",
-           response   TYPE ref to data, ":  "comma separated array of values, some strings some ints
+           response   TYPE REF TO data, ":  "comma separated array of values, some strings some ints
          END OF ty_executecontract_resp.
 
 
@@ -741,6 +741,7 @@ INTERFACE zif_proubc_nchain
               is_execcontractreq  TYPE ty_executecontractrequest
     EXPORTING
               ev_apiresponsestr   TYPE string
+              ev_apiresponsexstr  TYPE xstring
               ev_apiresponse      TYPE REF TO data
               ev_httpresponsecode TYPE i
     RAISING   cx_static_check.
