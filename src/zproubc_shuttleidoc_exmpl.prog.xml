@@ -44,6 +44,12 @@
     </item>
     <item>
      <ID>S</ID>
+     <KEY>P_SBJACT</KEY>
+     <ENTRY>PRVD Subject Account ID</ENTRY>
+     <LENGTH>31</LENGTH>
+    </item>
+    <item>
+     <ID>S</ID>
      <KEY>P_STAT</KEY>
      <ENTRY>iDoc status</ENTRY>
      <LENGTH>19</LENGTH>
@@ -53,6 +59,12 @@
      <KEY>P_TENANT</KEY>
      <ENTRY>PRVD Tenant ID</ENTRY>
      <LENGTH>22</LENGTH>
+    </item>
+    <item>
+     <ID>S</ID>
+     <KEY>P_WRKGRP</KEY>
+     <ENTRY>PRVD Workgroup ID</ENTRY>
+     <LENGTH>25</LENGTH>
     </item>
     <item>
      <ID>S</ID>

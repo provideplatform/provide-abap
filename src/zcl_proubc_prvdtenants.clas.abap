@@ -7,7 +7,8 @@ CLASS zcl_proubc_prvdtenants DEFINITION
 
     CLASS-METHODS get_prvdtenant
       IMPORTING
-        !iv_prvdtenant TYPE zPRVDTENANTID
+        !iv_prvdtenant TYPE zPRVDTENANTID OPTIONAL
+        !iv_subjacctid TYPE zprvdtenantid
       EXPORTING
         !ev_prvdtenant TYPE zif_proubc_tenants=>ty_tenant_wo_token .
     CLASS-METHODS get_allprvdtenant
@@ -25,23 +26,26 @@ CLASS zcl_proubc_prvdtenants DEFINITION
         !ET_prvdtenant TYPE ZTTprvdtenant .
     CLASS-METHODS delete_prvdtenant
       EXPORTING
-        !EV_prvdtenantID TYPE ZSprvdtenant-tenant_id .
+        !EV_prvdtenantID TYPE Zprvdtenantid
+        !EV_subj_acct_id TYPE zprvdtenantid.
     METHODS get_refreshtoken
       EXPORTING
-        !EV_prvdtenantID TYPE ZSprvdtenant-tenant_id .
+        !EV_prvdtenantID TYPE Zprvdtenantid .
     METHODS get_authtoken
       EXPORTING
-        !EV_prvdtenantID TYPE ZSprvdtenant-tenant_id .
+        !EV_prvdtenantID TYPE Zprvdtenantid .
   PROTECTED SECTION.
   PRIVATE SECTION.
 ENDCLASS.
 
 
 
-CLASS ZCL_PROUBC_PRVDTENANTS IMPLEMENTATION.
+CLASS zcl_proubc_prvdtenants IMPLEMENTATION.
 
 
   METHOD create_prvdtenant.
+    CONSTANTS: c_default_identurl TYPE string VALUE 'https://ident.provide.services',
+               c_default_bpiurl TYPE string VALUE 'https://baseline.provide.services'.
     DATA: ls_prvdtenant         TYPE zprvdtenants,
           lt_prvdtenant         TYPE TABLE OF zprvdtenants,
           lt_existingprvdtenant TYPE TABLE OF zprvdtenants,
@@ -52,21 +56,32 @@ CLASS ZCL_PROUBC_PRVDTENANTS IMPLEMENTATION.
 
     "duplicate check
 
+    "TODO improve data validation process, add subject account id
     "throw out error message if the tenant already exists
-    SELECT * FROM zprvdtenants INTO TABLE lt_existingprvdtenant
-        FOR ALL ENTRIES IN it_prvdtenant WHERE tenant_id = it_prvdtenant-tenant_id.
-    IF sy-dbcnt > 0.
-      MESSAGE e004(zclproubcmsg) WITH 'orgid'.
-    ENDIF.
+*    SELECT * FROM zprvdtenants INTO TABLE lt_existingprvdtenant
+*        FOR ALL ENTRIES IN it_prvdtenant WHERE tenant_id = it_prvdtenant-tenant_id.
+*    IF sy-dbcnt > 0.
+*      MESSAGE e004(zclproubcmsg) WITH 'orgid'.
+*    ENDIF.
 
     GET TIME STAMP FIELD lv_timestamp.
 
     LOOP AT it_prvdtenant ASSIGNING FIELD-SYMBOL(<fs_prvdtenant>).
       CLEAR: ls_prvdtenant.
       ls_prvdtenant-mandt = sy-mandt.
-      ls_prvdtenant-tenant_id = <fs_prvdtenant>-tenant_id.
-      ls_prvdtenant-bpi_endpoint = <fs_prvdtenant>-bpi_endpoint.
-      ls_prvdtenant-ident_endpoint = <fs_prvdtenant>-ident_endpoint.
+      ls_prvdtenant-organization_id = <fs_prvdtenant>-organization_id.
+      ls_prvdtenant-workgroup_id = <fs_prvdtenant>-workgroup_id.
+      ls_prvdtenant-subject_account_id = <fs_prvdtenant>-subject_account_id.
+      IF <fs_prvdtenant>-bpi_endpoint IS NOT INITIAL.
+        ls_prvdtenant-bpi_endpoint = <fs_prvdtenant>-bpi_endpoint.
+      ELSE.
+        ls_prvdtenant-bpi_endpoint = c_default_bpiurl.
+      ENDIF.
+      IF <fs_prvdtenant>-ident_endpoint IS NOT INITIAL.
+        ls_prvdtenant-ident_endpoint = <fs_prvdtenant>-ident_endpoint.
+      ELSE.
+        ls_prvdtenant-ident_endpoint = c_default_identurl.
+      ENDIF.
       DATA(lv_tokenlength) = strlen( <fs_prvdtenant>-refresh_token ).
       IF lv_tokenlength LE 1024 .
         ls_prvdtenant-refresh_token = <fs_prvdtenant>-refresh_token(lv_tokenlength).
@@ -74,9 +89,6 @@ CLASS ZCL_PROUBC_PRVDTENANTS IMPLEMENTATION.
         ls_prvdtenant-refresh_token = <fs_prvdtenant>-refresh_token(1024).
         ls_prvdtenant-refresh_tokenext = <fs_prvdtenant>-refresh_token+1024(1024).
       ENDIF.
-
-
-
       ls_prvdtenant-createdby = sy-uname.
       ls_prvdtenant-created_at = lv_timestamp.
       APPEND ls_prvdtenant TO lt_prvdtenant.
@@ -89,7 +101,6 @@ CLASS ZCL_PROUBC_PRVDTENANTS IMPLEMENTATION.
       MOVE-CORRESPONDING lt_prvdtenant TO et_prvdtenant.
     ENDIF.
 
-
   ENDMETHOD.
 
 
@@ -97,7 +108,8 @@ CLASS ZCL_PROUBC_PRVDTENANTS IMPLEMENTATION.
     "TODO add SAP auth
 
     IF ev_prvdtenantid IS NOT INITIAL.
-      DELETE FROM zprvdtenants WHERE tenant_id = ev_prvdtenantid.
+      DELETE FROM zprvdtenants WHERE organization_id = ev_prvdtenantid
+                                 AND subject_account_id = EV_subj_acct_id.
       IF sy-subrc = 0.
         "todo Add some logging for this
       ELSE. "delete failed. why?
@@ -130,7 +142,8 @@ CLASS ZCL_PROUBC_PRVDTENANTS IMPLEMENTATION.
     LOOP AT lt_prvdtenant ASSIGNING FIELD-SYMBOL(<fs_prvdtenant>).
       CLEAR ls_prvdtenant.
       ls_prvdtenant-mandt = <fs_prvdtenant>-mandt.
-      ls_prvdtenant-tenant_id = <fs_prvdtenant>-tenant_id.
+      ls_prvdtenant-organization_id = <fs_prvdtenant>-organization_id.
+      ls_prvdtenant-subject_account_id = <fs_prvdtenant>-subject_account_id.
       ls_prvdtenant-ident_endpoint = <fs_prvdtenant>-ident_endpoint.
       ls_prvdtenant-bpi_endpoint = <fs_prvdtenant>-bpi_endpoint.
       ls_prvdtenant-created_by = <fs_prvdtenant>-createdby.
@@ -154,7 +167,12 @@ CLASS ZCL_PROUBC_PRVDTENANTS IMPLEMENTATION.
           lo_api_helper TYPE REF TO zcl_proubc_api_helper.
 
     lo_api_helper = NEW zcl_proubc_api_helper( ).
-    SELECT SINGLE * FROM zprvdtenants INTO ls_prvdtenant WHERE tenant_id = iv_prvdtenant.
+    IF iv_prvdtenant IS NOT INITIAL.
+        SELECT SINGLE * FROM zprvdtenants INTO ls_prvdtenant WHERE organization_id = iv_prvdtenant
+                                                           AND subject_account_id = iv_subjacctid.
+    ELSE.
+        SELECT SINGLE * FROM zprvdtenants INTO ls_prvdtenant WHERE subject_account_id = iv_subjacctid.
+    ENDIF.
     IF sy-subrc = 0.
       ev_prvdtenant-bpi_endpoint = ls_prvdtenant-bpi_endpoint.
       ev_prvdtenant-changed_at = ls_prvdtenant-changed_at.
@@ -163,10 +181,11 @@ CLASS ZCL_PROUBC_PRVDTENANTS IMPLEMENTATION.
       ev_prvdtenant-created_by = ls_prvdtenant-createdby.
       ev_prvdtenant-ident_endpoint = ls_prvdtenant-ident_endpoint.
       ev_prvdtenant-mandt = ls_prvdtenant-mandt.
-      ev_prvdtenant-tenant_id = ls_prvdtenant-tenant_id.
+      ev_prvdtenant-organization_id = ls_prvdtenant-organization_id.
+      ev_prvdtenant-subject_account_id = ls_prvdtenant-subject_account_id.
       lo_api_helper->baseline_health_check(
         EXPORTING
-          iv_tenant      =  ls_prvdtenant-tenant_id
+          iv_tenant      =  ls_prvdtenant-subject_account_id "todo do we need an additional param?
         IMPORTING
           ev_isreachable = ev_prvdtenant-reachable
       ).
@@ -231,27 +250,24 @@ CLASS ZCL_PROUBC_PRVDTENANTS IMPLEMENTATION.
     GET TIME STAMP FIELD lv_timestamp.
 
     SELECT * FROM zprvdtenants INTO TABLE lt_targettenants
-        FOR ALL ENTRIES IN it_prvdtenant WHERE tenant_id = it_prvdtenant-tenant_id.
+        FOR ALL ENTRIES IN it_prvdtenant WHERE organization_id = it_prvdtenant-organization_id.
 
     LOOP AT it_prvdtenant ASSIGNING FIELD-SYMBOL(<fs_prvdtenant>).
       CLEAR: ls_prvdtenant.
       ls_prvdtenant-mandt = sy-mandt.
-      ls_prvdtenant-tenant_id = <fs_prvdtenant>-tenant_id.
+      ls_prvdtenant-organization_id = <fs_prvdtenant>-organization_id.
+      ls_prvdtenant-subject_account_id = <fs_prvdtenant>-subject_account_id.
+      ls_prvdtenant-workgroup_id = <fs_prvdtenant>-workgroup_id.
       ls_prvdtenant-bpi_endpoint = <fs_prvdtenant>-bpi_endpoint.
       ls_prvdtenant-ident_endpoint = <fs_prvdtenant>-ident_endpoint.
-      "ls_prvdtenant-refresh_token = <fs_prvdtenant>-refresh_token.
-      "ls_prvdtenant-refresh_tokenext = <fs_prvdtenant>-refresh_tokenext.
       DATA(lv_tokenlength) = strlen( <fs_prvdtenant>-refresh_token ).
       IF lv_tokenlength LE 1024 .
         ls_prvdtenant-refresh_token = <fs_prvdtenant>-refresh_token(lv_tokenlength).
       ELSE.
-*        DATA(lv_remaininglength) = 2048 - lv_tokenlength.
         ls_prvdtenant-refresh_token = <fs_prvdtenant>-refresh_token(1024).
         ls_prvdtenant-refresh_tokenext = <fs_prvdtenant>-refresh_token+1024(1024).
-        "ls_prvdtenant-refresh_token = substring( val = <fs_prvdtenant>-refresh_token off = 0 len = 1024 ).
-        "ls_prvdtenant-refresh_token = substring( val = <fs_prvdtenant>-refresh_token off = 1024 len = 1024 ).
       ENDIF.
-      READ TABLE lt_targettenants ASSIGNING FIELD-SYMBOL(<fs_olddata>) WITH KEY tenant_id = <fs_prvdtenant>-tenant_id.
+      READ TABLE lt_targettenants ASSIGNING FIELD-SYMBOL(<fs_olddata>) WITH KEY organization_id = <fs_prvdtenant>-organization_id.
       IF sy-subrc = 0.
         ls_prvdtenant-createdby = <fs_olddata>-createdby.
         ls_prvdtenant-created_at = <fs_olddata>-created_at.

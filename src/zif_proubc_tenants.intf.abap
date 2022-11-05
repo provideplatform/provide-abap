@@ -5,7 +5,9 @@ INTERFACE zif_proubc_tenants
   TYPES:
     BEGIN OF ty_tenant_wo_token,
       mandt          TYPE mandt,
-      tenant_id      TYPE zprvdtenants-tenant_id,
+      organization_id      TYPE zprvdtenants-organization_id,
+      subject_account_id type zprvdtenants-subject_account_id,
+      workgroup_id   type zprvdtenants-workgroup_id,
       bpi_endpoint   TYPE zprvdtenants-bpi_endpoint,
       ident_endpoint TYPE zprvdtenants-ident_endpoint,
       created_by     TYPE zprvdtenants-changedby,

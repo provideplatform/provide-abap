@@ -106,7 +106,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
 * todo, set body, #/components/schemas/AssociateWorkgroupUserRequest
     me->get_bearer_token( ).
     lv_code = send_receive( ).
-    WRITE / lv_code.
+    "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
       WHEN 201. " The request was successful and a new entity was created
       WHEN 401.
@@ -153,7 +153,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     me->set_bearer_token( EXPORTING iv_tokenstring = body ).
     me->get_bearer_token( ).
     lv_code = send_receive( ).
-    WRITE / lv_code.
+    "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
       WHEN 201. " Created
         " application/json,#/components/schemas/AuthenticationResponse
@@ -196,7 +196,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     me->set_bearer_token( EXPORTING iv_tokenstring = body ).
     me->get_bearer_token( ).
     lv_code = send_receive( ).
-    "WRITE / lv_code.
+    ""WRITE / lv_code. ~ replace with logging call
     code = lv_code.
     CASE lv_code.
       WHEN 201. " Created
@@ -224,7 +224,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
 * todo, set body, #/components/schemas/Account
     me->get_bearer_token( ).
     lv_code = send_receive( ).
-    WRITE / lv_code.
+    "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
       WHEN 201. " The request was successful and a new `Account` was created
       WHEN 404 OR 403.
@@ -269,7 +269,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
       CHANGING
         data             = apiresponse
     ).
-    WRITE / lv_code.
+    "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
       WHEN 202. " Accepted
         " application/json,#/components/responses/Accepted
@@ -295,7 +295,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
 * todo, set body, #/components/schemas/Circuit
     me->get_bearer_token( ).
     lv_code = send_receive( ).
-    WRITE / lv_code.
+    "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
       WHEN 200. " The request was successful
       WHEN 401.
@@ -319,7 +319,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
 * todo, set body, #/components/schemas/Connector
     me->get_bearer_token( ).
     lv_code = send_receive( ).
-    WRITE / lv_code.
+    "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
       WHEN 201. " The request was successful and a new entity was created
       WHEN 401.
@@ -347,7 +347,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
 * todo, set body, #/components/schemas/Key
     me->get_bearer_token( ).
     lv_code = send_receive( ).
-    WRITE / lv_code.
+    "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
       WHEN 201. " The request was successful and a new entity was created
       WHEN 401.
@@ -371,7 +371,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
 * todo, set body, #/components/schemas/Network
     me->get_bearer_token( ).
     lv_code = send_receive( ).
-    WRITE / lv_code.
+    "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
       WHEN 201. " The request was successful and a new entity was created
       WHEN 401.
@@ -394,7 +394,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
     me->get_bearer_token( ).
     lv_code = send_receive( ).
-    WRITE / lv_code.
+    "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
       WHEN 200. " The request was successful.
       WHEN 401.
@@ -418,7 +418,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
 * todo, set body, #/components/schemas/Organization
     me->get_bearer_token( ).
     lv_code = send_receive( ).
-    WRITE / lv_code.
+    "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
       WHEN 201. " The request was successful.
       WHEN 401.
@@ -442,7 +442,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
 * todo, set body, #/components/schemas/Transaction
     me->get_bearer_token( ).
     lv_code = send_receive( ).
-    WRITE / lv_code.
+    "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
       WHEN 201. " The request was successful and a new entity was created
       WHEN 401.
@@ -466,7 +466,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
 * todo, set body, #/components/schemas/User
     me->get_bearer_token( ).
     lv_code = send_receive( ).
-    WRITE / lv_code.
+    "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
       WHEN 201. " User created
         " application/json,#/components/schemas/User
@@ -484,7 +484,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
 * todo, set body, #/components/schemas/Vault
     me->get_bearer_token( ).
     lv_code = send_receive( ).
-    WRITE / lv_code.
+    "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
       WHEN 201. " The request was successful and a new entity was created
       WHEN 401.
@@ -508,7 +508,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
 * todo, set body, #/components/schemas/Wallet
     me->get_bearer_token( ).
     lv_code = send_receive( ).
-    WRITE / lv_code.
+    "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
       WHEN 201. " The request was successful and a new entity was created
       WHEN 401.
@@ -532,7 +532,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
 * todo, set body, #/components/schemas/Workgroup
     me->get_bearer_token( ).
     lv_code = send_receive( ).
-    WRITE / lv_code.
+    "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
       WHEN 200. " The request was successful
         " application/json,#/components/schemas/Workgroup
@@ -563,7 +563,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
     me->get_bearer_token( ).
     lv_code = send_receive( ).
-    WRITE / lv_code.
+    "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
       WHEN 204.
       WHEN 401.
@@ -589,7 +589,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
     me->get_bearer_token( ).
     lv_code = send_receive( ).
-    WRITE / lv_code.
+    "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
       WHEN 204. " The request was successful but did not return a response.
       WHEN 401.
@@ -610,7 +610,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
     me->get_bearer_token( ).
     lv_code = send_receive( ).
-    WRITE / lv_code.
+    "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
       WHEN 200. " The request was successful.
       WHEN 401.
@@ -639,7 +639,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
     me->get_bearer_token( ).
     lv_code = send_receive( ).
-    WRITE / lv_code.
+    "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
       WHEN 204. " The request was successful but did not return a response
       WHEN 401.
@@ -665,7 +665,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
     me->get_bearer_token( ).
     lv_code = send_receive( ).
-    WRITE / lv_code.
+    "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
       WHEN 200. " Target `User` deleted
       WHEN 401.
@@ -691,7 +691,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
     me->get_bearer_token( ).
     lv_code = send_receive( ).
-    WRITE / lv_code.
+    "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
       WHEN 200. " The request was successful
       WHEN 401.
@@ -715,7 +715,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
 * todo, set body, #/components/schemas/Contract
     me->get_bearer_token( ).
     lv_code = send_receive( ).
-    WRITE / lv_code.
+    "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
       WHEN 201. " The request was successful and a new entity was created
       WHEN 401.
@@ -749,7 +749,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
 * todo, set body, #/components/schemas/Key
     me->get_bearer_token( ).
     lv_code = send_receive( ).
-    WRITE / lv_code.
+    "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
       WHEN 201. " The request was successful and a new entity was created
       WHEN 401.
@@ -776,7 +776,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
 * todo, set body, #/components/schemas/ExecuteContractRequest
     me->get_bearer_token( ).
     lv_code = send_receive( ).
-    WRITE / lv_code.
+    "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
       WHEN 202. " The request was successfully accepted and processing will complete\nasynchronously.\n\nThe API returns 202 Accepted if the contract execution will\nbroadcast a Transaction to the network and returns a ref, which is\nan identifier you ma
         "y use to ask for the execution status of the\nTransaction.\napplication/json; charset=UTF-8:\n  schema:\n    $ref: '#/components/schemas/ExecuteContract'\n
@@ -804,7 +804,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
     me->get_bearer_token( ).
     lv_code = send_receive( ).
-    WRITE / lv_code.
+    "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
       WHEN 200. " OK
         " application/json,#/components/schemas/Account
@@ -829,7 +829,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
     me->get_bearer_token( ).
     lv_code = send_receive( ).
-    WRITE / lv_code.
+    "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
       WHEN 200. " The request was successful
       WHEN 401.
@@ -856,7 +856,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
     me->get_bearer_token( ).
     lv_code = send_receive( ).
-    WRITE / lv_code.
+    "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
       WHEN 200. " The request was successful.
       WHEN 401.
@@ -883,7 +883,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
     me->get_bearer_token( ).
     lv_code = send_receive( ).
-    WRITE / lv_code.
+    "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
       WHEN 200. " The request was successful.
       WHEN 401.
@@ -910,7 +910,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
     me->get_bearer_token( ).
     lv_code = send_receive( ).
-    WRITE / lv_code.
+    "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
       WHEN 200. " The request was successful.
       WHEN 401.
@@ -937,7 +937,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
     me->get_bearer_token( ).
     lv_code = send_receive( ).
-    WRITE / lv_code.
+    "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
       WHEN 200. " The request was successful.
       WHEN 401.
@@ -963,7 +963,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
     me->get_bearer_token( ).
     lv_code = send_receive( ).
-    WRITE / lv_code.
+    "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
       WHEN 200. " The request was successful.
       WHEN 401.
@@ -992,7 +992,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
     me->get_bearer_token( ).
     lv_code = send_receive( ).
-    WRITE / lv_code.
+    "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
       WHEN 200. " The request was successful
       WHEN 401.
@@ -1018,7 +1018,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
     me->get_bearer_token( ).
     lv_code = send_receive( ).
-    WRITE / lv_code.
+    "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
       WHEN 200. " The request was successful
       WHEN 401.
@@ -1044,7 +1044,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
     me->get_bearer_token( ).
     lv_code = send_receive( ).
-    WRITE / lv_code.
+    "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
       WHEN 200. " The request was successful
       WHEN 401.
@@ -1071,7 +1071,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
     me->get_bearer_token( ).
     lv_code = send_receive( ).
-    WRITE / lv_code.
+    "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
       WHEN 200. " The request was successful
       WHEN 401.
@@ -1104,7 +1104,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
     me->get_bearer_token( ).
     lv_code = send_receive( ).
-    WRITE / lv_code.
+    "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
       WHEN 200. " OK
       WHEN 401.
@@ -1139,7 +1139,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
     me->get_bearer_token( ).
     lv_code = send_receive( ).
-    WRITE / lv_code.
+    "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
       WHEN 200. " The request was successful
       WHEN 401.
@@ -1177,7 +1177,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
     me->get_bearer_token( ).
     lv_code = send_receive( ).
-    WRITE / lv_code.
+    "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
       WHEN 200. " OK
         " application/json,#/components/schemas/response_listconnectors
@@ -1217,7 +1217,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
     me->get_bearer_token( ).
     lv_code = send_receive( ).
-    WRITE / lv_code.
+    "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
       WHEN 200. " The request was successful.
       WHEN 401.
@@ -1254,7 +1254,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
     me->get_bearer_token( ).
     lv_code = send_receive( ).
-    WRITE / lv_code.
+    "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
       WHEN 200. " The request was successful
       WHEN 401.
@@ -1292,7 +1292,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
     me->get_bearer_token( ).
     lv_code = send_receive( ).
-    WRITE / lv_code.
+    "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
       WHEN 200. " The request was successful
       WHEN 401.
@@ -1315,7 +1315,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
     me->get_bearer_token( ).
     lv_code = send_receive( ).
-    WRITE / lv_code.
+    "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
       WHEN 200. " The request was successful
       WHEN OTHERS.
@@ -1341,7 +1341,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
     me->get_bearer_token( ).
     lv_code = send_receive( ).
-    WRITE / lv_code.
+    "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
       WHEN 200. " The request was successful.
       WHEN 401.
@@ -1374,7 +1374,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
     me->get_bearer_token( ).
     lv_code = send_receive( ).
-    WRITE / lv_code.
+    "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
       WHEN 200. " The request was successful
       WHEN 401.
@@ -1410,7 +1410,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
     me->get_bearer_token( ).
     lv_code = send_receive( ).
-    WRITE / lv_code.
+    "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
       WHEN 200. " The request was successful
       WHEN 401.
@@ -1443,7 +1443,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
     me->get_bearer_token( ).
     lv_code = send_receive( ).
-    WRITE / lv_code.
+    "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
       WHEN 200. " The request was successful.
         " application/json,#/components/schemas/response_listtokens
@@ -1486,7 +1486,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
     me->get_bearer_token( ).
     lv_code = send_receive( ).
-    WRITE / lv_code.
+    "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
       WHEN 200. " The request was successful
       WHEN 401.
@@ -1519,7 +1519,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
     me->get_bearer_token( ).
     lv_code = send_receive( ).
-    WRITE / lv_code.
+    "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
       WHEN 200. " The request was successful
         " application/json,#/components/schemas/response_listusers
@@ -1554,7 +1554,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
     me->get_bearer_token( ).
     lv_code = send_receive( ).
-    WRITE / lv_code.
+    "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
       WHEN 200. " The request was successful
       WHEN 401.
@@ -1585,7 +1585,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
     me->get_bearer_token( ).
     lv_code = send_receive( ).
-    WRITE / lv_code.
+    "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
       WHEN 200. " The request was successful
       WHEN 401.
@@ -1618,7 +1618,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
     me->get_bearer_token( ).
     lv_code = send_receive( ).
-    WRITE / lv_code.
+    "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
       WHEN 200. " The request was successful
       WHEN 401.
@@ -1641,7 +1641,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
     me->get_bearer_token( ).
     lv_code = send_receive( ).
-    WRITE / lv_code.
+    "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
       WHEN 200. " The request was successful
       WHEN OTHERS.
@@ -1667,7 +1667,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
     me->get_bearer_token( ).
     lv_code = send_receive( ).
-    WRITE / lv_code.
+    "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
       WHEN 200. " The request was successful
         " application/json,#/components/schemas/response_listworkgroups
@@ -1697,7 +1697,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
     me->get_bearer_token( ).
     lv_code = send_receive( ).
-    WRITE / lv_code.
+    "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
       WHEN 200. " The request was successful
         " application/json,#/components/schemas/response_listworkgroupusers
@@ -1726,7 +1726,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
 * todo, set body, #/components/schemas/ProveRequest
     me->get_bearer_token( ).
     lv_code = send_receive( ).
-    WRITE / lv_code.
+    "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
       WHEN 200. " The request was successful
       WHEN 401.
@@ -1758,7 +1758,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
     me->get_bearer_token( ).
     lv_code = send_receive( ).
-    WRITE / lv_code.
+    "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
       WHEN 200. " The request was successful
       WHEN 401.
@@ -1784,7 +1784,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
     me->get_bearer_token( ).
     lv_code = send_receive( ).
-    WRITE / lv_code.
+    "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
       WHEN 200. " The request was successful
       WHEN 401.
@@ -1912,7 +1912,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
 * todo, set body, #/components/schemas/Secret
     me->get_bearer_token( ).
     lv_code = send_receive( ).
-    WRITE / lv_code.
+    "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
       WHEN 201. " The request was successful and a new entity was created
       WHEN 401.
@@ -1936,7 +1936,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
 * todo, set body, #/components/schemas/Token
     me->get_bearer_token( ).
     lv_code = send_receive( ).
-    WRITE / lv_code.
+    "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
       WHEN 201. " Request successfully authorized a `Token`
         " application/json,#/components/schemas/Token
@@ -1962,7 +1962,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
 * todo, set body, #/components/schemas/UnsealVaultRequest
     me->get_bearer_token( ).
     lv_code = send_receive( ).
-    WRITE / lv_code.
+    "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
       WHEN 204. " The request was successful but did not return a response
       WHEN 401.
@@ -1989,7 +1989,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
 * todo, set body, #/components/schemas/BusinessObject
     me->get_bearer_token( ).
     lv_code = send_receive( ).
-    WRITE / lv_code.
+    "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
       WHEN 200. " The request was successful
       WHEN 401.
@@ -2016,7 +2016,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
 * todo, set body, #/components/schemas/Network
     me->get_bearer_token( ).
     lv_code = send_receive( ).
-    WRITE / lv_code.
+    "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
       WHEN 204. " The request was successful but did not return a response
         " application/json,#/components/responses/NoContent
@@ -2043,7 +2043,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
     me->get_bearer_token( ).
     lv_code = send_receive( ).
-    WRITE / lv_code.
+    "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
       WHEN 200. " The request was successful.
       WHEN 401.
@@ -2070,7 +2070,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
 * todo, set body, #/components/schemas/Organization
     me->get_bearer_token( ).
     lv_code = send_receive( ).
-    WRITE / lv_code.
+    "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
       WHEN 200. " The request was successful.
       WHEN 401.
@@ -2097,7 +2097,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
 * todo, set body, #/components/schemas/User
     me->get_bearer_token( ).
     lv_code = send_receive( ).
-    WRITE / lv_code.
+    "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
       WHEN 200. " The request was successful
         " application/json,#/components/schemas/User
@@ -2126,7 +2126,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
 * todo, set body, #/components/schemas/Workgroup
     me->get_bearer_token( ).
     lv_code = send_receive( ).
-    WRITE / lv_code.
+    "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
       WHEN 204. " The request was successful but did not return a response
       WHEN 401.
@@ -2153,7 +2153,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
 * todo, set body, #/components/schemas/VerifyProofRequest
     me->get_bearer_token( ).
     lv_code = send_receive( ).
-    WRITE / lv_code.
+    "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
       WHEN 200. " The request was successful
       WHEN 401.

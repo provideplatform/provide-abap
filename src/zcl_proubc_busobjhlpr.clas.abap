@@ -12,7 +12,7 @@ CLASS zcl_proubc_busobjhlpr DEFINITION
         !et_objects TYPE ztty_bpiobj .
     CLASS-METHODS get_object
       IMPORTING
-        !iv_objectid TYPE zBPIOBJ-object_id OPTIONAL
+        !iv_objectid TYPE zbpiobj-object_id OPTIONAL
       EXPORTING
         !et_objects  TYPE ztty_bpiobj .
     CLASS-METHODS update_object
@@ -22,12 +22,12 @@ CLASS zcl_proubc_busobjhlpr DEFINITION
         !et_objects TYPE ztty_bpiobj .
     CLASS-METHODS get_object_status
       IMPORTING
-        !iv_objectid   TYPE zBPIOBJ-object_id
+        !iv_objectid   TYPE zbpiobj-object_id
       EXPORTING
         !es_objectstat TYPE zif_proubc_object=>ty_update_status_res .
     CLASS-METHODS update_object_status
       IMPORTING
-        !iv_objectid   TYPE zBPIOBJ-object_id
+        !iv_objectid   TYPE zbpiobj-object_id
         !is_objectstat TYPE zif_proubc_object=>ty_update_status_req
       EXPORTING
         !es_objectstat TYPE zif_proubc_object=>ty_update_status_res .
@@ -47,7 +47,7 @@ ENDCLASS.
 
 
 
-CLASS ZCL_PROUBC_BUSOBJHLPR IMPLEMENTATION.
+CLASS zcl_proubc_busobjhlpr IMPLEMENTATION.
 
 
   METHOD create_object.
@@ -71,6 +71,8 @@ CLASS ZCL_PROUBC_BUSOBJHLPR IMPLEMENTATION.
       ls_bpiobj-schematype = <fs_object>-schematype.
       ls_bpiobj-status = <fs_object>-status.
       ls_bpiobj-object_id = <fs_object>-object_id.
+      ls_bpiobj-subject_account_id = <fs_object>-subject_account_id.
+      ls_bpiobj-workgroup_id = <fs_object>-workgroup_id.
       APPEND ls_bpiobj TO lt_bpiobj.
     ENDLOOP.
     MODIFY zbpiobj FROM TABLE lt_bpiobj.
@@ -135,7 +137,8 @@ CLASS ZCL_PROUBC_BUSOBJHLPR IMPLEMENTATION.
 
     CLEAR: ls_bpiobj.
     LOOP AT it_objects ASSIGNING FIELD-SYMBOL(<fs_object_upd>).
-      READ TABLE lt_targetbpiobj ASSIGNING FIELD-SYMBOL(<fs_object_old>) WITH KEY object_id = <fs_object_upd>-object_id.
+      READ TABLE lt_targetbpiobj ASSIGNING FIELD-SYMBOL(<fs_object_old>) WITH KEY object_id = <fs_object_upd>-object_id
+                                                                                  baseline_id = <fs_object_upd>-baseline_id.
       IF sy-subrc = 0.
         "TODO refactor this into something nice
         IF <fs_object_upd>-baseline_id IS NOT INITIAL.
@@ -162,6 +165,16 @@ CLASS ZCL_PROUBC_BUSOBJHLPR IMPLEMENTATION.
           ls_bpiobj-status = <fs_object_upd>-status.
         ELSE.
           ls_bpiobj-status = <fs_object_old>-status.
+        ENDIF.
+        IF <fs_object_upd>-subject_account_id IS NOT INITIAL.
+          ls_bpiobj-subject_account_id = <fs_object_upd>-subject_account_id.
+        ELSE.
+          ls_bpiobj-subject_account_id = <fs_object_old>-subject_account_id.
+        ENDIF.
+        IF <fs_object_upd>-workgroup_id IS NOT INITIAL.
+          ls_bpiobj-workgroup_id = <fs_object_upd>-workgroup_id.
+        ELSE.
+          ls_bpiobj-workgroup_id = <fs_object_old>-workgroup_id.
         ENDIF.
 
         ls_bpiobj-changed_by = sy-uname.
@@ -215,12 +228,25 @@ CLASS ZCL_PROUBC_BUSOBJHLPR IMPLEMENTATION.
 
 
   METHOD validate_object_create.
-    "object ID is required
+    DATA: lt_objects TYPE TABLE OF zbpiobj.
+    lt_objects = it_objects.
+    LOOP AT lt_objects ASSIGNING FIELD-SYMBOL(<fs_object>).
+      "TODO add error logging
+      "object id is required
+      "baseline id is required
+    ENDLOOP.
+    et_objects = lt_objects.
   ENDMETHOD.
 
 
   METHOD validate_object_update.
-    "object ID is required
-    "baseline ID required for certain statuses
+    DATA: lt_objects TYPE TABLE OF zbpiobj.
+    lt_objects = it_objects.
+    LOOP AT lt_objects ASSIGNING FIELD-SYMBOL(<fs_object>).
+      "TODO add error logging
+      "object id is required
+      "baseline id is required
+    ENDLOOP.
+    et_objects = lt_objects.
   ENDMETHOD.
 ENDCLASS.

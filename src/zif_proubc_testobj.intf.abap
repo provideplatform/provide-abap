@@ -4,7 +4,7 @@ INTERFACE zif_proubc_testobj
 
   TYPES:
     BEGIN OF ty_obtrigtest,
-      bpi_tenant_id        TYPE zprvdtenants-tenant_id,
+      bpi_tenant_id        TYPE zprvdtenants-organization_id,
       status               TYPE i, "status 201, 400, etc
       bpi_response_payload TYPE string,
       bpi_endpoint         TYPE string,
