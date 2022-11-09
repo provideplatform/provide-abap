@@ -12,9 +12,9 @@
 define view ZC_PROUBC_SCHEMA_TRAFFICLIGHTS
   as select from ZI_PROUBC_SCHEMA_TRAFFICLIGHTS
 {
-  key schema_datetime,
   key schema_id,
       schema_name,
       schema_type,
-      schema_tlight
+      schema_tlight,
+      _iDocTypeDetails
 }

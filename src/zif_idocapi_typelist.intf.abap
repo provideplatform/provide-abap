@@ -24,7 +24,6 @@ INTERFACE zif_idocapi_typelist
 
   TYPES:
     BEGIN OF ty_schema_trafficlight,
-      schema_datetime TYPE zprvdtraflight-schema_datetime,
       schema_id       TYPE zprvdtraflight-schema_id,
       schema_name     TYPE zprvdtraflight-schema_name,
       schema_type     TYPE zprvdtraflight-schema_type,
