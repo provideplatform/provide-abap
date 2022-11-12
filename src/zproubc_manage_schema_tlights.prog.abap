@@ -9,6 +9,7 @@ DATA: lo_prvd_schemas_helper TYPE REF TO zcl_prvd_schemas_helper,
       ls_traflight           TYPE zprvdtraflight.
 
 PARAMETERS: p_sname  TYPE char100,
+            p_sdesc  type char255 DEFAULT 'description',
             p_tlight TYPE zproubc_schema_trafficlight,
             p_stype  TYPE zproubc_schema_types,
             p_vfrom  TYPE sy-datum DEFAULT sy-datum,

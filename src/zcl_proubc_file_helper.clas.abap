@@ -11,11 +11,12 @@ CLASS zcl_proubc_file_helper DEFINITION
                                       !ev_abi_data              TYPE REF TO data ,
       open_abiregistry IMPORTING !is_abi_registry TYPE zprvdabiregistry
                        EXPORTING !ev_filecontent  TYPE zcasesensitive_str ,
-      open_file_generic IMPORTING !iv_file_location TYPE zcasesensitivechar255
+      open_file_generic IMPORTING !iv_file_location TYPE string
                         EXPORTING !ev_filecontent_x TYPE xstring
                                   !ev_filecontent   TYPE zcasesensitive_str,
       write_file_generic,
-      transfer_file_to_ipfs,
+      transfer_file_to_ipfs IMPORTING iv_filecontent_x type xstring
+                            EXPORTING ev_contentid type string,
       read_file_from_ipfs.
   PROTECTED SECTION.
   PRIVATE SECTION.
