@@ -13,16 +13,19 @@ CLASS zcl_proubc_file_helper DEFINITION
                        EXPORTING !ev_filecontent  TYPE zcasesensitive_str ,
       open_file_generic IMPORTING !iv_file_location TYPE string
                         EXPORTING !ev_filecontent_x TYPE xstring
-                                  !ev_filecontent   TYPE zcasesensitive_str,
-      write_file_generic IMPORTING iv_filename type string
-                                   iv_filecontent type xstring
-                                   iv_directory type string,
-      transfer_file_to_ipfs IMPORTING iv_filecontent_x TYPE xstring
-                                      iv_filename      TYPE string
-                                      iv_filetype      TYPE string
-                                      iv_ipfsprojid    type string
-                                      iv_ipfsapikey    type string
-                            EXPORTING ev_contentid     TYPE string,
+                                  !ev_filecontent   TYPE zcasesensitive_str
+                                  !ev_length        TYPE i,
+      write_file_generic IMPORTING iv_filename    TYPE string
+                                   iv_filecontent TYPE xstring
+                                   iv_directory   TYPE string,
+      transfer_file_to_ipfs IMPORTING iv_filecontent_x  TYPE xstring
+                                      iv_filecontent    TYPE string
+                                      iv_filename       TYPE string
+                                      iv_filetype       TYPE string
+                                      iv_ipfsprojid     TYPE string
+                                      iv_ipfsapikey     TYPE string
+                                      iv_xcontentlength TYPE i
+                            EXPORTING ev_contentid      TYPE string,
       read_file_from_ipfs.
   PROTECTED SECTION.
   PRIVATE SECTION.
@@ -82,7 +85,13 @@ CLASS zcl_proubc_file_helper IMPLEMENTATION.
     ).
     IF sy-subrc = 0.
       ev_filecontent = lv_string.
+      ev_length = bytes.
     ENDIF.
+
+    OPEN DATASET iv_file_location FOR INPUT IN TEXT MODE ENCODING DEFAULT.
+    READ DATASET iv_file_location INTO ev_filecontent.
+    CLOSE DATASET iv_file_location.
+
   ENDMETHOD.
 
   METHOD write_file_generic.
@@ -97,14 +106,18 @@ CLASS zcl_proubc_file_helper IMPLEMENTATION.
       lo_prvd_ipfs_simple TYPE REF TO zcl_prvd_ipfs_simple.
 
     DATA:
-      lv_xstr     TYPE xstring,
-      lv_i        TYPE i,
-      lv_ipfs_url TYPE string.
+      lv_xstr          TYPE xstring,
+      lv_contentstring TYPE string,
+      lv_rawbinary     TYPE string,
+      lv_i             TYPE i,
+      lv_ipfs_url      TYPE string.
 
 *    open_file_generic(  EXPORTING iv_file_location = ''
 *                         IMPORTING ev_filecontent_x = lv_xstr ).
 
     lv_xstr = iv_filecontent_x.
+    lv_rawbinary = lv_xstr.
+    lv_contentstring = iv_filecontent.
 
     lv_ipfs_url = 'https://ipfs.infura.io:5001'.
 
@@ -128,10 +141,12 @@ CLASS zcl_proubc_file_helper IMPLEMENTATION.
     lo_prvd_ipfs_simple->zif_prvd_ipfs_simple~add(
       EXPORTING
         iv_binarystring        = lv_xstr
+        iv_contentstring       = lv_rawbinary
         iv_filename            = iv_filename
         iv_filetype            = iv_filetype
         iv_ipfsprojid           = iv_ipfsprojid
         iv_ipfsapikey           = iv_ipfsapikey
+        iv_xcontentlength       = iv_xcontentlength
 *        iv_quiet               =
 *        iv_quieter             =
 *        iv_silent              =
@@ -153,6 +168,16 @@ CLASS zcl_proubc_file_helper IMPLEMENTATION.
         ev_apiresponse         = lv_ipfs_add_data
         ev_httpresponsecode    = lv_ipfs_add_code
     ).
+    IF lv_ipfs_add_code EQ 200.
+      FIELD-SYMBOLS: <fs_contentid>     TYPE any,
+                     <fs_contentid_str> TYPE string.
+
+      ASSIGN lv_ipfs_add_data->* TO FIELD-SYMBOL(<fs_ipfsresp>).
+      ASSIGN COMPONENT 'NAME' OF STRUCTURE <fs_ipfsresp> TO <fs_contentid>.
+      ASSIGN <fs_contentid>->* TO <fs_contentid_str>.
+      ev_contentid = <fs_contentid_str>.
+
+    ENDIF.
 *    CATCH cx_static_check.
 
 
