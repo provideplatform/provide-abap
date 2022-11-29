@@ -91,7 +91,7 @@ CLASS zcl_proubc_api_helper DEFINITION
           lv_default_bpiendpoint  TYPE string,
           lo_ident_client         TYPE REF TO zif_proubc_ident,
           lo_baseline_client      TYPE REF TO zif_proubc_baseline.
-    METHODS: set_default_tenant IMPORTING iv_defaulttenant TYPE zprvdtenants-organization_id OPTIONAL.
+    METHODS set_default_tenant IMPORTING iv_defaulttenant TYPE zprvdtenants-organization_id OPTIONAL.
   PRIVATE SECTION.
 ENDCLASS.
 
@@ -112,6 +112,9 @@ CLASS zcl_proubc_api_helper IMPLEMENTATION.
       lv_code         TYPE i,
       lv_bpiendpoint  TYPE string.
 
+    FIELD-SYMBOLS: <fs_authreq>  TYPE any,
+                   <fs_authreq2> TYPE string.
+
     "TODO improve the error handling for invalid tenant ids
     "get the current auth token
     lv_tenant = iv_tenant.
@@ -122,13 +125,12 @@ CLASS zcl_proubc_api_helper IMPLEMENTATION.
     IF lv_subjacct IS INITIAL.
       lv_subjacct = lv_defaultsubjectacct.
     ENDIF.
-    me->call_ident_api( EXPORTING iv_tenant = lv_tenant
-                                  iv_subjacct = lv_defaultsubjectacct
-                        IMPORTING ev_authtoken = lv_tenant_jwt
-                                  ev_bpiendpoint = lv_bpiendpoint  ).
+    call_ident_api( EXPORTING iv_tenant          = lv_tenant
+                                  iv_subjacct    = lv_defaultsubjectacct
+                        IMPORTING ev_authtoken   = lv_tenant_jwt
+                                  ev_bpiendpoint = lv_bpiendpoint ).
 
-    FIELD-SYMBOLS: <fs_authreq>  TYPE any,
-                   <fs_authreq2> TYPE string.
+
 
     IF lv_tenant_jwt IS NOT INITIAL.
       TRY.
@@ -138,7 +140,7 @@ CLASS zcl_proubc_api_helper IMPLEMENTATION.
           lv_authreq = <fs_authreq2>.
 
           cl_http_client=>create_by_url(
-          EXPORTING
+            EXPORTING
             url                = lv_bpiendpoint
           IMPORTING
             client             = lo_http_client
@@ -152,16 +154,18 @@ CLASS zcl_proubc_api_helper IMPLEMENTATION.
           ENDIF.
 
           lo_http_client->propertytype_accept_cookie = if_http_client=>co_enabled.
-          lo_http_client->request->set_header_field( name  = if_http_form_fields_sap=>sap_client value = '100' ).
+          lo_http_client->request->set_header_field( name  = if_http_form_fields_sap=>sap_client 
+                                                     value = '100' ).
 
-          lo_baseline_api = NEW zcl_proubc_baseline( ii_client = lo_http_client iv_bpitenant_url = lv_bpiendpoint iv_bpitoken = lv_authreq ).
+          lo_baseline_api = NEW zcl_proubc_baseline( ii_client        = lo_http_client
+                                                     iv_bpitenant_url = lv_bpiendpoint
+                                                     iv_bpitoken      = lv_authreq ).
 
 * raises exception when docker instance of configured bpi instance is down
           TRY.
               lo_baseline_api->status(
                 IMPORTING
-                  statuscode = lv_code
-              ).
+                  statuscode = lv_code   ).
             CATCH cx_static_check.
               ev_isreachable = '-'.
             CATCH cx_root.
@@ -187,11 +191,11 @@ CLASS zcl_proubc_api_helper IMPLEMENTATION.
   METHOD build_dummy_idoc_protocol_msg.
     DATA ls_dummy_idoc_protocol_msg TYPE zif_proubc_baseline=>protocolmessage_req.
     SELECT docnum,
-       idoctp,
-       status,
-       credat,
-       cretim,
-       upddat,
+           idoctp,
+           status,
+           credat,
+           cretim,
+           upddat,
        updtim
        FROM edidc
        UP TO 1 ROWS
@@ -202,7 +206,9 @@ CLASS zcl_proubc_api_helper IMPLEMENTATION.
        AND mestyp = 'ORDERS'
        AND idoctp = 'ORDERS05'.
 
-    CHECK sy-subrc = 0.
+    IF NOT ubrc = 0.
+  RETURN.
+ENDIF.
 
     READ TABLE lt_selected_idocs INTO DATA(wa_selected_idoc) INDEX 1.
 
@@ -236,12 +242,8 @@ CLASS zcl_proubc_api_helper IMPLEMENTATION.
                              ev_newidocnum = lv_newidocnum
                     CHANGING ct_edidd = lt_edidd ).
 
-    DATA: lv_idocjson TYPE string.
-*    lv_idocjson = /ui2/cl_json=>serialize(
-*       EXPORTING
-*         data             = lt_edidd
-*     ).
-*    ls_dummy_idoc_protocol_msg-payload = lv_idocjson.
+    DATA lv_idocjson TYPE string.
+
 
     es_dummy_idoc_msg = ls_dummy_idoc_protocol_msg.
   ENDMETHOD.
@@ -261,7 +263,8 @@ CLASS zcl_proubc_api_helper IMPLEMENTATION.
       lv_identurl        TYPE string,
       lv_apiresponse     TYPE REF TO data,
       lv_tenant          TYPE zprvdtenantid,
-      lv_subjacct        TYPE zprvdtenants-subject_account_id.
+      lv_subjacct        TYPE zprvdtenants-subject_account_id,
+      lv_authtokenreqbody TYPE zif_proubc_ident=>refresh_accesstoken_request.
 
     IF iv_tenant IS NOT INITIAL.
       lv_tenant = iv_tenant.
@@ -277,9 +280,12 @@ CLASS zcl_proubc_api_helper IMPLEMENTATION.
 
     "todo add subject account id
     SELECT SINGLE * FROM zprvdtenants INTO ls_prvdtenant WHERE organization_id = lv_tenant
-    AND subject_account_id = lv_subjacct.
+      AND subject_account_id = lv_subjacct.
 
-    CHECK sy-subrc = 0. "todo send error message, org not found
+    "todo send error message, org not found
+    IF sy-subrc <> 0.
+      RETURN.
+    ENDIF.
 
     CONCATENATE ls_prvdtenant-refresh_token ls_prvdtenant-refresh_tokenext INTO lv_refreshtokenstr.
     lv_identurl = ls_prvdtenant-ident_endpoint.
@@ -298,27 +304,30 @@ CLASS zcl_proubc_api_helper IMPLEMENTATION.
         OTHERS             = 4 ).
     IF sy-subrc <> 0.
       " error handling
+      RETURN.
     ENDIF.
 
 
 
-    lo_http_client->propertytype_accept_cookie = if_http_client=>co_enabled.
-    lo_http_client->request->set_header_field( name  = if_http_form_fields_sap=>sap_client value = '100' ).
+    lo_http_client->propertytype_accept_cookie       = if_http_client=>co_enabled.
+    lo_http_client->request->set_header_field( name  = if_http_form_fields_sap=>sap_client
+                                               value = '100' ).
 
-    lo_ident_api = NEW zcl_proubc_ident( ii_client = lo_http_client iv_tenant = lv_tenant iv_refreshtoken = lv_refreshtokenstr  ).
+    lo_ident_api = NEW zcl_proubc_ident( ii_client       = lo_http_client
+                                         iv_tenant       = lv_tenant
+                                         iv_refreshtoken = lv_refreshtokenstr ).
     lo_ident_client = lo_ident_api.
 
-    DATA: authtokenreqbody TYPE zif_proubc_ident=>refresh_accesstoken_request.
 
-    authtokenreqbody-organization_id = lv_tenant.
-    authtokenreqbody-grant_type = 'refresh_token'.
+
+    lv_authtokenreqbody-organization_id = lv_tenant.
+    lv_authtokenreqbody-grant_type = 'refresh_token'.
     lo_ident_api->refresh_access_token(
       EXPORTING
-        body        = authtokenreqbody
+        body        = lv_authtokenreqbody
       IMPORTING
         status      = status
-        apiresponse = lv_apiresponse
-    ).
+        apiresponse = lv_apiresponse   ).
     ev_authtoken = lv_apiresponse.
   ENDMETHOD.
 
@@ -339,7 +348,7 @@ CLASS zcl_proubc_api_helper IMPLEMENTATION.
           FROM zprvdtenants
           INTO TABLE @DATA(lt_defaultorg)
           WHERE organization_id = @iv_tenant
-          AND   subject_account_id = @iv_subject_acct_id.
+          AND subject_account_id = @iv_subject_acct_id.
       IF sy-subrc = 0.
         READ TABLE lt_defaultorg INDEX 1 INTO DATA(wa_defaulttenant).
         IF sy-subrc = 0.
@@ -374,7 +383,7 @@ CLASS zcl_proubc_api_helper IMPLEMENTATION.
 
     "core authority check - is user allowed to use this subject account
     AUTHORITY-CHECK OBJECT 'ZPRVDTENAN' ID 'ACTVT' FIELD '16'
-    ID 'ZPRVDSHA1' FIELD lv_defaultsubjectacct.
+      ID 'ZPRVDSHA1' FIELD lv_defaultsubjectacct.
     IF sy-subrc <> 0.
       MESSAGE e012(zclproubcmsg) WITH sy-uname lv_defaultsubjectacct lv_defaulttenant lv_selected_workgroupid.
     ENDIF.
@@ -383,13 +392,16 @@ CLASS zcl_proubc_api_helper IMPLEMENTATION.
 
 
   METHOD copy_data_to_ref.
-    FIELD-SYMBOLS:
+    FIELD-SYMBOLS
                  <ls_data> TYPE any.
 
     CREATE DATA cr_data LIKE is_data.
     ASSIGN cr_data->* TO <ls_data>.
-    <ls_data> = is_data.
-
+    IF sy-subrc = 0.
+      <ls_data> = is_data.
+    ELSE.
+      RETURN.
+    ENDIF.
   ENDMETHOD.
 
 
@@ -399,7 +411,7 @@ CLASS zcl_proubc_api_helper IMPLEMENTATION.
         lo_baseline_client->createbaselinebusinessobject( EXPORTING body = body
                                                IMPORTING statuscode = statuscode
                                                          apiresponsestr = apiresponsestr
-                                                         apiresponse = apiresponse  ).
+                                                         apiresponse = apiresponse ).
       CATCH cx_static_check.
     ENDTRY.
   ENDMETHOD.
@@ -419,8 +431,7 @@ CLASS zcl_proubc_api_helper IMPLEMENTATION.
 
   METHOD list_bpi_accounts.
     TRY.
-        lo_baseline_client->listaccounts(
-        ).
+        lo_baseline_client->listaccounts( ).
       CATCH cx_static_check.
     ENDTRY.
   ENDMETHOD.
@@ -438,7 +449,7 @@ CLASS zcl_proubc_api_helper IMPLEMENTATION.
 
 
   METHOD send_protocol_msg.
-    DATA: ls_finalized_protocol_msg TYPE zif_proubc_baseline=>protocolmessage_req.
+    DATA ls_finalized_protocol_msg TYPE zif_proubc_baseline=>protocolmessage_req.
 
     ls_finalized_protocol_msg = body.
     ls_finalized_protocol_msg-subject_account_id = lv_defaultsubjectacct.
@@ -470,12 +481,10 @@ CLASS zcl_proubc_api_helper IMPLEMENTATION.
     FIELD-SYMBOLS: <fs_authreq>  TYPE any,
                    <fs_authreq2> TYPE string.
 
-
-
-    me->call_ident_api( EXPORTING iv_tenant = lv_defaulttenant
+    call_ident_api( EXPORTING iv_tenant = lv_defaulttenant
                                   iv_subjacct = lv_defaultsubjectacct
                       IMPORTING ev_authtoken = lv_tenant_jwt
-                                ev_bpiendpoint = lv_bpiendpoint  ).
+                                ev_bpiendpoint = lv_bpiendpoint ).
     lv_defaultidenttoken = lv_tenant_jwt.
 
     IF lv_tenant_jwt IS NOT INITIAL.
@@ -486,7 +495,7 @@ CLASS zcl_proubc_api_helper IMPLEMENTATION.
           lv_bpitoken  = <fs_authreq2>.
 
           cl_http_client=>create_by_url(
-          EXPORTING
+            EXPORTING
             url                = lv_bpiendpoint
           IMPORTING
             client             = lo_http_client
@@ -500,18 +509,23 @@ CLASS zcl_proubc_api_helper IMPLEMENTATION.
           ENDIF.
 
           lo_http_client->propertytype_accept_cookie = if_http_client=>co_enabled.
-          lo_http_client->request->set_header_field( name  = if_http_form_fields_sap=>sap_client value = '100' ).
+          lo_http_client->request->set_header_field( name  = if_http_form_fields_sap=>sap_client
+                                                     value = '100' ).
 
-          lo_baseline_client = NEW zcl_proubc_baseline( ii_client = lo_http_client iv_bpitenant_url = lv_bpiendpoint iv_bpitoken =  lv_bpitoken  ).
+          lo_baseline_client = NEW zcl_proubc_baseline( ii_client        = lo_http_client
+                                                        iv_bpitenant_url = lv_bpiendpoint
+                                                        iv_bpitoken      = lv_bpitoken ).
           IF sy-subrc = 0.
             setup_success = 'X'.
           ELSE.
+            "failed setup
             setup_success = '-'.
           ENDIF.
         CATCH cx_root.
       ENDTRY.
     ELSE.
-      setup_success = '-'. " failed
+      "failed setup
+      setup_success = '-'.
     ENDIF.
   ENDMETHOD.
 
@@ -523,11 +537,10 @@ CLASS zcl_proubc_api_helper IMPLEMENTATION.
 
 
   METHOD prvd_tenant_sap_authcheck.
+    DATA lo_digest TYPE REF TO cl_abap_message_digest.
+    DATA lv_hash_string TYPE zcasesensitivesha1.
+    DATA lv_hash_base64 TYPE string.
     IF iv_tenant IS NOT INITIAL.
-      DATA lo_digest TYPE REF TO cl_abap_message_digest.
-      DATA lv_hash_string TYPE zcasesensitivesha1.
-      DATA lv_hash_base64 TYPE string.
-
 * create a message digest object with a given hash algo
       lo_digest = cl_abap_message_digest=>get_instance( 'sha1' ).
       lo_digest->update( if_data = cl_abap_message_digest=>string_to_xstring( |{ iv_tenant }| ) ).
@@ -537,17 +550,17 @@ CLASS zcl_proubc_api_helper IMPLEMENTATION.
       AUTHORITY-CHECK OBJECT 'zprvdtenan'
         ID 'ACTVT' FIELD '16'
         ID 'ZPRVDSHA1' FIELD lv_hash_string.
-      IF sy-subrc = 0.
+      IF sy-subrc <> 0.
       ENDIF.
-
     ELSE.
+      "message no subject account determined
     ENDIF.
   ENDMETHOD.
 
 
   METHOD get_nchain_helper.
-    DATA: lo_prvd_nchain_helper TYPE REF TO zcl_proubc_nchain_helper.
-    lo_prvd_nchain_helper = NEW zcl_proubc_nchain_helper( io_prvd_api_helper = me  ).
+    DATA lo_prvd_nchain_helper TYPE REF TO zcl_proubc_nchain_helper.
+    lo_prvd_nchain_helper = NEW zcl_proubc_nchain_helper( io_prvd_api_helper = me ).
     eo_prvd_nchain_helper = lo_prvd_nchain_helper.
   ENDMETHOD.
 

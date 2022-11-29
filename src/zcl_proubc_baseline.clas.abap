@@ -45,8 +45,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     CONCATENATE 'Bearer' authtoken INTO lv_bearertoken SEPARATED BY space.
     mi_client->request->set_header_field(
       EXPORTING
-        name  = 'Authorization'    " Name of the header field
-        value = lv_bearertoken    " HTTP header field value
+        name  = 'Authorization'    "## Name of the header field
+        value = lv_bearertoken    "## HTTP header field value
     ).
   ENDMETHOD.
 
@@ -57,8 +57,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     CONCATENATE 'Bearer' bpitoken INTO lv_bearertoken SEPARATED BY space.
     mi_client->request->set_header_field(
       EXPORTING
-        name  = 'Authorization'    " Name of the header field
-        value = lv_bearertoken    " HTTP header field value
+        name  = 'Authorization'    "## Name of the header field
+        value = lv_bearertoken    "## HTTP header field value
     ).
   ENDMETHOD.
 
@@ -68,7 +68,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
       http_communication_failure = 1
       http_invalid_state         = 2 ).
     IF sy-subrc = 0.
-      mi_client->receive(    EXCEPTIONS
+      mi_client->receive( EXCEPTIONS
         http_communication_failure = 1
         http_invalid_state         = 2
         http_processing_failed     = 3 ).
@@ -102,7 +102,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{id}' IN lv_uri WITH lv_temp.
     mi_client->request->set_method( 'POST' ).
-    mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
+    mi_client->request->set_header_field( name  = '~request_uri' 
+                                          value = lv_uri ).
 * todo, set body, #/components/schemas/AssociateWorkgroupUserRequest
     me->get_bearer_token( ).
     lv_code = send_receive( ).
@@ -155,7 +156,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     lv_code = send_receive( ).
     "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
-      WHEN 201. " Created
+      WHEN 201. "## Created
         " application/json,#/components/schemas/AuthenticationResponse
 
       WHEN 401.
@@ -183,14 +184,14 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     lv_authpayload-organization_id = iv_tenantid.
 
     zcl_proubc_api_helper=>copy_data_to_ref( EXPORTING is_data = lv_authpayload
-                      CHANGING cr_data = lv_longtermrequestdata  ).
+                                             CHANGING cr_data  = lv_longtermrequestdata  ).
 
     lv_requeststr = /ui2/cl_json=>serialize( EXPORTING data = lv_longtermrequestdata
                                        pretty_name = /ui2/cl_json=>pretty_mode-low_case ).
 
     mi_client->request->set_cdata(
       EXPORTING
-        data   =  lv_requeststr
+        data   = lv_requeststr
     ).
 
     me->set_bearer_token( EXPORTING iv_tokenstring = body ).
