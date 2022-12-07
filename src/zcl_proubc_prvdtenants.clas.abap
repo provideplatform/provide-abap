@@ -4,36 +4,41 @@ CLASS zcl_proubc_prvdtenants DEFINITION
   CREATE PUBLIC .
 
   PUBLIC SECTION.
-
+    "! Returns specific PRVD Org table entry per key criteria
+    "! TODO add params for workgroup ID, rename to PRVd Org
     CLASS-METHODS get_prvdtenant
       IMPORTING
-        !iv_prvdtenant TYPE zPRVDTENANTID OPTIONAL
+        !iv_prvdtenant TYPE zprvdtenantid OPTIONAL
         !iv_subjacctid TYPE zprvdtenantid
       EXPORTING
         !ev_prvdtenant TYPE zif_proubc_tenants=>ty_tenant_wo_token .
+    "! Returns list of PRVD Org table entries per criteria
     CLASS-METHODS get_allprvdtenant
       EXPORTING
-        !ET_prvdtenant TYPE zif_proubc_tenants=>tty_tenant_wo_token .
+        !et_prvdtenant TYPE zif_proubc_tenants=>tty_tenant_wo_token .
+    "! Creates a new entry to the PRVD Tenant table
     CLASS-METHODS create_prvdtenant
       IMPORTING
-        !IT_prvdtenant TYPE ZTTprvdtenant
+        !it_prvdtenant TYPE zttprvdtenant
       EXPORTING
-        !ET_prvdtenant TYPE ZTTprvdtenant .
+        !et_prvdtenant TYPE zttprvdtenant .
+    "! Updates the selected PRVD tenant table entry with changed data
     CLASS-METHODS update_prvdtenant
       IMPORTING
-        !IT_prvdtenant TYPE ZTTprvdtenant
+        !it_prvdtenant TYPE zttprvdtenant
       EXPORTING
-        !ET_prvdtenant TYPE ZTTprvdtenant .
+        !et_prvdtenant TYPE zttprvdtenant .
+    "! Deletes the selected PRVD tenant table entry
     CLASS-METHODS delete_prvdtenant
       EXPORTING
-        !EV_prvdtenantID TYPE Zprvdtenantid
-        !EV_subj_acct_id TYPE zprvdtenantid.
+        !ev_prvdtenantid TYPE zprvdtenantid
+        !ev_subj_acct_id TYPE zprvdtenantid.
     METHODS get_refreshtoken
       EXPORTING
-        !EV_prvdtenantID TYPE Zprvdtenantid .
+        !ev_prvdtenantid TYPE zprvdtenantid .
     METHODS get_authtoken
       EXPORTING
-        !EV_prvdtenantID TYPE Zprvdtenantid .
+        !ev_prvdtenantid TYPE zprvdtenantid .
   PROTECTED SECTION.
   PRIVATE SECTION.
 ENDCLASS.
@@ -44,8 +49,8 @@ CLASS zcl_proubc_prvdtenants IMPLEMENTATION.
 
 
   METHOD create_prvdtenant.
-    CONSTANTS: c_default_identurl TYPE string VALUE 'https://ident.provide.services',
-               c_default_bpiurl TYPE string VALUE 'https://baseline.provide.services'.
+    CONSTANTS: lc_default_identurl TYPE string VALUE 'https://ident.provide.services',
+               lc_default_bpiurl TYPE string VALUE 'https://baseline.provide.services'.
     DATA: ls_prvdtenant         TYPE zprvdtenants,
           lt_prvdtenant         TYPE TABLE OF zprvdtenants,
           lt_existingprvdtenant TYPE TABLE OF zprvdtenants,
@@ -75,12 +80,12 @@ CLASS zcl_proubc_prvdtenants IMPLEMENTATION.
       IF <fs_prvdtenant>-bpi_endpoint IS NOT INITIAL.
         ls_prvdtenant-bpi_endpoint = <fs_prvdtenant>-bpi_endpoint.
       ELSE.
-        ls_prvdtenant-bpi_endpoint = c_default_bpiurl.
+        ls_prvdtenant-bpi_endpoint = lc_default_bpiurl.
       ENDIF.
       IF <fs_prvdtenant>-ident_endpoint IS NOT INITIAL.
         ls_prvdtenant-ident_endpoint = <fs_prvdtenant>-ident_endpoint.
       ELSE.
-        ls_prvdtenant-ident_endpoint = c_default_identurl.
+        ls_prvdtenant-ident_endpoint = lc_default_identurl.
       ENDIF.
       DATA(lv_tokenlength) = strlen( <fs_prvdtenant>-refresh_token ).
       IF lv_tokenlength LE 1024 .
@@ -103,13 +108,12 @@ CLASS zcl_proubc_prvdtenants IMPLEMENTATION.
 
   ENDMETHOD.
 
-
   METHOD delete_prvdtenant.
     "TODO add SAP auth
 
     IF ev_prvdtenantid IS NOT INITIAL.
       DELETE FROM zprvdtenants WHERE organization_id = ev_prvdtenantid
-                                 AND subject_account_id = EV_subj_acct_id.
+                                 AND subject_account_id = ev_subj_acct_id.
       IF sy-subrc = 0.
         "todo Add some logging for this
       ELSE. "delete failed. why?
@@ -131,7 +135,7 @@ CLASS zcl_proubc_prvdtenants IMPLEMENTATION.
     lo_api_helper = NEW zcl_proubc_api_helper( ).
     SELECT * FROM zprvdtenants INTO TABLE lt_prvdtenant.
     IF sy-subrc = 0.
-    ELSEIF sy-subrc EQ 4. "can't find it. thats ok
+    ELSEIF sy-subrc EQ 4. "# can't find it. thats ok
     ELSEIF sy-subrc EQ 8. "problem with the db
     ELSE. "general error
 

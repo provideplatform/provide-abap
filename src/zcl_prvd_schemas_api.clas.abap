@@ -17,15 +17,14 @@ CLASS zcl_prvd_schemas_api IMPLEMENTATION.
   METHOD if_rest_resource~get.
 
     DATA(lt_uriattributes) = mo_request->get_uri_attributes( ).
-    DATA: lv_schematype TYPE string.
+    DATA: lv_schematype TYPE string,
+          lt_basictypes TYPE zif_idocapi_typelist=>tt_basictype.
 
     READ TABLE lt_uriattributes WITH KEY name = 'schematype' ASSIGNING FIELD-SYMBOL(<fs_schematype>).
     IF sy-subrc = 0.
       lv_schematype = <fs_schematype>-value.
       TRANSLATE lv_schematype TO UPPER CASE.
     ENDIF.
-
-    DATA: lt_basictypes TYPE zif_idocapi_typelist=>tt_basictype.
 
     CASE lv_schematype.
       WHEN 'IDOC'.
@@ -51,10 +50,12 @@ CLASS zcl_prvd_schemas_api IMPLEMENTATION.
         IF sy-subrc = 0.
           DATA(lo_entity) = mo_response->create_entity( ).
           lo_entity->set_content_type( if_rest_media_type=>gc_appl_json ).
-          lo_entity->set_string_data( /ui2/cl_json=>serialize( EXPORTING data = lt_basictypes pretty_name = /ui2/cl_json=>pretty_mode-low_case ) ).
+          lo_entity->set_string_data( /ui2/cl_json=>serialize( data        = lt_basictypes
+                                                               pretty_name = /ui2/cl_json=>pretty_mode-low_case ) ).
           mo_response->set_status( cl_rest_status_code=>gc_success_ok ).
         ENDIF.
       WHEN 'DDIC'.
+      "Handle DDIC types
       WHEN OTHERS.
         mo_response->set_status( cl_rest_status_code=>gc_client_error_not_found ).
     ENDCASE.

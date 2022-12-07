@@ -7,11 +7,13 @@ CLASS zcl_proubc_vault_helper DEFINITION
 
   PUBLIC SECTION.
     METHODS:
+      "! Constructor method to return PRVD Vault Helper class instance
       constructor IMPORTING !io_api_helper         TYPE REF TO zcl_proubc_api_helper OPTIONAL
                             !iv_org_id             TYPE zprvdtenantid OPTIONAL
                             !iv_subject_account_id TYPE zprvdtenantid OPTIONAL
                             !iv_workgroup_id       TYPE zprvdtenantid OPTIONAL
                             !iv_vault_api_url      TYPE string OPTIONAL,
+      "! Method to create a key
       create_key,
       list_vaults EXPORTING !et_vault_list TYPE zif_proubc_vault=>tty_vault_query,
       create_vault,
@@ -43,9 +45,9 @@ CLASS zcl_proubc_vault_helper IMPLEMENTATION.
     IF io_api_helper IS BOUND.
       lo_api_helper = io_api_helper.
     ELSE.
-      lo_api_helper = NEW zcl_proubc_api_helper( iv_tenant = iv_org_id
+      lo_api_helper = NEW zcl_proubc_api_helper( iv_tenant          = iv_org_id
                                                  iv_subject_acct_id = iv_subject_account_id
-                                                 iv_workgroup_id = iv_workgroup_id ).
+                                                 iv_workgroup_id    = iv_workgroup_id ).
     ENDIF.
 
     lv_vault_api_url = 'https://vault.provide.services'.

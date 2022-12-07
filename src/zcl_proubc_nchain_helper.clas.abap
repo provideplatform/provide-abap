@@ -6,12 +6,14 @@ CLASS zcl_proubc_nchain_helper DEFINITION
 
   PUBLIC SECTION.
     METHODS:
+      "! Creates or retrieves an existing instance of the PRVD Nchain helper class
       constructor IMPORTING !io_prvd_api_helper    TYPE REF TO zcl_proubc_api_helper OPTIONAL
                             !io_prvd_vault_helper  TYPE REF TO zcl_proubc_vault_helper OPTIONAL
                             !iv_org_id             TYPE zprvdtenantid OPTIONAL
                             !iv_subject_account_id TYPE zprvdtenantid OPTIONAL
                             !iv_workgroup_id       TYPE zprvdtenantid OPTIONAL
                             !iv_bpitoken           TYPE zprvdrefreshtoken OPTIONAL ,
+
       call_chainlink_pricefeed IMPORTING !iv_inputcurrency    TYPE string
                                          !iv_inputamount      TYPE  string
                                          !iv_outputcurrency   TYPE string
@@ -127,7 +129,7 @@ CLASS zcl_proubc_nchain_helper IMPLEMENTATION.
           ls_execute_contract_summary   TYPE zif_proubc_nchain=>ty_executecontract_summary.
 
     ls_pricefeedwallet-purpose = 44.
-    me->lo_nchain_api->zif_proubc_nchain~createhdwallet( EXPORTING is_walletrequest = ls_pricefeedwallet
+    lo_nchain_api->zif_proubc_nchain~createhdwallet( EXPORTING is_walletrequest = ls_pricefeedwallet
                                                          IMPORTING ev_apiresponsestr   = lv_getwallet_str
                                                                    ev_apiresponse       = lv_getwallet_data
                                                                    ev_httpresponsecode = lv_getwallet_responsecode ).
@@ -138,7 +140,7 @@ CLASS zcl_proubc_nchain_helper IMPLEMENTATION.
     ENDCASE.
     "eth/usd pair -- see https://docs.chain.link/docs/consuming-data-feeds/
     "https://docs.chain.link/docs/data-feeds/price-feeds/addresses/?network=polygon#Mumbai%20Testnet
-    me->smartcontract_factory(  EXPORTING iv_smartcontractaddress = '0x0715A7794a1dc8e42615F059dD6e406A6594651A'
+    smartcontract_factory( EXPORTING iv_smartcontractaddress = '0x0715A7794a1dc8e42615F059dD6e406A6594651A'
                                           iv_name                 = 'ETH/USD'
                                           iv_walletaddress        = ls_wallet_created-id  "from the wallet we created earlier
                                           iv_nchain_networkid     = '4251b6fd-c98d-4017-87a3-d691a77a52a7' " polygon mumbai testnet nchain id

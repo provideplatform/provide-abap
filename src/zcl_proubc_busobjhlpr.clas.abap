@@ -4,7 +4,7 @@ CLASS zcl_proubc_busobjhlpr DEFINITION
   CREATE PUBLIC .
 
   PUBLIC SECTION.
-
+    "! Creates an entry to the BPI objects table
     CLASS-METHODS create_object
       IMPORTING
         !it_objects TYPE ztty_bpiobj
@@ -54,11 +54,10 @@ CLASS zcl_proubc_busobjhlpr IMPLEMENTATION.
     DATA: ls_bpiobj    TYPE zbpiobj,
           lt_bpiobj    TYPE TABLE OF zbpiobj,
           l_timestampl TYPE timestampl.
-
+    FIELD-SYMBOLS: <fs_object> TYPE zbpiobj.
     "TODO add SAP authorization objects
 
     GET TIME STAMP FIELD l_timestampl.
-    FIELD-SYMBOLS: <fs_object> TYPE zbpiobj.
     "ensure object does not already exist
     LOOP AT it_objects ASSIGNING <fs_object>.
       CLEAR: ls_bpiobj.

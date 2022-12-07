@@ -65,13 +65,14 @@ INTERFACE zif_proubc_blidochlper
 
   TYPES:
     BEGIN OF ty_idoc_xmllist,
-      object_id TYPE Zbpiobj-object_id,
+      object_id TYPE zbpiobj-object_id,
       idocnum   TYPE edidc-docnum,
       idoc      TYPE REF TO cl_idoc_xml1,
     END OF ty_idoc_xmllist .
   TYPES:
     tty_idoc_xmllist TYPE TABLE OF ty_idoc_xmllist .
 
+  "! Method to initiate PRVD Baseline zk proof creation for selection of iDocs
   METHODS shuttle_idocs
     IMPORTING
       !it_idoctype   TYPE tty_r_idoctype

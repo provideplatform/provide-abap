@@ -70,9 +70,9 @@ CLASS ZCL_IDOCAPI_SEGMENTAPI IMPLEMENTATION.
     GET PARAMETER ID 'EDI_SELDOCU' FIELD DATA(l_recsel). "record selection
 
     DATA: lv_idoc_type      TYPE ledid_idoc_type,
-          lt_IDOC_STRUCT    TYPE ledid_t_idoc_struct,
-          lt_SEGMENTS       TYPE ledid_t_segment,
-          lt_SEGMENT_STRUCT TYPE ledid_t_segment_struct.
+          lt_idoc_struct    TYPE ledid_t_idoc_struct,
+          lt_segments       TYPE ledid_t_segment,
+          lt_segment_struct TYPE ledid_t_segment_struct.
 
     "get the idoc segments
     CALL FUNCTION 'IDOC_TYPE_COMPLETE_READ'
@@ -98,7 +98,8 @@ CLASS ZCL_IDOCAPI_SEGMENTAPI IMPLEMENTATION.
     "create the json HTTP response
     DATA(lo_entity) = mo_response->create_entity( ).
     lo_entity->set_content_type( if_rest_media_type=>gc_appl_json ).
-    lo_entity->set_string_data( /ui2/cl_json=>serialize( EXPORTING data = ls_responsedata pretty_name = /ui2/cl_json=>pretty_mode-low_case ) ).
+    lo_entity->set_string_data( /ui2/cl_json=>serialize( data        = ls_responsedata 
+                                                         pretty_name = /ui2/cl_json=>pretty_mode-low_case ) ).
     mo_response->set_status( cl_rest_status_code=>gc_success_ok ).
   ENDMETHOD.
 ENDCLASS.
