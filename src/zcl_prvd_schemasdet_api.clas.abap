@@ -43,10 +43,10 @@ CLASS zcl_prvd_schemasdet_api IMPLEMENTATION.
             a~ldate,
             a~ltime,
             a~applrel
-      FROM edbas AS a
-      LEFT OUTER JOIN edbast AS b ON a~idoctyp = b~idoctyp
-                                  AND b~langua = 'E'
-      WHERE a~idoctyp = @lv_selectedbasictype
+    FROM edbas AS a
+    LEFT OUTER JOIN edbast AS b ON a~idoctyp = b~idoctyp
+                                AND b~langua = 'E'
+    WHERE a~idoctyp = @lv_selectedbasictype
     INTO @lS_basictypes.
 
     ls_responsedata-basictype = ls_basictypes.
@@ -59,9 +59,9 @@ CLASS zcl_prvd_schemasdet_api IMPLEMENTATION.
     GET PARAMETER ID 'EDI_SELDOCU' FIELD DATA(l_recsel). "record selection
 
     DATA: lv_idoc_type      TYPE ledid_idoc_type,
-          lt_IDOC_STRUCT    TYPE ledid_t_idoc_struct,
-          lt_SEGMENTS       TYPE ledid_t_segment,
-          lt_SEGMENT_STRUCT TYPE ledid_t_segment_struct.
+          lt_idoc_struct    TYPE ledid_t_idoc_struct,
+          lt_segments       TYPE ledid_t_segment,
+          lt_segment_struct TYPE ledid_t_segment_struct.
 
     "get the idoc segments
     CALL FUNCTION 'IDOC_TYPE_COMPLETE_READ'
@@ -92,8 +92,7 @@ CLASS zcl_prvd_schemasdet_api IMPLEMENTATION.
 
     DATA: lv_responsejson TYPE string.
     lv_responsejson = /ui2/cl_json=>serialize(
-         EXPORTING
-          data = lv_idoc_schema_json_tree
+         data = lv_idoc_schema_json_tree
     ).
 
     "create the json HTTP response

@@ -21,7 +21,7 @@ CLASS ZCL_PROUBC_OBTRIGTEST IMPLEMENTATION.
     DATA: lo_api_helper             TYPE REF TO zcl_proubc_api_helper,
           lv_status                 TYPE i,
           ls_protocol_msg_req       TYPE zif_proubc_baseline=>protocolmessage_req,
-          ls_DUMMY_protocol_msg_req TYPE zif_proubc_baseline=>protocolmessage_req,
+          ls_dummy_protocol_msg_req TYPE zif_proubc_baseline=>protocolmessage_req,
           ls_testresponse           TYPE zif_proubc_testobj=>ty_obtrigtest,
           lv_testresponse           TYPE string,
           lv_apiresponsestr         TYPE string,
@@ -47,7 +47,7 @@ CLASS ZCL_PROUBC_OBTRIGTEST IMPLEMENTATION.
     ).
 
     IF ls_protocol_msg_req IS INITIAL.
-      ls_DUMMY_protocol_msg_req = lo_api_helper->build_dummy_idoc_protocol_msg( ).
+      ls_dummy_protocol_msg_req = lo_api_helper->build_dummy_idoc_protocol_msg( ).
     ENDIF.
 
     DATA: lv_setup_success TYPE boolean.

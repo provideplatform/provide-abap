@@ -47,11 +47,11 @@ INTERFACE zif_proubc_privacy PUBLIC.
       body TYPE ty_createcircuitrequest
     RAISING cx_static_check.
 
-* POST - "Verify"
-* Operation id: Verify
-* Parameter: circuit_id, required, path
-* Response: 200
-* Body ref: #/components/schemas/VerifyRequest
+"! POST - "Verify"
+"! Operation id: Verify
+"! Parameter: circuit_id, required, path
+"! Response: 200
+"! Body ref: #/components/schemas/VerifyRequest
   METHODS verify
     IMPORTING
       circuit_id TYPE string

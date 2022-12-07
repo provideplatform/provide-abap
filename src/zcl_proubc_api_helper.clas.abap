@@ -1,9 +1,9 @@
+"! <p class="shorttext synchronized" lang="en">ABAP class that contains ABAP Doc</p>
 CLASS zcl_proubc_api_helper DEFINITION
   PUBLIC
   CREATE PUBLIC .
 
   PUBLIC SECTION.
-
     CLASS-METHODS build_refresh_token
       IMPORTING
         !iv_refreshtoken1 TYPE string
@@ -16,20 +16,36 @@ CLASS zcl_proubc_api_helper DEFINITION
         !is_data TYPE any
       CHANGING
         !cr_data TYPE REF TO data .
+    "! Generic method to perform SAP authority checks for PRVD stack API activities
     CLASS-METHODS prvd_tenant_sap_authcheck
       IMPORTING
         !iv_tenant TYPE zprvdtenantid.
+    "! Derives the PRVD subject account id from PRVD Org and PRVD Workgroup ID
+    "! @parameter iv_organization | PRVD Org
+    "! @parameter iv_workgroup_Id | PRVD workgroup ID
+    "! @parameter ev_subject_account_id | PRVD Subject Account ID - derived from given info
     CLASS-METHODS get_subject_account_id
       IMPORTING
         !iv_organization       TYPE zprvdtenantid
         !iv_workgroup_id       TYPE zprvdtenantid
       EXPORTING
         !ev_subject_account_id TYPE zprvdtenantid.
+    "! Method to create an instance of the API Helper object
+    "! @parameter iv_tenant | PRVD Org ID
+    "! @parameter iv_subjcect_acct_id | PRVD Subject Account ID
+    "! @parameter iv_workgroup_id | PRVD Workgroup ID
     METHODS constructor
       IMPORTING
         !iv_tenant          TYPE zprvdtenantid OPTIONAL
         !iv_subject_acct_id TYPE zprvdtenantid OPTIONAL
         !iv_workgroup_id    TYPE zprvdtenantid OPTIONAL.
+    "! Method to retrieve access token from PRVD Ident API using user's PRVD subject account
+    "! @parameter iv_tenant | PRVD Org ID
+    "! @parameter iv_subjacct | PRVD Subject Account ID
+    "! @parameter iv_wrkgrpid | PRVD Workgroup ID
+    "! @parameter ev_authtoken | Access token structure
+    "! @parameter status | HTTP status code
+    "! @parameter ev_bpiendpoint | BPI Endpoint host
     METHODS call_ident_api
       IMPORTING
         !iv_tenant      TYPE zprvdtenantid OPTIONAL
@@ -39,6 +55,7 @@ CLASS zcl_proubc_api_helper DEFINITION
         !ev_authtoken   TYPE REF TO data
         !status         TYPE i
         !ev_bpiendpoint TYPE string .
+    "! Method to check if configured PRVD BPI endpoint is currently reachable
     METHODS baseline_health_check
       IMPORTING
         !iv_tenant      TYPE zprvdtenantid OPTIONAL
@@ -48,6 +65,7 @@ CLASS zcl_proubc_api_helper DEFINITION
     METHODS setup_protocol_msg
       EXPORTING
         !setup_success TYPE boolean .
+    "! Emits PRVD Baseline protocol message
     METHODS send_protocol_msg
       IMPORTING
         !body           TYPE zif_proubc_baseline=>protocolmessage_req
@@ -69,9 +87,11 @@ CLASS zcl_proubc_api_helper DEFINITION
         !statuscode     TYPE i
         !apiresponsestr TYPE string
         !apiresponse    TYPE REF TO data .
+    "! Method that attempts to resolve a PRVD tenant to the user based upon available data
     METHODS get_default_tenant
       RETURNING
         VALUE(ev_defaulttenant) TYPE zprvdtenantid .
+    "! Method to return the PRVD Baseline BPI endpoint to be used
     METHODS get_default_tenant_bpiendpoint
       RETURNING
         VALUE(ev_bpiendpoint) TYPE zprvdtenants-bpi_endpoint .
@@ -79,6 +99,7 @@ CLASS zcl_proubc_api_helper DEFINITION
       RETURNING
         VALUE(es_dummy_idoc_msg) TYPE zif_proubc_baseline=>protocolmessage_req .
     METHODS list_bpi_accounts .
+    "! Method to return PRVD Nchain helper class
     METHODS get_nchain_helper EXPORTING eo_prvd_nchain_helper TYPE REF TO zcl_proubc_nchain_helper.
 
   PROTECTED SECTION.
@@ -141,14 +162,14 @@ CLASS zcl_proubc_api_helper IMPLEMENTATION.
 
           cl_http_client=>create_by_url(
             EXPORTING
-            url                = lv_bpiendpoint
-          IMPORTING
-            client             = lo_http_client
-          EXCEPTIONS
-            argument_not_found = 1
-            plugin_not_active  = 2
-            internal_error     = 3
-            OTHERS             = 4 ).
+              url                = lv_bpiendpoint
+            IMPORTING
+              client             = lo_http_client
+            EXCEPTIONS
+              argument_not_found = 1
+              plugin_not_active  = 2
+              internal_error     = 3
+              OTHERS             = 4 ).
           IF sy-subrc <> 0.
             " error handling
           ENDIF.
@@ -451,15 +472,15 @@ ENDIF.
   METHOD send_protocol_msg.
     DATA ls_finalized_protocol_msg TYPE zif_proubc_baseline=>protocolmessage_req.
 
-    ls_finalized_protocol_msg = body.
+    ls_finalized_protocol_msg                    = body.
     ls_finalized_protocol_msg-subject_account_id = lv_defaultsubjectacct.
-    ls_finalized_protocol_msg-workgroup_id = lv_selected_workgroupid.
+    ls_finalized_protocol_msg-workgroup_id       = lv_selected_workgroupid.
     TRY.
-        lo_baseline_client->send_protocol_msg( EXPORTING iv_body = ls_finalized_protocol_msg
-                                                         iv_bpitoken = lv_bpitoken
-                                               IMPORTING statuscode = statuscode
+        lo_baseline_client->send_protocol_msg( EXPORTING iv_body        = ls_finalized_protocol_msg
+                                                         iv_bpitoken    = lv_bpitoken
+                                               IMPORTING statuscode     = statuscode
                                                          apiresponsestr = apiresponsestr
-                                                         apiresponse = apiresponse ).
+                                                         apiresponse    = apiresponse ).
       CATCH cx_static_check.
     ENDTRY.
   ENDMETHOD.
@@ -481,7 +502,7 @@ ENDIF.
     FIELD-SYMBOLS: <fs_authreq>  TYPE any,
                    <fs_authreq2> TYPE string.
 
-    call_ident_api( EXPORTING   iv_tenant      = lv_defaulttenant
+    me->call_ident_api( EXPORTING   iv_tenant  = lv_defaulttenant
                                 iv_subjacct    = lv_defaultsubjectacct
                       IMPORTING ev_authtoken   = lv_tenant_jwt
                                 ev_bpiendpoint = lv_bpiendpoint ).

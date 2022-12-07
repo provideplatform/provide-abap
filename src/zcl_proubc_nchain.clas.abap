@@ -1,6 +1,7 @@
 CLASS zcl_proubc_nchain DEFINITION PUBLIC.
   PUBLIC SECTION.
     INTERFACES zif_proubc_nchain.
+    "! Constructor method to creates the PRVD Nchain API Proxy class
     METHODS constructor IMPORTING !ii_client   TYPE REF TO if_http_client
                                   !iv_tenant   TYPE zprvdtenantid
                                   !iv_bpitoken TYPE zprvdrefreshtoken.

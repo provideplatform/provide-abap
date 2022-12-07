@@ -93,9 +93,10 @@ INTERFACE zif_proubc_baseline
     END OF circuit .
   TYPES:
 * Component schema: CompiledArtifact, object
+" todo, handle array in ABI
     BEGIN OF compiledartifact,
       contractname TYPE string,
-      abi          TYPE STANDARD TABLE OF string WITH DEFAULT KEY, " todo, handle array
+      abi          TYPE REF TO data, 
       bytecode     TYPE string,
       source       TYPE string,
     END OF compiledartifact .
@@ -223,7 +224,7 @@ INTERFACE zif_proubc_baseline
 * Component schema: ExecuteContractRequest, object
     BEGIN OF executecontractrequest,
       method     TYPE string,
-      params     TYPE STANDARD TABLE OF string WITH DEFAULT KEY, " todo, handle array
+      params     TYPE STANDARD TABLE OF string WITH EMPTY KEY,
       value      TYPE i,
       account_id TYPE string,
     END OF executecontractrequest .
@@ -407,21 +408,21 @@ INTERFACE zif_proubc_baseline
 *    Type            *string          `sql:"-" json:"type,omitempty"`
 *}
     BEGIN OF protocolmessage_req,
-      id               TYPE zbpiobj-object_id, "object id, e.g PO number
-      payload          TYPE ref to data, "the idoc payload
-      payload_mimetype TYPE string, " 'application/xml or json
-      type             TYPE string, "e.g. ORDERS05
-      subject_account_id type zprvdtenantid,
-      workgroup_id type zprvdtenantid,
+      id               TYPE zbpiobj-object_id, 
+      payload          TYPE REF TO data,
+      payload_mimetype TYPE string,
+      type             TYPE string,
+      subject_account_id TYPE zprvdtenantid,
+      workgroup_id TYPE zprvdtenantid,
     END OF protocolmessage_req .
- types:
+  TYPES:
        begin of protocolmessage_resp,
-            baseline_id type string, ": "14ff34b2-ccbf-4a58-906a-05653d24470c",
+            baseline_id type string,
             proof type string,
             recipients type tab_string, ": [],
-            subject_account_id type zprvdtenantid, ": "523ed05ebc7ac1b50fabc4a876da0a7dc54df9313a5c002655f8d62843afd031",
-            type type string,": "INTERNAL_ORDER01",
-            workgroup_id type zprvdtenantid, ": "387750f1-e370-4042-bfc2-89f74b955f3c"
+            subject_account_id type zprvdtenantid,
+            type type string,
+            workgroup_id type zprvdtenantid,
        end of protocolmessage_resp.
 
   TYPES:
@@ -536,19 +537,19 @@ INTERFACE zif_proubc_baseline
 
   TYPES:
 * Component schema: response_listconnectors, array
-    response_listconnectors TYPE STANDARD TABLE OF connector WITH DEFAULT KEY .
+    response_listconnectors TYPE STANDARD TABLE OF connector WITH EMPTY KEY .
   TYPES:
 * Component schema: response_listtokens, array
-    response_listtokens TYPE STANDARD TABLE OF token WITH DEFAULT KEY .
+    response_listtokens TYPE STANDARD TABLE OF token WITH EMPTY KEY .
   TYPES:
 * Component schema: response_listusers, array
-    response_listusers TYPE STANDARD TABLE OF user WITH DEFAULT KEY .
+    response_listusers TYPE STANDARD TABLE OF user WITH EMPTY KEY .
   TYPES:
 * Component schema: response_listworkgroups, array
-    response_listworkgroups TYPE STANDARD TABLE OF workgroup WITH DEFAULT KEY .
+    response_listworkgroups TYPE STANDARD TABLE OF workgroup WITH EMPTY KEY .
   TYPES:
 * Component schema: response_listworkgroupusers, array
-    response_listworkgroupusers TYPE STANDARD TABLE OF user WITH DEFAULT KEY .
+    response_listworkgroupusers TYPE STANDARD TABLE OF user WITH EMPTY KEY .
 
 * GET - "List accounts"
 * Operation id: ListAccounts
@@ -745,7 +746,7 @@ INTERFACE zif_proubc_baseline
       !body TYPE contract
     RAISING
       cx_static_check .
-* GET - "Get contract detail"
+*! GET - "Get contract detail"
 * Operation id: GetContractDetail
 * Parameter: id, required, path
 * Response: 200
@@ -755,7 +756,7 @@ INTERFACE zif_proubc_baseline
 * Response: 404
 * Response: 503
 * Response: default
-*     application/json, #/components/schemas/Error
+*!     application/json, #/components/schemas/Error
   METHODS getcontractdetail
     IMPORTING
       !id TYPE string

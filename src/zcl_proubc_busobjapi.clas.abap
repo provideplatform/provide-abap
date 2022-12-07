@@ -24,7 +24,7 @@ CLASS ZCL_PROUBC_BUSOBJAPI IMPLEMENTATION.
     "todo handle other URI params
     DATA(lo_entity) = mo_response->create_entity( ).
     DATA lv_objectid TYPE zbpiobj-object_id.
-    DATA lt_object TYPE  ztty_bpiobj.
+    DATA lt_object TYPE ztty_bpiobj.
     DATA ls_object TYPE zbpiobj.
     DATA lv_bpiobjdata TYPE REF TO data.
 
@@ -36,13 +36,14 @@ CLASS ZCL_PROUBC_BUSOBJAPI IMPLEMENTATION.
     ).
     zcl_proubc_api_helper=>copy_data_to_ref(
             EXPORTING is_data = lt_object
-            CHANGING cr_data = lv_bpiobjdata
-      ).
+            CHANGING cr_data  = lv_bpiobjdata
+    ).
 
 
     lo_entity = mo_response->create_entity( ).
     lo_entity->set_content_type( if_rest_media_type=>gc_appl_json ).
-    lo_entity->set_string_data( /ui2/cl_json=>serialize( EXPORTING data = lv_bpiobjdata pretty_name = /ui2/cl_json=>pretty_mode-low_case ) ).
+    lo_entity->set_string_data( /ui2/cl_json=>serialize( data = lv_bpiobjdata
+                                                         pretty_name = /ui2/cl_json=>pretty_mode-low_case ) ).
     mo_response->set_status( cl_rest_status_code=>gc_success_ok ).
   ENDMETHOD.
 
@@ -54,7 +55,8 @@ CLASS ZCL_PROUBC_BUSOBJAPI IMPLEMENTATION.
     "create the business object
     DATA: lt_objects TYPE zif_proubc_object=>tty_create_object_req_objid.
     DATA(lv_request_body) = mo_request->get_entity( )->get_string_data( ).
-    /ui2/cl_json=>deserialize( EXPORTING json = lv_request_body CHANGING data = lt_objects ).
+    /ui2/cl_json=>deserialize( EXPORTING json = lv_request_body
+                               CHANGING data  = lt_objects ).
 
     DATA: ls_obj      TYPE zbpiobj,
           lt_obj      TYPE ztty_bpiobj,
@@ -84,7 +86,8 @@ CLASS ZCL_PROUBC_BUSOBJAPI IMPLEMENTATION.
 
     lo_entity = mo_response->create_entity( ).
     lo_entity->set_content_type( if_rest_media_type=>gc_appl_json ).
-    lo_entity->set_string_data( /ui2/cl_json=>serialize( EXPORTING data = lv_bpiobjdata pretty_name = /ui2/cl_json=>pretty_mode-low_case ) ).
+    lo_entity->set_string_data( /ui2/cl_json=>serialize( data        = lv_bpiobjdata
+                                                         pretty_name = /ui2/cl_json=>pretty_mode-low_case ) ).
     mo_response->set_status( cl_rest_status_code=>gc_success_created ).
 
   ENDMETHOD.
