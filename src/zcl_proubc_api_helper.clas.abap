@@ -502,10 +502,10 @@ ENDIF.
     FIELD-SYMBOLS: <fs_authreq>  TYPE any,
                    <fs_authreq2> TYPE string.
 
-    me->call_ident_api( EXPORTING   iv_tenant  = lv_defaulttenant
-                                iv_subjacct    = lv_defaultsubjectacct
-                      IMPORTING ev_authtoken   = lv_tenant_jwt
-                                ev_bpiendpoint = lv_bpiendpoint ).
+    me->call_ident_api( EXPORTING iv_tenant = lv_defaulttenant
+                                  iv_subjacct = lv_defaultsubjectacct
+                      IMPORTING ev_authtoken = lv_tenant_jwt
+                                ev_bpiendpoint = lv_bpiendpoint  ).
     lv_defaultidenttoken = lv_tenant_jwt.
 
     IF lv_tenant_jwt IS NOT INITIAL.
