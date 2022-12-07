@@ -249,11 +249,12 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     DATA lv_busobjmsg TYPE REF TO data.
 
     mi_client->request->set_method( 'POST' ).
-    mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
+    mi_client->request->set_header_field( name  = '~request_uri' 
+                                         value  = lv_uri ).
     me->get_bpi_token( ).
 
     zcl_proubc_api_helper=>copy_data_to_ref( EXPORTING is_data = body
-                  CHANGING cr_data = lv_busobjmsg ).
+                                              CHANGING cr_data = lv_busobjmsg ).
 
     lv_requeststr = /ui2/cl_json=>serialize( EXPORTING data                 = lv_busobjmsg
                                                        pretty_name          = /ui2/cl_json=>pretty_mode-low_case ).
@@ -380,7 +381,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/networks'.
     mi_client->request->set_method( 'POST' ).
-    mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
+    mi_client->request->set_header_field( name = '~request_uri' 
+                                         value = lv_uri ).
 * todo, set body, #/components/schemas/Network
     me->get_bearer_token( ).
     lv_code = send_receive( ).
@@ -482,7 +484,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/users'.
     mi_client->request->set_method( 'POST' ).
-    mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
+    mi_client->request->set_header_field( name = '~request_uri' 
+                                         value = lv_uri ).
 * todo, set body, #/components/schemas/User
     me->get_bearer_token( ).
     lv_code = send_receive( ).
@@ -637,7 +640,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{id}' IN lv_uri WITH lv_temp.
     mi_client->request->set_method( 'DELETE' ).
-    mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
+    mi_client->request->set_header_field( name  = '~request_uri' 
+                                          value = lv_uri ).
     me->get_bearer_token( ).
     lv_code = send_receive( ).
     "WRITE / lv_code. ~ replace with logging call
@@ -695,7 +699,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{id}' IN lv_uri WITH lv_temp.
     mi_client->request->set_method( 'DELETE' ).
-    mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
+    mi_client->request->set_header_field( name = '~request_uri' 
+                                         value = lv_uri ).
     me->get_bearer_token( ).
     lv_code = send_receive( ).
     "WRITE / lv_code. ~ replace with logging call
@@ -721,7 +726,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{id}' IN lv_uri WITH lv_temp.
     mi_client->request->set_method( 'DELETE' ).
-    mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
+    mi_client->request->set_header_field( name = '~request_uri' 
+                                         value = lv_uri ).
     me->get_bearer_token( ).
     lv_code = send_receive( ).
     "WRITE / lv_code. ~ replace with logging call

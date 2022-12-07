@@ -33,10 +33,8 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     DATA lv_bearertoken TYPE string.
     CONCATENATE 'Bearer' lv_bpitoken INTO lv_bearertoken SEPARATED BY space.
     mi_client->request->set_header_field(
-      EXPORTING
-        name  = 'Authorization'    " Name of the header field
-        value = lv_bearertoken    " HTTP header field value
-    ).
+        name  = 'Authorization'
+        value = lv_bearertoken ).
   ENDMETHOD.
 
 
@@ -184,10 +182,9 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     ev_apiresponsestr = mi_client->response->get_cdata( ).
     /ui2/cl_json=>deserialize(
       EXPORTING
-        json             = ev_apiresponsestr
+        json            = ev_apiresponsestr
       CHANGING
-        data             = ev_apiresponse
-    ).
+        data            = ev_apiresponse ).
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
@@ -211,8 +208,7 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
       EXPORTING
         json             = ev_apiresponsestr
       CHANGING
-        data             = ev_apiresponse
-    ).
+        data             = ev_apiresponse ).
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
@@ -236,8 +232,7 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
       EXPORTING
         json             = ev_apiresponsestr
       CHANGING
-        data             = ev_apiresponse
-    ).
+        data             = ev_apiresponse ).
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
@@ -275,6 +270,7 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     DATA lv_uri TYPE string VALUE '/api/v1/networks'.
     mi_client->request->set_method( 'POST' ).
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
+
 * todo, set body, #/components/schemas/CreatenetworkRequest
     me->get_bpi_token( ).
     lv_code = send_receive( ).
@@ -346,8 +342,10 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{account_id}' IN lv_uri WITH lv_temp.
     mi_client->request->set_method( 'GET' ).
-    mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
-    mi_client->request->set_header_field( name = 'content-type' value = content_type ).
+    mi_client->request->set_header_field( name  = '~request_uri' 
+                                          value = lv_uri ).
+    mi_client->request->set_header_field( name  = 'content-type' 
+                                          value = content_type ).
     me->get_bpi_token( ).
     lv_code = send_receive( ).
     ev_httpresponsecode = lv_code.
@@ -651,7 +649,8 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/api/v1/contracts/{contract_id}/execute'.
     mi_client->request->set_method( 'POST' ).
-    mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
+    mi_client->request->set_header_field( name  = '~request_uri' 
+                                          value = lv_uri ).
 * todo, set body, #/components/schemas/ExecutereadonlycontractRequest
     me->get_bpi_token( ).
     lv_code = send_receive( ).

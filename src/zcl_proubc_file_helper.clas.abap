@@ -6,11 +6,11 @@ CLASS zcl_proubc_file_helper DEFINITION
   PUBLIC SECTION.
     CLASS-METHODS:
       "! Retrieves a EVM smart contract ABI from the registry + AL11 based on the smart contract address and network ID
-      "
       get_smartcontract_abi IMPORTING !iv_nchain_networkid      TYPE zprvd_nchain_networkid
                                       !iv_smartcontract_address TYPE zproubc_smartcontract_addr
                             EXPORTING !ev_abi_str               TYPE zcasesensitive_str
                                       !ev_abi_data              TYPE REF TO data ,
+      "! Retrieves the ABI file contents based upon the ABI registry table entry
       open_abiregistry IMPORTING !is_abi_registry TYPE zprvdabiregistry
                        EXPORTING !ev_filecontent  TYPE zcasesensitive_str ,
       open_file_generic IMPORTING !iv_file_location TYPE string
@@ -46,7 +46,7 @@ CLASS zcl_proubc_file_helper IMPLEMENTATION.
        AND smartcontract_address = @iv_smartcontract_address.
     IF sy-subrc = 0.
       zcl_proubc_file_helper=>open_abiregistry( EXPORTING is_abi_registry = ls_abi_registry
-                                                IMPORTING ev_filecontent = lv_filestr ).
+                                                IMPORTING ev_filecontent  = lv_filestr ).
       ev_abi_str = lv_filestr.
       /ui2/cl_json=>deserialize( EXPORTING json = lv_filestr CHANGING data = lv_abi_data ).
       ev_abi_data = lv_abi_data.
@@ -57,7 +57,7 @@ CLASS zcl_proubc_file_helper IMPLEMENTATION.
 
   METHOD open_abiregistry.
     DATA: it_filecontent TYPE TABLE OF zif_proubc_file=>ty_filecontent.
-    DATA: wa_tab TYPE REF TO data. "zif_proubc_file=>ty_filecontent.
+    DATA: wa_tab TYPE REF TO data.
     DATA: xstr TYPE xstring.
     OPEN DATASET is_abi_registry-abi_location FOR INPUT IN BINARY MODE.
     READ DATASET is_abi_registry-abi_location INTO xstr ACTUAL LENGTH DATA(bytes).
@@ -65,7 +65,7 @@ CLASS zcl_proubc_file_helper IMPLEMENTATION.
     cl_bcs_convert=>xstring_to_string(
     EXPORTING
       iv_xstr   = xstr
-      iv_cp     =  1100                " SAP character set identification
+      iv_cp     =  1100
     RECEIVING
       rv_string = DATA(lv_string)
     ).
@@ -76,18 +76,18 @@ CLASS zcl_proubc_file_helper IMPLEMENTATION.
 
   METHOD open_file_generic.
     OPEN DATASET iv_file_location FOR INPUT IN BINARY MODE.
-    READ DATASET iv_file_location INTO ev_filecontent_x ACTUAL LENGTH DATA(bytes).
+    READ DATASET iv_file_location INTO ev_filecontent_x ACTUAL LENGTH DATA(lv_bytes).
     CLOSE DATASET iv_file_location.
     cl_bcs_convert=>xstring_to_string(
     EXPORTING
       iv_xstr   = ev_filecontent_x
-      iv_cp     =  1100                " SAP character set identification
+      iv_cp     =  1100
     RECEIVING
       rv_string = DATA(lv_string)
     ).
     IF sy-subrc = 0.
       ev_filecontent = lv_string.
-      ev_length = bytes.
+      ev_length = lv_bytes.
     ENDIF.
 
     OPEN DATASET iv_file_location FOR INPUT IN TEXT MODE ENCODING DEFAULT.
@@ -114,8 +114,11 @@ CLASS zcl_proubc_file_helper IMPLEMENTATION.
       lv_i             TYPE i,
       lv_ipfs_url      TYPE string.
 
-*    open_file_generic(  EXPORTING iv_file_location = ''
-*                         IMPORTING ev_filecontent_x = lv_xstr ).
+    DATA: lv_ipfs_add_code TYPE i,
+      lv_ipfs_add_resp TYPE string,
+      lv_ipfs_add_data TYPE REF TO data.
+    FIELD-SYMBOLS: <fs_contentid>     TYPE any,
+                   <fs_contentid_str> TYPE string.
 
     lv_xstr = iv_filecontent_x.
     lv_rawbinary = lv_xstr.
@@ -123,7 +126,7 @@ CLASS zcl_proubc_file_helper IMPLEMENTATION.
 
     lv_ipfs_url = 'https://ipfs.infura.io:5001'.
 
-    CALL METHOD cl_http_client=>create_by_url
+    cl_http_client=>create_by_url(
       EXPORTING
         url                = lv_ipfs_url
       IMPORTING
@@ -131,14 +134,10 @@ CLASS zcl_proubc_file_helper IMPLEMENTATION.
       EXCEPTIONS
         argument_not_found = 1
         plugin_not_active  = 2
-        internal_error     = 3.
+        internal_error     = 3 ).
 
-
-    DATA: lv_ipfs_add_code TYPE i,
-          lv_ipfs_add_resp TYPE string,
-          lv_ipfs_add_data TYPE REF TO data.
-
-    lo_prvd_ipfs_simple = NEW zcl_prvd_ipfs_simple( ii_client = lo_http_client iv_ipfs_url = lv_ipfs_url ).
+    lo_prvd_ipfs_simple = NEW zcl_prvd_ipfs_simple( ii_client   = lo_http_client
+                                                    iv_ipfs_url = lv_ipfs_url ).
 
     lo_prvd_ipfs_simple->zif_prvd_ipfs_simple~add(
       EXPORTING
@@ -171,16 +170,11 @@ CLASS zcl_proubc_file_helper IMPLEMENTATION.
         ev_httpresponsecode    = lv_ipfs_add_code
     ).
     IF lv_ipfs_add_code EQ 200.
-      FIELD-SYMBOLS: <fs_contentid>     TYPE any,
-                     <fs_contentid_str> TYPE string.
-
       ASSIGN lv_ipfs_add_data->* TO FIELD-SYMBOL(<fs_ipfsresp>).
       ASSIGN COMPONENT 'NAME' OF STRUCTURE <fs_ipfsresp> TO <fs_contentid>.
       ASSIGN <fs_contentid>->* TO <fs_contentid_str>.
       ev_contentid = <fs_contentid_str>.
-
     ENDIF.
-*    CATCH cx_static_check.
 
 
   ENDMETHOD.

@@ -5,12 +5,13 @@ CLASS zcl_prvd_ipfs_simple DEFINITION
 
   PUBLIC SECTION.
     INTERFACES: zif_prvd_ipfs_simple.
+    "! Class instance constructor for the simple IPFS API proxy
     METHODS: constructor IMPORTING ii_client   TYPE REF TO if_http_client
                                    iv_ipfs_url TYPE string.
 
   PROTECTED SECTION.
     DATA: mi_client   TYPE REF TO if_http_client,
-          lv_ipfs_url TYPE string.
+          mv_ipfs_url TYPE string.
     METHODS: send_receive RETURNING VALUE(rv_code) TYPE i.
   PRIVATE SECTION.
 ENDCLASS.
@@ -21,7 +22,7 @@ CLASS zcl_prvd_ipfs_simple IMPLEMENTATION.
 
   METHOD constructor.
     mi_client = ii_client.
-    lv_ipfs_url = iv_ipfs_url.
+    mv_ipfs_url = iv_ipfs_url.
   ENDMETHOD.
 
   METHOD send_receive.
@@ -33,7 +34,6 @@ CLASS zcl_prvd_ipfs_simple IMPLEMENTATION.
 
   METHOD zif_prvd_ipfs_simple~add.
     DATA lv_code TYPE i.
-    DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/api/v0/add'.
     DATA lv_uri_w_projid TYPE string.
     DATA lv_creds TYPE string.
@@ -86,7 +86,7 @@ CLASS zcl_prvd_ipfs_simple IMPLEMENTATION.
     cl_bcs_convert=>xstring_to_string(
         EXPORTING
           iv_xstr   = iv_binarystring
-          iv_cp     =  1100                " SAP character set identification
+          iv_cp     = 1100
         RECEIVING
           rv_string = DATA(lv_content_string)
     ).
@@ -102,14 +102,11 @@ CLASS zcl_prvd_ipfs_simple IMPLEMENTATION.
 
     "dumpy
     CALL METHOD lv_binary_header->set_header_field
-    "CALL METHOD mi_client->request->set_header_field
       EXPORTING
         name  = 'content-disposition'
         value = lv_content_dispo_alt.
 
-    CALL METHOD lv_binary_header->set_content_type
-      EXPORTING
-        content_type = 'application/json'.
+    lv_binary_header->set_content_type( 'application/json' ).
 *
 *       DATA(lv_content_len) = strlen( lv_content_string ).
 *    DATA: lv_content_len_str TYPE string.
@@ -201,9 +198,8 @@ CLASS zcl_prvd_ipfs_simple IMPLEMENTATION.
     CONCATENATE lv_uri '?project_id=' iv_ipfsprojid INTO lv_uri_w_projid.
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
     mi_client->request->set_form_field(
-        EXPORTING
-        name = 'project_id' " Name of form field
-        value = iv_ipfsprojid " Form field value
+        name  = 'project_id'
+        value = iv_ipfsprojid
     ).
 
     lv_code = send_receive( ).
@@ -211,9 +207,9 @@ CLASS zcl_prvd_ipfs_simple IMPLEMENTATION.
     ev_apiresponsestr = mi_client->response->get_cdata( ).
     /ui2/cl_json=>deserialize(
       EXPORTING
-        json             = ev_apiresponsestr
+        json            = ev_apiresponsestr
       CHANGING
-        data             = ev_apiresponse
+        data            = ev_apiresponse
     ).
 
   ENDMETHOD.

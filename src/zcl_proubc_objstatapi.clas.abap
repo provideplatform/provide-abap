@@ -39,8 +39,7 @@ CLASS ZCL_PROUBC_OBJSTATAPI IMPLEMENTATION.
     "/objects
     zcl_proubc_api_helper=>copy_data_to_ref(
             EXPORTING is_data = ls_status_response
-            CHANGING cr_data  = lv_statusdata
-      ).
+            CHANGING cr_data  = lv_statusdata ).
 
     lo_entity = mo_response->create_entity( ).
     lo_entity->set_content_type( if_rest_media_type=>gc_appl_json ).
@@ -57,7 +56,9 @@ CLASS ZCL_PROUBC_OBJSTATAPI IMPLEMENTATION.
     DATA: ls_objectstat   TYPE zif_proubc_object=>ty_update_status_req,
           ls_resp_objstat TYPE zif_proubc_object=>ty_update_status_res.
     DATA(lv_request_body) = mo_request->get_entity( )->get_string_data( ).
-    /ui2/cl_json=>deserialize( EXPORTING json = lv_request_body CHANGING data = ls_objectstat ).
+
+    /ui2/cl_json=>deserialize( EXPORTING json = lv_request_body
+                                CHANGING data = ls_objectstat ).
 
     DATA(lt_uriattributes) = mo_request->get_uri_attributes( ).
     READ TABLE lt_uriattributes WITH KEY name = 'ID' ASSIGNING FIELD-SYMBOL(<fs_object_put>).
@@ -66,17 +67,16 @@ CLASS ZCL_PROUBC_OBJSTATAPI IMPLEMENTATION.
       lv_objectid = <fs_object_put>-value.
       zcl_proubc_busobjhlpr=>update_object_status(
         EXPORTING
-          iv_objectid = lv_objectid
-          is_objectstat   = ls_objectstat
+          iv_objectid    = lv_objectid
+          is_objectstat  = ls_objectstat
         IMPORTING
-          es_objectstat  = ls_resp_objstat
-      ).
+          es_objectstat  = ls_resp_objstat ).
     ENDIF.
 
     lo_entity = mo_response->create_entity( ).
     lo_entity->set_content_type( if_rest_media_type=>gc_appl_json ).
-    lo_entity->set_string_data( /ui2/cl_json=>serialize( EXPORTING data = ls_resp_objstat 
-                                                                   pretty_name = /ui2/cl_json=>pretty_mode-low_case ) ).
+    lo_entity->set_string_data( /ui2/cl_json=>serialize( data = ls_resp_objstat 
+                                                  pretty_name = /ui2/cl_json=>pretty_mode-low_case ) ).
     mo_response->set_status( cl_rest_status_code=>gc_success_ok ).
   ENDMETHOD.
 ENDCLASS.

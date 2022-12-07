@@ -65,9 +65,9 @@ CLASS ZCL_IDOCAPI_SEGMENTAPI IMPLEMENTATION.
     GET PARAMETER ID 'SEG' FIELD DATA(l_segtyp).
     GET PARAMETER ID 'IDC' FIELD DATA(l_idoctyp).
     GET PARAMETER ID 'CIM' FIELD DATA(l_cimtyp).
-    GET PARAMETER ID 'EDIDEF_OBJTYP' FIELD DATA(l_type). "settings from we30
+    GET PARAMETER ID 'EDIDEF_OBJTYP' FIELD DATA(l_type).
     GET PARAMETER ID 'EDD' FIELD DATA(l_object).
-    GET PARAMETER ID 'EDI_SELDOCU' FIELD DATA(l_recsel). "record selection
+    GET PARAMETER ID 'EDI_SELDOCU' FIELD DATA(l_recsel).
 
     DATA: lv_idoc_type      TYPE ledid_idoc_type,
           lt_idoc_struct    TYPE ledid_t_idoc_struct,

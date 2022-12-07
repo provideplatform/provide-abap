@@ -4,13 +4,16 @@ CLASS zcl_prvd_schemas_helper DEFINITION
   CREATE PUBLIC .
 
   PUBLIC SECTION.
-    METHODS: add_schema_traflight IMPORTING !iv_schemaname        TYPE char100
+    METHODS:
+      "! Adds a schema traffic light entry
+      add_schema_traflight IMPORTING !iv_schemaname        TYPE char100
                                             !iv_valid_from        TYPE timestampl OPTIONAL
                                             !iv_valid_to          TYPE timestampl OPTIONAL
                                             !iv_schema_tlight     TYPE zproubc_schema_trafficlight
                                             !iv_schema_type       TYPE zproubc_schema_types
                                             !iv_deletion_flag     TYPE char1 OPTIONAL
                                   EXPORTING !es_created_traflight TYPE zprvdtraflight ,
+      "! Deletes a schema traffic light entry
       delete_entries.
   PROTECTED SECTION.
     METHODS: create_schema_id IMPORTING !iv_schemaname TYPE char100
@@ -58,7 +61,9 @@ CLASS zcl_prvd_schemas_helper IMPLEMENTATION.
           lv_default_validtodate LIKE sy-datum,
           lv_default_validtotime LIKE sy-uzeit.
 
-    CHECK iv_schemaname IS NOT INITIAL.
+    IF iv_schemaname IS INITIAL.
+      "raise schema name missing error
+    ENDIF.
 
     ls_schema_traflight-schema_name = iv_schemaname.
 
@@ -73,13 +78,14 @@ CLASS zcl_prvd_schemas_helper IMPLEMENTATION.
       GET TIME STAMP FIELD lv_temp_validto.
       CONVERT TIME STAMP lv_temp_validto TIME ZONE sy-timlo
       INTO DATE lv_default_validtodate TIME lv_default_validtotime.
-      lv_default_validtodate = lv_default_validtodate + 7. "trash this man...
+      "trash this man...
+      lv_default_validtodate = lv_default_validtodate + 7. 
       CONVERT DATE lv_default_validtodate TIME lv_default_validtotime
           INTO TIME STAMP lv_default_validto  TIME ZONE sy-timlo.
     ENDIF.
 
-    IF lv_default_validto LT lv_default_validfrom.
-    ENDIF. "yo thats wack
+    IF lv_default_validto < lv_default_validfrom.
+    ENDIF.
 
     ls_schema_traflight-valid_from = lv_default_validfrom.
     ls_schema_traflight-valid_to = lv_default_validto.
@@ -92,7 +98,7 @@ CLASS zcl_prvd_schemas_helper IMPLEMENTATION.
         AND schema_type = @ls_schema_traflight-schema_type
         AND valid_from GE @ls_schema_traflight-valid_from
         AND valid_to LE @ls_schema_traflight-valid_to.
-    IF sy-subrc = 0. "update existing entry
+    IF sy-subrc = 0.
       ls_schema_traflight-schema_id = ls_existing_tlight-schema_id.
       ls_schema_traflight-schema_name = ls_existing_tlight-schema_name.
       ls_schema_traflight-schema_type = ls_existing_tlight-schema_type.
@@ -122,6 +128,9 @@ CLASS zcl_prvd_schemas_helper IMPLEMENTATION.
 
     IF ls_schema_traflight IS NOT INITIAL.
       MODIFY zprvdtraflight FROM ls_schema_traflight.
+      if sy-subrc <> 0.
+        "error updating table
+      endif.
     ELSE.
       "no data to update
     ENDIF.

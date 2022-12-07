@@ -120,17 +120,20 @@ CLASS zcl_proubc_tenantsapi IMPLEMENTATION.
           lv_tenantdata      TYPE REF TO data.
 
     DATA(lv_request_body) = mo_request->get_entity( )->get_string_data( ).
-    /ui2/cl_json=>deserialize( EXPORTING json = lv_request_body CHANGING data = ls_prvdtenant ).
+
+    /ui2/cl_json=>deserialize( EXPORTING json = lv_request_body
+                                CHANGING data = ls_prvdtenant ).
 
     APPEND ls_prvdtenant TO lt_prvdtenants.
 
     zcl_proubc_prvdtenants=>create_prvdtenant( EXPORTING it_prvdtenant = lt_prvdtenants
                                                IMPORTING et_prvdtenant = lt_prvdtenants_out ).
-    "TODO improve error handling
-
     READ TABLE lt_prvdtenants_out INDEX 1 INTO wa_prvdtenant.
+    IF sy-subrc <> 0.
+    ENDIF.
     wa_prvdtenant-refresh_token = '***'.
-    zcl_proubc_api_helper=>copy_data_to_ref( EXPORTING is_data = wa_prvdtenant CHANGING cr_data = lv_tenantdata ).
+    zcl_proubc_api_helper=>copy_data_to_ref( EXPORTING is_data = wa_prvdtenant
+                                              CHANGING cr_data = lv_tenantdata ).
     DATA(lo_entity) = mo_response->create_entity( ).
     lo_entity->set_content_type( if_rest_media_type=>gc_appl_json ).
     lo_entity->set_string_data( /ui2/cl_json=>serialize( data = lv_tenantdata 
@@ -152,7 +155,8 @@ CLASS zcl_proubc_tenantsapi IMPLEMENTATION.
 
     APPEND ls_prvdtenant TO lt_prvdtenants.
 
-    zcl_proubc_prvdtenants=>update_prvdtenant( EXPORTING it_prvdtenant = lt_prvdtenants IMPORTING et_prvdtenant = lt_prvdtenants_out ).
+    zcl_proubc_prvdtenants=>update_prvdtenant( EXPORTING it_prvdtenant = lt_prvdtenants
+                                               IMPORTING et_prvdtenant = lt_prvdtenants_out ).
     READ TABLE lt_prvdtenants_out INDEX 1 INTO wa_prvdtenant.
     if sy-subrc <> 0.
       "No update mapped

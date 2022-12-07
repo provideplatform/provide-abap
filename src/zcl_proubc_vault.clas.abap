@@ -37,9 +37,8 @@ CLASS zcl_proubc_vault IMPLEMENTATION.
     CONCATENATE 'Bearer' lv_bpitoken INTO lv_bearertoken SEPARATED BY space.
     mi_client->request->set_header_field(
       EXPORTING
-        name  = 'Authorization'    " Name of the header field
-        value = lv_bearertoken    " HTTP header field value
-    ).
+        name  = 'Authorization'
+        value = lv_bearertoken ).
   ENDMETHOD.
 
 
@@ -60,8 +59,9 @@ CLASS zcl_proubc_vault IMPLEMENTATION.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE 'https://vault.provide.services/api/v1/unsealerkey'.
     mi_client->request->set_method( 'POST' ).
-    mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
-    me->get_bpi_token( ).
+    mi_client->request->set_header_field( name = '~request_uri' 
+                                         value = lv_uri ).
+    get_bpi_token( ).
     mi_client->request->set_header_field( name = 'Content-Type' value = content_type ).
     lv_code = send_receive( ).
     ev_httpresponsecode = lv_code.
@@ -70,8 +70,7 @@ CLASS zcl_proubc_vault IMPLEMENTATION.
       EXPORTING
         json             = ev_apiresponsestr
       CHANGING
-        data             = ev_apiresponse
-    ).
+        data             = ev_apiresponse ).
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
@@ -89,7 +88,7 @@ CLASS zcl_proubc_vault IMPLEMENTATION.
     mi_client->request->set_method( 'POST' ).
     mi_client->request->set_header_field( name  = '~request_uri' 
                                           value = lv_uri ).
-    me->get_bpi_token( ).
+    get_bpi_token( ).
     mi_client->request->set_header_field( name = 'Content-Type' value = content_type ).
     mi_client->request->set_cdata( body ).
     lv_code = send_receive( ).
@@ -99,8 +98,7 @@ CLASS zcl_proubc_vault IMPLEMENTATION.
       EXPORTING
         json             = ev_apiresponsestr
       CHANGING
-        data             = ev_apiresponse
-    ).
+        data             = ev_apiresponse ).
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
@@ -116,7 +114,7 @@ CLASS zcl_proubc_vault IMPLEMENTATION.
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
     mi_client->request->set_header_field( name = 'Content-Type' value = content_type ).
     mi_client->request->set_header_field( name = 'content-type' value = content_type ).
-    me->get_bpi_token( ).
+    get_bpi_token( ).
     mi_client->request->set_cdata( body ).
     lv_code = send_receive( ).
     ev_httpresponsecode = lv_code.
@@ -125,8 +123,7 @@ CLASS zcl_proubc_vault IMPLEMENTATION.
       EXPORTING
         json             = ev_apiresponsestr
       CHANGING
-        data             = ev_apiresponse
-    ).
+        data             = ev_apiresponse ).
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
@@ -146,7 +143,7 @@ CLASS zcl_proubc_vault IMPLEMENTATION.
     REPLACE ALL OCCURRENCES OF '{key_id}' IN lv_uri WITH lv_temp.
     mi_client->request->set_method( 'DELETE' ).
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
-    me->get_bpi_token( ).
+    get_bpi_token( ).
     mi_client->request->set_header_field( name = 'Content-Type' value = content_type ).
     lv_code = send_receive( ).
     ev_httpresponsecode = lv_code.
@@ -155,8 +152,7 @@ CLASS zcl_proubc_vault IMPLEMENTATION.
       EXPORTING
         json             = ev_apiresponsestr
       CHANGING
-        data             = ev_apiresponse
-    ).
+        data             = ev_apiresponse ).
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
@@ -175,9 +171,11 @@ CLASS zcl_proubc_vault IMPLEMENTATION.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{secret_id}' IN lv_uri WITH lv_temp.
     mi_client->request->set_method( 'DELETE' ).
-    mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
-    me->get_bpi_token( ).
-    mi_client->request->set_header_field( name = 'Content-Type' value = content_type ).
+    mi_client->request->set_header_field( name = '~request_uri' 
+                                         value = lv_uri ).
+    get_bpi_token( ).
+    mi_client->request->set_header_field( name = 'Content-Type' 
+                                         value = content_type ).
     mi_client->request->set_cdata( body ).
     lv_code = send_receive( ).
     ev_httpresponsecode = lv_code.
@@ -186,8 +184,7 @@ CLASS zcl_proubc_vault IMPLEMENTATION.
       EXPORTING
         json             = ev_apiresponsestr
       CHANGING
-        data             = ev_apiresponse
-    ).
+        data             = ev_apiresponse ).
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
@@ -203,9 +200,11 @@ CLASS zcl_proubc_vault IMPLEMENTATION.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{vault_id}' IN lv_uri WITH lv_temp.
     mi_client->request->set_method( 'POST' ).
-    mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
-    me->get_bpi_token( ).
-    mi_client->request->set_header_field( name = 'Content-Type' value = content_type ).
+    mi_client->request->set_header_field( name = '~request_uri' 
+                                         value = lv_uri ).
+    get_bpi_token( ).
+    mi_client->request->set_header_field( name = 'Content-Type'
+                                         value = content_type ).
     mi_client->request->set_cdata( body ).
     lv_code = send_receive( ).
     ev_httpresponsecode = lv_code.
@@ -214,8 +213,7 @@ CLASS zcl_proubc_vault IMPLEMENTATION.
       EXPORTING
         json             = ev_apiresponsestr
       CHANGING
-        data             = ev_apiresponse
-    ).
+        data             = ev_apiresponse ).
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
@@ -231,9 +229,11 @@ CLASS zcl_proubc_vault IMPLEMENTATION.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{vault_id}' IN lv_uri WITH lv_temp.
     mi_client->request->set_method( 'GET' ).
-    mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
-    me->get_bpi_token( ).
-    mi_client->request->set_header_field( name = 'Content-Type' value = content_type ).
+    mi_client->request->set_header_field( name = '~request_uri' 
+                                         value = lv_uri ).
+    get_bpi_token( ).
+    mi_client->request->set_header_field( name = 'Content-Type' 
+                                         value = content_type ).
     mi_client->request->set_cdata( body ).
     lv_code = send_receive( ).
     ev_httpresponsecode = lv_code.
@@ -242,8 +242,7 @@ CLASS zcl_proubc_vault IMPLEMENTATION.
       EXPORTING
         json             = ev_apiresponsestr
       CHANGING
-        data             = ev_apiresponse
-    ).
+        data             = ev_apiresponse ).
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
@@ -259,9 +258,11 @@ CLASS zcl_proubc_vault IMPLEMENTATION.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{vault_id}' IN lv_uri WITH lv_temp.
     mi_client->request->set_method( 'GET' ).
-    mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
-    me->get_bpi_token( ).
-    mi_client->request->set_header_field( name = 'Content-Type' value = content_type ).
+    mi_client->request->set_header_field( name = '~request_uri' 
+                                         value = lv_uri ).
+    get_bpi_token( ).
+    mi_client->request->set_header_field( name = 'Content-Type' 
+                                         value = content_type ).
     lv_code = send_receive( ).
     ev_httpresponsecode = lv_code.
     ev_apiresponsestr = mi_client->response->get_cdata( ).
@@ -269,8 +270,7 @@ CLASS zcl_proubc_vault IMPLEMENTATION.
       EXPORTING
         json             = ev_apiresponsestr
       CHANGING
-        data             = ev_apiresponse
-    ).
+        data             = ev_apiresponse ).
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
@@ -285,7 +285,7 @@ CLASS zcl_proubc_vault IMPLEMENTATION.
     DATA lv_responsestr.
     mi_client->request->set_method( 'GET' ).
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
-    me->get_bpi_token( ).
+    get_bpi_token( ).
     "mi_client->request->set_cdata( body ).
     lv_code = send_receive( ).
     lv_responsestr = mi_client->response->get_cdata( ).
@@ -315,7 +315,7 @@ CLASS zcl_proubc_vault IMPLEMENTATION.
     REPLACE ALL OCCURRENCES OF '{secret_id}' IN lv_uri WITH lv_temp.
     mi_client->request->set_method( 'POST' ).
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
-    me->get_bpi_token( ).
+    get_bpi_token( ).
     mi_client->request->set_header_field( name = 'Content-Type' value = content_type ).
     mi_client->request->set_cdata( body ).
     lv_code = send_receive( ).
@@ -325,8 +325,7 @@ CLASS zcl_proubc_vault IMPLEMENTATION.
       EXPORTING
         json             = ev_apiresponsestr
       CHANGING
-        data             = ev_apiresponse
-    ).
+        data             = ev_apiresponse ).
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
@@ -340,7 +339,7 @@ CLASS zcl_proubc_vault IMPLEMENTATION.
     DATA lv_uri TYPE string VALUE 'https://vault.provide.services/api/v1/unseal'.
     mi_client->request->set_method( 'POST' ).
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
-    me->get_bpi_token( ).
+    get_bpi_token( ).
     mi_client->request->set_header_field( name = 'Content-Type' value = content_type ).
     mi_client->request->set_cdata( body ).
     lv_code = send_receive( ).
@@ -350,8 +349,7 @@ CLASS zcl_proubc_vault IMPLEMENTATION.
       EXPORTING
         json             = ev_apiresponsestr
       CHANGING
-        data             = ev_apiresponse
-    ).
+        data             = ev_apiresponse ).
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
