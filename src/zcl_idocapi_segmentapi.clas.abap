@@ -3,9 +3,7 @@ CLASS zcl_idocapi_segmentapi DEFINITION
   INHERITING FROM cl_rest_resource
   FINAL
   CREATE PUBLIC .
-
   PUBLIC SECTION.
-
     METHODS if_rest_resource~get
         REDEFINITION .
   PROTECTED SECTION.
@@ -15,8 +13,6 @@ ENDCLASS.
 
 
 CLASS ZCL_IDOCAPI_SEGMENTAPI IMPLEMENTATION.
-
-
   METHOD if_rest_resource~get.
     DATA: lv_selectedbasictype TYPE string,
           ls_basictypes        TYPE zif_idocapi_typelist=>ty_basictype,
@@ -30,14 +26,6 @@ CLASS ZCL_IDOCAPI_SEGMENTAPI IMPLEMENTATION.
       REPLACE ALL OCCURRENCES OF '%2F' IN lv_selectedbasictype WITH '/'.
       lv_idoctype = lv_selectedbasictype.
     ENDIF.
-
-    "prototype to add other non-idoc schemas
-*    GET TIME STAMP FIELD DATA(lv_current_timestamp).
-*    SELECT * FROM zprvdtraflight AS a INTO TABLE @DATA(lt_traflights)
-*     WHERE lv_current_timestamp GE a~valid_from
-*     AND   lv_current_timestamp LE a~valid_to
-*     and   a~schema_name = lv_selectedbasictype
-*     AND  ( a~schema_tlight EQ 'Y' OR a~schema_tlight EQ 'G' ).
 
     "get the selected idoc Basic type
     SELECT SINGLE  a~idoctyp,
@@ -90,7 +78,6 @@ CLASS ZCL_IDOCAPI_SEGMENTAPI IMPLEMENTATION.
         segment_struct = lt_segment_struct
       EXCEPTIONS
         OTHERS         = 1.
-
     ls_responsedata-idocstruct = lt_idoc_struct.
     ls_responsedata-idocsegments = lt_segments.
     ls_responsedata-segmentstruct = lt_segment_struct.

@@ -1,9 +1,9 @@
-"! <p class="shorttext synchronized" lang="en">ABAP class that contains ABAP Doc</p>
 CLASS zcl_proubc_api_helper DEFINITION
   PUBLIC
   CREATE PUBLIC .
 
   PUBLIC SECTION.
+    "! Constructs the refresh token from 2 parts into one and provides the length
     CLASS-METHODS build_refresh_token
       IMPORTING
         !iv_refreshtoken1 TYPE string
@@ -11,6 +11,7 @@ CLASS zcl_proubc_api_helper DEFINITION
       EXPORTING
         !ev_tokenlength   TYPE int4
         !ev_refreshtoken  TYPE zprvdrefreshtoken .
+    "! Utillity method to copy from type any to type ref to data
     CLASS-METHODS copy_data_to_ref
       IMPORTING
         !is_data TYPE any
@@ -62,6 +63,7 @@ CLASS zcl_proubc_api_helper DEFINITION
         iv_subjacct     TYPE zprvdtenantid OPTIONAL
       EXPORTING
         !ev_isreachable TYPE boolean .
+    "! Ensures the API helper class is properly initialized to send PRVD Baseline protocol messages
     METHODS setup_protocol_msg
       EXPORTING
         !setup_success TYPE boolean .
@@ -103,8 +105,8 @@ CLASS zcl_proubc_api_helper DEFINITION
     METHODS get_nchain_helper EXPORTING eo_prvd_nchain_helper TYPE REF TO zcl_proubc_nchain_helper.
 
   PROTECTED SECTION.
-    DATA: lv_defaulttenant        TYPE zprvdtenants-organization_id,
-          lv_defaultsubjectacct   TYPE zprvdtenantid,
+    DATA: mv_defaulttenant        TYPE zprvdtenants-organization_id,
+          mv_defaultsubjectacct   TYPE zprvdtenantid,
           lv_selected_workgroupid TYPE zprvdtenantid,
           lv_defaultidenttoken    TYPE REF TO data,
           lv_defaultbaselinetoken TYPE REF TO data,
@@ -140,14 +142,14 @@ CLASS zcl_proubc_api_helper IMPLEMENTATION.
     "get the current auth token
     lv_tenant = iv_tenant.
     IF lv_tenant IS INITIAL.
-      lv_tenant = lv_defaulttenant.
+      lv_tenant = mv_defaulttenant.
     ENDIF.
     lv_subjacct = iv_subjacct.
     IF lv_subjacct IS INITIAL.
-      lv_subjacct = lv_defaultsubjectacct.
+      lv_subjacct = mv_defaultsubjectacct.
     ENDIF.
     call_ident_api( EXPORTING iv_tenant          = lv_tenant
-                                  iv_subjacct    = lv_defaultsubjectacct
+                                  iv_subjacct    = mv_defaultsubjectacct
                         IMPORTING ev_authtoken   = lv_tenant_jwt
                                   ev_bpiendpoint = lv_bpiendpoint ).
 
@@ -290,13 +292,13 @@ ENDIF.
     IF iv_tenant IS NOT INITIAL.
       lv_tenant = iv_tenant.
     ELSE.
-      lv_tenant = lv_defaulttenant.
+      lv_tenant = mv_defaulttenant.
     ENDIF.
 
     IF iv_subjacct IS NOT INITIAL.
       lv_subjacct = iv_subjacct.
     ELSE.
-      lv_subjacct = lv_defaultsubjectacct.
+      lv_subjacct = mv_defaultsubjectacct.
     ENDIF.
 
     "todo add subject account id
@@ -373,8 +375,8 @@ ENDIF.
       IF sy-subrc = 0.
         READ TABLE lt_defaultorg INDEX 1 INTO DATA(wa_defaulttenant).
         IF sy-subrc = 0.
-          lv_defaulttenant = wa_defaulttenant-organization_id.
-          lv_defaultsubjectacct = wa_defaulttenant-subject_account_id.
+          mv_defaulttenant = wa_defaulttenant-organization_id.
+          mv_defaultsubjectacct = wa_defaulttenant-subject_account_id.
           lv_selected_workgroupid = wa_defaulttenant-workgroup_id.
           lv_default_bpiendpoint = wa_defaulttenant-bpi_endpoint.
           RETURN.
@@ -393,8 +395,8 @@ ENDIF.
     IF sy-subrc = 0.
       READ TABLE lt_defaultorg INDEX 1 INTO wa_defaulttenant.
       IF sy-subrc = 0.
-        lv_defaulttenant = wa_defaulttenant-organization_id.
-        lv_defaultsubjectacct  = wa_defaulttenant-subject_account_id.
+        mv_defaulttenant = wa_defaulttenant-organization_id.
+        mv_defaultsubjectacct  = wa_defaulttenant-subject_account_id.
         lv_selected_workgroupid = wa_defaulttenant-workgroup_id.
         lv_default_bpiendpoint = wa_defaulttenant-bpi_endpoint.
       ENDIF.
@@ -404,9 +406,9 @@ ENDIF.
 
     "core authority check - is user allowed to use this subject account
     AUTHORITY-CHECK OBJECT 'ZPRVDTENAN' ID 'ACTVT' FIELD '16'
-      ID 'ZPRVDSHA1' FIELD lv_defaultsubjectacct.
+      ID 'ZPRVDSHA1' FIELD mv_defaultsubjectacct.
     IF sy-subrc <> 0.
-      MESSAGE e012(zclproubcmsg) WITH sy-uname lv_defaultsubjectacct lv_defaulttenant lv_selected_workgroupid.
+      MESSAGE e012(zclproubcmsg) WITH sy-uname mv_defaultsubjectacct mv_defaulttenant lv_selected_workgroupid.
     ENDIF.
 
   ENDMETHOD.
@@ -440,7 +442,7 @@ ENDIF.
 
   METHOD get_default_tenant.
     "TODO add authorization check and mapping to sap user id
-    ev_defaulttenant = lv_defaulttenant.
+    ev_defaulttenant = mv_defaulttenant.
   ENDMETHOD.
 
 
@@ -473,7 +475,7 @@ ENDIF.
     DATA ls_finalized_protocol_msg TYPE zif_proubc_baseline=>protocolmessage_req.
 
     ls_finalized_protocol_msg                    = body.
-    ls_finalized_protocol_msg-subject_account_id = lv_defaultsubjectacct.
+    ls_finalized_protocol_msg-subject_account_id = mv_defaultsubjectacct.
     ls_finalized_protocol_msg-workgroup_id       = lv_selected_workgroupid.
     TRY.
         lo_baseline_client->send_protocol_msg( EXPORTING iv_body        = ls_finalized_protocol_msg
@@ -502,8 +504,8 @@ ENDIF.
     FIELD-SYMBOLS: <fs_authreq>  TYPE any,
                    <fs_authreq2> TYPE string.
 
-    me->call_ident_api( EXPORTING iv_tenant = lv_defaulttenant
-                                  iv_subjacct = lv_defaultsubjectacct
+    me->call_ident_api( EXPORTING iv_tenant = mv_defaulttenant
+                                  iv_subjacct = mv_defaultsubjectacct
                       IMPORTING ev_authtoken = lv_tenant_jwt
                                 ev_bpiendpoint = lv_bpiendpoint  ).
     lv_defaultidenttoken = lv_tenant_jwt.
@@ -553,7 +555,7 @@ ENDIF.
 
   METHOD set_default_tenant.
     "TODO add authorization check and mapping to sap user id
-    lv_defaulttenant = iv_defaulttenant.
+    mv_defaulttenant = iv_defaulttenant.
   ENDMETHOD.
 
 

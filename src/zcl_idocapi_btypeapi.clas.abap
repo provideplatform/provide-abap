@@ -20,7 +20,7 @@ CLASS zcl_idocapi_btypeapi IMPLEMENTATION.
   METHOD if_rest_resource~get.
     DATA: lt_basictypes TYPE zif_idocapi_typelist=>tt_basictype.
 
-    SELECT  a~idoctyp
+    SELECT a~idoctyp
             b~descrp
             a~presp
             a~pwork
