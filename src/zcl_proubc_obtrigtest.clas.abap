@@ -27,7 +27,7 @@ CLASS ZCL_PROUBC_OBTRIGTEST IMPLEMENTATION.
           lv_apiresponsestr         TYPE string,
           lv_apiresponse            TYPE REF TO data.
 
-    lo_api_helper = NEW  zcl_proubc_api_helper( ).
+    lo_api_helper = NEW zcl_proubc_api_helper( ).
 
     DATA(lo_entity) = mo_response->create_entity( ).
     lo_entity->set_content_type( if_rest_media_type=>gc_appl_json ).
@@ -36,15 +36,8 @@ CLASS ZCL_PROUBC_OBTRIGTEST IMPLEMENTATION.
     /ui2/cl_json=>deserialize(
           EXPORTING
             json             = lv_request_body
-*            jsonx            =
-*            pretty_name      =
-*            assoc_arrays     =
-*            assoc_arrays_opt =
-*            name_mappings    =
-*            conversion_exits =
       CHANGING
-        data             = ls_protocol_msg_req
-    ).
+        data             = ls_protocol_msg_req ).
 
     IF ls_protocol_msg_req IS INITIAL.
       ls_dummy_protocol_msg_req = lo_api_helper->build_dummy_idoc_protocol_msg( ).
@@ -71,11 +64,8 @@ CLASS ZCL_PROUBC_OBTRIGTEST IMPLEMENTATION.
       ls_testresponse-msg_payload = ls_protocol_msg_req.
     ENDIF.
 
-    lv_testresponse = /ui2/cl_json=>serialize(
-      EXPORTING
-        data             =  ls_testresponse
-        pretty_name      = /ui2/cl_json=>pretty_mode-low_case
-    ).
+    lv_testresponse = /ui2/cl_json=>serialize( data        = ls_testresponse
+                                               pretty_name = /ui2/cl_json=>pretty_mode-low_case ).
 
     lo_entity = mo_response->create_entity( ).
     lo_entity->set_content_type( if_rest_media_type=>gc_appl_json ).

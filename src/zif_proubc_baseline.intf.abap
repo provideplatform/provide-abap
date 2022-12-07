@@ -35,7 +35,7 @@ INTERFACE zif_proubc_baseline
     BEGIN OF workflow,
       circuits       TYPE string,
       identifier     TYPE string,
-      parcicipants   TYPE STANDARD TABLE OF string WITH DEFAULT KEY, " todo, handle array
+      parcicipants   TYPE STANDARD TABLE OF string WITH EMPTY KEY,
       shield         TYPE string,
       workstep_index TYPE i,
     END OF workflow .
@@ -354,24 +354,24 @@ INTERFACE zif_proubc_baseline
   TYPES:
     BEGIN OF openidconfig,
       authorization_endpoint         TYPE string,
-      claims_supported               TYPE STANDARD TABLE OF string WITH DEFAULT KEY, " todo, handle array
+      claims_supported               TYPE STANDARD TABLE OF string WITH EMPTY KEY,
       cloud_instance_name            TYPE string,
       device_authorization_endpoint  TYPE string,
       end_session_endpoint           TYPE subopenidconfig_end_session_en,
       frontchannel_logout_supported  TYPE abap_bool,
       http_logout_supported          TYPE abap_bool,
-      id_token_signing_alg_values_su TYPE STANDARD TABLE OF string WITH DEFAULT KEY, " todo, handle array
+      id_token_signing_alg_values_su TYPE STANDARD TABLE OF string WITH EMPTY KEY,
       issuer                         TYPE string,
       jwks_uri                       TYPE string,
       rbac_url                       TYPE subopenidconfig_rbac_url,
       request_uri_parameter_supporte TYPE abap_bool,
-      response_modes_supported       TYPE STANDARD TABLE OF string WITH DEFAULT KEY, " todo, handle array
-      response_types_supported       TYPE STANDARD TABLE OF string WITH DEFAULT KEY, " todo, handle array
-      scopes_supported               TYPE STANDARD TABLE OF string WITH DEFAULT KEY, " todo, handle array
-      subject_types_supported        TYPE STANDARD TABLE OF string WITH DEFAULT KEY, " todo, handle array
+      response_modes_supported       TYPE STANDARD TABLE OF string WITH EMPTY KEY,
+      response_types_supported       TYPE STANDARD TABLE OF string WITH EMPTY KEY,
+      scopes_supported               TYPE STANDARD TABLE OF string WITH EMPTY KEY,
+      subject_types_supported        TYPE STANDARD TABLE OF string WITH EMPTY KEY,
       tenant_region_scope            TYPE subopenidconfig_tenant_region_,
       token_endpoint                 TYPE string,
-      token_endpoint_auth_methods_su TYPE STANDARD TABLE OF string WITH DEFAULT KEY, " todo, handle array
+      token_endpoint_auth_methods_su TYPE STANDARD TABLE OF string WITH EMPTY KEY,
       userinfo_endpoint              TYPE string,
     END OF openidconfig .
   TYPES:
@@ -394,19 +394,6 @@ INTERFACE zif_proubc_baseline
       payload     TYPE xstring,
     END OF protocolmessage .
   TYPES:
-*https://gist.github.com/kthomas/459381e98c808febea9c1bb51408bbde
-*type Message struct {
-*    ID              *string          `sql:"-" json:"id,omitempty"`
-*    BaselineID      *uuid.UUID       `sql:"-" json:"baseline_id,omitempty"` // don't need this optional; when included, can be used to map outbound message just-in-time
-*    Errors          []*api.Error     `sql:"-" json:"errors,omitempty"`
-*    MessageID       *string          `sql:"-" json:"message_id,omitempty"` dont need this. but
-*    Payload         interface{}      `sql:"-" json:"payload,omitempty"` THE IDOC. need this
-*     payload_mimetype 'application/xml'
-*m    ProtocolMessage *ProtocolMessage `sql:"-" json:"protocol_essage,omitempty"`. don't need this.
-*    Recipients      []*Participant   `sql:"-" json:"recipients"` don't need this
-*    Status          *string          `sql:"-" json:"status,omitempty"` don't need this. shuttle gives this back to us.
-*    Type            *string          `sql:"-" json:"type,omitempty"`
-*}
     BEGIN OF protocolmessage_req,
       id               TYPE zbpiobj-object_id, 
       payload          TYPE REF TO data,
@@ -416,21 +403,21 @@ INTERFACE zif_proubc_baseline
       workgroup_id TYPE zprvdtenantid,
     END OF protocolmessage_req .
   TYPES:
-       begin of protocolmessage_resp,
-            baseline_id type string,
-            proof type string,
-            recipients type tab_string, ": [],
-            subject_account_id type zprvdtenantid,
-            type type string,
-            workgroup_id type zprvdtenantid,
-       end of protocolmessage_resp.
+       BEGIN OF protocolmessage_resp,
+            baseline_id TYPE string,
+            proof TYPE string,
+            recipients TYPE tab_string, 
+            subject_account_id TYPE zprvdtenantid,
+            type TYPE string,
+            workgroup_id TYPE zprvdtenantid,
+       END OF protocolmessage_resp.
 
   TYPES:
     BEGIN OF bpiobjects_req,
       type    TYPE string,
       id      TYPE string,
       payload TYPE string,
-    END OF bpiobjects_req .
+    END OF bpiobjects_req.
   TYPES:
 * Component schema: ProtocolMessagePayload, string
     "  TYPES protocolmessagepayload TYPE string.
@@ -551,45 +538,45 @@ INTERFACE zif_proubc_baseline
 * Component schema: response_listworkgroupusers, array
     response_listworkgroupusers TYPE STANDARD TABLE OF user WITH EMPTY KEY .
 
-* GET - "List accounts"
-* Operation id: ListAccounts
-* Parameter: page, optional, query
-* Parameter: rpp, optional, query
-* Response: 200
-*     application/json; charset=UTF-8, array
-* Response: 401
-* Response: 500
-* Response: default
-*     application/json, #/components/schemas/Error
+"! GET - "List accounts"
+"! Operation id: ListAccounts
+"! Parameter: page, optional, query
+"! Parameter: rpp, optional, query
+"! Response: 200
+"!     application/json; charset=UTF-8, array
+"! Response: 401
+"! Response: 500
+"! Response: default
+"!     application/json, #/components/schemas/Error
   METHODS listaccounts
     IMPORTING
       !page TYPE i OPTIONAL
       !rpp  TYPE i OPTIONAL
     RAISING
       cx_static_check .
-* POST - "Create account"
-* Operation id: CreateAccount
-* Response: 201
-*     application/json; charset=UTF-8, #/components/schemas/Account
-* Response: 4XX
-* Response: 5XX
-* Response: default
-*     application/json, #/components/schemas/Error
-* Body ref: #/components/schemas/Account
+"! POST - "Create account"
+"! Operation id: CreateAccount
+"! Response: 201
+"!     application/json; charset=UTF-8, #/components/schemas/Account
+"! Response: 4XX
+"! Response: 5XX
+"! Response: default
+"!     application/json, #/components/schemas/Error
+"! Body ref: #/components/schemas/Account
   METHODS createaccount
     IMPORTING
       !body TYPE account
     RAISING
       cx_static_check .
-* GET - "Get account details"
-* Operation id: GetAccountDetails
-* Parameter: id, required, path
-* Response: 200
-*     application/json, #/components/schemas/Account
-* Response: 403
-* Response: 404
-* Response: default
-*     application/json, #/components/schemas/Error
+"! GET - "Get account details"
+"! Operation id: GetAccountDetails
+"! Parameter: id, required, path
+"! Response: 200
+"!     application/json, #/components/schemas/Account
+"! Response: 403
+"! Response: 404
+"! Response: default
+"!     application/json, #/components/schemas/Error
   METHODS getaccountdetails
     IMPORTING
       !id                TYPE string
@@ -597,12 +584,12 @@ INTERFACE zif_proubc_baseline
       VALUE(return_data) TYPE account
     RAISING
       cx_static_check .
-* POST - "User authentication"
-* Operation id: Authentication
-* Response: 201
-*     application/json, #/components/schemas/AuthenticationResponse
-* Response: 401
-* Body ref: #/components/schemas/AuthenticationRequest
+"! POST - "User authentication"
+"! Operation id: Authentication
+"! Response: 201
+"!     application/json, #/components/schemas/AuthenticationResponse
+"! Response: 401
+"! Body ref: #/components/schemas/AuthenticationRequest
   METHODS authentication
     IMPORTING
       !body              TYPE authenticationrequest
@@ -611,12 +598,12 @@ INTERFACE zif_proubc_baseline
       VALUE(return_data) TYPE authenticationresponse
     RAISING
       cx_static_check .
-* POST - "Bearer authentication"
-* Operation id: Authentication
-* Response: 201
-*     application/json, #/components/schemas/AuthenticationResponse
-* Response: 401
-* Body ref: #/components/schemas/AuthenticationRequest
+"! POST - "Bearer authentication"
+"! Operation id: Authentication
+"! Response: 201
+"!     application/json, #/components/schemas/AuthenticationResponse
+"! Response: 401
+"! Body ref: #/components/schemas/AuthenticationRequest
   "VALUE(return_data) TYPE authenticationresponse
   METHODS bearerauthentication
     IMPORTING
@@ -628,17 +615,17 @@ INTERFACE zif_proubc_baseline
       VALUE(apiresponse) TYPE REF TO data
     RAISING
       cx_static_check .
-* GET - "List connectors"
-* Operation id: ListConnectors
-* Parameter: page, optional, query
-* Parameter: rpp, optional, query
-* Parameter: public, optional, query
-* Response: 200
-*     application/json, #/components/schemas/response_listconnectors
-* Response: 422
-*     application/json, #/components/schemas/Error
-* Response: default
-*     application/json, #/components/schemas/Error
+"! GET - "List connectors"
+"! Operation id: ListConnectors
+"! Parameter: page, optional, query
+"! Parameter: rpp, optional, query
+"! Parameter: public, optional, query
+"! Response: 200
+"!     application/json, #/components/schemas/response_listconnectors
+"! Response: 422
+"!     application/json, #/components/schemas/Error
+"! Response: default
+"!     application/json, #/components/schemas/Error
   METHODS listconnectors
     IMPORTING
       !page              TYPE i OPTIONAL
@@ -648,80 +635,80 @@ INTERFACE zif_proubc_baseline
       VALUE(return_data) TYPE response_listconnectors
     RAISING
       cx_static_check .
-* POST - "Create connector"
-* Operation id: CreateConnector
-* Response: 201
-*     application/json; charset=UTF-8, #/components/schemas/Connector
-* Response: 401
-* Response: 403
-* Response: 404
-* Response: 503
-* Response: default
-*     application/json, #/components/schemas/Error
-* Body ref: #/components/schemas/Connector
+"! POST - "Create connector"
+"! Operation id: CreateConnector
+"! Response: 201
+"!     application/json; charset=UTF-8, #/components/schemas/Connector
+"! Response: 401
+"! Response: 403
+"! Response: 404
+"! Response: 503
+"! Response: default
+"!     application/json, #/components/schemas/Error
+"! Body ref: #/components/schemas/Connector
   METHODS createconnector
     IMPORTING
       !body TYPE connector
     RAISING
       cx_static_check .
-* GET - "Get connector details"
-* Operation id: GetConnectorDetails
-* Parameter: id, required, path
-* Response: 200
-*     application/json; charset=UTF-8, #/components/schemas/Connector
-* Response: 401
-* Response: 403
-* Response: 404
-* Response: 503
-* Response: default
-*     application/json, #/components/schemas/Error
+"! GET - "Get connector details"
+"! Operation id: GetConnectorDetails
+"! Parameter: id, required, path
+"! Response: 200
+"!     application/json; charset=UTF-8, #/components/schemas/Connector
+"! Response: 401
+"! Response: 403
+"! Response: 404
+"! Response: 503
+"! Response: default
+"!     application/json, #/components/schemas/Error
   METHODS getconnectordetails
     IMPORTING
       !id TYPE string
     RAISING
       cx_static_check .
-* DELETE - "Delete connector"
-* Operation id: deleteConnector
-* Parameter: id, required, path
-* Response: 204
-* Response: 401
-* Response: default
-*     application/json, #/components/schemas/Error
+"! DELETE - "Delete connector"
+"! Operation id: deleteConnector
+"! Parameter: id, required, path
+"! Response: 204
+"! Response: 401
+"! Response: default
+"!     application/json, #/components/schemas/Error
   METHODS deleteconnector
     IMPORTING
       !id TYPE string
     RAISING
       cx_static_check .
-* GET - "Retrieve load balancer details"
-* Operation id: GetLoadBalancerDetails
-* Parameter: id, required, path
-* Response: 200
-*     application/json; charset=UTF-8, array
-* Response: 401
-* Response: 403
-* Response: 404
-* Response: 503
-* Response: default
-*     application/json, #/components/schemas/Error
+"! GET - "Retrieve load balancer details"
+"! Operation id: GetLoadBalancerDetails
+"! Parameter: id, required, path
+"! Response: 200
+"!     application/json; charset=UTF-8, array
+"! Response: 401
+"! Response: 403
+"! Response: 404
+"! Response: 503
+"! Response: default
+"!     application/json, #/components/schemas/Error
   METHODS getloadbalancerdetails
     IMPORTING
       !id TYPE string
     RAISING
       cx_static_check .
-* GET - "List contracts"
-* Operation id: ListContracts
-* Parameter: filter_tokens, optional, query
-* Parameter: sort, optional, query
-* Parameter: page, optional, query
-* Parameter: rpp, optional, query
-* Response: 200
-*     application/json; charset=UTF-8, array
-* Response: 401
-* Response: 403
-* Response: 404
-* Response: 503
-* Response: default
-*     application/json, #/components/schemas/Error
+"! GET - "List contracts"
+"! Operation id: ListContracts
+"! Parameter: filter_tokens, optional, query
+"! Parameter: sort, optional, query
+"! Parameter: page, optional, query
+"! Parameter: rpp, optional, query
+"! Response: 200
+"!     application/json; charset=UTF-8, array
+"! Response: 401
+"! Response: 403
+"! Response: 404
+"! Response: 503
+"! Response: default
+"!     application/json, #/components/schemas/Error
   METHODS listcontracts
     IMPORTING
       !filter_tokens TYPE abap_bool OPTIONAL
@@ -730,64 +717,64 @@ INTERFACE zif_proubc_baseline
       !rpp           TYPE i OPTIONAL
     RAISING
       cx_static_check .
-* POST - "Deploy contract"
-* Operation id: DeployContract
-* Response: 201
-*     application/json; charset=UTF-8, #/components/schemas/Contract
-* Response: 401
-* Response: 403
-* Response: 404
-* Response: 422
-*     application/json, #/components/schemas/Error
-* Response: 503
-* Body ref: #/components/schemas/Contract
+"! POST - "Deploy contract"
+"! Operation id: DeployContract
+"! Response: 201
+"!     application/json; charset=UTF-8, #/components/schemas/Contract
+"! Response: 401
+"! Response: 403
+"! Response: 404
+"! Response: 422
+"!     application/json, #/components/schemas/Error
+"! Response: 503
+"! Body ref: #/components/schemas/Contract
   METHODS deploycontract
     IMPORTING
       !body TYPE contract
     RAISING
       cx_static_check .
-*! GET - "Get contract detail"
-* Operation id: GetContractDetail
-* Parameter: id, required, path
-* Response: 200
-*     application/json; charset=UTF-8, #/components/schemas/Contract
-* Response: 401
-* Response: 403
-* Response: 404
-* Response: 503
-* Response: default
-*!     application/json, #/components/schemas/Error
+"!! GET - "Get contract detail"
+"! Operation id: GetContractDetail
+"! Parameter: id, required, path
+"! Response: 200
+"!     application/json; charset=UTF-8, #/components/schemas/Contract
+"! Response: 401
+"! Response: 403
+"! Response: 404
+"! Response: 503
+"! Response: default
+"!!     application/json, #/components/schemas/Error
   METHODS getcontractdetail
     IMPORTING
       !id TYPE string
     RAISING
       cx_static_check .
-* POST - "Execute contract"
-* Operation id: ExecuteContract
-* Parameter: id, required, path
-* Response: 202
-* Response: 401
-* Response: 403
-* Response: 404
-* Response: 503
-* Body ref: #/components/schemas/ExecuteContractRequest
+"! POST - "Execute contract"
+"! Operation id: ExecuteContract
+"! Parameter: id, required, path
+"! Response: 202
+"! Response: 401
+"! Response: 403
+"! Response: 404
+"! Response: 503
+"! Body ref: #/components/schemas/ExecuteContractRequest
   METHODS executecontract
     IMPORTING
       !id   TYPE string
       !body TYPE executecontractrequest
     RAISING
       cx_static_check .
-* GET - "List networks"
-* Operation id: ListNetworks
-* Parameter: page, optional, query
-* Parameter: rpp, optional, query
-* Parameter: public, optional, query
-* Response: 200
-*     application/json; charset=UTF-8, array
-* Response: 401
-* Response: 403
-* Response: 404
-* Response: 503
+"! GET - "List networks"
+"! Operation id: ListNetworks
+"! Parameter: page, optional, query
+"! Parameter: rpp, optional, query
+"! Parameter: public, optional, query
+"! Response: 200
+"!     application/json; charset=UTF-8, array
+"! Response: 401
+"! Response: 403
+"! Response: 404
+"! Response: 503
   METHODS listnetworks
     IMPORTING
       !page   TYPE i OPTIONAL
@@ -795,182 +782,182 @@ INTERFACE zif_proubc_baseline
       !public TYPE abap_bool OPTIONAL
     RAISING
       cx_static_check .
-* POST - "Create network"
-* Operation id: CreateNetwork
-* Response: 201
-*     application/json; charset=UTF-8, #/components/schemas/Network
-* Response: 401
-* Response: 403
-* Response: 404
-* Response: 503
-* Body ref: #/components/schemas/Network
+"! POST - "Create network"
+"! Operation id: CreateNetwork
+"! Response: 201
+"!     application/json; charset=UTF-8, #/components/schemas/Network
+"! Response: 401
+"! Response: 403
+"! Response: 404
+"! Response: 503
+"! Body ref: #/components/schemas/Network
   METHODS createnetwork
     IMPORTING
       !body TYPE network
     RAISING
       cx_static_check .
-* PUT - "Update network"
-* Operation id: UpdateNetwork
-* Parameter: id, required, path
-* Response: 204
-*     application/json, #/components/responses/NoContent
-* Response: 401
-* Response: 403
-* Response: 404
-* Response: 503
-* Body ref: #/components/schemas/Network
+"! PUT - "Update network"
+"! Operation id: UpdateNetwork
+"! Parameter: id, required, path
+"! Response: 204
+"!     application/json, #/components/responses/NoContent
+"! Response: 401
+"! Response: 403
+"! Response: 404
+"! Response: 503
+"! Body ref: #/components/schemas/Network
   METHODS updatenetwork
     IMPORTING
       !id   TYPE string
       !body TYPE network
     RAISING
       cx_static_check .
-* GET - "Get network status"
-* Operation id: GetNetworkStatus
-* Parameter: id, required, path
-* Response: 200
-*     application/json; charset=UTF-8, #/components/schemas/NetworkStatus
-* Response: 401
-* Response: 403
-* Response: 404
-* Response: 503
-* Response: default
-*     application/json, #/components/schemas/Error
+"! GET - "Get network status"
+"! Operation id: GetNetworkStatus
+"! Parameter: id, required, path
+"! Response: 200
+"!     application/json; charset=UTF-8, #/components/schemas/NetworkStatus
+"! Response: 401
+"! Response: 403
+"! Response: 404
+"! Response: 503
+"! Response: default
+"!     application/json, #/components/schemas/Error
   METHODS getnetworkstatus
     IMPORTING
       !id TYPE string
     RAISING
       cx_static_check .
-* GET - "List oracles"
-* Operation id: ListOracles
-* Parameter: page, optional, query
-* Parameter: rpp, optional, query
-* Response: 200
-* Response: 401
-* Response: 403
-* Response: 404
-* Response: 503
+"! GET - "List oracles"
+"! Operation id: ListOracles
+"! Parameter: page, optional, query
+"! Parameter: rpp, optional, query
+"! Response: 200
+"! Response: 401
+"! Response: 403
+"! Response: 404
+"! Response: 503
   METHODS listoracles
     IMPORTING
       !page TYPE i OPTIONAL
       !rpp  TYPE i OPTIONAL
     RAISING
       cx_static_check .
-* POST - "Create oracle"
-* Operation id: CreateOracle
-* Response: 200
-* Response: 401
-* Response: 403
-* Response: 404
-* Response: 503
+"! POST - "Create oracle"
+"! Operation id: CreateOracle
+"! Response: 200
+"! Response: 401
+"! Response: 403
+"! Response: 404
+"! Response: 503
   METHODS createoracle
     RAISING
       cx_static_check .
-* GET - "Get oracle details"
-* Operation id: GetOracleDetail
-* Parameter: id, required, path
-* Response: 200
-* Response: 401
-* Response: 403
-* Response: 404
-* Response: 503
+"! GET - "Get oracle details"
+"! Operation id: GetOracleDetail
+"! Parameter: id, required, path
+"! Response: 200
+"! Response: 401
+"! Response: 403
+"! Response: 404
+"! Response: 503
   METHODS getoracledetail
     IMPORTING
       !id TYPE string
     RAISING
       cx_static_check .
-* PUT - "Update oracle"
-* Operation id: UpdateOracle
-* Parameter: id, required, path
-* Response: 200
-* Response: 401
-* Response: 403
-* Response: 404
-* Response: 503
+"! PUT - "Update oracle"
+"! Operation id: UpdateOracle
+"! Parameter: id, required, path
+"! Response: 200
+"! Response: 401
+"! Response: 403
+"! Response: 404
+"! Response: 503
   METHODS updateoracle
     IMPORTING
       !id TYPE string
     RAISING
       cx_static_check .
-* DELETE - "Delete oracle"
-* Operation id: DeleteOracle
-* Parameter: id, required, path
-* Response: 200
-* Response: 401
-* Response: 403
-* Response: 404
-* Response: 503
+"! DELETE - "Delete oracle"
+"! Operation id: DeleteOracle
+"! Parameter: id, required, path
+"! Response: 200
+"! Response: 401
+"! Response: 403
+"! Response: 404
+"! Response: 503
   METHODS deleteoracle
     IMPORTING
       !id TYPE string
     RAISING
       cx_static_check .
-* GET - "List organizations"
-* Operation id: ListOrganizations
-* Parameter: page, optional, query
-* Parameter: rpp, optional, query
-* Response: 200
-* Response: 401
-* Response: 403
-* Response: 404
-* Response: 503
+"! GET - "List organizations"
+"! Operation id: ListOrganizations
+"! Parameter: page, optional, query
+"! Parameter: rpp, optional, query
+"! Response: 200
+"! Response: 401
+"! Response: 403
+"! Response: 404
+"! Response: 503
   METHODS listorganizations
     IMPORTING
       !page TYPE i OPTIONAL
       !rpp  TYPE i OPTIONAL
     RAISING
       cx_static_check .
-* POST - "Create organization"
-* Operation id: CreateOrganization
-* Response: 201
-* Response: 401
-* Response: 403
-* Response: 404
-* Response: 503
-* Body ref: #/components/schemas/Organization
+"! POST - "Create organization"
+"! Operation id: CreateOrganization
+"! Response: 201
+"! Response: 401
+"! Response: 403
+"! Response: 404
+"! Response: 503
+"! Body ref: #/components/schemas/Organization
   METHODS createorganization
     IMPORTING
       !body TYPE organization
     RAISING
       cx_static_check .
-* GET - "Get organization details"
-* Operation id: GetOrganizationDetails
-* Parameter: id, required, path
-* Response: 200
-* Response: 401
-* Response: 403
-* Response: 404
-* Response: 503
+"! GET - "Get organization details"
+"! Operation id: GetOrganizationDetails
+"! Parameter: id, required, path
+"! Response: 200
+"! Response: 401
+"! Response: 403
+"! Response: 404
+"! Response: 503
   METHODS getorganizationdetails
     IMPORTING
       !id TYPE string
     RAISING
       cx_static_check .
-* PUT - "Update organization details"
-* Operation id: UpdateOrganizationDetails
-* Parameter: id, required, path
-* Response: 200
-* Response: 401
-* Response: 403
-* Response: 404
-* Response: 503
-* Body ref: #/components/schemas/Organization
+"! PUT - "Update organization details"
+"! Operation id: UpdateOrganizationDetails
+"! Parameter: id, required, path
+"! Response: 200
+"! Response: 401
+"! Response: 403
+"! Response: 404
+"! Response: 503
+"! Body ref: #/components/schemas/Organization
   METHODS updateorganizationdetails
     IMPORTING
       !id   TYPE string
       !body TYPE organization
     RAISING
       cx_static_check .
-* GET - "List revocable tokens"
-* Operation id: ListTokens
-* Parameter: page, optional, query
-* Parameter: rpp, optional, query
-* Response: 200
-*     application/json, #/components/schemas/response_listtokens
-* Response: 401
-* Response: 403
-* Response: 404
-* Response: 503
+"! GET - "List revocable tokens"
+"! Operation id: ListTokens
+"! Parameter: page, optional, query
+"! Parameter: rpp, optional, query
+"! Response: 200
+"!     application/json, #/components/schemas/response_listtokens
+"! Response: 401
+"! Response: 403
+"! Response: 404
+"! Response: 503
   METHODS listtokens
     IMPORTING
       !page              TYPE i OPTIONAL
@@ -979,15 +966,15 @@ INTERFACE zif_proubc_baseline
       VALUE(return_data) TYPE response_listtokens
     RAISING
       cx_static_check .
-* POST - "Token authorization"
-* Operation id: TokenAuthorization
-* Response: 201
-*     application/json, #/components/schemas/Token
-* Response: 401
-* Response: 403
-* Response: 404
-* Response: 503
-* Body ref: #/components/schemas/Token
+"! POST - "Token authorization"
+"! Operation id: TokenAuthorization
+"! Response: 201
+"!     application/json, #/components/schemas/Token
+"! Response: 401
+"! Response: 403
+"! Response: 404
+"! Response: 503
+"! Body ref: #/components/schemas/Token
   METHODS tokenauthorization
     IMPORTING
       !body              TYPE token
@@ -995,31 +982,31 @@ INTERFACE zif_proubc_baseline
       VALUE(return_data) TYPE token
     RAISING
       cx_static_check .
-* DELETE - "Revoke token"
-* Operation id: RevokeToken
-* Parameter: id, required, path
-* Response: 200
-* Response: 401
-* Response: 403
-* Response: 404
-* Response: 503
+"! DELETE - "Revoke token"
+"! Operation id: RevokeToken
+"! Parameter: id, required, path
+"! Response: 200
+"! Response: 401
+"! Response: 403
+"! Response: 404
+"! Response: 503
   METHODS revoketoken
     IMPORTING
       !id TYPE string
     RAISING
       cx_static_check .
-* GET - "List transactions"
-* Operation id: ListTransactions
-* Parameter: filter_contract_creations, optional, query
-* Parameter: status, optional, query
-* Parameter: page, optional, query
-* Parameter: rpp, optional, query
-* Response: 200
-*     application/json; charset=UTF-8, array
-* Response: 401
-* Response: 403
-* Response: 404
-* Response: 503
+"! GET - "List transactions"
+"! Operation id: ListTransactions
+"! Parameter: filter_contract_creations, optional, query
+"! Parameter: status, optional, query
+"! Parameter: page, optional, query
+"! Parameter: rpp, optional, query
+"! Response: 200
+"!     application/json; charset=UTF-8, array
+"! Response: 401
+"! Response: 403
+"! Response: 404
+"! Response: 503
   METHODS listtransactions
     IMPORTING
       !filter_contract_creations TYPE abap_bool OPTIONAL
@@ -1028,44 +1015,44 @@ INTERFACE zif_proubc_baseline
       !rpp                       TYPE i OPTIONAL
     RAISING
       cx_static_check .
-* POST - "Create transaction"
-* Operation id: CreateTransaction
-* Response: 201
-*     application/json; charset=UTF-8, #/components/schemas/Transaction
-* Response: 401
-* Response: 403
-* Response: 404
-* Response: 503
-* Body ref: #/components/schemas/Transaction
+"! POST - "Create transaction"
+"! Operation id: CreateTransaction
+"! Response: 201
+"!     application/json; charset=UTF-8, #/components/schemas/Transaction
+"! Response: 401
+"! Response: 403
+"! Response: 404
+"! Response: 503
+"! Body ref: #/components/schemas/Transaction
   METHODS createtransaction
     IMPORTING
       !body TYPE transaction
     RAISING
       cx_static_check .
-* GET - "Get transaction details"
-* Operation id: GetTransactionDetails
-* Parameter: id, required, path
-* Response: 200
-*     application/json; charset=UTF-8, #/components/schemas/Transaction
-* Response: 401
-* Response: 403
-* Response: 404
-* Response: 503
+"! GET - "Get transaction details"
+"! Operation id: GetTransactionDetails
+"! Parameter: id, required, path
+"! Response: 200
+"!     application/json; charset=UTF-8, #/components/schemas/Transaction
+"! Response: 401
+"! Response: 403
+"! Response: 404
+"! Response: 503
   METHODS gettransactiondetails
     IMPORTING
       !id TYPE string
     RAISING
       cx_static_check .
-* GET - "List users"
-* Operation id: ListUsers
-* Parameter: page, optional, query
-* Parameter: rpp, optional, query
-* Response: 200
-*     application/json, #/components/schemas/response_listusers
-* Response: 401
-* Response: 403
-* Response: 404
-* Response: 503
+"! GET - "List users"
+"! Operation id: ListUsers
+"! Parameter: page, optional, query
+"! Parameter: rpp, optional, query
+"! Response: 200
+"!     application/json, #/components/schemas/response_listusers
+"! Response: 401
+"! Response: 403
+"! Response: 404
+"! Response: 503
   METHODS listusers
     IMPORTING
       !page              TYPE i OPTIONAL
@@ -1074,11 +1061,11 @@ INTERFACE zif_proubc_baseline
       VALUE(return_data) TYPE response_listusers
     RAISING
       cx_static_check .
-* POST - "Create user"
-* Operation id: CreateUser
-* Response: 201
-*     application/json, #/components/schemas/User
-* Body ref: #/components/schemas/User
+"! POST - "Create user"
+"! Operation id: CreateUser
+"! Response: 201
+"!     application/json, #/components/schemas/User
+"! Body ref: #/components/schemas/User
   METHODS createuser
     IMPORTING
       !body              TYPE user
@@ -1086,32 +1073,32 @@ INTERFACE zif_proubc_baseline
       VALUE(return_data) TYPE user
     RAISING
       cx_static_check .
-* GET - "Get user detail"
-* Operation id: GetUserDetail
-* Parameter: id, required, path
-* Response: 200
-*     application/json; charset=UTF-8, #/components/schemas/User
-* Response: 401
-* Response: 403
-* Response: 404
-* Response: 503
-* Response: default
-*     application/json, #/components/schemas/Error
+"! GET - "Get user detail"
+"! Operation id: GetUserDetail
+"! Parameter: id, required, path
+"! Response: 200
+"!     application/json; charset=UTF-8, #/components/schemas/User
+"! Response: 401
+"! Response: 403
+"! Response: 404
+"! Response: 503
+"! Response: default
+"!     application/json, #/components/schemas/Error
   METHODS getuserdetail
     IMPORTING
       !id TYPE string
     RAISING
       cx_static_check .
-* PUT - "Update user"
-* Operation id: UpdateUser
-* Parameter: id, required, path
-* Response: 200
-*     application/json, #/components/schemas/User
-* Response: 401
-* Response: 403
-* Response: 404
-* Response: 503
-* Body ref: #/components/schemas/User
+"! PUT - "Update user"
+"! Operation id: UpdateUser
+"! Parameter: id, required, path
+"! Response: 200
+"!     application/json, #/components/schemas/User
+"! Response: 401
+"! Response: 403
+"! Response: 404
+"! Response: 503
+"! Body ref: #/components/schemas/User
   METHODS updateuser
     IMPORTING
       !id                TYPE string
@@ -1120,73 +1107,73 @@ INTERFACE zif_proubc_baseline
       VALUE(return_data) TYPE user
     RAISING
       cx_static_check .
-* DELETE - "Delete user"
-* Operation id: DeleteUserRequest
-* Parameter: id, required, path
-* Response: 200
-* Response: 401
-* Response: 403
-* Response: 404
-* Response: 503
+"! DELETE - "Delete user"
+"! Operation id: DeleteUserRequest
+"! Parameter: id, required, path
+"! Response: 200
+"! Response: 401
+"! Response: 403
+"! Response: 404
+"! Response: 503
   METHODS deleteuserrequest
     IMPORTING
       !id TYPE string
     RAISING
       cx_static_check .
-* POST - "Unseal vault"
-* Operation id: UnsealVault
-* Response: 204
-* Response: 401
-* Response: 403
-* Response: 404
-* Response: 503
-* Body ref: #/components/schemas/UnsealVaultRequest
+"! POST - "Unseal vault"
+"! Operation id: UnsealVault
+"! Response: 204
+"! Response: 401
+"! Response: 403
+"! Response: 404
+"! Response: 503
+"! Body ref: #/components/schemas/UnsealVaultRequest
   METHODS unsealvault
     IMPORTING
       !body TYPE unsealvaultrequest
     RAISING
       cx_static_check .
-* GET - "List vaults"
-* Operation id: ListVaults
-* Parameter: page, optional, query
-* Parameter: rpp, optional, query
-* Response: 200
-*     application/json; charset=UTF-8, array
-* Response: 401
-* Response: 403
-* Response: 404
-* Response: 503
+"! GET - "List vaults"
+"! Operation id: ListVaults
+"! Parameter: page, optional, query
+"! Parameter: rpp, optional, query
+"! Response: 200
+"!     application/json; charset=UTF-8, array
+"! Response: 401
+"! Response: 403
+"! Response: 404
+"! Response: 503
   METHODS listvaults
     IMPORTING
       !page TYPE i OPTIONAL
       !rpp  TYPE i OPTIONAL
     RAISING
       cx_static_check .
-* POST - "Create a vault"
-* Operation id: CreateVault
-* Response: 201
-*     application/json; charset=UTF-8, #/components/schemas/Vault
-* Response: 401
-* Response: 403
-* Response: 404
-* Response: 503
-* Body ref: #/components/schemas/Vault
+"! POST - "Create a vault"
+"! Operation id: CreateVault
+"! Response: 201
+"!     application/json; charset=UTF-8, #/components/schemas/Vault
+"! Response: 401
+"! Response: 403
+"! Response: 404
+"! Response: 503
+"! Body ref: #/components/schemas/Vault
   METHODS createvault
     IMPORTING
       !body TYPE vault
     RAISING
       cx_static_check .
-* GET - "List keys"
-* Operation id: Listkeys
-* Parameter: id, required, path
-* Parameter: page, optional, query
-* Parameter: rpp, optional, query
-* Response: 200
-*     application/json; charset=UTF-8, array
-* Response: 401
-* Response: 403
-* Response: 404
-* Response: 503
+"! GET - "List keys"
+"! Operation id: Listkeys
+"! Parameter: id, required, path
+"! Parameter: page, optional, query
+"! Parameter: rpp, optional, query
+"! Response: 200
+"!     application/json; charset=UTF-8, array
+"! Response: 401
+"! Response: 403
+"! Response: 404
+"! Response: 503
   METHODS listkeys
     IMPORTING
       !id   TYPE string
@@ -1194,33 +1181,33 @@ INTERFACE zif_proubc_baseline
       !rpp  TYPE i OPTIONAL
     RAISING
       cx_static_check .
-* POST - "Create a key"
-* Operation id: CreateKey
-* Parameter: id, required, path
-* Response: 201
-*     application/json; charset=UTF-8, #/components/schemas/Key
-* Response: 401
-* Response: 403
-* Response: 404
-* Response: 503
-* Body ref: #/components/schemas/Key
+"! POST - "Create a key"
+"! Operation id: CreateKey
+"! Parameter: id, required, path
+"! Response: 201
+"!     application/json; charset=UTF-8, #/components/schemas/Key
+"! Response: 401
+"! Response: 403
+"! Response: 404
+"! Response: 503
+"! Body ref: #/components/schemas/Key
   METHODS createkey
     IMPORTING
       !id   TYPE string
       !body TYPE key
     RAISING
       cx_static_check .
-* POST - "Derive a key"
-* Operation id: DeriveaKeyRequest
-* Parameter: id, required, path
-* Parameter: key_id, required, path
-* Response: 201
-*     application/json; charset=UTF-8, #/components/schemas/DeriveKeyRequest
-* Response: 401
-* Response: 403
-* Response: 404
-* Response: 503
-* Body ref: #/components/schemas/Key
+"! POST - "Derive a key"
+"! Operation id: DeriveaKeyRequest
+"! Parameter: id, required, path
+"! Parameter: key_id, required, path
+"! Response: 201
+"!     application/json; charset=UTF-8, #/components/schemas/DeriveKeyRequest
+"! Response: 401
+"! Response: 403
+"! Response: 404
+"! Response: 503
+"! Body ref: #/components/schemas/Key
   METHODS deriveakeyrequest
     IMPORTING
       !id     TYPE string
@@ -1228,32 +1215,32 @@ INTERFACE zif_proubc_baseline
       !body   TYPE key
     RAISING
       cx_static_check .
-* DELETE - "Delete a key"
-* Operation id: Deleteakey
-* Parameter: id, required, path
-* Parameter: key_id, required, path
-* Response: 204
-* Response: 401
-* Response: 403
-* Response: 404
-* Response: 503
+"! DELETE - "Delete a key"
+"! Operation id: Deleteakey
+"! Parameter: id, required, path
+"! Parameter: key_id, required, path
+"! Response: 204
+"! Response: 401
+"! Response: 403
+"! Response: 404
+"! Response: 503
   METHODS deleteakey
     IMPORTING
       !id     TYPE string
       !key_id TYPE string
     RAISING
       cx_static_check .
-* GET - "List secrets"
-* Operation id: ListSecrets
-* Parameter: id, required, path
-* Parameter: page, optional, query
-* Parameter: rpp, optional, query
-* Response: 200
-*     application/json; charset=UTF-8, array
-* Response: 401
-* Response: 403
-* Response: 404
-* Response: 503
+"! GET - "List secrets"
+"! Operation id: ListSecrets
+"! Parameter: id, required, path
+"! Parameter: page, optional, query
+"! Parameter: rpp, optional, query
+"! Response: 200
+"!     application/json; charset=UTF-8, array
+"! Response: 401
+"! Response: 403
+"! Response: 404
+"! Response: 503
   METHODS listsecrets
     IMPORTING
       !id   TYPE string
@@ -1261,106 +1248,106 @@ INTERFACE zif_proubc_baseline
       !rpp  TYPE i OPTIONAL
     RAISING
       cx_static_check .
-* POST - "Store secret"
-* Operation id: StoreSecret
-* Parameter: id, required, path
-* Response: 201
-*     application/json; charset=UTF-8, #/components/schemas/Secret
-* Response: 401
-* Response: 403
-* Response: 404
-* Response: 503
-* Body ref: #/components/schemas/Secret
+"! POST - "Store secret"
+"! Operation id: StoreSecret
+"! Parameter: id, required, path
+"! Response: 201
+"!     application/json; charset=UTF-8, #/components/schemas/Secret
+"! Response: 401
+"! Response: 403
+"! Response: 404
+"! Response: 503
+"! Body ref: #/components/schemas/Secret
   METHODS storesecret
     IMPORTING
       !id   TYPE string
       !body TYPE secret
     RAISING
       cx_static_check .
-* GET - "Retrieve secret"
-* Operation id: RetrieveSecret
-* Parameter: id, required, path
-* Parameter: secret_id, required, path
-* Response: 200
-*     application/json; charset=UTF-8, #/components/schemas/Secret
-* Response: 401
-* Response: 403
-* Response: 404
-* Response: 503
+"! GET - "Retrieve secret"
+"! Operation id: RetrieveSecret
+"! Parameter: id, required, path
+"! Parameter: secret_id, required, path
+"! Response: 200
+"!     application/json; charset=UTF-8, #/components/schemas/Secret
+"! Response: 401
+"! Response: 403
+"! Response: 404
+"! Response: 503
   METHODS retrievesecret
     IMPORTING
       !id        TYPE string
       !secret_id TYPE string
     RAISING
       cx_static_check .
-* DELETE - "Delete secret"
-* Operation id: DeleteSecret
-* Parameter: id, required, path
-* Parameter: secret_id, required, path
-* Response: 204
-*     application/json; charset=UTF-8, #/components/schemas/Secret
-* Response: 401
-* Response: 403
-* Response: 404
-* Response: 503
+"! DELETE - "Delete secret"
+"! Operation id: DeleteSecret
+"! Parameter: id, required, path
+"! Parameter: secret_id, required, path
+"! Response: 204
+"!     application/json; charset=UTF-8, #/components/schemas/Secret
+"! Response: 401
+"! Response: 403
+"! Response: 404
+"! Response: 503
   METHODS deletesecret
     IMPORTING
       !id        TYPE string
       !secret_id TYPE string
     RAISING
       cx_static_check .
-* GET - "List wallets"
-* Operation id: ListWallets
-* Parameter: page, optional, query
-* Parameter: rpp, optional, query
-* Response: 200
-*     application/json; charset=UTF-8, array
-* Response: 401
-* Response: 403
-* Response: 404
-* Response: 503
+"! GET - "List wallets"
+"! Operation id: ListWallets
+"! Parameter: page, optional, query
+"! Parameter: rpp, optional, query
+"! Response: 200
+"!     application/json; charset=UTF-8, array
+"! Response: 401
+"! Response: 403
+"! Response: 404
+"! Response: 503
   METHODS listwallets
     IMPORTING
       !page TYPE i OPTIONAL
       !rpp  TYPE i OPTIONAL
     RAISING
       cx_static_check .
-* POST - "Create wallet"
-* Operation id: CreateWallet
-* Response: 201
-*     application/json; charset=UTF-8, #/components/schemas/Wallet
-* Response: 401
-* Response: 403
-* Response: 404
-* Response: 503
-* Body ref: #/components/schemas/Wallet
+"! POST - "Create wallet"
+"! Operation id: CreateWallet
+"! Response: 201
+"!     application/json; charset=UTF-8, #/components/schemas/Wallet
+"! Response: 401
+"! Response: 403
+"! Response: 404
+"! Response: 503
+"! Body ref: #/components/schemas/Wallet
   METHODS createwallet
     IMPORTING
       !body TYPE wallet
     RAISING
       cx_static_check .
-* GET - "List wallet accounts"
-* Operation id: ListWalletAccounts
-* Parameter: id, required, path
-* Parameter: rpp, optional, query
-* Response: 200
-*     application/json; charset=UTF-8, array
-* Response: 401
-* Response: 403
-* Response: 404
-* Response: 503
+"! GET - "List wallet accounts"
+"! Operation id: ListWalletAccounts
+"! Parameter: id, required, path
+"! Parameter: rpp, optional, query
+"! Response: 200
+"!     application/json; charset=UTF-8, array
+"! Response: 401
+"! Response: 403
+"! Response: 404
+"! Response: 503
   METHODS listwalletaccounts
     IMPORTING
       !id  TYPE string
       !rpp TYPE i OPTIONAL
     RAISING
       cx_static_check .
-* GET - "List workgroups"
-* Operation id: ListWorkgroups
-* Parameter: page, optional, query
-* Parameter: rpp, optional, query
-* Response: 200
-*     application/json, #/components/schemas/response_listworkgroups
+"! GET - "List workgroups"
+"! Operation id: ListWorkgroups
+"! Parameter: page, optional, query
+"! Parameter: rpp, optional, query
+"! Response: 200
+"!     application/json, #/components/schemas/response_listworkgroups
   METHODS listworkgroups
     IMPORTING
       !page              TYPE i OPTIONAL
@@ -1369,15 +1356,15 @@ INTERFACE zif_proubc_baseline
       VALUE(return_data) TYPE response_listworkgroups
     RAISING
       cx_static_check .
-* POST - "Create workgroup"
-* Operation id: CreateWorkgroup
-* Response: 200
-*     application/json, #/components/schemas/Workgroup
-* Response: 401
-* Response: 403
-* Response: 404
-* Response: 503
-* Body ref: #/components/schemas/Workgroup
+"! POST - "Create workgroup"
+"! Operation id: CreateWorkgroup
+"! Response: 200
+"!     application/json, #/components/schemas/Workgroup
+"! Response: 401
+"! Response: 403
+"! Response: 404
+"! Response: 503
+"! Body ref: #/components/schemas/Workgroup
   METHODS createworkgroup
     IMPORTING
       !body              TYPE workgroup
@@ -1385,17 +1372,17 @@ INTERFACE zif_proubc_baseline
       VALUE(return_data) TYPE workgroup
     RAISING
       cx_static_check .
-* GET - "List workgroup users"
-* Operation id: ListWorkgroupUsers
-* Parameter: id, required, path
-* Parameter: page, optional, query
-* Parameter: rpp, optional, query
-* Response: 200
-*     application/json, #/components/schemas/response_listworkgroupusers
-* Response: 401
-* Response: 403
-* Response: 404
-* Response: 503
+"! GET - "List workgroup users"
+"! Operation id: ListWorkgroupUsers
+"! Parameter: id, required, path
+"! Parameter: page, optional, query
+"! Parameter: rpp, optional, query
+"! Response: 200
+"!     application/json, #/components/schemas/response_listworkgroupusers
+"! Response: 401
+"! Response: 403
+"! Response: 404
+"! Response: 503
   METHODS listworkgroupusers
     IMPORTING
       !id                TYPE string
@@ -1405,72 +1392,72 @@ INTERFACE zif_proubc_baseline
       VALUE(return_data) TYPE response_listworkgroupusers
     RAISING
       cx_static_check .
-* POST - "Associate workgroup user"
-* Operation id: AssociateWorkgroupUser
-* Parameter: id, required, path
-* Response: 201
-* Response: 401
-* Response: 403
-* Response: 404
-* Response: 503
-* Body ref: #/components/schemas/AssociateWorkgroupUserRequest
+"! POST - "Associate workgroup user"
+"! Operation id: AssociateWorkgroupUser
+"! Parameter: id, required, path
+"! Response: 201
+"! Response: 401
+"! Response: 403
+"! Response: 404
+"! Response: 503
+"! Body ref: #/components/schemas/AssociateWorkgroupUserRequest
   METHODS associateworkgroupuser
     IMPORTING
       !id   TYPE string
       !body TYPE associateworkgroupuserrequest
     RAISING
       cx_static_check .
-* GET - "Get workgroup details"
-* Operation id: GetWorkgroupDetails
-* Parameter: id, required, path
-* Response: 200
-* Response: 401
-* Response: 403
-* Response: 404
-* Response: 503
+"! GET - "Get workgroup details"
+"! Operation id: GetWorkgroupDetails
+"! Parameter: id, required, path
+"! Response: 200
+"! Response: 401
+"! Response: 403
+"! Response: 404
+"! Response: 503
   METHODS getworkgroupdetails
     IMPORTING
       !id TYPE string
     RAISING
       cx_static_check .
-* PUT - "Update workgroup"
-* Operation id: UpdateWorkgroup
-* Parameter: id, required, path
-* Response: 204
-* Response: 401
-* Response: 403
-* Response: 404
-* Response: 503
-* Body ref: #/components/schemas/Workgroup
+"! PUT - "Update workgroup"
+"! Operation id: UpdateWorkgroup
+"! Parameter: id, required, path
+"! Response: 204
+"! Response: 401
+"! Response: 403
+"! Response: 404
+"! Response: 503
+"! Body ref: #/components/schemas/Workgroup
   METHODS updateworkgroup
     IMPORTING
       !id   TYPE string
       !body TYPE workgroup
     RAISING
       cx_static_check .
-* DELETE - "Delete workgroup"
-* Operation id: DeleteWorkgroup
-* Parameter: id, required, path
-* Response: 200
-* Response: 401
-* Response: 403
-* Response: 404
-* Response: 503
+"! DELETE - "Delete workgroup"
+"! Operation id: DeleteWorkgroup
+"! Parameter: id, required, path
+"! Response: 200
+"! Response: 401
+"! Response: 403
+"! Response: 404
+"! Response: 503
   METHODS deleteworkgroup
     IMPORTING
       !id TYPE string
     RAISING
       cx_static_check .
-* POST - "Create a business object"
-* Operation id: CreateBaselineBusinessObject
-* Response: 202
-*     application/json, #/components/responses/Accepted
-* Response: 401
-* Response: 403
-* Response: 404
-*     application/json, #/components/schemas/Error
-* Response: 503
-* Body ref: #/components/schemas/BusinessObject
+"! POST - "Create a business object"
+"! Operation id: CreateBaselineBusinessObject
+"! Response: 202
+"!     application/json, #/components/responses/Accepted
+"! Response: 401
+"! Response: 403
+"! Response: 404
+"!     application/json, #/components/schemas/Error
+"! Response: 503
+"! Body ref: #/components/schemas/BusinessObject
   METHODS createbaselinebusinessobject
     IMPORTING
       !body           TYPE businessobject
@@ -1480,34 +1467,34 @@ INTERFACE zif_proubc_baseline
       !apiresponse    TYPE REF TO data
     RAISING
       cx_static_check .
-* PUT - "Update a business object"
-* Operation id: UpdateBaselineBusinessObject
-* Parameter: id, required, path
-* Response: 200
-* Response: 401
-* Response: 403
-* Response: 404
-* Response: 503
-* Body ref: #/components/schemas/BusinessObject
+"! PUT - "Update a business object"
+"! Operation id: UpdateBaselineBusinessObject
+"! Parameter: id, required, path
+"! Response: 200
+"! Response: 401
+"! Response: 403
+"! Response: 404
+"! Response: 503
+"! Body ref: #/components/schemas/BusinessObject
   METHODS updatebaselinebusinessobject
     IMPORTING
       !id   TYPE string
       !body TYPE businessobject
     RAISING
       cx_static_check .
-* GET - "List Circuits"
-* Operation id: ListCircuits
-* Parameter: curve, optional, query
-* Parameter: identifier, optional, query
-* Parameter: provider, optional, query
-* Parameter: proving scheme, optional, query
-* Parameter: status, optional, query
-* Response: 200
-*     application/json; charset=UTF-8, array
-* Response: 401
-* Response: 403
-* Response: 404
-* Response: 503
+"! GET - "List Circuits"
+"! Operation id: ListCircuits
+"! Parameter: curve, optional, query
+"! Parameter: identifier, optional, query
+"! Parameter: provider, optional, query
+"! Parameter: proving scheme, optional, query
+"! Parameter: status, optional, query
+"! Response: 200
+"!     application/json; charset=UTF-8, array
+"! Response: 401
+"! Response: 403
+"! Response: 404
+"! Response: 503
   METHODS listcircuits
     IMPORTING
       !curve          TYPE string OPTIONAL
@@ -1517,89 +1504,89 @@ INTERFACE zif_proubc_baseline
       !status         TYPE string OPTIONAL
     RAISING
       cx_static_check .
-* POST - "Create circuit"
-* Operation id: CreateCircuit
-* Response: 200
-* Response: 401
-* Response: 403
-* Response: 404
-* Response: 503
-* Body ref: #/components/schemas/Circuit
+"! POST - "Create circuit"
+"! Operation id: CreateCircuit
+"! Response: 200
+"! Response: 401
+"! Response: 403
+"! Response: 404
+"! Response: 503
+"! Body ref: #/components/schemas/Circuit
   METHODS createcircuit
     IMPORTING
       !body TYPE circuit
     RAISING
       cx_static_check .
-* POST - "Prove circuit"
-* Operation id: Prove
-* Parameter: id, required, path
-* Response: 200
-* Response: 401
-* Response: 403
-* Response: 404
-* Response: 422
-* Response: 503
-* Body ref: #/components/schemas/ProveRequest
+"! POST - "Prove circuit"
+"! Operation id: Prove
+"! Parameter: id, required, path
+"! Response: 200
+"! Response: 401
+"! Response: 403
+"! Response: 404
+"! Response: 422
+"! Response: 503
+"! Body ref: #/components/schemas/ProveRequest
   METHODS prove
     IMPORTING
       !id   TYPE string
       !body TYPE proverequest
     RAISING
       cx_static_check .
-* POST - "Verify"
-* Operation id: Verify
-* Parameter: id, required, path
-* Response: 200
-* Response: 401
-* Response: 403
-* Response: 404
-* Response: 503
-* Body ref: #/components/schemas/VerifyProofRequest
+"! POST - "Verify"
+"! Operation id: Verify
+"! Parameter: id, required, path
+"! Response: 200
+"! Response: 401
+"! Response: 403
+"! Response: 404
+"! Response: 503
+"! Body ref: #/components/schemas/VerifyProofRequest
   METHODS verify
     IMPORTING
       !id   TYPE string
       !body TYPE verifyproofrequest
     RAISING
       cx_static_check .
-* GET - "Retrieve store value"
-* Operation id: GetStoreValue
-* Parameter: id, required, path
-* Parameter: index, required, path
-* Response: 200
-* Response: 401
-* Response: 403
-* Response: 404
-* Response: 503
+"! GET - "Retrieve store value"
+"! Operation id: GetStoreValue
+"! Parameter: id, required, path
+"! Parameter: index, required, path
+"! Response: 200
+"! Response: 401
+"! Response: 403
+"! Response: 404
+"! Response: 503
   METHODS getstorevalue
     IMPORTING
       !id    TYPE string
       !index TYPE string
     RAISING
       cx_static_check .
-* GET - "JSON Web Key Set (JWK)"
-* Operation id: ListWellKnownKeys
-* Response: 200
-*     application/json; charset=UTF-8, array
-* Response: default
-*     application/json, #/components/schemas/Error
+"! GET - "JSON Web Key Set (JWK)"
+"! Operation id: ListWellKnownKeys
+"! Response: 200
+"!     application/json; charset=UTF-8, array
+"! Response: default
+"!     application/json, #/components/schemas/Error
   METHODS listwellknownkeys
     RAISING
       cx_static_check .
-* GET - "Returns OpenID configuration"
-* Operation id: ListOpenIDConfiguration
-* Response: 200
-*     application/json; charset=UTF-8, #/components/schemas/OpenIDConfig
-* Response: default
-*     application/json, #/components/schemas/Error
+"! GET - "Returns OpenID configuration"
+"! Operation id: ListOpenIDConfiguration
+"! Response: 200
+"!     application/json; charset=UTF-8, #/components/schemas/OpenIDConfig
+"! Response: default
+"!     application/json, #/components/schemas/Error
   METHODS listopenidconfiguration
     RAISING
       cx_static_check .
-* POST
-* *https://gist.github.com/kthomas/459381e98c808febea9c1bb51408bbde
+"! POST
+"! "!https://gist.github.com/kthomas/459381e98c808febea9c1bb51408bbde
   METHODS send_protocol_msg
     IMPORTING
       !iv_body        TYPE protocolmessage_req
-      !iv_bpitoken    TYPE zPRVDREFRESHTOKEN
+      !iv_bpitoken    TYPE zprvdrefreshtoken
     EXPORTING
       !statuscode     TYPE i
       !apiresponsestr TYPE string

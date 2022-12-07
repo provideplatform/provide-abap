@@ -9,20 +9,20 @@ INTERFACE zif_proubc_vault
   CONSTANTS: c_vaultkey_spec_aes256 TYPE string VALUE 'AES-256-GCM'.
   CONSTANTS: c_vaultkey_spec_chacha20 TYPE string VALUE 'ChaCha20'.
   "RSA
-  CONSTANTS: c_vaultkey_spec_RSA TYPE string VALUE 'RSA'.
+  CONSTANTS: c_vaultkey_spec_rsa TYPE string VALUE 'RSA'.
 
   "vault key specs - assymetric
   CONSTANTS: c_vaultkey_spec_bjj TYPE string VALUE 'babyJubJub'.
-  CONSTANTS: c_vaultkey_spec_C25519 TYPE string VALUE 'C25519'.
-  CONSTANTS: c_vaultkey_spec_Ed25519 TYPE string VALUE 'Ed25519'.
-  CONSTANTS: c_vaultkey_spec_nats_Ed25519 TYPE string VALUE 'Ed25519-nkey'.
+  CONSTANTS: c_vaultkey_spec_c25519 TYPE string VALUE 'C25519'.
+  CONSTANTS: c_vaultkey_spec_ed25519 TYPE string VALUE 'Ed25519'.
+  CONSTANTS: c_vaultkey_spec_nats_ed25519 TYPE string VALUE 'Ed25519-nkey'.
   CONSTANTS: c_vaultkey_spec_secp256k1 TYPE string VALUE 'secp256k1'.
-  CONSTANTS: c_vaultkey_spec_BIP39 TYPE string VALUE 'BIP39'.
+  CONSTANTS: c_vaultkey_spec_bip39 TYPE string VALUE 'BIP39'.
 
 
   TYPES: BEGIN OF ty_vault_query,
            id          TYPE zcasesensitive_str,
-           created_at  TYPE string, "convertable to timestampl
+           created_at  TYPE string,
            name        TYPE string,
            description TYPE string,
          END OF ty_vault_query.
@@ -36,13 +36,13 @@ INTERFACE zif_proubc_vault
 
 
 
-* POST - "Create a key: C25519"
-* Operation id: Createakey:C25519
-* Parameter: authorization, required, header
-* Parameter: Content-Type, required, header
-* Parameter: vault_id, required, path
-* Response: 200
-* Body schema: string
+"! POST - "Create a key: C25519"
+"! Operation id: Createakey:C25519
+"! Parameter: authorization, required, header
+"! Parameter: Content-Type, required, header
+"! Parameter: vault_id, required, path
+"! Response: 200
+"! Body schema: string
   METHODS create_key
     IMPORTING
               authorization       TYPE string
@@ -55,13 +55,13 @@ INTERFACE zif_proubc_vault
               ev_httpresponsecode TYPE i
     RAISING   cx_static_check.
 
-* GET - "List keys"
-* Operation id: Listkeys
-* Parameter: authorization, required, header
-* Parameter: Content-Type, required, header
-* Parameter: vault_id, required, path
-* Response: 200
-* Body schema: string
+"! GET - "List keys"
+"! Operation id: Listkeys
+"! Parameter: authorization, required, header
+"! Parameter: Content-Type, required, header
+"! Parameter: vault_id, required, path
+"! Response: 200
+"! Body schema: string
   METHODS list_keys
     IMPORTING
               authorization       TYPE string
@@ -74,13 +74,13 @@ INTERFACE zif_proubc_vault
               ev_httpresponsecode TYPE i
     RAISING   cx_static_check.
 
-* POST - "Derive a key: ChaCha20"
-* Operation id: Deriveakey:ChaCha20
-* Parameter: authorization, required, header
-* Parameter: Content-Type, required, header
-* Parameter: vault_id, required, path
-* Response: 200
-* Body schema: string
+"! POST - "Derive a key: ChaCha20"
+"! Operation id: Deriveakey:ChaCha20
+"! Parameter: authorization, required, header
+"! Parameter: Content-Type, required, header
+"! Parameter: vault_id, required, path
+"! Response: 200
+"! Body schema: string
   METHODS derive_key
     IMPORTING
               authorization       TYPE string
@@ -93,13 +93,13 @@ INTERFACE zif_proubc_vault
               ev_httpresponsecode TYPE i
     RAISING   cx_static_check.
 
-* DELETE - "Delete a key"
-* Operation id: Deleteakey
-* Parameter: authorization, required, header
-* Parameter: Content-Type, required, header
-* Parameter: vault_id, required, path
-* Parameter: key_id, required, path
-* Response: 200
+"! DELETE - "Delete a key"
+"! Operation id: Deleteakey
+"! Parameter: authorization, required, header
+"! Parameter: Content-Type, required, header
+"! Parameter: vault_id, required, path
+"! Parameter: key_id, required, path
+"! Response: 200
   METHODS delete_key
     IMPORTING
               authorization       TYPE string
@@ -112,12 +112,12 @@ INTERFACE zif_proubc_vault
               ev_httpresponsecode TYPE i
     RAISING   cx_static_check.
 
-* GET - "List secrets"
-* Operation id: Listsecrets
-* Parameter: authorization, required, header
-* Parameter: Content-Type, required, header
-* Parameter: vault_id, required, path
-* Response: 200
+"! GET - "List secrets"
+"! Operation id: Listsecrets
+"! Parameter: authorization, required, header
+"! Parameter: Content-Type, required, header
+"! Parameter: vault_id, required, path
+"! Response: 200
   METHODS list_secrets
     IMPORTING
               authorization       TYPE string
@@ -129,14 +129,14 @@ INTERFACE zif_proubc_vault
               ev_httpresponsecode TYPE i
     RAISING   cx_static_check.
 
-* POST - "Retreive secret"
-* Operation id: Retreivesecret
-* Parameter: authorization, required, header
-* Parameter: Content-Type, required, header
-* Parameter: vault_id, required, path
-* Parameter: secret_id, required, path
-* Response: 200
-* Body schema: string
+"! POST - "Retreive secret"
+"! Operation id: Retreivesecret
+"! Parameter: authorization, required, header
+"! Parameter: Content-Type, required, header
+"! Parameter: vault_id, required, path
+"! Parameter: secret_id, required, path
+"! Response: 200
+"! Body schema: string
   METHODS retreive_secret
     IMPORTING
               authorization       TYPE string
@@ -150,14 +150,14 @@ INTERFACE zif_proubc_vault
               ev_httpresponsecode TYPE i
     RAISING   cx_static_check.
 
-* DELETE - "Delete secret"
-* Operation id: Deletesecret
-* Parameter: authorization, required, header
-* Parameter: Content-Type, required, header
-* Parameter: vault_id, required, path
-* Parameter: secret_id, required, path
-* Response: 200
-* Body schema: string
+"! DELETE - "Delete secret"
+"! Operation id: Deletesecret
+"! Parameter: authorization, required, header
+"! Parameter: Content-Type, required, header
+"! Parameter: vault_id, required, path
+"! Parameter: secret_id, required, path
+"! Response: 200
+"! Body schema: string
   METHODS delete_secret
     IMPORTING
               authorization       TYPE string
@@ -171,13 +171,13 @@ INTERFACE zif_proubc_vault
               ev_httpresponsecode TYPE i
     RAISING   cx_static_check.
 
-* POST - "Create Vault"
-* Operation id: CreateVault
-* Parameter: Content-Type, required, header
-* Parameter: content-type, required, header
-* Parameter: Authorization, required, header
-* Response: 200
-* Body schema: string
+"! POST - "Create Vault"
+"! Operation id: CreateVault
+"! Parameter: Content-Type, required, header
+"! Parameter: content-type, required, header
+"! Parameter: Authorization, required, header
+"! Response: 200
+"! Body schema: string
   METHODS create_vault
     IMPORTING
               content_type        TYPE string
@@ -189,11 +189,11 @@ INTERFACE zif_proubc_vault
               ev_httpresponsecode TYPE i
     RAISING   cx_static_check.
 
-* GET - "List Vaults"
-* Operation id: ListVaults
-* Parameter: Authorization, required, header
-* Response: 200
-* Body schema: string
+"! GET - "List Vaults"
+"! Operation id: ListVaults
+"! Parameter: Authorization, required, header
+"! Response: 200
+"! Body schema: string
   METHODS list_vaults
     EXPORTING et_vault_list       TYPE zif_proubc_vault=>tty_vault_query
               ev_apiresponsestr   TYPE string
@@ -201,11 +201,11 @@ INTERFACE zif_proubc_vault
               ev_httpresponsecode TYPE i
     RAISING   cx_static_check.
 
-* POST - "Create Seal/Unseal key"
-* Operation id: CreateSeal/Unsealkey
-* Parameter: authorization, required, header
-* Parameter: Content-Type, required, header
-* Response: 200
+"! POST - "Create Seal/Unseal key"
+"! Operation id: CreateSeal/Unsealkey
+"! Parameter: authorization, required, header
+"! Parameter: Content-Type, required, header
+"! Response: 200
   METHODS createseal_unsealkey
     IMPORTING
               authorization       TYPE string
@@ -216,12 +216,12 @@ INTERFACE zif_proubc_vault
               ev_httpresponsecode TYPE i
     RAISING   cx_static_check.
 
-* POST - "Unseal vault"
-* Operation id: Unsealvault
-* Parameter: authorization, required, header
-* Parameter: Content-Type, required, header
-* Response: 200
-* Body schema: string
+"! POST - "Unseal vault"
+"! Operation id: Unsealvault
+"! Parameter: authorization, required, header
+"! Parameter: Content-Type, required, header
+"! Response: 200
+"! Body schema: string
   METHODS unseal_vault
     IMPORTING
               authorization       TYPE string

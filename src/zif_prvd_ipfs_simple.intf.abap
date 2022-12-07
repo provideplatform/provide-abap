@@ -1,21 +1,22 @@
 INTERFACE zif_prvd_ipfs_simple
   PUBLIC .
 
+  "! Calls the /
   METHODS: add IMPORTING iv_binarystring     TYPE xstring
-                         iv_contentstring    type string
-                         iv_ipfsprojid       type string
-                         iv_ipfsapikey       type string
-                         iv_filename         type string
-                         iv_filetype         type string
-                         iv_xcontentlength   type i
-                         iv_quiet               TYPE abap_bool optional
+                         iv_contentstring    TYPE string
+                         iv_ipfsprojid       TYPE string
+                         iv_ipfsapikey       TYPE string
+                         iv_filename         TYPE string
+                         iv_filetype         TYPE string
+                         iv_xcontentlength   TYPE i
+                         iv_quiet               TYPE abap_bool OPTIONAL
                          iv_quieter             TYPE abap_bool OPTIONAL
                          iv_silent              TYPE abap_bool OPTIONAL
                          iv_progress            TYPE abap_bool OPTIONAL
                          iv_trickle             TYPE abap_bool OPTIONAL
                          iv_only_hash           TYPE abap_bool OPTIONAL
                          iv_wrap_with_directory TYPE abap_bool OPTIONAL
-                         iv_chunker             TYPE string optional
+                         iv_chunker             TYPE string OPTIONAL
                          iv_pin                 TYPE abap_bool OPTIONAL
                          iv_raw_leaves          TYPE abap_bool OPTIONAL
                          iv_nocopy              TYPE abap_bool OPTIONAL

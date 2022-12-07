@@ -1,10 +1,10 @@
-interface ZIF_PROUBC_FILE
-  public .
+INTERFACE zif_proubc_file
+  PUBLIC .
 
   TYPES: BEGIN OF ty_filecontent,
            rec TYPE xstring,
            END OF ty_filecontent.
 
-  types: tty_filecontent type table of ty_filecontent.
+  TYPES: tty_filecontent TYPE TABLE OF ty_filecontent.
 
-endinterface.
+ENDINTERFACE.

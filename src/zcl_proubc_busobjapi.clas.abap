@@ -42,7 +42,7 @@ CLASS ZCL_PROUBC_BUSOBJAPI IMPLEMENTATION.
 
     lo_entity = mo_response->create_entity( ).
     lo_entity->set_content_type( if_rest_media_type=>gc_appl_json ).
-    lo_entity->set_string_data( /ui2/cl_json=>serialize( data = lv_bpiobjdata
+    lo_entity->set_string_data( /ui2/cl_json=>serialize( data        = lv_bpiobjdata
                                                          pretty_name = /ui2/cl_json=>pretty_mode-low_case ) ).
     mo_response->set_status( cl_rest_status_code=>gc_success_ok ).
   ENDMETHOD.
@@ -80,7 +80,7 @@ CLASS ZCL_PROUBC_BUSOBJAPI IMPLEMENTATION.
 
     zcl_proubc_api_helper=>copy_data_to_ref(
            EXPORTING is_data = lt_resp_obj
-           CHANGING cr_data = lv_bpiobjdata
+           CHANGING cr_data  = lv_bpiobjdata
    ).
 
 

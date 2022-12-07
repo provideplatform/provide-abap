@@ -42,9 +42,7 @@ CLASS ZCL_PROUBC_OBJIDAPI IMPLEMENTATION.
       READ TABLE lt_object INDEX 1 INTO ls_object.
       zcl_proubc_api_helper=>copy_data_to_ref(
               EXPORTING is_data = ls_object
-              CHANGING cr_data  = lv_bpiobjdata
-        ).
-
+              CHANGING cr_data  = lv_bpiobjdata ).
     ELSE.
       "not sure if this ever gets called based on how handler is structured
     ENDIF.
@@ -66,7 +64,8 @@ CLASS ZCL_PROUBC_OBJIDAPI IMPLEMENTATION.
     "create the business object
     DATA: ls_objects TYPE zif_proubc_object=>ty_create_object_req.
     DATA(lv_request_body) = mo_request->get_entity( )->get_string_data( ).
-    /ui2/cl_json=>deserialize( EXPORTING json = lv_request_body CHANGING data = ls_objects ).
+    /ui2/cl_json=>deserialize( EXPORTING json = lv_request_body
+                                CHANGING data = ls_objects ).
 
     DATA: ls_obj      TYPE zbpiobj,
           lt_obj      TYPE ztty_bpiobj,
@@ -93,15 +92,14 @@ CLASS ZCL_PROUBC_OBJIDAPI IMPLEMENTATION.
         et_objects = lt_resp_obj
     ).
 
-    zcl_proubc_api_helper=>copy_data_to_ref(
-           EXPORTING is_data = lt_resp_obj
-           CHANGING cr_data = lv_bpiobjdata
-   ).
+    zcl_proubc_api_helper=>copy_data_to_ref( EXPORTING is_data = lt_resp_obj
+                                              CHANGING cr_data = lv_bpiobjdata ).
 
 
     lo_entity = mo_response->create_entity( ).
     lo_entity->set_content_type( if_rest_media_type=>gc_appl_json ).
-    lo_entity->set_string_data( /ui2/cl_json=>serialize( EXPORTING data = lv_bpiobjdata pretty_name = /ui2/cl_json=>pretty_mode-low_case ) ).
+    lo_entity->set_string_data( /ui2/cl_json=>serialize( data = lv_bpiobjdata
+                                                  pretty_name = /ui2/cl_json=>pretty_mode-low_case ) ).
     mo_response->set_status( cl_rest_status_code=>gc_success_ok ).
   ENDMETHOD.
 
@@ -112,7 +110,8 @@ CLASS ZCL_PROUBC_OBJIDAPI IMPLEMENTATION.
     DATA lv_bpiobjdata TYPE REF TO data.
     DATA: ls_objects TYPE zif_proubc_object=>ty_create_object_req.
     DATA(lv_request_body) = mo_request->get_entity( )->get_string_data( ).
-    /ui2/cl_json=>deserialize( EXPORTING json = lv_request_body CHANGING data = ls_objects ).
+    /ui2/cl_json=>deserialize( EXPORTING json = lv_request_body
+                                CHANGING data = ls_objects ).
 
     DATA: ls_obj      TYPE zbpiobj,
           lt_obj      TYPE ztty_bpiobj,
@@ -139,10 +138,8 @@ CLASS ZCL_PROUBC_OBJIDAPI IMPLEMENTATION.
 
     READ TABLE lt_resp_obj INDEX 1 INTO ls_resp_obj.
 
-    zcl_proubc_api_helper=>copy_data_to_ref(
-           EXPORTING is_data = ls_resp_obj
-           CHANGING cr_data = lv_bpiobjdata
-   ).
+    zcl_proubc_api_helper=>copy_data_to_ref( EXPORTING is_data = ls_resp_obj
+                                             CHANGING cr_data  = lv_bpiobjdata ).
 
 
     lo_entity = mo_response->create_entity( ).

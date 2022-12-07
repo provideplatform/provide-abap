@@ -551,11 +551,12 @@ CLASS zcl_proubc_ident IMPLEMENTATION.
     REPLACE ALL OCCURRENCES OF '{organization_id}' IN lv_uri WITH lv_temp.
     mi_client->request->set_method( 'PUT' ).
     mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
-    mi_client->request->set_header_field( name = 'name' value = name ).
-* todo, set body, #/components/schemas/UpdateorganizationdetailsRequest
-    lv_code = send_receive( ).
+    mi_client->request->set_header_field( name  = 'name'
+                                          value = name ).
+    lv_code           = send_receive( ).
     ev_apiresponsestr = mi_client->response->get_cdata( ).
-    /ui2/cl_json=>deserialize( EXPORTING json = ev_apiresponsestr CHANGING data =  ev_apiresponse ).
+    /ui2/cl_json=>deserialize( EXPORTING json = ev_apiresponsestr
+                               CHANGING data  = ev_apiresponse ).
     ev_httpresponsecode = lv_code.
     "TODO add logging call
     CASE lv_code.

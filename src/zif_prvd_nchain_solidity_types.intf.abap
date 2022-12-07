@@ -20,46 +20,47 @@ INTERFACE zif_prvd_nchain_solidity_types
 *...
 *uint256     78      115,792,089,237,316,195,423,570,985,008,687,907,853,269,984,665,640,564,039,457,584,007,913,129,639,935
 
+  "! Method change solidity uint8 to a char3 type
   METHODS: uint8_to_char3 IMPORTING iv_uint8_data TYPE REF TO data
                           EXPORTING ev_char3      TYPE char3.
-
+  "! Method change solidity uint16 to a char5 type
   METHODS: uint16_to_char5 IMPORTING iv_uint16_data TYPE REF TO data
                            EXPORTING ev_char5       TYPE char5.
-
+  "! Method change solidity uint24 to a char8 type
   METHODS: uint24_to_char8 IMPORTING iv_uint24_data TYPE REF TO data
                            EXPORTING ev_char8       TYPE char8.
-
-  METHODS: uint32_to_char3 IMPORTING iv_uint8_data TYPE REF TO data
-                           EXPORTING ev_char10     TYPE char10.
-
+  "! Method change solidity uint32 to a char10 type
+  METHODS: uint32_to_char10 IMPORTING iv_uint8_data TYPE REF TO data
+                            EXPORTING ev_char10     TYPE char10.
+  "! Method change solidity uint40 to a char13 type
   METHODS: uint40_to_char3 IMPORTING iv_uint8_data TYPE REF TO data
                            EXPORTING ev_char13     TYPE char13.
-
-  METHODS: uint48_to_char3 IMPORTING iv_uint8_data TYPE REF TO data
+  "! Method change solidity uint40 to a char15 type
+  METHODS: uint48_to_char15 IMPORTING iv_uint8_data TYPE REF TO data
                            EXPORTING ev_char15     TYPE char15.
-
-  METHODS: uint56_to_char3 IMPORTING iv_uint8_data TYPE REF TO data
+  "! Method change solidity uint56 to a char17 type
+  METHODS: uint56_to_char17 IMPORTING iv_uint8_data TYPE REF TO data
                            EXPORTING ev_char17     TYPE char17.
-
-  METHODS: uint64_to_char3 IMPORTING iv_uint8_data TYPE REF TO data
+  "! Method change solidity uint64 to a char20 type
+  METHODS: uint64_to_char20 IMPORTING iv_uint8_data TYPE REF TO data
                            EXPORTING ev_char20     TYPE char20.
-
-  METHODS: uint72_to_char3 IMPORTING iv_uint8_data TYPE REF TO data
+  "! Method change solidity uint72 to a char22 type
+  METHODS: uint72_to_char22 IMPORTING iv_uint8_data TYPE REF TO data
                            EXPORTING ev_char22     TYPE char22.
-
-  METHODS: uint80_to_char3 IMPORTING iv_uint8_data TYPE REF TO data
+  "! Method change solidity uint80 to a char25 type
+  METHODS: uint80_to_char25 IMPORTING iv_uint8_data TYPE REF TO data
                            EXPORTING ev_char25     TYPE char25.
-
-  METHODS: uint88_to_char3 IMPORTING iv_uint8_data TYPE REF TO data
+  "! Method change solidity uint88 to a char27 type
+  METHODS: uint88_to_char27 IMPORTING iv_uint8_data TYPE REF TO data
                            EXPORTING ev_char27     TYPE char27.
-
-  METHODS: uint96_to_char3 IMPORTING iv_uint8_data TYPE REF TO data
+  "! Method change solidity uint96 to a char29 type
+  METHODS: uint96_to_char29 IMPORTING iv_uint8_data TYPE REF TO data
                            EXPORTING ev_char29     TYPE char29.
-
-  METHODS: uint128_to_char3 IMPORTING iv_uint8_data TYPE REF TO data
+  "! Method change solidity uint128 to a char40 type
+  METHODS: uint128_to_char40 IMPORTING iv_uint8_data TYPE REF TO data
                             EXPORTING ev_char40     TYPE char40.
-
-  METHODS: uint256_to_char3 IMPORTING iv_uint8_data TYPE REF TO data
+  "! Method change solidity uint256 to a char80 type
+  METHODS: uint256_to_char80 IMPORTING iv_uint8_data TYPE REF TO data
                             EXPORTING ev_char80     TYPE char80.
 
 

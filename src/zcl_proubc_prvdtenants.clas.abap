@@ -116,7 +116,8 @@ CLASS zcl_proubc_prvdtenants IMPLEMENTATION.
                                  AND subject_account_id = ev_subj_acct_id.
       IF sy-subrc = 0.
         "todo Add some logging for this
-      ELSE. "delete failed. why?
+      ELSE.
+      "delete failed. why?
         "TODO raise exception here
       ENDIF.
     ELSE.
@@ -135,9 +136,12 @@ CLASS zcl_proubc_prvdtenants IMPLEMENTATION.
     lo_api_helper = NEW zcl_proubc_api_helper( ).
     SELECT * FROM zprvdtenants INTO TABLE lt_prvdtenant.
     IF sy-subrc = 0.
-    ELSEIF sy-subrc EQ 4. "# can't find it. thats ok
-    ELSEIF sy-subrc EQ 8. "problem with the db
-    ELSE. "general error
+    ELSEIF sy-subrc EQ 4. 
+    "# can't find it. thats ok
+    ELSEIF sy-subrc EQ 8. 
+    "problem with the db
+    ELSE. 
+    "general error
 
     ENDIF.
 
@@ -187,16 +191,15 @@ CLASS zcl_proubc_prvdtenants IMPLEMENTATION.
       ev_prvdtenant-mandt = ls_prvdtenant-mandt.
       ev_prvdtenant-organization_id = ls_prvdtenant-organization_id.
       ev_prvdtenant-subject_account_id = ls_prvdtenant-subject_account_id.
-      lo_api_helper->baseline_health_check(
-        EXPORTING
-          iv_tenant      =  ls_prvdtenant-subject_account_id "todo do we need an additional param?
-        IMPORTING
-          ev_isreachable = ev_prvdtenant-reachable
-      ).
+      lo_api_helper->baseline_health_check( EXPORTING iv_tenant    = ls_prvdtenant-subject_account_id
+                                          IMPORTING ev_isreachable = ev_prvdtenant-reachable ).
       "ev_prvdtenant-reachable = abap_false. "TODO call the bpi health check
-    ELSEIF sy-subrc EQ 4. "can't find it. thats ok
-    ELSEIF sy-subrc EQ 8. "problem with the db
-    ELSE. "general error wtf
+    ELSEIF sy-subrc EQ 4.
+    "can't find it. thats ok
+    ELSEIF sy-subrc EQ 8. 
+    "problem with the db
+    ELSE. 
+    "general error wtf
     ENDIF.
   ENDMETHOD.
 
