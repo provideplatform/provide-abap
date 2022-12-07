@@ -18,7 +18,7 @@ ENDCLASS.
 CLASS lcl_idoc_moni IMPLEMENTATION.
   METHOD constructor.
     me->lo_idochlpr = NEW zcl_proubc_idochlpr( iv_tenant = p_tenant iv_subject_acct_id = p_sbjact iv_workgroup_id = p_wrkgrp ).
-    MOVE-CORRESPONDING s_ebeln[] TO lt_poebeln[].
+    MOVE-CORRESPONDING  s_ebeln[] TO lt_poebeln[].
     MOVE-CORRESPONDING s_idoc[] TO lt_idocnum[].
     MOVE-CORRESPONDING s_ityp[] TO lt_idoctyp[].
   ENDMETHOD.
