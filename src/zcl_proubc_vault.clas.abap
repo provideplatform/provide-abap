@@ -87,7 +87,8 @@ CLASS zcl_proubc_vault IMPLEMENTATION.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{vault_id}' IN lv_uri WITH lv_temp.
     mi_client->request->set_method( 'POST' ).
-    mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
+    mi_client->request->set_header_field( name  = '~request_uri' 
+                                          value = lv_uri ).
     me->get_bpi_token( ).
     mi_client->request->set_header_field( name = 'Content-Type' value = content_type ).
     mi_client->request->set_cdata( body ).

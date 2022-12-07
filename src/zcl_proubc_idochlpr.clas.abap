@@ -117,12 +117,12 @@ CLASS zcl_proubc_idochlpr IMPLEMENTATION.
 
 
   METHOD constructor.
-    "lo_api_helper = NEW zcl_proubc_api_helper( iv_tenant = iv_tenant ).
+    "authenticates to PRVD APIs / authority checks use of the PRVD Tenant to SAP
+    "used for all PRVD API calls
     lo_api_helper = NEW zcl_proubc_api_helper( iv_tenant = iv_tenant iv_subject_acct_id = iv_subject_acct_id iv_workgroup_id = iv_workgroup_id ).
 
-    "sets the default tenant and ident/baseline api tokens
+    "Sets the ident/baseline api tokens
     lo_api_helper->setup_protocol_msg( IMPORTING setup_success = lv_setup_success ).
-    "TODO pass back error message to spool if unsuccessful
     CHECK lv_setup_success = abap_true.
 
   ENDMETHOD.
@@ -314,8 +314,6 @@ CLASS zcl_proubc_idochlpr IMPLEMENTATION.
 
       DATA: lv_flattened_idoc TYPE REF TO data.
       DATA: lv_idoc_basictype TYPE string.
-      "write iv_idocmesty to lv_idoc_basictype.
-      "lv_idoc_basictype = iv_idocmesty.
       lv_idoc_basictype = wa_idoc_control-idoctp.
       me->idoc_to_json(
         EXPORTING
@@ -328,10 +326,7 @@ CLASS zcl_proubc_idochlpr IMPLEMENTATION.
       "request to /api/v1/protocol_messages
       ls_protocol_msg_req-payload = lv_flattened_idoc.
       ls_protocol_msg_req-payload_mimetype = 'json'.
-      ls_protocol_msg_req-type = wa_idoc_control-idoctp. "should be orders05 for demo purposes
-
-
-      "TODO handle errors if mapping to id is not implemented yet
+      ls_protocol_msg_req-type = wa_idoc_control-idoctp.
       zcl_proubc_idochlpr=>get_objid( EXPORTING iv_schema = ls_protocol_msg_req-type
                                it_edidd = lt_edidd
                                iv_idoc = lv_idoc

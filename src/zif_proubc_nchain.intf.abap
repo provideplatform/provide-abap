@@ -433,6 +433,13 @@ INTERFACE zif_proubc_nchain
            response   TYPE REF TO data, ":  "comma separated array of values, some strings some ints
          END OF ty_executecontract_resp.
 
+  types: begin of ty_executecontract_summary,
+            nchain_network_id type zprvd_nchain_networkid,
+            smartcontract_addr type zproubc_smartcontract_addr,
+            prvd_stack_contractid type string,
+            walletid type zproubc_smartcontract_addr,
+         end of ty_executecontract_summary.
+
 
 * GET - "List connectors"
 * Operation id: Listconnectors

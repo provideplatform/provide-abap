@@ -6,25 +6,28 @@ CLASS zcl_proubc_nchain_helper DEFINITION
 
   PUBLIC SECTION.
     METHODS:
+      "! Creates or retrieves an existing instance of the PRVD Nchain helper class
       constructor IMPORTING !io_prvd_api_helper    TYPE REF TO zcl_proubc_api_helper OPTIONAL
                             !io_prvd_vault_helper  TYPE REF TO zcl_proubc_vault_helper OPTIONAL
                             !iv_org_id             TYPE zprvdtenantid OPTIONAL
                             !iv_subject_account_id TYPE zprvdtenantid OPTIONAL
                             !iv_workgroup_id       TYPE zprvdtenantid OPTIONAL
                             !iv_bpitoken           TYPE zprvdrefreshtoken OPTIONAL ,
-      call_chainlink_pricefeed IMPORTING !iv_inputcurrency  TYPE string
-                                         !iv_inputamount    TYPE  string
-                                         !iv_outputcurrency TYPE string
-                               EXPORTING !es_contract_resp  TYPE zif_proubc_nchain=>ty_executecontract_resp
-                                         !ev_outputamount   TYPE string,
+
+      call_chainlink_pricefeed IMPORTING !iv_inputcurrency    TYPE string
+                                         !iv_inputamount      TYPE  string
+                                         !iv_outputcurrency   TYPE string
+                               EXPORTING !es_contract_resp    TYPE zif_proubc_nchain=>ty_executecontract_resp
+                                         !es_contract_summary TYPE zif_proubc_nchain=>ty_executecontract_summary
+                                         !ev_outputamount     TYPE string,
       smartcontract_factory IMPORTING !iv_smartcontractaddress TYPE zproubc_smartcontract_addr
                                       !iv_name                 TYPE string
-                                      !iv_contract             TYPE zcasesensitive_str
                                       !iv_walletaddress        TYPE zcasesensitive_str
                                       !iv_nchain_networkid     TYPE zprvd_nchain_networkid
                                       !iv_contracttype         TYPE zcasesensitive_str OPTIONAL
                             EXPORTING !es_selectedcontract     TYPE zif_proubc_nchain=>ty_chainlinkpricefeed_req,
-      get_wallet_address EXPORTING ev_wallet_address TYPE zproubc_smartcontract_addr.
+      get_wallet_address EXPORTING ev_wallet_address TYPE zproubc_smartcontract_addr,
+      get_nchain_client RETURNING VALUE(ro_nchain_client) TYPE REF TO zcl_proubc_nchain.
   PROTECTED SECTION.
     DATA: lv_tenant             TYPE zprvdtenantid,
           lv_org_id             TYPE zprvdtenantid,
@@ -122,10 +125,11 @@ CLASS zcl_proubc_nchain_helper IMPLEMENTATION.
           lv_executecontract_responsecd TYPE i,
           lv_network_contract_id        TYPE zproubc_smartcontract_addr,
           lv_prvd_stack_contract_id     TYPE zcasesensitive_str,
-          ls_execute_contract_resp      TYPE zif_proubc_nchain=>ty_executecontract_resp.
+          ls_execute_contract_resp      TYPE zif_proubc_nchain=>ty_executecontract_resp,
+          ls_execute_contract_summary   TYPE zif_proubc_nchain=>ty_executecontract_summary.
 
     ls_pricefeedwallet-purpose = 44.
-    me->lo_nchain_api->zif_proubc_nchain~createhdwallet( EXPORTING is_walletrequest = ls_pricefeedwallet
+    lo_nchain_api->zif_proubc_nchain~createhdwallet( EXPORTING is_walletrequest = ls_pricefeedwallet
                                                          IMPORTING ev_apiresponsestr   = lv_getwallet_str
                                                                    ev_apiresponse       = lv_getwallet_data
                                                                    ev_httpresponsecode = lv_getwallet_responsecode ).
@@ -136,9 +140,8 @@ CLASS zcl_proubc_nchain_helper IMPLEMENTATION.
     ENDCASE.
     "eth/usd pair -- see https://docs.chain.link/docs/consuming-data-feeds/
     "https://docs.chain.link/docs/data-feeds/price-feeds/addresses/?network=polygon#Mumbai%20Testnet
-    me->smartcontract_factory(  EXPORTING iv_smartcontractaddress = '0x0715A7794a1dc8e42615F059dD6e406A6594651A'
+    smartcontract_factory( EXPORTING iv_smartcontractaddress = '0x0715A7794a1dc8e42615F059dD6e406A6594651A'
                                           iv_name                 = 'ETH/USD'
-                                          iv_contract             = '' "this is more complex
                                           iv_walletaddress        = ls_wallet_created-id  "from the wallet we created earlier
                                           iv_nchain_networkid     = '4251b6fd-c98d-4017-87a3-d691a77a52a7' " polygon mumbai testnet nchain id
                                           iv_contracttype         = 'price-feed'
@@ -183,20 +186,16 @@ CLASS zcl_proubc_nchain_helper IMPLEMENTATION.
     ).
     CASE lv_executecontract_responsecd.
       WHEN 200.
-
-*        cl_bcs_convert=>xstring_to_string(
-*          EXPORTING
-*            iv_xstr   = lv_executecontract_xstr
-*            iv_cp     =  1100                " SAP character set identification
-*          RECEIVING
-*            rv_string = DATA(lv_string)
-*        ).
-
+        ls_execute_contract_summary-nchain_network_id = '4251b6fd-c98d-4017-87a3-d691a77a52a7'.
+        ls_execute_contract_summary-prvd_stack_contractid = lv_prvd_stack_contract_id.
+        ls_execute_contract_summary-smartcontract_addr = '0x0715A7794a1dc8e42615F059dD6e406A6594651A'.
+        ls_execute_contract_summary-walletid = ls_wallet_created-id.
         "TODO - losing response values when deserializing. Round IDs surpass p8 type
         /ui2/cl_json=>deserialize( EXPORTING jsonx = lv_executecontract_xstr CHANGING data = ls_execute_contract_resp  ).
         ASSIGN lv_executecontract_data->* TO FIELD-SYMBOL(<ls_contractoutputs>).
         ASSIGN COMPONENT 'RESPONSE' OF STRUCTURE <ls_contractoutputs> TO FIELD-SYMBOL(<fs_executecontract_resp>).
         es_contract_resp = ls_execute_contract_resp.
+        es_contract_summary = ls_execute_contract_summary.
         "PRVD Nchain response may look like this:
         "{
 *    "confidence": null,
@@ -252,6 +251,10 @@ CLASS zcl_proubc_nchain_helper IMPLEMENTATION.
   METHOD get_wallet_address.
     me->get_vault_helper( ).
     ev_wallet_address = ''.
+  ENDMETHOD.
+
+  METHOD get_nchain_client.
+    ro_nchain_client = lo_nchain_api.
   ENDMETHOD.
 
 ENDCLASS.

@@ -28,7 +28,13 @@ CLASS zcl_proubc_tenantsapi IMPLEMENTATION.
           lv_subj_acct_id TYPE zsprvdtenant-subject_account_id.
     DATA(lt_uriattributes) = mo_request->get_uri_attributes( ).
     READ TABLE lt_uriattributes WITH KEY name = 'ID' ASSIGNING FIELD-SYMBOL(<fs_tenantid>).
+    IF sy-subrc <> 0.
+      "raise HTTP 422
+    ENDIF.
     READ TABLE lt_uriattributes WITH KEY name = 'SUBJACCTID' ASSIGNING FIELD-SYMBOL(<fs_subj_acct_id>).
+    IF sy-subrc <> 0.
+      "raise HTTP 422
+    ENDIF.
     IF <fs_tenantid> IS ASSIGNED AND <fs_subj_acct_id> IS ASSIGNED.
       lv_tenantid = <fs_tenantid>-value.
       lv_subj_acct_id = <fs_subj_acct_id>-value.
@@ -52,7 +58,6 @@ CLASS zcl_proubc_tenantsapi IMPLEMENTATION.
           lv_subj_acct_id TYPE zsprvdtenant-subject_account_id,
           lt_prvdtenants TYPE zif_proubc_tenants=>tty_tenant_wo_token,
           ls_prvdtenant  TYPE zif_proubc_tenants=>ty_tenant_wo_token,
-          "lo_entity          type ref to if_rest_response,
           lv_tenantdata  TYPE REF TO data.
 
     "TODO add SAP auths for reading the tenant(s)
@@ -70,9 +75,10 @@ CLASS zcl_proubc_tenantsapi IMPLEMENTATION.
         IMPORTING
           ev_prvdtenant = ls_prvdtenant
       ).
-            DATA(lo_entity) = mo_response->create_entity( ).
+      DATA(lo_entity) = mo_response->create_entity( ).
       lo_entity->set_content_type( if_rest_media_type=>gc_appl_json ).
-      lo_entity->set_string_data( /ui2/cl_json=>serialize( EXPORTING data = ls_prvdtenant pretty_name = /ui2/cl_json=>pretty_mode-low_case ) ).
+      lo_entity->set_string_data( /ui2/cl_json=>serialize( EXPORTING data        = ls_prvdtenant
+                                                                     pretty_name = /ui2/cl_json=>pretty_mode-low_case ) ).
       mo_response->set_status( cl_rest_status_code=>gc_success_ok ).
     ELSEIF <fs_tenantid> IS ASSIGNED.
       lv_tenantid = <fs_tenantid>-value.
@@ -84,7 +90,8 @@ CLASS zcl_proubc_tenantsapi IMPLEMENTATION.
       ).
       lo_entity = mo_response->create_entity( ).
       lo_entity->set_content_type( if_rest_media_type=>gc_appl_json ).
-      lo_entity->set_string_data( /ui2/cl_json=>serialize( EXPORTING data = ls_prvdtenant pretty_name = /ui2/cl_json=>pretty_mode-low_case ) ).
+      lo_entity->set_string_data( /ui2/cl_json=>serialize( data        = ls_prvdtenant
+                                                           pretty_name = /ui2/cl_json=>pretty_mode-low_case ) ).
       mo_response->set_status( cl_rest_status_code=>gc_success_ok ).
 
     ELSE.
@@ -93,12 +100,13 @@ CLASS zcl_proubc_tenantsapi IMPLEMENTATION.
       zcl_proubc_prvdtenants=>get_allprvdtenant( IMPORTING et_prvdtenant = lt_prvdtenants ).
       zcl_proubc_api_helper=>copy_data_to_ref(
             EXPORTING is_data = lt_prvdtenants
-            CHANGING cr_data = lv_tenantdata
+            CHANGING cr_data  = lv_tenantdata
       ).
 
       lo_entity = mo_response->create_entity( ).
       lo_entity->set_content_type( if_rest_media_type=>gc_appl_json ).
-      lo_entity->set_string_data( /ui2/cl_json=>serialize( EXPORTING data = lv_tenantdata pretty_name = /ui2/cl_json=>pretty_mode-low_case ) ).
+      lo_entity->set_string_data( /ui2/cl_json=>serialize( data        = lv_tenantdata
+                                                           pretty_name = /ui2/cl_json=>pretty_mode-low_case ) ).
       mo_response->set_status( cl_rest_status_code=>gc_success_ok ).
     ENDIF.
   ENDMETHOD.
@@ -116,7 +124,8 @@ CLASS zcl_proubc_tenantsapi IMPLEMENTATION.
 
     APPEND ls_prvdtenant TO lt_prvdtenants.
 
-    zcl_proubc_prvdtenants=>create_prvdtenant( EXPORTING it_prvdtenant = lt_prvdtenants IMPORTING et_prvdtenant = lt_prvdtenants_out ).
+    zcl_proubc_prvdtenants=>create_prvdtenant( EXPORTING it_prvdtenant = lt_prvdtenants
+                                               IMPORTING et_prvdtenant = lt_prvdtenants_out ).
     "TODO improve error handling
 
     READ TABLE lt_prvdtenants_out INDEX 1 INTO wa_prvdtenant.
@@ -124,30 +133,35 @@ CLASS zcl_proubc_tenantsapi IMPLEMENTATION.
     zcl_proubc_api_helper=>copy_data_to_ref( EXPORTING is_data = wa_prvdtenant CHANGING cr_data = lv_tenantdata ).
     DATA(lo_entity) = mo_response->create_entity( ).
     lo_entity->set_content_type( if_rest_media_type=>gc_appl_json ).
-    lo_entity->set_string_data( /ui2/cl_json=>serialize( EXPORTING data = lv_tenantdata pretty_name = /ui2/cl_json=>pretty_mode-low_case ) ).
+    lo_entity->set_string_data( /ui2/cl_json=>serialize( data = lv_tenantdata 
+                                                         pretty_name = /ui2/cl_json=>pretty_mode-low_case ) ).
     mo_response->set_status( cl_rest_status_code=>gc_success_created ).
   ENDMETHOD.
 
 
   METHOD if_rest_resource~put.
     DATA: lt_prvdtenants     TYPE zttprvdtenant,
-          ls_prvdtenant      TYPE ZSPRVDtenant,
+          ls_prvdtenant      TYPE zsprvdtenant,
           lt_prvdtenants_out TYPE zttprvdtenant,
           wa_prvdtenant      TYPE zsprvdtenant,
           lv_tenantdata      TYPE REF TO data.
 
     DATA(lv_request_body) = mo_request->get_entity( )->get_string_data( ).
-    /ui2/cl_json=>deserialize( EXPORTING json = lv_request_body CHANGING data = ls_prvdtenant ).
+    /ui2/cl_json=>deserialize( EXPORTING json = lv_request_body 
+                               CHANGING  data = ls_prvdtenant ).
 
     APPEND ls_prvdtenant TO lt_prvdtenants.
 
     zcl_proubc_prvdtenants=>update_prvdtenant( EXPORTING it_prvdtenant = lt_prvdtenants IMPORTING et_prvdtenant = lt_prvdtenants_out ).
     READ TABLE lt_prvdtenants_out INDEX 1 INTO wa_prvdtenant.
+    if sy-subrc <> 0.
+      "No update mapped
+    endif.
 
-    zcl_proubc_api_helper=>copy_data_to_ref( EXPORTING is_data = wa_prvdtenant CHANGING cr_data = lv_tenantdata ).
+    zcl_proubc_api_helper=>copy_data_to_ref( EXPORTING is_data = wa_prvdtenant
+                                             CHANGING cr_data  = lv_tenantdata ).
     DATA(lo_entity) = mo_response->create_entity( ).
     lo_entity->set_content_type( if_rest_media_type=>gc_appl_json ).
-    "lo_entity->set_string_data( /ui2/cl_json=>serialize( exporting data = lv_tenantdata pretty_name = /ui2/cl_json=>pretty_mode-low_case  ) ).
     mo_response->set_status( cl_rest_status_code=>gc_success_no_content ).
   ENDMETHOD.
 ENDCLASS.
