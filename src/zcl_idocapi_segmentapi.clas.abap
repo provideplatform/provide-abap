@@ -31,6 +31,14 @@ CLASS ZCL_IDOCAPI_SEGMENTAPI IMPLEMENTATION.
       lv_idoctype = lv_selectedbasictype.
     ENDIF.
 
+    "prototype to add other non-idoc schemas
+*    GET TIME STAMP FIELD DATA(lv_current_timestamp).
+*    SELECT * FROM zprvdtraflight AS a INTO TABLE @DATA(lt_traflights)
+*     WHERE lv_current_timestamp GE a~valid_from
+*     AND   lv_current_timestamp LE a~valid_to
+*     and   a~schema_name = lv_selectedbasictype
+*     AND  ( a~schema_tlight EQ 'Y' OR a~schema_tlight EQ 'G' ).
+
     "get the selected idoc Basic type
     SELECT SINGLE  a~idoctyp,
             b~descrp,
