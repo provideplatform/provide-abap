@@ -27,7 +27,7 @@ CLASS zcl_proubc_ident_helper IMPLEMENTATION.
     DATA: lo_http_client TYPE REF TO if_http_client,
         lo_ident_api       TYPE REF TO zif_proubc_ident.
 
-        lv_identurl = 'https://ident.provide.services'.
+    lv_identurl = 'https://ident.provide.services'.
             cl_http_client=>create_by_url(
           EXPORTING
             url                = lv_identurl
@@ -42,12 +42,12 @@ CLASS zcl_proubc_ident_helper IMPLEMENTATION.
           " error handling
         ENDIF.
 
-        lo_http_client->propertytype_accept_cookie = if_http_client=>co_enabled.
-        lo_http_client->request->set_header_field( name  = if_http_form_fields_sap=>sap_client value = '100' ).
+    lo_http_client->propertytype_accept_cookie = if_http_client=>co_enabled.
+    lo_http_client->request->set_header_field( name  = if_http_form_fields_sap=>sap_client value = '100' ).
 
-        lo_ident_api = NEW zcl_proubc_ident( ii_client = lo_http_client iv_tenant = '' iv_refreshtoken = '' ).
-        mo_ident_client = lo_ident_api.
-    ENDMETHOD.
+    lo_ident_api = NEW zcl_proubc_ident( ii_client = lo_http_client iv_tenant = '' iv_refreshtoken = '' ).
+    mo_ident_client = lo_ident_api.
+  ENDMETHOD.
   METHOD create_ident_user.
     DATA: ls_create_user_req TYPE zif_proubc_ident=>createuserrequest,
           ls_prvdtenant TYPE zsprvdtenant,

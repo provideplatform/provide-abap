@@ -3,4 +3,4 @@
 *---------------------------------------------------------------------*
 
 * base table related FORM-routines.............
-INCLUDE LSVIMFTX .
+INCLUDE LSVIMFTX.

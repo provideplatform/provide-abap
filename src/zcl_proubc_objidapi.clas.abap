@@ -133,10 +133,12 @@ CLASS ZCL_PROUBC_OBJIDAPI IMPLEMENTATION.
       EXPORTING
         it_objects =  lt_obj
       IMPORTING
-        et_objects = lt_resp_obj
-    ).
+        et_objects = lt_resp_obj ).
 
     READ TABLE lt_resp_obj INDEX 1 INTO ls_resp_obj.
+    IF sy-surbc <> 0.
+      "no update mapped.
+    ENDIF.
 
     zcl_proubc_api_helper=>copy_data_to_ref( EXPORTING is_data = ls_resp_obj
                                              CHANGING cr_data  = lv_bpiobjdata ).

@@ -13,13 +13,16 @@ CLASS zcl_proubc_file_helper DEFINITION
       "! Retrieves the ABI file contents based upon the ABI registry table entry
       open_abiregistry IMPORTING !is_abi_registry TYPE zprvdabiregistry
                        EXPORTING !ev_filecontent  TYPE zcasesensitive_str ,
+      "! General purpose method to open a file from AL11
       open_file_generic IMPORTING !iv_file_location TYPE string
                         EXPORTING !ev_filecontent_x TYPE xstring
                                   !ev_filecontent   TYPE zcasesensitive_str
                                   !ev_length        TYPE i,
+      "! general purpose method to write a file to AL11
       write_file_generic IMPORTING iv_filename    TYPE string
                                    iv_filecontent TYPE xstring
                                    iv_directory   TYPE string,
+      "! Transers file content to IPFS
       transfer_file_to_ipfs IMPORTING iv_filecontent_x  TYPE xstring
                                       iv_filecontent    TYPE string
                                       iv_filename       TYPE string
@@ -28,6 +31,7 @@ CLASS zcl_proubc_file_helper DEFINITION
                                       iv_ipfsapikey     TYPE string
                                       iv_xcontentlength TYPE i
                             EXPORTING ev_contentid      TYPE string,
+      "! Reads a file from IPFS for a given content ID hash
       read_file_from_ipfs.
   PROTECTED SECTION.
   PRIVATE SECTION.

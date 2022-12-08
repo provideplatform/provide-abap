@@ -129,6 +129,9 @@ CLASS zcl_proubc_busobjhlpr IMPLEMENTATION.
 
     SELECT * FROM zbpiobj INTO TABLE lt_targetbpiobj
         FOR ALL ENTRIES IN it_objects WHERE object_id = it_objects-object_id.
+    IF SY-SUBRC <> 0.
+      "Raise message no bpi object for update
+    ENDIF.
 
     GET TIME STAMP FIELD l_timestampl.
     FIELD-SYMBOLS: <fs_object> TYPE zbpiobj.
@@ -191,6 +194,8 @@ CLASS zcl_proubc_busobjhlpr IMPLEMENTATION.
     MODIFY zbpiobj FROM TABLE lt_bpiobj.
     IF sy-subrc = 0.
       et_objects = lt_bpiobj.
+    else.
+      "raise message error updating table
     ENDIF.
 
 
@@ -213,6 +218,8 @@ CLASS zcl_proubc_busobjhlpr IMPLEMENTATION.
       ls_bpiobj-changed_by = sy-uname.
       ls_bpiobj-changed_at = l_timestampl.
       APPEND ls_bpiobj TO lt_bpiobj.
+    ELSE.
+      "Raise error no BPI object found
     ENDIF.
     IF lt_bpiobj IS NOT INITIAL.
       MODIFY zbpiobj FROM TABLE lt_bpiobj.

@@ -1,5 +1,5 @@
 *---------------------------------------------------------------------*
 *    view related PAI modules
 *---------------------------------------------------------------------*
-
-INCLUDE LSVIMITX . "base table related PAI modules
+"base table related PAI modules
+INCLUDE LSVIMITX. 
