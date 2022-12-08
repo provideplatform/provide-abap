@@ -38,7 +38,8 @@ CLASS zcl_idocapi_btypeapi IMPLEMENTATION.
       "INNER JOIN zprvdtraflight AS c ON a~idoctyp = c~schema_name AND c~schema_type = 'IDOC' AND c~schema_tlight NE 'R'
       LEFT OUTER JOIN edbast AS b ON a~idoctyp = b~idoctyp
                                   AND b~langua = 'E'
-      INTO TABLE lt_basictypes.
+      INTO TABLE lt_basictypes
+      order by PRIMARY key.
 
     IF sy-subrc = 0.
       DATA(lo_entity) = mo_response->create_entity( ).

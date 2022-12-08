@@ -32,13 +32,10 @@ CLASS ZCL_PROUBC_BUSOBJAPI IMPLEMENTATION.
       EXPORTING
         iv_objectid = lv_objectid
       IMPORTING
-        et_objects  = lt_object
-    ).
+        et_objects  = lt_object ).
     zcl_proubc_api_helper=>copy_data_to_ref(
             EXPORTING is_data = lt_object
-            CHANGING cr_data  = lv_bpiobjdata
-    ).
-
+            CHANGING cr_data  = lv_bpiobjdata ).
 
     lo_entity = mo_response->create_entity( ).
     lo_entity->set_content_type( if_rest_media_type=>gc_appl_json ).
@@ -68,21 +65,18 @@ CLASS ZCL_PROUBC_BUSOBJAPI IMPLEMENTATION.
       ls_obj-schematype   = <fs_object>-schema_type.
       ls_obj-schema_id = <fs_object>-type.
       ls_obj-status = 'Created'.
-      APPEND  ls_obj TO lt_obj.
+      APPEND ls_obj TO lt_obj.
     ENDLOOP.
 
     zcl_proubc_busobjhlpr=>create_object(
       EXPORTING
         it_objects = lt_obj
       IMPORTING
-        et_objects = lt_resp_obj
-    ).
+        et_objects = lt_resp_obj ).
 
     zcl_proubc_api_helper=>copy_data_to_ref(
            EXPORTING is_data = lt_resp_obj
-           CHANGING cr_data  = lv_bpiobjdata
-   ).
-
+           CHANGING cr_data  = lv_bpiobjdata ).
 
     lo_entity = mo_response->create_entity( ).
     lo_entity->set_content_type( if_rest_media_type=>gc_appl_json ).

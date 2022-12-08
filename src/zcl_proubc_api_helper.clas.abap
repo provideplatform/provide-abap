@@ -100,6 +100,7 @@ CLASS zcl_proubc_api_helper DEFINITION
     METHODS build_dummy_idoc_protocol_msg
       RETURNING
         VALUE(es_dummy_idoc_msg) TYPE zif_proubc_baseline=>protocolmessage_req .
+    "! Lists the BPI accounts available to the user
     METHODS list_bpi_accounts .
     "! Method to return PRVD Nchain helper class
     METHODS get_nchain_helper EXPORTING eo_prvd_nchain_helper TYPE REF TO zcl_proubc_nchain_helper.
@@ -107,13 +108,13 @@ CLASS zcl_proubc_api_helper DEFINITION
   PROTECTED SECTION.
     DATA: mv_defaulttenant        TYPE zprvdtenants-organization_id,
           mv_defaultsubjectacct   TYPE zprvdtenantid,
-          lv_selected_workgroupid TYPE zprvdtenantid,
-          lv_defaultidenttoken    TYPE REF TO data,
-          lv_defaultbaselinetoken TYPE REF TO data,
-          lv_bpitoken             TYPE zprvdrefreshtoken,
-          lv_default_bpiendpoint  TYPE string,
-          lo_ident_client         TYPE REF TO zif_proubc_ident,
-          lo_baseline_client      TYPE REF TO zif_proubc_baseline.
+          mv_selected_workgroupid TYPE zprvdtenantid,
+          mv_defaultidenttoken    TYPE REF TO data,
+          mv_defaultbaselinetoken TYPE REF TO data,
+          mv_bpitoken             TYPE zprvdrefreshtoken,
+          mv_default_bpiendpoint  TYPE string,
+          mo_ident_client         TYPE REF TO zif_proubc_ident,
+          mo_baseline_client      TYPE REF TO zif_proubc_baseline.
     METHODS set_default_tenant IMPORTING iv_defaulttenant TYPE zprvdtenants-organization_id OPTIONAL.
   PRIVATE SECTION.
 ENDCLASS.
@@ -188,7 +189,7 @@ CLASS zcl_proubc_api_helper IMPLEMENTATION.
           TRY.
               lo_baseline_api->status(
                 IMPORTING
-                  statuscode = lv_code   ).
+                  statuscode = lv_code ).
             CATCH cx_static_check.
               ev_isreachable = '-'.
             CATCH cx_root.
@@ -229,11 +230,15 @@ CLASS zcl_proubc_api_helper IMPLEMENTATION.
        AND mestyp = 'ORDERS'
        AND idoctp = 'ORDERS05'.
 
-    IF NOT ubrc = 0.
-  RETURN.
-ENDIF.
+    IF sy-subrc <> 0.
+      "raise message no idocs available
+      RETURN.
+    ENDIF.
 
     READ TABLE lt_selected_idocs INTO DATA(wa_selected_idoc) INDEX 1.
+    IF sy-subrc <> 0.
+      "no idocs available
+    ENDIF.
 
     DATA:
       lv_idocnum      TYPE edidc-docnum,
@@ -339,7 +344,7 @@ ENDIF.
     lo_ident_api = NEW zcl_proubc_ident( ii_client       = lo_http_client
                                          iv_tenant       = lv_tenant
                                          iv_refreshtoken = lv_refreshtokenstr ).
-    lo_ident_client = lo_ident_api.
+    mo_ident_client = lo_ident_api.
 
 
 
@@ -360,7 +365,7 @@ ENDIF.
 
     "option 1 create ZPRVDTENANT parameter id - and auth check it whenever used
 
-    lv_selected_workgroupid = iv_workgroup_id.
+    mv_selected_workgroupid = iv_workgroup_id.
 
     "try using the tenant id provided by user
     IF iv_tenant IS NOT INITIAL AND iv_subject_acct_id IS NOT INITIAL.
@@ -371,14 +376,15 @@ ENDIF.
           FROM zprvdtenants
           INTO TABLE @DATA(lt_defaultorg)
           WHERE organization_id = @iv_tenant
-          AND subject_account_id = @iv_subject_acct_id.
+          AND subject_account_id = @iv_subject_acct_id
+          ORDER BY PRIMARY KEY.
       IF sy-subrc = 0.
         READ TABLE lt_defaultorg INDEX 1 INTO DATA(wa_defaulttenant).
         IF sy-subrc = 0.
           mv_defaulttenant = wa_defaulttenant-organization_id.
           mv_defaultsubjectacct = wa_defaulttenant-subject_account_id.
-          lv_selected_workgroupid = wa_defaulttenant-workgroup_id.
-          lv_default_bpiendpoint = wa_defaulttenant-bpi_endpoint.
+          mv_selected_workgroupid = wa_defaulttenant-workgroup_id.
+          mv_default_bpiendpoint = wa_defaulttenant-bpi_endpoint.
           RETURN.
         ENDIF.
       ENDIF.
@@ -397,18 +403,18 @@ ENDIF.
       IF sy-subrc = 0.
         mv_defaulttenant = wa_defaulttenant-organization_id.
         mv_defaultsubjectacct  = wa_defaulttenant-subject_account_id.
-        lv_selected_workgroupid = wa_defaulttenant-workgroup_id.
-        lv_default_bpiendpoint = wa_defaulttenant-bpi_endpoint.
+        mv_selected_workgroupid = wa_defaulttenant-workgroup_id.
+        mv_default_bpiendpoint = wa_defaulttenant-bpi_endpoint.
       ENDIF.
     ELSE.
-      MESSAGE e010(zclproubcmsg) WITH iv_tenant iv_subject_acct_id lv_selected_workgroupid.
+      MESSAGE e010(zclproubcmsg) WITH iv_tenant iv_subject_acct_id mv_selected_workgroupid.
     ENDIF.
 
     "core authority check - is user allowed to use this subject account
     AUTHORITY-CHECK OBJECT 'ZPRVDTENAN' ID 'ACTVT' FIELD '16'
       ID 'ZPRVDSHA1' FIELD mv_defaultsubjectacct.
     IF sy-subrc <> 0.
-      MESSAGE e012(zclproubcmsg) WITH sy-uname mv_defaultsubjectacct mv_defaulttenant lv_selected_workgroupid.
+      MESSAGE e012(zclproubcmsg) WITH sy-uname mv_defaultsubjectacct mv_defaulttenant mv_selected_workgroupid.
     ENDIF.
 
   ENDMETHOD.
@@ -431,7 +437,7 @@ ENDIF.
   METHOD create_businessobjects_msg.
 
     TRY.
-        lo_baseline_client->createbaselinebusinessobject( EXPORTING body = body
+        mo_baseline_client->createbaselinebusinessobject( EXPORTING body = body
                                                IMPORTING statuscode = statuscode
                                                          apiresponsestr = apiresponsestr
                                                          apiresponse = apiresponse ).
@@ -448,13 +454,13 @@ ENDIF.
 
   METHOD get_default_tenant_bpiendpoint.
     "TODO add authorization check and mapping to sap user id
-    ev_bpiendpoint = lv_default_bpiendpoint.
+    ev_bpiendpoint = mv_default_bpiendpoint.
   ENDMETHOD.
 
 
   METHOD list_bpi_accounts.
     TRY.
-        lo_baseline_client->listaccounts( ).
+        mo_baseline_client->listaccounts( ).
       CATCH cx_static_check.
     ENDTRY.
   ENDMETHOD.
@@ -462,7 +468,7 @@ ENDIF.
 
   METHOD send_bpiobjects_msg.
     TRY.
-        lo_baseline_client->send_bpiobjects_msg( EXPORTING body = body
+        mo_baseline_client->send_bpiobjects_msg( EXPORTING body = body
                                                IMPORTING statuscode = statuscode
                                                          apiresponsestr = apiresponsestr
                                                          apiresponse = apiresponse ).
@@ -476,10 +482,10 @@ ENDIF.
 
     ls_finalized_protocol_msg                    = body.
     ls_finalized_protocol_msg-subject_account_id = mv_defaultsubjectacct.
-    ls_finalized_protocol_msg-workgroup_id       = lv_selected_workgroupid.
+    ls_finalized_protocol_msg-workgroup_id       = mv_selected_workgroupid.
     TRY.
-        lo_baseline_client->send_protocol_msg( EXPORTING iv_body        = ls_finalized_protocol_msg
-                                                         iv_bpitoken    = lv_bpitoken
+        mo_baseline_client->send_protocol_msg( EXPORTING iv_body        = ls_finalized_protocol_msg
+                                                         iv_bpitoken    = mv_bpitoken
                                                IMPORTING statuscode     = statuscode
                                                          apiresponsestr = apiresponsestr
                                                          apiresponse    = apiresponse ).
@@ -504,18 +510,18 @@ ENDIF.
     FIELD-SYMBOLS: <fs_authreq>  TYPE any,
                    <fs_authreq2> TYPE string.
 
-    me->call_ident_api( EXPORTING iv_tenant = mv_defaulttenant
-                                  iv_subjacct = mv_defaultsubjectacct
-                      IMPORTING ev_authtoken = lv_tenant_jwt
-                                ev_bpiendpoint = lv_bpiendpoint  ).
-    lv_defaultidenttoken = lv_tenant_jwt.
+    call_ident_api( EXPORTING iv_tenant      = mv_defaulttenant
+                              iv_subjacct    = mv_defaultsubjectacct
+                    IMPORTING ev_authtoken   = lv_tenant_jwt
+                              ev_bpiendpoint = lv_bpiendpoint ).
+    mv_defaultidenttoken = lv_tenant_jwt.
 
     IF lv_tenant_jwt IS NOT INITIAL.
       TRY.
-          ASSIGN lv_tenant_jwt->* TO FIELD-SYMBOL(<ls_data>). "dereference into field symbol
+          ASSIGN lv_tenant_jwt->* TO FIELD-SYMBOL(<ls_data>).
           ASSIGN COMPONENT 'ACCESS_TOKEN' OF STRUCTURE <ls_data> TO <fs_authreq>.
           ASSIGN <fs_authreq>->* TO <fs_authreq2>.
-          lv_bpitoken  = <fs_authreq2>.
+          mv_bpitoken  = <fs_authreq2>.
 
           cl_http_client=>create_by_url(
             EXPORTING
@@ -535,9 +541,9 @@ ENDIF.
           lo_http_client->request->set_header_field( name  = if_http_form_fields_sap=>sap_client
                                                      value = '100' ).
 
-          lo_baseline_client = NEW zcl_proubc_baseline( ii_client        = lo_http_client
+          mo_baseline_client = NEW zcl_proubc_baseline( ii_client        = lo_http_client
                                                         iv_bpitenant_url = lv_bpiendpoint
-                                                        iv_bpitoken      = lv_bpitoken ).
+                                                        iv_bpitoken      = mv_bpitoken ).
           IF sy-subrc = 0.
             setup_success = 'X'.
           ELSE.

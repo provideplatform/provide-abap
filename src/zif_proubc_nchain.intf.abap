@@ -415,10 +415,10 @@ INTERFACE zif_proubc_nchain
          END OF ty_executecontract_resp.
 
   TYPES: BEGIN OF ty_executecontract_summary,
-            nchain_network_id type zprvd_nchain_networkid,
-            smartcontract_addr type zproubc_smartcontract_addr,
-            prvd_stack_contractid type string,
-            walletid type zproubc_smartcontract_addr,
+            nchain_network_id TYPE zprvd_nchain_networkid,
+            smartcontract_addr TYPE zproubc_smartcontract_addr,
+            prvd_stack_contractid TYPE string,
+            walletid TYPE zproubc_smartcontract_addr,
          END OF ty_executecontract_summary.
 
 "! GET - "List connectors"
@@ -572,7 +572,7 @@ INTERFACE zif_proubc_nchain
 "! Response: 200
   METHODS listaccounts
     IMPORTING
-              content_type        TYPE string
+              iv_content_type        TYPE string
     EXPORTING
               ev_apiresponsestr   TYPE string
               ev_apiresponse      TYPE REF TO data
@@ -586,8 +586,8 @@ INTERFACE zif_proubc_nchain
 "! Response: 200
   METHODS getaccountdetails
     IMPORTING
-              content_type        TYPE string
-              account_id          TYPE string
+              iv_content_type        TYPE string
+              iv_account_id          TYPE string
     EXPORTING
               ev_apiresponsestr   TYPE string
               ev_apiresponse      TYPE REF TO data
@@ -600,7 +600,7 @@ INTERFACE zif_proubc_nchain
 "! Response: 200
   METHODS listhdwallets
     IMPORTING
-              content_type        TYPE string
+              iv_content_type        TYPE string
     EXPORTING
               ev_apiresponsestr   TYPE string
               ev_apiresponse      TYPE REF TO data
@@ -628,9 +628,9 @@ INTERFACE zif_proubc_nchain
 "! Response: 200
   METHODS listhdwalletaccounts
     IMPORTING
-              page                TYPE i
-              content_type        TYPE string
-              wallet_id           TYPE string
+              iv_page                TYPE i
+              iv_content_type        TYPE string
+              iv_wallet_id           TYPE string
     EXPORTING
               ev_apiresponsestr   TYPE string
               ev_apiresponse      TYPE REF TO data
@@ -643,7 +643,7 @@ INTERFACE zif_proubc_nchain
 "! Response: 200
   METHODS listtransactions
     IMPORTING
-              content_type        TYPE string
+              iv_content_type        TYPE string
     EXPORTING
               ev_apiresponsestr   TYPE string
               ev_apiresponse      TYPE REF TO data
@@ -668,8 +668,8 @@ INTERFACE zif_proubc_nchain
 "! Response: 200
   METHODS gettransactiondetails
     IMPORTING
-              content_type        TYPE string
-              transaction_id      TYPE string
+              iv_content_type        TYPE string
+              iv_transaction_id      TYPE string
     EXPORTING
               ev_apiresponsestr   TYPE string
               ev_apiresponse      TYPE REF TO data
@@ -682,7 +682,7 @@ INTERFACE zif_proubc_nchain
 "! Response: 200
   METHODS listcontracts
     IMPORTING
-              content_type        TYPE string
+              iv_content_type        TYPE string
     EXPORTING
               ev_apiresponsestr   TYPE string
               ev_apiresponse      TYPE REF TO data
@@ -695,7 +695,7 @@ INTERFACE zif_proubc_nchain
 "! Body ref: #/components/schemas/DeploycontractRequest
   METHODS deploycontract
     IMPORTING
-              body                TYPE ty_deploycontractrequest
+              is_body             TYPE ty_deploycontractrequest
     EXPORTING
               ev_apiresponsestr   TYPE string
               ev_apiresponse      TYPE REF TO data
@@ -709,8 +709,8 @@ INTERFACE zif_proubc_nchain
 "! Response: 200
   METHODS getcontractdetail
     IMPORTING
-              content_type        TYPE string
-              contract_id         TYPE string
+              iv_content_type        TYPE string
+              iv_contract_id         TYPE string
     EXPORTING
               ev_apiresponsestr   TYPE string
               ev_apiresponse      TYPE REF TO data
@@ -739,7 +739,7 @@ INTERFACE zif_proubc_nchain
 "! Body ref: #/components/schemas/ExecutereadonlycontractRequest
   METHODS executereadonlycontract
     IMPORTING
-              body                TYPE ty_executereadonlycontractreq
+              is_body                TYPE ty_executereadonlycontractreq
     EXPORTING
               ev_apiresponsestr   TYPE string
               ev_apiresponse      TYPE REF TO data

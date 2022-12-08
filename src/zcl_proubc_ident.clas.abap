@@ -9,7 +9,7 @@ CLASS zcl_proubc_ident DEFINITION
   PUBLIC SECTION.
 
     INTERFACES zif_proubc_ident .
-
+    "! Initializes the Ident API proxy
     METHODS constructor
       IMPORTING
         !ii_client       TYPE REF TO if_http_client
@@ -17,15 +17,15 @@ CLASS zcl_proubc_ident DEFINITION
         !iv_refreshtoken TYPE zprvdrefreshtoken .
   PROTECTED SECTION.
     DATA mi_client TYPE REF TO if_http_client.
-    DATA authtoken TYPE zprvdrefreshtoken.
-    DATA refreshtoken TYPE zprvdrefreshtoken.
-    DATA tenant TYPE zprvdtenantid.
+    DATA mv_authtoken TYPE zprvdrefreshtoken.
+    DATA mv_refreshtoken TYPE zprvdrefreshtoken.
+    DATA mv_tenant TYPE zprvdtenantid.
     METHODS send_receive RETURNING VALUE(rv_code) TYPE i.
     METHODS set_refresh_bearer_token IMPORTING iv_tokenstring TYPE string.
     METHODS get_refresh_bearer_token
       RAISING cx_static_check.
     METHODS set_auth_token IMPORTING iv_tokenstring TYPE string.
-    METHODS get_authtoken RETURNING VALUE(rv_authtoken) TYPE string.
+    METHODS get_mv_authtoken RETURNING VALUE(rv_mv_authtoken) TYPE string.
   PRIVATE SECTION.
 ENDCLASS.
 
@@ -36,19 +36,19 @@ CLASS zcl_proubc_ident IMPLEMENTATION.
 
   METHOD constructor.
     mi_client = ii_client.
-    refreshtoken = iv_refreshtoken.
-    tenant = iv_tenant.
+    mv_refreshtoken = iv_refreshtoken.
+    mv_tenant = iv_tenant.
   ENDMETHOD.
 
 
-  METHOD get_authtoken.
-    DATA: lv_authtoken TYPE string.
-    "get and check org/tenant entered
-    "" SAP user id -> tenant authorization
-    "retrieve the cached authtoken
-    "todo check the expiry of the authtoken. If expired get a new one from refresh token.
-    lv_authtoken = authtoken.
-    rv_authtoken = lv_authtoken.
+  METHOD get_mv_authtoken.
+    DATA: lv_mv_authtoken TYPE string.
+    "get and check org/mv_tenant entered
+    "" SAP user id -> mv_tenant authorization
+    "retrieve the cached mv_authtoken
+    "todo check the expiry of the mv_authtoken. If expired get a new one from refresh token.
+    lv_mv_authtoken = mv_authtoken.
+    rv_mv_authtoken = lv_mv_authtoken.
   ENDMETHOD.
 
 
@@ -56,9 +56,9 @@ CLASS zcl_proubc_ident IMPLEMENTATION.
     DATA lv_bearertoken TYPE string.
     "todo check auth token is valid (not empty or expired)
 
-    DATA(lv_refreshtoken_length) = strlen( refreshtoken ).
+    DATA(lv_refreshtoken_length) = strlen( mv_refreshtoken ).
 
-    CONCATENATE 'bearer' refreshtoken INTO lv_bearertoken SEPARATED BY space.
+    CONCATENATE 'bearer' mv_refreshtoken INTO lv_bearertoken SEPARATED BY space.
 
     mi_client->request->set_header_field(
       EXPORTING
@@ -74,12 +74,12 @@ CLASS zcl_proubc_ident IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD set_auth_token.
-    authtoken = iv_tokenstring.
+    mv_authtoken = iv_tokenstring.
   ENDMETHOD.
 
   METHOD set_refresh_bearer_token.
     "todo add method implementation to retrive auth token from refresh token
-    refreshtoken = iv_tokenstring.
+    mv_refreshtoken = iv_tokenstring.
   ENDMETHOD.
 
   METHOD zif_proubc_ident~associateusertoapplication.
@@ -94,7 +94,8 @@ CLASS zcl_proubc_ident IMPLEMENTATION.
 * todo, set body, #/components/schemas/AssociateusertoapplicationRequest
     lv_code = send_receive( ).
     ev_apiresponsestr = mi_client->response->get_cdata( ).
-    /ui2/cl_json=>deserialize( EXPORTING json = ev_apiresponsestr CHANGING data =  ev_apiresponse ).
+    /ui2/cl_json=>deserialize( EXPORTING json = ev_apiresponsestr 
+                                CHANGING data = ev_apiresponse ).
     ev_httpresponsecode = lv_code.
     "TODO add logging call
     CASE lv_code.
@@ -130,7 +131,8 @@ CLASS zcl_proubc_ident IMPLEMENTATION.
     CASE lv_code.
       WHEN 201.
         lv_authresponsestr = mi_client->response->get_cdata( ).
-        /ui2/cl_json=>deserialize( EXPORTING json = lv_authresponsestr CHANGING data =  apiresponse ).
+        /ui2/cl_json=>deserialize( EXPORTING json = lv_authresponsestr 
+                                    CHANGING data = apiresponse ).
     ENDCASE.
   ENDMETHOD.
 
@@ -238,7 +240,8 @@ CLASS zcl_proubc_ident IMPLEMENTATION.
     ).
     lv_code = send_receive( ).
     ev_apiresponsestr = mi_client->response->get_cdata( ).
-    /ui2/cl_json=>deserialize( EXPORTING json = ev_apiresponsestr CHANGING data =  ev_apiresponse ).
+    /ui2/cl_json=>deserialize( EXPORTING json = ev_apiresponsestr
+                               CHANGING data  = ev_apiresponse ).
     ev_httpresponsecode = lv_code.
     "TODO add logging call
     CASE lv_code.
@@ -479,9 +482,7 @@ CLASS zcl_proubc_ident IMPLEMENTATION.
 
     mi_client->request->set_cdata(
       EXPORTING
-        data   =  lv_requeststr
-*        offset = 0
-*        length = -1
+        data   = lv_requeststr
     ).
 
     lv_code = send_receive( ).
@@ -506,11 +507,14 @@ CLASS zcl_proubc_ident IMPLEMENTATION.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/tokens/f2202ba1-e2af-4505-9b1a-53e1ce8de904'.
     mi_client->request->set_method( 'DELETE' ).
-    mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
-    mi_client->request->set_header_field( name = 'content-type' value = content_type ).
+    mi_client->request->set_header_field( name  = '~request_uri'
+                                          value = lv_uri ).
+    mi_client->request->set_header_field( name  = 'content-type' 
+                                          value = content_type ).
     lv_code = send_receive( ).
     ev_apiresponsestr = mi_client->response->get_cdata( ).
-    /ui2/cl_json=>deserialize( EXPORTING json = ev_apiresponsestr CHANGING data =  ev_apiresponse ).
+    /ui2/cl_json=>deserialize( EXPORTING json = ev_apiresponsestr
+                               CHANGING data  = ev_apiresponse ).
     ev_httpresponsecode = lv_code.
     "TODO add logging call
     CASE lv_code.
@@ -527,8 +531,10 @@ CLASS zcl_proubc_ident IMPLEMENTATION.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{application_id}' IN lv_uri WITH lv_temp.
     mi_client->request->set_method( 'PUT' ).
-    mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
-    mi_client->request->set_header_field( name = 'name' value = name ).
+    mi_client->request->set_header_field( name  = '~request_uri'
+                                          value = lv_uri ).
+    mi_client->request->set_header_field( name  = 'name'
+                                          value = name ).
 * todo, set body, #/components/schemas/UpdateapplicationRequest
     lv_code = send_receive( ).
     ev_apiresponsestr = mi_client->response->get_cdata( ).
@@ -550,7 +556,8 @@ CLASS zcl_proubc_ident IMPLEMENTATION.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{organization_id}' IN lv_uri WITH lv_temp.
     mi_client->request->set_method( 'PUT' ).
-    mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
+    mi_client->request->set_header_field( name  = '~request_uri'
+                                          value = lv_uri ).
     mi_client->request->set_header_field( name  = 'name'
                                           value = name ).
     lv_code           = send_receive( ).

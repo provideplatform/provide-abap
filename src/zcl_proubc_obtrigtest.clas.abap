@@ -34,8 +34,8 @@ CLASS ZCL_PROUBC_OBTRIGTEST IMPLEMENTATION.
 
     DATA(lv_request_body) = mo_request->get_entity( )->get_string_data( ).
     /ui2/cl_json=>deserialize(
-          EXPORTING
-            json             = lv_request_body
+      EXPORTING
+        json             = lv_request_body
       CHANGING
         data             = ls_protocol_msg_req ).
 
@@ -47,18 +47,18 @@ CLASS ZCL_PROUBC_OBTRIGTEST IMPLEMENTATION.
     lo_api_helper->setup_protocol_msg( IMPORTING setup_success = lv_setup_success ).
 
     IF lv_setup_success = 'X'.
-      lo_api_helper->send_protocol_msg( EXPORTING body = ls_protocol_msg_req IMPORTING statuscode = lv_status
-                                                                                       apiresponsestr = lv_apiresponsestr
-                                                                                        ).
+      lo_api_helper->send_protocol_msg( EXPORTING body       = ls_protocol_msg_req 
+                                        IMPORTING statuscode = lv_status
+                                              apiresponsestr = lv_apiresponsestr ).
 
       ls_testresponse-bpi_tenant_id = lo_api_helper->get_default_tenant( ).
-      ls_testresponse-status = lv_status. "201, 400, etc
+      ls_testresponse-status = lv_status.
       ls_testresponse-bpi_response_payload = lv_apiresponsestr.
       ls_testresponse-bpi_endpoint = lo_api_helper->get_default_tenant_bpiendpoint( ).
       ls_testresponse-msg_payload = ls_protocol_msg_req.
     ELSE.
       ls_testresponse-bpi_tenant_id = lo_api_helper->get_default_tenant( ).
-      ls_testresponse-status = 401. "201, 400, etc
+      ls_testresponse-status = 401.
       ls_testresponse-bpi_response_payload = 'ident call failed - check tenant if reachable'.
       ls_testresponse-bpi_endpoint = lo_api_helper->get_default_tenant_bpiendpoint( ).
       ls_testresponse-msg_payload = ls_protocol_msg_req.
