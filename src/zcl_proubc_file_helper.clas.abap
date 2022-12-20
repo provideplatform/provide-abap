@@ -67,12 +67,11 @@ CLASS zcl_proubc_file_helper IMPLEMENTATION.
     READ DATASET is_abi_registry-abi_location INTO xstr ACTUAL LENGTH DATA(bytes).
     CLOSE DATASET is_abi_registry-abi_location.
     cl_bcs_convert=>xstring_to_string(
-    EXPORTING
-      iv_xstr   = xstr
-      iv_cp     =  1100
-    RECEIVING
-      rv_string = DATA(lv_string)
-    ).
+      EXPORTING
+        iv_xstr   = xstr
+        iv_cp     = 1100
+      RECEIVING
+        rv_string = DATA(lv_string) ).
     IF sy-subrc = 0.
       ev_filecontent = lv_string.
     ENDIF.
@@ -152,22 +151,6 @@ CLASS zcl_proubc_file_helper IMPLEMENTATION.
         iv_ipfsprojid           = iv_ipfsprojid
         iv_ipfsapikey           = iv_ipfsapikey
         iv_xcontentlength       = iv_xcontentlength
-*        iv_quiet               =
-*        iv_quieter             =
-*        iv_silent              =
-*        iv_progress            =
-*        iv_trickle             =
-*        iv_only_hash           =
-*        iv_wrap_with_directory =
-*        iv_chunker             =
-*        iv_pin                 =
-*        iv_raw_leaves          =
-*        iv_nocopy              =
-*        iv_fscache             =
-*        iv_cid_version         =
-*        iv_hash                =
-*        iv_inline              =
-*        iv_inline_limit        =
       IMPORTING
         ev_apiresponsestr      = lv_ipfs_add_resp
         ev_apiresponse         = lv_ipfs_add_data
@@ -175,9 +158,17 @@ CLASS zcl_proubc_file_helper IMPLEMENTATION.
     ).
     IF lv_ipfs_add_code EQ 200.
       ASSIGN lv_ipfs_add_data->* TO FIELD-SYMBOL(<fs_ipfsresp>).
+      IF SY-SUBRC <> 0.
+      ENDIF.
       ASSIGN COMPONENT 'NAME' OF STRUCTURE <fs_ipfsresp> TO <fs_contentid>.
+      IF SY-SUBRC <> 0.
+      ENDIF.
       ASSIGN <fs_contentid>->* TO <fs_contentid_str>.
       ev_contentid = <fs_contentid_str>.
+      IF SY-SUBRC <> 0.
+      ENDIF.
+    ELSE.
+      "Error calling IPFS Add enpoint HTTP response code &1
     ENDIF.
 
 

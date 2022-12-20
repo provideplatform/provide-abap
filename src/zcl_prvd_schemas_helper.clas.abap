@@ -110,13 +110,12 @@ CLASS zcl_prvd_schemas_helper IMPLEMENTATION.
       GET TIME STAMP FIELD ls_schema_traflight-changed_on.
       ls_schema_traflight-deletion_flag = iv_deletion_flag.
     ELSEIF sy-subrc EQ 4.
-      me->create_schema_id(
+      create_schema_id(
         EXPORTING
           iv_schemaname = iv_schemaname
-        iv_valid_from = ls_schema_traflight-valid_from
-      IMPORTING
-        ev_schemaid   = ls_schema_traflight-schema_id
-      ).
+          iv_valid_from = ls_schema_traflight-valid_from
+        IMPORTING
+          ev_schemaid   = ls_schema_traflight-schema_id ).
       ls_schema_traflight-created_by = sy-uname.
       GET TIME STAMP FIELD ls_schema_traflight-created_on.
       IF ls_schema_traflight-schema_id IS INITIAL.

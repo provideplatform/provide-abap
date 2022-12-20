@@ -49,10 +49,13 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     DATA lv_uri TYPE string VALUE '/api/v1/connectors'.
     lv_temp = public.
     CONDENSE lv_temp.
-    mi_client->request->set_form_field( name = 'public' value = lv_temp ).
+    mi_client->request->set_form_field( name  = 'public' 
+                                        value = lv_temp ).
     mi_client->request->set_method( 'GET' ).
-    mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
-    mi_client->request->set_header_field( name = 'content-type' value = content_type ).
+    mi_client->request->set_header_field( name  = '~request_uri' 
+                                          value = lv_uri ).
+    mi_client->request->set_header_field( name  = 'content-type'
+                                          value = content_type ).
     get_bpi_token( ).
     lv_code = send_receive( ).
     ev_httpresponsecode = lv_code.
@@ -65,6 +68,9 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
+      "success
+      WHEN OTHERS.
+      "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
   ENDMETHOD.
 
@@ -73,7 +79,8 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/api/v1/connectors'.
     mi_client->request->set_method( 'POST' ).
-    mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
+    mi_client->request->set_header_field( name  = '~request_uri'
+                                          value = lv_uri ).
 * todo, set body, #/components/schemas/CreateconnectorRequest
     get_bpi_token( ).
     lv_code = send_receive( ).
@@ -87,6 +94,9 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
+      "Success
+      WHEN OTHERS.
+       "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
   ENDMETHOD.
 
@@ -98,7 +108,8 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{connector_id}' IN lv_uri WITH lv_temp.
     mi_client->request->set_method( 'GET' ).
-    mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
+    mi_client->request->set_header_field( name  = '~request_uri'
+                                          value = lv_uri ).
     get_bpi_token( ).
     lv_code = send_receive( ).
     ev_httpresponsecode = lv_code.
@@ -111,6 +122,9 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
+      "success
+      WHEN OTHERS.
+      "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
   ENDMETHOD.
 
@@ -122,7 +136,8 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{connector_id}' IN lv_uri WITH lv_temp.
     mi_client->request->set_method( 'DELETE' ).
-    mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
+    mi_client->request->set_header_field( name = '~request_uri'
+                                          value = lv_uri ).
     get_bpi_token( ).
     lv_code = send_receive( ).
     ev_httpresponsecode = lv_code.
@@ -135,6 +150,9 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
+      "success
+      WHEN OTHERS.
+      "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
   ENDMETHOD.
 
@@ -146,7 +164,8 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{connector_id}' IN lv_uri WITH lv_temp.
     mi_client->request->set_method( 'PUT' ).
-    mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
+    mi_client->request->set_header_field( name  = '~request_uri'
+                                          value = lv_uri ).
     get_bpi_token( ).
     lv_code = send_receive( ).
     ev_httpresponsecode = lv_code.
@@ -159,6 +178,9 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
+      "Success
+      WHEN OTHERS.
+      "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
   ENDMETHOD.
 
@@ -170,7 +192,8 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{connector_id}' IN lv_uri WITH lv_temp.
     mi_client->request->set_method( 'GET' ).
-    mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
+    mi_client->request->set_header_field( name  = '~request_uri'
+                                          value = lv_uri ).
     get_bpi_token( ).
     lv_code = send_receive( ).
     ev_httpresponsecode = lv_code.
@@ -183,6 +206,9 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
+      "Success
+      WHEN OTHERS.
+      "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
   ENDMETHOD.
 
@@ -194,7 +220,8 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{network_id}' IN lv_uri WITH lv_temp.
     mi_client->request->set_method( 'GET' ).
-    mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
+    mi_client->request->set_header_field( name  = '~request_uri'
+                                          value = lv_uri ).
     get_bpi_token( ).
     lv_code = send_receive( ).
     ev_httpresponsecode = lv_code.
@@ -207,6 +234,9 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
+      "Success
+      WHEN OTHERS.
+      "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
   ENDMETHOD.
 
@@ -218,7 +248,8 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{connector_id}' IN lv_uri WITH lv_temp.
     mi_client->request->set_method( 'GET' ).
-    mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
+    mi_client->request->set_header_field( name  = '~request_uri'
+                                          value = lv_uri ).
     get_bpi_token( ).
     lv_code = send_receive( ).
     ev_httpresponsecode = lv_code.
@@ -231,6 +262,9 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
+      "Success
+      WHEN OTHERS.
+      "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
   ENDMETHOD.
 
@@ -242,7 +276,8 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{network_id}' IN lv_uri WITH lv_temp.
     mi_client->request->set_method( 'GET' ).
-    mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
+    mi_client->request->set_header_field( name  = '~request_uri'
+                                          value = lv_uri ).
     get_bpi_token( ).
     lv_code = send_receive( ).
     ev_httpresponsecode = lv_code.
@@ -255,6 +290,9 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
+      "Success
+      WHEN OTHERS.
+      "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
   ENDMETHOD.
 
@@ -263,7 +301,8 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/api/v1/networks'.
     mi_client->request->set_method( 'POST' ).
-    mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
+    mi_client->request->set_header_field( name  = '~request_uri'
+                                          value = lv_uri ).
 
 * todo, set body, #/components/schemas/CreatenetworkRequest
     get_bpi_token( ).
@@ -278,6 +317,9 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
+      "Success
+      WHEN OTHERS.
+      "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
   ENDMETHOD.
 
@@ -286,7 +328,8 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/api/v1/accounts'.
     mi_client->request->set_method( 'POST' ).
-    mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
+    mi_client->request->set_header_field( name  = '~request_uri'
+                                          value = lv_uri ).
 * todo, set body, #/components/schemas/CreateaccountsRequest
     get_bpi_token( ).
     lv_code = send_receive( ).
@@ -300,6 +343,9 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
+      "Success
+      WHEN OTHERS.
+      "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
   ENDMETHOD.
 
@@ -308,8 +354,10 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/api/v1/accounts'.
     mi_client->request->set_method( 'GET' ).
-    mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
-    mi_client->request->set_header_field( name = 'content-type' value = content_type ).
+    mi_client->request->set_header_field( name  = '~request_uri'
+                                          value = lv_uri ).
+    mi_client->request->set_header_field( name  = 'content-type'
+                                          value = content_type ).
     get_bpi_token( ).
     lv_code = send_receive( ).
     ev_httpresponsecode = lv_code.
@@ -322,6 +370,9 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
+      "Success
+      WHEN OTHERS.
+      "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
   ENDMETHOD.
 
@@ -349,6 +400,9 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
+      "Success
+      WHEN OTHERS.
+      "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
   ENDMETHOD.
 
@@ -357,8 +411,10 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/api/v1/wallets'.
     mi_client->request->set_method( 'GET' ).
-    mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
-    mi_client->request->set_header_field( name = 'content-type' value = content_type ).
+    mi_client->request->set_header_field( name  = '~request_uri'
+                                          value = lv_uri ).
+    mi_client->request->set_header_field( name  = 'content-type'
+                                          value = content_type ).
     get_bpi_token( ).
     lv_code = send_receive( ).
     ev_httpresponsecode = lv_code.
@@ -371,6 +427,9 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
+      "Success
+      WHEN OTHERS.
+      "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
   ENDMETHOD.
 
@@ -382,13 +441,14 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     DATA lv_requeststr TYPE string.
 
     mi_client->request->set_method( 'POST' ).
-    mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
+    mi_client->request->set_header_field( name  = '~request_uri'
+                                          value = lv_uri ).
 
     zcl_proubc_api_helper=>copy_data_to_ref( EXPORTING is_data = is_walletrequest
-                  CHANGING cr_data = lv_requestdata  ).
+                                             CHANGING cr_data  = lv_requestdata  ).
 
-    lv_requeststr = /ui2/cl_json=>serialize( EXPORTING data = lv_requestdata
-                                       pretty_name = /ui2/cl_json=>pretty_mode-low_case ).
+    lv_requeststr = /ui2/cl_json=>serialize( data        = lv_requestdata
+                                             pretty_name = /ui2/cl_json=>pretty_mode-low_case ).
 
     mi_client->request->set_cdata( data = lv_requeststr ).
 
@@ -405,6 +465,9 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
+      "Success
+      WHEN OTHERS.
+      "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
   ENDMETHOD.
 
@@ -417,10 +480,13 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     REPLACE ALL OCCURRENCES OF '{wallet_id}' IN lv_uri WITH lv_temp.
     lv_temp = page.
     CONDENSE lv_temp.
-    mi_client->request->set_form_field( name = 'page' value = lv_temp ).
+    mi_client->request->set_form_field( name  = 'page'
+                                        value = lv_temp ).
     mi_client->request->set_method( 'GET' ).
-    mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
-    mi_client->request->set_header_field( name = 'content-type' value = content_type ).
+    mi_client->request->set_header_field( name  = '~request_uri'
+                                          value = lv_uri ).
+    mi_client->request->set_header_field( name  = 'content-type'
+                                          value = content_type ).
     get_bpi_token( ).
     lv_code = send_receive( ).
     ev_httpresponsecode = lv_code.
@@ -433,6 +499,9 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
+      "Success
+      WHEN OTHERS.
+      "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
   ENDMETHOD.
 
@@ -441,8 +510,10 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/api/v1/transactions'.
     mi_client->request->set_method( 'GET' ).
-    mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
-    mi_client->request->set_header_field( name = 'content-type' value = content_type ).
+    mi_client->request->set_header_field( name  = '~request_uri'
+                                          value = lv_uri ).
+    mi_client->request->set_header_field( name  = 'content-type'
+                                          value = content_type ).
     get_bpi_token( ).
     lv_code = send_receive( ).
     ev_httpresponsecode = lv_code.
@@ -455,6 +526,9 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
+      "Success
+      WHEN OTHERS.
+      "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
   ENDMETHOD.
 
@@ -463,7 +537,8 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/api/v1/transactions'.
     mi_client->request->set_method( 'POST' ).
-    mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
+    mi_client->request->set_header_field( name  = '~request_uri'
+                                          value = lv_uri ).
     get_bpi_token( ).
     lv_code = send_receive( ).
     ev_httpresponsecode = lv_code.
@@ -476,6 +551,9 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
+      "Success
+      WHEN OTHERS.
+      "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
   ENDMETHOD.
 
@@ -487,8 +565,10 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{transaction_id}' IN lv_uri WITH lv_temp.
     mi_client->request->set_method( 'GET' ).
-    mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
-    mi_client->request->set_header_field( name = 'content-type' value = content_type ).
+    mi_client->request->set_header_field( name  = '~request_uri'
+                                          value = lv_uri ).
+    mi_client->request->set_header_field( name  = 'content-type'
+                                          value = content_type ).
     get_bpi_token( ).
     lv_code = send_receive( ).
     ev_httpresponsecode = lv_code.
@@ -501,6 +581,9 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
+      "Success
+      WHEN OTHERS.
+      "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
   ENDMETHOD.
 
@@ -509,8 +592,10 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/api/v1/contracts'.
     mi_client->request->set_method( 'GET' ).
-    mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
-    mi_client->request->set_header_field( name = 'content-type' value = content_type ).
+    mi_client->request->set_header_field( name  = '~request_uri'
+                                          value = lv_uri ).
+    mi_client->request->set_header_field( name  = 'content-type'
+                                          value = content_type ).
     get_bpi_token( ).
     lv_code = send_receive( ).
     ev_httpresponsecode = lv_code.
@@ -523,6 +608,9 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
+      "Success
+      WHEN OTHERS.
+      "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
   ENDMETHOD.
 
@@ -531,7 +619,8 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/api/v1/contracts'.
     mi_client->request->set_method( 'POST' ).
-    mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
+    mi_client->request->set_header_field( name  = '~request_uri'
+                                          value = lv_uri ).
 * todo, set body, #/components/schemas/DeploycontractRequest
     get_bpi_token( ).
     lv_code = send_receive( ).
@@ -545,6 +634,9 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
+      "Success
+      WHEN OTHERS.
+      "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
   ENDMETHOD.
 
@@ -556,8 +648,10 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{contract_id}' IN lv_uri WITH lv_temp.
     mi_client->request->set_method( 'GET' ).
-    mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
-    mi_client->request->set_header_field( name = 'content-type' value = content_type ).
+    mi_client->request->set_header_field( name  = '~request_uri'
+                                          value = lv_uri ).
+    mi_client->request->set_header_field( name  = 'content-type'
+                                          value = content_type ).
     get_bpi_token( ).
     lv_code = send_receive( ).
     ev_httpresponsecode = lv_code.
@@ -570,6 +664,9 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
+      "Success
+      WHEN OTHERS.
+      "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
   ENDMETHOD.
 
@@ -579,17 +676,19 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     DATA lv_uri TYPE string VALUE '/api/v1/contracts/{contract_id}/execute'.
     DATA lv_requeststr TYPE string.
     DATA lv_requestdata TYPE REF TO data.
+    DATA: lv_response_xstring TYPE xstring.
     lv_temp = iv_contract_id.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{contract_id}' IN lv_uri WITH lv_temp.
     mi_client->request->set_method( 'POST' ).
-    mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
+    mi_client->request->set_header_field( name  = '~request_uri'
+                                          value = lv_uri ).
 
     zcl_proubc_api_helper=>copy_data_to_ref( EXPORTING is_data = is_execcontractreq
-                  CHANGING cr_data = lv_requestdata  ).
+                                              CHANGING cr_data = lv_requestdata ).
 
-    lv_requeststr = /ui2/cl_json=>serialize( EXPORTING data = lv_requestdata
-                                       pretty_name = /ui2/cl_json=>pretty_mode-low_case ).
+    lv_requeststr = /ui2/cl_json=>serialize( data        = lv_requestdata
+                                             pretty_name = /ui2/cl_json=>pretty_mode-low_case ).
 
     mi_client->request->set_cdata( data = lv_requeststr ).
 
@@ -597,7 +696,6 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     lv_code = send_receive( ).
     ev_httpresponsecode = lv_code.
     ev_apiresponsestr = mi_client->response->get_cdata( ).
-    DATA: lv_response_xstring TYPE xstring.
     lv_response_xstring = mi_client->response->get_data( ).
     ev_apiresponsexstr = lv_response_xstring.
     /ui2/cl_json=>deserialize(
@@ -608,6 +706,9 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
+      "Success
+      WHEN OTHERS.
+      "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
   ENDMETHOD.
 
@@ -631,6 +732,9 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
+      "Success
+      WHEN OTHERS.
+      "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
   ENDMETHOD.
 
@@ -643,17 +747,16 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     lv_temp = iv_smartcontractaddr.
     REPLACE ALL OCCURRENCES OF '{contract_id}' IN lv_uri WITH lv_temp.
     mi_client->request->set_method( 'POST' ).
-    mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
+    mi_client->request->set_header_field( name  = '~request_uri'
+                                          value = lv_uri ).
 
     zcl_proubc_api_helper=>copy_data_to_ref( EXPORTING is_data = is_pricefeedcontract
-                  CHANGING cr_data = lv_requestdata  ).
+                                             CHANGING cr_data  = lv_requestdata  ).
 
-    lv_requeststr = /ui2/cl_json=>serialize( EXPORTING data = lv_requestdata
-                                       pretty_name = /ui2/cl_json=>pretty_mode-low_case ).
+    lv_requeststr = /ui2/cl_json=>serialize( data        = lv_requestdata
+                                             pretty_name = /ui2/cl_json=>pretty_mode-low_case ).
 
-    mi_client->request->set_cdata(
-      EXPORTING
-        data   =  lv_requeststr ).
+    mi_client->request->set_cdata( data = lv_requeststr ).
 
     get_bpi_token( ).
     lv_code = send_receive( ).
@@ -667,6 +770,9 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
+      "Success
+      WHEN OTHERS.
+      "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
   ENDMETHOD.
 

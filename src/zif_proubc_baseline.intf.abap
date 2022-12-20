@@ -1588,9 +1588,9 @@ INTERFACE zif_proubc_baseline
       !iv_body        TYPE protocolmessage_req
       !iv_bpitoken    TYPE zprvdrefreshtoken
     EXPORTING
-      !statuscode     TYPE i
-      !apiresponsestr TYPE string
-      !apiresponse    TYPE REF TO data
+      !ev_statuscode     TYPE i
+      !ev_apiresponsestr TYPE string
+      !ev_apiresponse    TYPE REF TO data
     RAISING
       cx_static_check .
   METHODS status

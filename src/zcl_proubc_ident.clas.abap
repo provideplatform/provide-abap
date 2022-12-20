@@ -61,10 +61,8 @@ CLASS zcl_proubc_ident IMPLEMENTATION.
     CONCATENATE 'bearer' mv_refreshtoken INTO lv_bearertoken SEPARATED BY space.
 
     mi_client->request->set_header_field(
-      EXPORTING
         name  = 'authorization'
-        value = lv_bearertoken
-    ). "HINT: if this authorization does not appear to work, check token length
+        value = lv_bearertoken ).
   ENDMETHOD.
 
   METHOD send_receive.
@@ -90,7 +88,8 @@ CLASS zcl_proubc_ident IMPLEMENTATION.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{application_id}' IN lv_uri WITH lv_temp.
     mi_client->request->set_method( 'POST' ).
-    mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
+    mi_client->request->set_header_field( name = '~request_uri'
+                                         value = lv_uri ).
 * todo, set body, #/components/schemas/AssociateusertoapplicationRequest
     lv_code = send_receive( ).
     ev_apiresponsestr = mi_client->response->get_cdata( ).
@@ -100,6 +99,9 @@ CLASS zcl_proubc_ident IMPLEMENTATION.
     "TODO add logging call
     CASE lv_code.
       WHEN 200.
+      "Success
+      WHEN OTHERS.
+      "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
   ENDMETHOD.
 
@@ -111,20 +113,14 @@ CLASS zcl_proubc_ident IMPLEMENTATION.
     DATA lv_basicauthdata TYPE REF TO data.
     DATA lv_authresponsestr TYPE string.
     mi_client->request->set_method( 'POST' ).
-    mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
+    mi_client->request->set_header_field( name = '~request_uri'
+                                         value = lv_uri ).
 * todo, set body, #/components/schemas/AuthenticationRequest
     zcl_proubc_api_helper=>copy_data_to_ref( EXPORTING is_data = body
-                      CHANGING cr_data = lv_basicauthdata  ).
+                                              CHANGING cr_data = lv_basicauthdata ).
 
-    "/ui2/cl_json=>serialize( ls_basicauthdata ).
-
-    mi_client->request->set_cdata(
-      EXPORTING
-        data   =  /ui2/cl_json=>serialize( EXPORTING data = lv_basicauthdata
-                                                     pretty_name      = /ui2/cl_json=>pretty_mode-low_case )
-*        offset = 0
-*        length = -1
-    ).
+    mi_client->request->set_cdata( data   =  /ui2/cl_json=>serialize( data        = lv_basicauthdata
+                                                                      pretty_name = /ui2/cl_json=>pretty_mode-low_case ) ).
 
     lv_code = send_receive( ).
     ""TODO add logging call
@@ -133,6 +129,8 @@ CLASS zcl_proubc_ident IMPLEMENTATION.
         lv_authresponsestr = mi_client->response->get_cdata( ).
         /ui2/cl_json=>deserialize( EXPORTING json = lv_authresponsestr 
                                     CHANGING data = apiresponse ).
+      WHEN OTHERS.
+      "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
   ENDMETHOD.
 
@@ -147,26 +145,22 @@ CLASS zcl_proubc_ident IMPLEMENTATION.
     DATA: lt_headerfields TYPE tihttpnvp.
 
     mi_client->request->set_method( 'POST' ).
-    mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
-    mi_client->request->set_header_field( name = 'content-type' value = 'application/json' ).
+    mi_client->request->set_header_field( name  = '~request_uri' 
+                                          value = lv_uri ).
+    mi_client->request->set_header_field( name  = 'content-type' 
+                                          value = 'application/json' ).
     me->get_refresh_bearer_token( ).
     mi_client->request->get_header_fields(
       CHANGING
-        fields = lt_headerfields
-    ).
+        fields = lt_headerfields ).
 
     zcl_proubc_api_helper=>copy_data_to_ref( EXPORTING is_data = body
-                      CHANGING cr_data = lv_longtermrequestdata  ).
+                                             CHANGING cr_data  = lv_longtermrequestdata ).
 
-    lv_requeststr = /ui2/cl_json=>serialize( EXPORTING data = lv_longtermrequestdata
+    lv_requeststr = /ui2/cl_json=>serialize( data  = lv_longtermrequestdata
                                        pretty_name = /ui2/cl_json=>pretty_mode-low_case ).
 
-    mi_client->request->set_cdata(
-      EXPORTING
-        data   =  lv_requeststr
-*        offset = 0
-*        length = -1
-    ).
+    mi_client->request->set_cdata( lv_requeststr ).
 
     lv_code = send_receive( ).
     status = lv_code.
@@ -175,10 +169,13 @@ CLASS zcl_proubc_ident IMPLEMENTATION.
       WHEN 200 OR 201 OR 202.
         DATA: lv_parsedresponse TYPE zif_proubc_ident=>authorizelongtermtokenresponse.
         lv_authresponsestr = mi_client->response->get_cdata( ).
-        "lv_parsedresponse = me->parse_longauthenticationresp( exporting iv_prefix = lv_authresponsestr ).
         /ui2/cl_json=>deserialize( EXPORTING json = lv_authresponsestr CHANGING data =  apiresponse ).
-      WHEN 401. "refresh token incorrect
-      WHEN 407. "check the certs in strust
+      WHEN 401.
+      "refresh token incorrect
+      WHEN 407. 
+      "check the certs in strust
+      WHEN OTHERS.
+      "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
   ENDMETHOD.
 
@@ -188,16 +185,22 @@ CLASS zcl_proubc_ident IMPLEMENTATION.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/applications'.
     mi_client->request->set_method( 'POST' ).
-    mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
-    mi_client->request->set_header_field( name = 'name' value = name ).
+    mi_client->request->set_header_field( name  = '~request_uri'
+                                          value = lv_uri ).
+    mi_client->request->set_header_field( name  = 'name'
+                                          value = name ).
 * todo, set body, #/components/schemas/CreateapplicationRequest
     lv_code = send_receive( ).
     ev_apiresponsestr = mi_client->response->get_cdata( ).
-    /ui2/cl_json=>deserialize( EXPORTING json = ev_apiresponsestr CHANGING data =  ev_apiresponse ).
+    /ui2/cl_json=>deserialize( EXPORTING json = ev_apiresponsestr 
+                               CHANGING  data = ev_apiresponse ).
     ev_httpresponsecode = lv_code.
     "TODO add logging call
     CASE lv_code.
       WHEN 200.
+      "Success
+      WHEN OTHERS.
+      "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
   ENDMETHOD.
 
@@ -207,16 +210,22 @@ CLASS zcl_proubc_ident IMPLEMENTATION.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/organizations'.
     mi_client->request->set_method( 'POST' ).
-    mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
-    mi_client->request->set_header_field( name = 'name' value = name ).
+    mi_client->request->set_header_field( name  = '~request_uri'
+                                          value = lv_uri ).
+    mi_client->request->set_header_field( name  = 'name'
+                                          value = name ).
 * todo, set body, #/components/schemas/CreateorganizationRequest
     lv_code = send_receive( ).
     ev_apiresponsestr = mi_client->response->get_cdata( ).
-    /ui2/cl_json=>deserialize( EXPORTING json = ev_apiresponsestr CHANGING data =  ev_apiresponse ).
+    /ui2/cl_json=>deserialize( EXPORTING json = ev_apiresponsestr 
+                                CHANGING data = ev_apiresponse ).
     ev_httpresponsecode = lv_code.
     "TODO add logging call
     CASE lv_code.
       WHEN 200.
+      "Success
+      WHEN OTHERS.
+      "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
   ENDMETHOD.
 
@@ -228,16 +237,14 @@ CLASS zcl_proubc_ident IMPLEMENTATION.
     DATA lv_requestdata TYPE REF TO data.
     DATA lv_requeststr TYPE string.
     mi_client->request->set_method( 'POST' ).
-    mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
+    mi_client->request->set_header_field( name  = '~request_uri'
+                                          value = lv_uri ).
     zcl_proubc_api_helper=>copy_data_to_ref( EXPORTING is_data = body
-                  CHANGING cr_data = lv_REQUESTDATA  ).
-    lv_requeststr = /ui2/cl_json=>serialize( EXPORTING data = lv_requestdata
-                                       pretty_name = /ui2/cl_json=>pretty_mode-low_case ).
+                                              CHANGING cr_data = lv_REQUESTDATA ).
+    lv_requeststr = /ui2/cl_json=>serialize( data = lv_requestdata
+                                             pretty_name = /ui2/cl_json=>pretty_mode-low_case ).
 
-    mi_client->request->set_cdata(
-      EXPORTING
-        data   =  lv_requeststr
-    ).
+    mi_client->request->set_cdata( data = lv_requeststr ).
     lv_code = send_receive( ).
     ev_apiresponsestr = mi_client->response->get_cdata( ).
     /ui2/cl_json=>deserialize( EXPORTING json = ev_apiresponsestr
@@ -246,6 +253,9 @@ CLASS zcl_proubc_ident IMPLEMENTATION.
     "TODO add logging call
     CASE lv_code.
       WHEN 200.
+      "Success
+      WHEN OTHERS.
+      "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
   ENDMETHOD.
 
@@ -258,15 +268,21 @@ CLASS zcl_proubc_ident IMPLEMENTATION.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{application_id}' IN lv_uri WITH lv_temp.
     mi_client->request->set_method( 'DELETE' ).
-    mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
-    mi_client->request->set_header_field( name = 'content-type' value = content_type ).
+    mi_client->request->set_header_field( name = '~request_uri' 
+                                         value = lv_uri ).
+    mi_client->request->set_header_field( name = 'content-type'
+                                         value = content_type ).
     lv_code = send_receive( ).
     ev_apiresponsestr = mi_client->response->get_cdata( ).
-    /ui2/cl_json=>deserialize( EXPORTING json = ev_apiresponsestr CHANGING data =  ev_apiresponse ).
+    /ui2/cl_json=>deserialize( EXPORTING json = ev_apiresponsestr 
+                                CHANGING data = ev_apiresponse ).
     ev_httpresponsecode = lv_code.
     "TODO add logging call
     CASE lv_code.
       WHEN 200.
+      "Success
+      WHEN OTHERS.
+      "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
   ENDMETHOD.
 
@@ -279,15 +295,21 @@ CLASS zcl_proubc_ident IMPLEMENTATION.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{user_id}' IN lv_uri WITH lv_temp.
     mi_client->request->set_method( 'DELETE' ).
-    mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
-    mi_client->request->set_header_field( name = 'content-type' value = content_type ).
+    mi_client->request->set_header_field( name = '~request_uri' 
+                                         value = lv_uri ).
+    mi_client->request->set_header_field( name = 'content-type' 
+                                         value = content_type ).
     lv_code = send_receive( ).
     ev_apiresponsestr = mi_client->response->get_cdata( ).
-    /ui2/cl_json=>deserialize( EXPORTING json = ev_apiresponsestr CHANGING data =  ev_apiresponse ).
+    /ui2/cl_json=>deserialize( EXPORTING json = ev_apiresponsestr 
+                                CHANGING data = ev_apiresponse ).
     ev_httpresponsecode = lv_code.
     "TODO add logging call
     CASE lv_code.
       WHEN 200.
+      "Success
+      WHEN OTHERS.
+      "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
   ENDMETHOD.
 
@@ -300,15 +322,21 @@ CLASS zcl_proubc_ident IMPLEMENTATION.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{application_id}' IN lv_uri WITH lv_temp.
     mi_client->request->set_method( 'GET' ).
-    mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
-    mi_client->request->set_header_field( name = 'content-type' value = content_type ).
+    mi_client->request->set_header_field( name  = '~request_uri'
+                                          value = lv_uri ).
+    mi_client->request->set_header_field( name  = 'content-type'
+                                          value = content_type ).
     lv_code = send_receive( ).
     ev_apiresponsestr = mi_client->response->get_cdata( ).
-    /ui2/cl_json=>deserialize( EXPORTING json = ev_apiresponsestr CHANGING data = ev_apiresponse ).
+    /ui2/cl_json=>deserialize( EXPORTING json = ev_apiresponsestr
+                               CHANGING data  = ev_apiresponse ).
     ev_httpresponsecode = lv_code.
     "TODO add logging call
     CASE lv_code.
       WHEN 200.
+       "Success
+       WHEN OTHERS.
+       "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
   ENDMETHOD.
 
@@ -321,16 +349,23 @@ CLASS zcl_proubc_ident IMPLEMENTATION.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{organization_id}' IN lv_uri WITH lv_temp.
     mi_client->request->set_method( 'GET' ).
-    mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
-    mi_client->request->set_header_field( name = 'content-type' value = content_type ).
-    mi_client->request->set_header_field( name = 'name' value = name ).
+    mi_client->request->set_header_field( name  = '~request_uri'
+                                          value = lv_uri ).
+    mi_client->request->set_header_field( name  = 'content-type'
+                                          value = content_type ).
+    mi_client->request->set_header_field( name  = 'name'
+                                          value = name ).
     lv_code = send_receive( ).
     ev_apiresponsestr = mi_client->response->get_cdata( ).
-    /ui2/cl_json=>deserialize( EXPORTING json = ev_apiresponsestr CHANGING data =  ev_apiresponse ).
+    /ui2/cl_json=>deserialize( EXPORTING json = ev_apiresponsestr
+                               CHANGING data  = ev_apiresponse ).
     ev_httpresponsecode = lv_code.
     "TODO add logging call
     CASE lv_code.
       WHEN 200.
+      "Success
+      WHEN OTHERS.
+      "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
   ENDMETHOD.
 
@@ -343,16 +378,23 @@ CLASS zcl_proubc_ident IMPLEMENTATION.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{user_id}' IN lv_uri WITH lv_temp.
     mi_client->request->set_method( 'GET' ).
-    mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
-    mi_client->request->set_header_field( name = 'content-type' value = content_type ).
-    mi_client->request->set_header_field( name = 'name' value = name ).
+    mi_client->request->set_header_field( name  = '~request_uri'
+                                          value = lv_uri ).
+    mi_client->request->set_header_field( name  = 'content-type'
+                                          value = content_type ).
+    mi_client->request->set_header_field( name  = 'name'
+                                          value = name ).
     lv_code = send_receive( ).
     ev_apiresponsestr = mi_client->response->get_cdata( ).
-    /ui2/cl_json=>deserialize( EXPORTING json = ev_apiresponsestr CHANGING data =  ev_apiresponse ).
+    /ui2/cl_json=>deserialize( EXPORTING json = ev_apiresponsestr
+                               CHANGING data  = ev_apiresponse ).
     ev_httpresponsecode = lv_code.
     "TODO add logging call
     CASE lv_code.
       WHEN 200.
+      "Success
+      WHEN OTHERS.
+      "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
   ENDMETHOD.
 
@@ -366,11 +408,15 @@ CLASS zcl_proubc_ident IMPLEMENTATION.
                                           value = lv_uri ).
     lv_code = send_receive( ).
     ev_apiresponsestr = mi_client->response->get_cdata( ).
-    /ui2/cl_json=>deserialize( EXPORTING json = ev_apiresponsestr CHANGING data =  ev_apiresponse ).
+    /ui2/cl_json=>deserialize( EXPORTING json = ev_apiresponsestr
+                               CHANGING data  = ev_apiresponse ).
     ev_httpresponsecode = lv_code.
     "TODO add logging call
     CASE lv_code.
       WHEN 200.
+      "Success
+      WHEN OTHERS.
+      "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
   ENDMETHOD.
 
@@ -389,11 +435,15 @@ CLASS zcl_proubc_ident IMPLEMENTATION.
                                           value = content_type ).
     lv_code = send_receive( ).
     ev_apiresponsestr = mi_client->response->get_cdata( ).
-    /ui2/cl_json=>deserialize( EXPORTING json = ev_apiresponsestr CHANGING data =  ev_apiresponse ).
+    /ui2/cl_json=>deserialize( EXPORTING json = ev_apiresponsestr
+                               CHANGING data  = ev_apiresponse ).
     ev_httpresponsecode = lv_code.
     "TODO add logging call
     CASE lv_code.
       WHEN 200.
+      "Success
+      WHEN OTHERS.
+      "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
   ENDMETHOD.
 
@@ -403,8 +453,10 @@ CLASS zcl_proubc_ident IMPLEMENTATION.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/organizations'.
     mi_client->request->set_method( 'GET' ).
-    mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
-    mi_client->request->set_header_field( name = 'content-type' value = content_type ).
+    mi_client->request->set_header_field( name  = '~request_uri'
+                                          value = lv_uri ).
+    mi_client->request->set_header_field( name  = 'content-type'
+                                          value = content_type ).
     lv_code = send_receive( ).
     ev_apiresponsestr = mi_client->response->get_cdata( ).
     /ui2/cl_json=>deserialize( EXPORTING json = ev_apiresponsestr 
@@ -413,6 +465,9 @@ CLASS zcl_proubc_ident IMPLEMENTATION.
     "TODO add logging call
     CASE lv_code.
       WHEN 200.
+      "Success
+      WHEN OTHERS.
+      "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
   ENDMETHOD.
 
@@ -422,34 +477,46 @@ CLASS zcl_proubc_ident IMPLEMENTATION.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/tokens'.
     mi_client->request->set_method( 'GET' ).
-    mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
-    mi_client->request->set_header_field( name = 'content-type' value = content_type ).
-    mi_client->request->set_header_field( name = 'name' value = name ).
+    mi_client->request->set_header_field( name = '~request_uri'
+                                         value = lv_uri ).
+    mi_client->request->set_header_field( name = 'content-type' 
+                                         value = content_type ).
+    mi_client->request->set_header_field( name = 'name'
+                                         value = name ).
     lv_code = send_receive( ).
     ev_apiresponsestr = mi_client->response->get_cdata( ).
-    /ui2/cl_json=>deserialize( EXPORTING json = ev_apiresponsestr CHANGING data =  ev_apiresponse ).
+    /ui2/cl_json=>deserialize( EXPORTING json = ev_apiresponsestr
+                                CHANGING data = ev_apiresponse ).
     ev_httpresponsecode = lv_code.
     "TODO add logging call
     CASE lv_code.
       WHEN 200.
+      "Success
+      WHEN OTHERS.
+      "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
   ENDMETHOD.
-
 
   METHOD zif_proubc_ident~listuserscopy.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/users'.
     mi_client->request->set_method( 'GET' ).
-    mi_client->request->set_header_field( name = '~request_uri' value = lv_uri ).
-    mi_client->request->set_header_field( name = 'content-type' value = content_type ).
+    mi_client->request->set_header_field( name = '~request_uri' 
+                                         value = lv_uri ).
+    mi_client->request->set_header_field( name = 'content-type' 
+                                         value = content_type ).
     lv_code = send_receive( ).
     ev_apiresponsestr = mi_client->response->get_cdata( ).
-    /ui2/cl_json=>deserialize( EXPORTING json = ev_apiresponsestr CHANGING data =  ev_apiresponse ).
+    /ui2/cl_json=>deserialize( EXPORTING json = ev_apiresponsestr 
+                                CHANGING data = ev_apiresponse ).
     ev_httpresponsecode = lv_code.
     "TODO add logging call
     CASE lv_code.
       WHEN 200.
+      "Success
+      WHEN OTHERS.
+      "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
   ENDMETHOD.
 
@@ -461,29 +528,24 @@ CLASS zcl_proubc_ident IMPLEMENTATION.
     DATA: lv_longtermrequestdata TYPE REF TO data,
           lv_requeststr          TYPE string.
     DATA lv_authresponsestr TYPE string.
+    DATA: lt_headerfields TYPE tihttpnvp.
 
     mi_client->request->set_method( 'POST' ).
     mi_client->request->set_header_field( name  = '~request_uri' 
                                           value = lv_uri ).
     mi_client->request->set_header_field( name  = 'content-type' 
                                           value = 'application/json' ).
-    me->get_refresh_bearer_token( ).
-    DATA: lt_headerfields TYPE tihttpnvp.
-    mi_client->request->get_header_fields(
-      CHANGING
-        fields = lt_headerfields
-    ).
+    get_refresh_bearer_token( ).
+    
+    mi_client->request->get_header_fields( CHANGING fields = lt_headerfields ).
 
     zcl_proubc_api_helper=>copy_data_to_ref( EXPORTING is_data = body
-                      CHANGING cr_data = lv_longtermrequestdata  ).
+                                              CHANGING cr_data = lv_longtermrequestdata ).
 
     lv_requeststr = /ui2/cl_json=>serialize( EXPORTING data = lv_longtermrequestdata
-                                       pretty_name = /ui2/cl_json=>pretty_mode-low_case ).
+                                                pretty_name = /ui2/cl_json=>pretty_mode-low_case ).
 
-    mi_client->request->set_cdata(
-      EXPORTING
-        data   = lv_requeststr
-    ).
+    mi_client->request->set_cdata( data = lv_requeststr ).
 
     lv_code = send_receive( ).
     status = lv_code.
@@ -492,12 +554,14 @@ CLASS zcl_proubc_ident IMPLEMENTATION.
       WHEN 200 OR 201 OR 202.
         DATA: lv_parsedresponse TYPE zif_proubc_ident=>authorizelongtermtokenresponse.
         lv_authresponsestr = mi_client->response->get_cdata( ).
-        "lv_parsedresponse = me->parse_longauthenticationresp( exporting iv_prefix = lv_authresponsestr ).
-        /ui2/cl_json=>deserialize( EXPORTING json = lv_authresponsestr CHANGING data =  apiresponse ).
-      "refresh token incorrect
+        /ui2/cl_json=>deserialize( EXPORTING json = lv_authresponsestr
+                                    CHANGING data = apiresponse ).
       WHEN 401. 
-      "check the certs in strust
+      "refresh token incorrect
       WHEN 407. 
+      "check the certs in strust
+      WHEN OTHERS.
+      "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
   ENDMETHOD.
 
@@ -519,6 +583,9 @@ CLASS zcl_proubc_ident IMPLEMENTATION.
     "TODO add logging call
     CASE lv_code.
       WHEN 200.
+      "Success
+      WHEN OTHERS.
+      "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
   ENDMETHOD.
 
@@ -544,6 +611,9 @@ CLASS zcl_proubc_ident IMPLEMENTATION.
     "TODO add logging call
     CASE lv_code.
       WHEN 200.
+      "Success
+      WHEN OTHERS.
+      "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
   ENDMETHOD.
 
@@ -568,6 +638,9 @@ CLASS zcl_proubc_ident IMPLEMENTATION.
     "TODO add logging call
     CASE lv_code.
       WHEN 200.
+      "Success
+      WHEN OTHERS.
+      "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
   ENDMETHOD.
 
@@ -590,6 +663,9 @@ CLASS zcl_proubc_ident IMPLEMENTATION.
     "TODO add logging call
     CASE lv_code.
       WHEN 200.
+      "Success
+      WHEN OTHERS.
+      "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
   ENDMETHOD.
 ENDCLASS.

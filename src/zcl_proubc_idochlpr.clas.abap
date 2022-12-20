@@ -13,6 +13,7 @@ CLASS zcl_proubc_idochlpr DEFINITION
     DATA mo_api_helper TYPE REF TO zcl_proubc_api_helper .
     DATA mt_selected_idocs TYPE zif_proubc_blidochlper=>tty_proubc_idocs .
 
+    "! Determines the object id for an idoc (ex: BELNR for purchase order ORDERS idoc)
     CLASS-METHODS get_objid
       IMPORTING
         !iv_schema TYPE string
@@ -20,6 +21,7 @@ CLASS zcl_proubc_idochlpr DEFINITION
         !iv_idoc   TYPE REF TO data
       EXPORTING
         !ev_objid  TYPE zbpiobj-object_id .
+    "! Formats the requested idoc type into a tree like hierarchical structure
     CLASS-METHODS idoc_schema_to_json_tree
       IMPORTING
         !it_idoc_struct           TYPE ledid_t_idoc_struct
@@ -27,6 +29,7 @@ CLASS zcl_proubc_idochlpr DEFINITION
         !it_segment_struct        TYPE ledid_t_segment_struct
       EXPORTING
         !ev_idoc_schema_json_tree TYPE REF TO data .
+    "! Generates a prod-like object id for a given schema for testing purposes
     CLASS-METHODS get_dummy_objid
       IMPORTING
         !iv_schema     TYPE string
@@ -35,23 +38,28 @@ CLASS zcl_proubc_idochlpr DEFINITION
         !ev_newidocnum TYPE edidd-docnum
       CHANGING
         !ct_edidd      TYPE tty_edidd .
+    "! Creates list of fields of an iDoc segment
     CLASS-METHODS generate_segment_fields
       IMPORTING
         !it_target_segment_struct TYPE ledid_t_segment_struct
       EXPORTING
         !et_field_data            TYPE zif_proubc_blidochlper=>tty_idoc_segment_field .
+    "! For given idoc schema, populates the child level idoc segments schema
     CLASS-METHODS generate_child_segment_schema
       CHANGING
         !cs_segment_schema TYPE zif_proubc_blidochlper=>ty_idoc_segment .
+    "! ZCL_PROUBC_IDOCHLPR object constructor
     METHODS constructor
       IMPORTING
         !iv_tenant          TYPE zprvdtenantid OPTIONAL
         !iv_subject_acct_id TYPE zprvdtenantid OPTIONAL
         !iv_workgroup_id    TYPE zprvdtenantid OPTIONAL .
+    "! Creates PRVD Baseline protocol messages for the selected idocs
     METHODS launch_idoc_to_baseline
       IMPORTING
         VALUE(iv_idocmesty) TYPE edi_mestyp
         VALUE(iv_idoctp)    TYPE edi_idoctp .
+    "! Searches a string to find illegal characters that would cause some HTTP request to fail
     METHODS check_for_illegal_characters
       IMPORTING
         iv_string             TYPE string
@@ -59,6 +67,7 @@ CLASS zcl_proubc_idochlpr DEFINITION
         ev_illegal_char_index TYPE i
         ev_illegal_char_found TYPE c
         ev_safestring         TYPE char30.
+    "! Removes hidden illegal characters
     METHODS build_safestring
       IMPORTING
         iv_string     TYPE string
@@ -70,8 +79,8 @@ CLASS zcl_proubc_idochlpr DEFINITION
              child  TYPE edilsegtyp,
            END OF ty_idoc_struct_parent_child.
     TYPES: tty_idoc_struct_parent_child TYPE STANDARD TABLE OF ty_idoc_struct_parent_child.
-    DATA: lv_setup_success TYPE boolean,
-          return_messages  TYPE TABLE OF bapiret2.
+    DATA: mv_setup_success TYPE boolean,
+          mt_return_messages  TYPE TABLE OF bapiret2.
     METHODS: add_message IMPORTING iv_msg TYPE bapiret2,
       clear_messages,
       idoc_to_json
@@ -107,23 +116,25 @@ CLASS zcl_proubc_idochlpr IMPLEMENTATION.
 
 
   METHOD add_message.
-    APPEND iv_msg TO return_messages.
+    APPEND iv_msg TO mt_return_messages.
   ENDMETHOD.
 
 
   METHOD clear_messages.
-    CLEAR: return_messages.
+    CLEAR: mt_return_messages.
   ENDMETHOD.
 
 
   METHOD constructor.
     "authenticates to PRVD APIs / authority checks use of the PRVD Tenant to SAP
     "used for all PRVD API calls
-    mo_api_helper = NEW zcl_proubc_api_helper( iv_tenant = iv_tenant iv_subject_acct_id = iv_subject_acct_id iv_workgroup_id = iv_workgroup_id ).
+    mo_api_helper = NEW zcl_proubc_api_helper( iv_tenant          = iv_tenant 
+                                               iv_subject_acct_id = iv_subject_acct_id
+                                               iv_workgroup_id    = iv_workgroup_id ).
 
     "Sets the ident/baseline api tokens
-    mo_api_helper->setup_protocol_msg( IMPORTING setup_success = lv_setup_success ).
-    CHECK lv_setup_success = abap_true.
+    mo_api_helper->setup_protocol_msg( IMPORTING setup_success = mv_setup_success ).
+    CHECK mv_setup_success = abap_true.
 
   ENDMETHOD.
 
@@ -190,7 +201,8 @@ CLASS zcl_proubc_idochlpr IMPLEMENTATION.
           lv_intordersegment = <fs_header_intord>-sdata.
           ev_objid = lv_intordersegment-orderid.
         ENDIF.
-      WHEN OTHERS. "TODO configure object id determinations, throw errors if missing
+      WHEN OTHERS. 
+      "TODO configure object id determinations, throw errors if missing
     ENDCASE.
   ENDMETHOD.
 
@@ -251,8 +263,7 @@ CLASS zcl_proubc_idochlpr IMPLEMENTATION.
         EXPORTING
           it_target_segment_struct =  lt_mapped_segment_struct
         IMPORTING
-          et_field_data            = ls_idoc_struct-fields
-      ).
+          et_field_data            = ls_idoc_struct-fields ).
       FIELD-SYMBOLS: <fs_targetsegment> TYPE any,
                      <fs_mappedsegment> TYPE any.
       "TODO this is dumpin but why?
@@ -315,13 +326,12 @@ CLASS zcl_proubc_idochlpr IMPLEMENTATION.
       DATA: lv_flattened_idoc TYPE REF TO data.
       DATA: lv_idoc_basictype TYPE string.
       lv_idoc_basictype = wa_idoc_control-idoctp.
-      me->idoc_to_json(
+      idoc_to_json(
         EXPORTING
           iv_idoc_basictype = lv_idoc_basictype
           it_idoc_segments  =  lt_edidd
          IMPORTING
-           ev_flattened_idoc = lv_flattened_idoc
-      ).
+           ev_flattened_idoc = lv_flattened_idoc ).
 
       "request to /api/v1/protocol_messages
       ls_protocol_msg_req-payload = lv_flattened_idoc.
@@ -335,13 +345,15 @@ CLASS zcl_proubc_idochlpr IMPLEMENTATION.
       "creates the Baseline Protocol / zk-proof of the idoc
       DATA: lv_apiresponse    TYPE REF TO data,
             lv_apiresponsestr TYPE string.
-      mo_api_helper->send_protocol_msg( EXPORTING body = ls_protocol_msg_req IMPORTING statuscode = lv_status
-                                                                                       apiresponse = lv_apiresponse
-                                                                                       apiresponsestr = lv_apiresponsestr  ). "should return 202
+      mo_api_helper->send_protocol_msg( EXPORTING body           = ls_protocol_msg_req 
+                                        IMPORTING statuscode     = lv_status
+                                                  apiresponse    = lv_apiresponse
+                                                  apiresponsestr = lv_apiresponsestr ).
 
       IF lv_status = '202'.
         DATA: ls_protocol_msg_resp TYPE zif_proubc_baseline=>protocolmessage_resp.
-        /ui2/cl_json=>deserialize( EXPORTING json = lv_apiresponsestr  CHANGING data = ls_protocol_msg_resp ).
+        /ui2/cl_json=>deserialize( EXPORTING json = lv_apiresponsestr
+                                    CHANGING data = ls_protocol_msg_resp ).
 
         DATA: wa_bpiobj    TYPE zbpiobj,
               lv_timestamp TYPE timestampl.
@@ -372,7 +384,8 @@ CLASS zcl_proubc_idochlpr IMPLEMENTATION.
           wa_bpiobj-subject_account_id = ls_protocol_msg_resp-subject_account_id.
           APPEND wa_bpiobj TO lt_newbpis.
         ENDIF.
-      ELSE. "log error message
+      ELSE. 
+      "log error message
       ENDIF.
 
     ENDLOOP.
@@ -381,8 +394,7 @@ CLASS zcl_proubc_idochlpr IMPLEMENTATION.
       EXPORTING
         it_objects = lt_newbpis
       IMPORTING
-        et_objects = lt_final_newbpis
-    ).
+        et_objects = lt_final_newbpis ).
     zcl_proubc_busobjhlpr=>create_object(
       EXPORTING
         it_objects = lt_final_newbpis
@@ -393,8 +405,7 @@ CLASS zcl_proubc_idochlpr IMPLEMENTATION.
       EXPORTING
         it_objects = lt_updatedbpis
       IMPORTING
-        et_objects = lt_final_updatedbpis
-    ).
+        et_objects = lt_final_updatedbpis ).
     zcl_proubc_busobjhlpr=>update_object(
       EXPORTING
         it_objects = lt_final_updatedbpis
@@ -426,8 +437,10 @@ CLASS zcl_proubc_idochlpr IMPLEMENTATION.
     AND docnum IN @it_idocnum.
 
     IF sy-subrc EQ 0.
-      me->launch_idoc_to_baseline( iv_idoctp = iv_idoctp 
-                                iv_idocmesty = iv_idocmestyp ).
+      launch_idoc_to_baseline( iv_idoctp    = iv_idoctp 
+                               iv_idocmesty = iv_idocmestyp ).
+    else.
+      "message no idocs found
     ENDIF.
 
   ENDMETHOD.
@@ -457,7 +470,7 @@ CLASS zcl_proubc_idochlpr IMPLEMENTATION.
                    <segmentdata_child>        TYPE any.
 
 
-    me->generate_idoc_segdata(
+    generate_idoc_segdata(
       EXPORTING
         iv_segmenttype      = iv_childsegmenttype
         iv_rawsegment       = iv_childrawsegment
@@ -507,7 +520,7 @@ CLASS zcl_proubc_idochlpr IMPLEMENTATION.
 
       LOOP AT it_idoc_data_copy ASSIGNING FIELD-SYMBOL(<fs_grandchild>) WHERE segnam = <fs_parentchild>-child
                                                                           AND psgnum = iv_childrawsegment-segnum.
-        me->generate_child_idoc_segdata(
+        generate_child_idoc_segdata(
         EXPORTING
           iv_parent_json_segmentid = lv_json_child_segmentid
           iv_childsegmenttype      = <fs_parentchild>-child
@@ -549,18 +562,18 @@ CLASS zcl_proubc_idochlpr IMPLEMENTATION.
     lv_segnumint = iv_rawsegment-segnum.
     lv_segnumstring = lv_segnumint.
     lv_segnam = iv_rawsegment-segnam.
-    "replace all occurrences of '_' in lv_segnam with ''.
-    "translate lv_segnam to lower case.
     SELECT SINGLE segnam FROM edid4 WHERE segnam = @lv_segnam INTO @DATA(lv_encodedsegnmam).
+    IF sy-subrc <> 0.
+      "Message segment &1 not found for idoc type &2
+    ENDIF.
     REPLACE ALL OCCURRENCES OF '_' IN lv_encodedsegnmam WITH ''.
     CONCATENATE lv_encodedsegnmam lv_segnumstring INTO lv_json_segmentid SEPARATED BY '_'.
     DATA: lv_safestring TYPE char30.
-    me->check_for_illegal_characters(
+    check_for_illegal_characters(
       EXPORTING
         iv_string             = lv_json_segmentid
       IMPORTING
-        ev_safestring         = lv_safestring
-    ).
+        ev_safestring         = lv_safestring ).
     ev_json_segmentid = lv_safestring.
 
     DATA:  dataref TYPE REF TO data.
@@ -592,7 +605,7 @@ CLASS zcl_proubc_idochlpr IMPLEMENTATION.
 
     "Create Dynamic table using component table
     "struct_type = cl_abap_structdescr=>create( comp_tab ).
-    cl_abap_structdescr=>create( "TODO discover wth this dumps on component name
+    cl_abap_structdescr=>create(
       EXPORTING
         p_components = comp_tab
         p_strict     = ''
@@ -600,7 +613,8 @@ CLASS zcl_proubc_idochlpr IMPLEMENTATION.
         p_result     = struct_type ).
 
     CREATE DATA dataref TYPE HANDLE struct_type.
-    ASSIGN dataref->* TO <segmentdata>. "Dyanmic Structure
+    "dynamic structure assignment
+    ASSIGN dataref->* TO <segmentdata>.
 
     FIELD-SYMBOLS: <fs_segment_raw> TYPE any.
     ASSIGN iv_rawsegment-sdata TO <fs_segment_raw> CASTING TYPE (iv_rawsegment-segnam).
@@ -697,7 +711,7 @@ CLASS zcl_proubc_idochlpr IMPLEMENTATION.
         "IF sy-subrc = 0.
         CLEAR:  lt_segment_comptab.
         "create the segment json
-        me->generate_idoc_segdata(
+        generate_idoc_segdata(
           EXPORTING
             iv_segmenttype      = <fs_idoc_struct>-segment_type
             iv_rawsegment       = wa_rawsegment
@@ -718,7 +732,7 @@ CLASS zcl_proubc_idochlpr IMPLEMENTATION.
 
           LOOP AT lt_idoc_segments_copy INTO wa_rawchildsegment WHERE segnam = <fs_idoc_struct_parent_child>-child
                                                                  AND  psgnum = wa_rawsegment-segnum.
-            me->generate_child_idoc_segdata(
+            generate_child_idoc_segdata(
               EXPORTING
                 iv_childsegmenttype = <fs_idoc_struct_parent_child>-child
                 iv_childrawsegment = wa_rawchildsegment
@@ -731,8 +745,7 @@ CLASS zcl_proubc_idochlpr IMPLEMENTATION.
                ev_child_json_segment    = ls_json_child_segment
              CHANGING
               cv_parent_segment = ls_json_segmentdata
-              ct_parent_comp_tab = lt_segment_comptab
-            ).
+              ct_parent_comp_tab = lt_segment_comptab ).
           ENDLOOP.
 
         ENDLOOP.
@@ -857,7 +870,7 @@ CLASS zcl_proubc_idochlpr IMPLEMENTATION.
     IF iv_string CN 'ABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789#$%&*-/;<=>?@^{|}'.
       "do something to fix it!
       lv_checkedstring = iv_string.
-      me->build_safestring( EXPORTING iv_string     = lv_checkedstring
+      build_safestring( EXPORTING iv_string     = lv_checkedstring
                             IMPORTING ev_safestring = lv_safestring ).
       ev_safestring = lv_safestring.
     ELSE.

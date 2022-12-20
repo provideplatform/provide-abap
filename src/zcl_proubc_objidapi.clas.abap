@@ -37,9 +37,11 @@ CLASS ZCL_PROUBC_OBJIDAPI IMPLEMENTATION.
         EXPORTING
           iv_objectid = lv_objectid
         IMPORTING
-          et_objects  = lt_object
-      ).
+          et_objects  = lt_object ).
       READ TABLE lt_object INDEX 1 INTO ls_object.
+      IF sy-subrc <> 0.
+        "message no object found
+      ENDIF.
       zcl_proubc_api_helper=>copy_data_to_ref(
               EXPORTING is_data = ls_object
               CHANGING cr_data  = lv_bpiobjdata ).

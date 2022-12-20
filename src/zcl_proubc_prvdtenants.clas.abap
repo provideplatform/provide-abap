@@ -176,10 +176,16 @@ CLASS zcl_proubc_prvdtenants IMPLEMENTATION.
 
     lo_api_helper = NEW zcl_proubc_api_helper( ).
     IF iv_prvdtenant IS NOT INITIAL.
-        SELECT SINGLE * FROM zprvdtenants INTO ls_prvdtenant WHERE organization_id = iv_prvdtenant
+      SELECT SINGLE * FROM zprvdtenants INTO ls_prvdtenant WHERE organization_id = iv_prvdtenant
                                                            AND subject_account_id = iv_subjacctid.
+      IF sy-subrc <> 0.
+        "message no PRVD tenant found
+      ENDIF.
     ELSE.
-        SELECT SINGLE * FROM zprvdtenants INTO ls_prvdtenant WHERE subject_account_id = iv_subjacctid.
+      SELECT SINGLE * FROM zprvdtenants INTO ls_prvdtenant WHERE subject_account_id = iv_subjacctid.
+      IF sy-subrc <> 0.
+        "message no PRVD tenant found
+      ENDIF.
     ENDIF.
     IF sy-subrc = 0.
       ev_prvdtenant-bpi_endpoint = ls_prvdtenant-bpi_endpoint.

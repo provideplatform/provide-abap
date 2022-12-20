@@ -10,32 +10,38 @@ CLASS zcl_proubc_busobjhlpr DEFINITION
         !it_objects TYPE ztty_bpiobj
       EXPORTING
         !et_objects TYPE ztty_bpiobj .
+    "! Retrieves a BPI objects table entry
     CLASS-METHODS get_object
       IMPORTING
         !iv_objectid TYPE zbpiobj-object_id OPTIONAL
       EXPORTING
         !et_objects  TYPE ztty_bpiobj .
+    "! Updates a BPI objects table entry
     CLASS-METHODS update_object
       IMPORTING
         !it_objects TYPE ztty_bpiobj
       EXPORTING
         !et_objects TYPE ztty_bpiobj .
+    "! Queries a BPI object's relative status
     CLASS-METHODS get_object_status
       IMPORTING
         !iv_objectid   TYPE zbpiobj-object_id
       EXPORTING
         !es_objectstat TYPE zif_proubc_object=>ty_update_status_res .
+    "! Updates a BPI object's relative status
     CLASS-METHODS update_object_status
       IMPORTING
         !iv_objectid   TYPE zbpiobj-object_id
         !is_objectstat TYPE zif_proubc_object=>ty_update_status_req
       EXPORTING
         !es_objectstat TYPE zif_proubc_object=>ty_update_status_res .
+    "! Verifies completeness of the BPI object being creates
     CLASS-METHODS validate_object_create
       IMPORTING
         !it_objects TYPE ztty_bpiobj
       EXPORTING
         !et_objects TYPE ztty_bpiobj .
+    "! Verifies the updates to be completd on a BPI object entry
     CLASS-METHODS validate_object_update
       IMPORTING
         !it_objects TYPE ztty_bpiobj

@@ -24,8 +24,8 @@ INTERFACE zif_proubc_blidochlper
     BEGIN OF ty_r_ebeln,
       sign   TYPE ddsign,
       option TYPE ddoption,
-      low    TYPE string, "ekko-ebeln,
-      high   TYPE string, "ekko-ebeln,
+      low    TYPE string,
+      high   TYPE string,
     END OF ty_r_ebeln .
   TYPES:
     tty_r_ebeln TYPE TABLE OF ty_r_ebeln .

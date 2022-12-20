@@ -72,23 +72,9 @@ CLASS zcl_proubc_api_helper DEFINITION
       IMPORTING
         !body           TYPE zif_proubc_baseline=>protocolmessage_req
       EXPORTING
-        !statuscode     TYPE i
-        !apiresponsestr TYPE string
-        !apiresponse    TYPE REF TO data .
-    METHODS send_bpiobjects_msg
-      IMPORTING
-        !body           TYPE zif_proubc_baseline=>bpiobjects_req
-      EXPORTING
-        !statuscode     TYPE i
-        !apiresponsestr TYPE string
-        !apiresponse    TYPE REF TO data .
-    METHODS create_businessobjects_msg
-      IMPORTING
-        !body           TYPE zif_proubc_baseline=>businessobject
-      EXPORTING
-        !statuscode     TYPE i
-        !apiresponsestr TYPE string
-        !apiresponse    TYPE REF TO data .
+        !ev_statuscode     TYPE i
+        !ev_apiresponsestr TYPE string
+        !ev_apiresponse    TYPE REF TO data .
     "! Method that attempts to resolve a PRVD tenant to the user based upon available data
     METHODS get_default_tenant
       RETURNING
@@ -149,18 +135,24 @@ CLASS zcl_proubc_api_helper IMPLEMENTATION.
     IF lv_subjacct IS INITIAL.
       lv_subjacct = mv_defaultsubjectacct.
     ENDIF.
-    call_ident_api( EXPORTING iv_tenant          = lv_tenant
-                                  iv_subjacct    = mv_defaultsubjectacct
-                        IMPORTING ev_authtoken   = lv_tenant_jwt
-                                  ev_bpiendpoint = lv_bpiendpoint ).
+    call_ident_api( EXPORTING iv_tenant      = lv_tenant
+                              iv_subjacct    = mv_defaultsubjectacct
+                    IMPORTING ev_authtoken   = lv_tenant_jwt
+                              ev_bpiendpoint = lv_bpiendpoint ).
 
 
 
     IF lv_tenant_jwt IS NOT INITIAL.
       TRY.
           ASSIGN lv_tenant_jwt->* TO FIELD-SYMBOL(<ls_data>).
+          IF SY-SUBRC <> 0.
+          ENDIF.
           ASSIGN COMPONENT 'ACCESS_TOKEN' OF STRUCTURE <ls_data> TO <fs_authreq>.
+          IF SY-SUBRC <> 0.
+          ENDIF.
           ASSIGN <fs_authreq>->* TO <fs_authreq2>.
+          IF SY-SUBRC <> 0.
+          ENDIF.
           lv_authreq = <fs_authreq2>.
 
           cl_http_client=>create_by_url(
@@ -223,8 +215,8 @@ CLASS zcl_proubc_api_helper IMPLEMENTATION.
        updtim
        FROM edidc
        UP TO 1 ROWS
-       "inner join EDID4 as b on a~docnum = b~docnum
        INTO TABLE @DATA(lt_selected_idocs)
+       ORDER BY PRIMARY KEY
        WHERE direct = '1'
        AND status = '03'
        AND mestyp = 'ORDERS'
@@ -261,6 +253,9 @@ CLASS zcl_proubc_api_helper IMPLEMENTATION.
         int_edidd       = lt_edidd
       EXCEPTIONS
         OTHERS          = 1.
+    IF SY-SUBRC <> 0.
+    "Message error reading idoc
+    ENDIF.
 
     ls_dummy_idoc_protocol_msg-payload_mimetype = 'json'.
     ls_dummy_idoc_protocol_msg-type = 'ORDERS05'.
@@ -386,6 +381,8 @@ CLASS zcl_proubc_api_helper IMPLEMENTATION.
           mv_selected_workgroupid = wa_defaulttenant-workgroup_id.
           mv_default_bpiendpoint = wa_defaulttenant-bpi_endpoint.
           RETURN.
+        ELSE.
+          "Message no default org determined
         ENDIF.
       ENDIF.
     ENDIF.
@@ -465,18 +462,6 @@ CLASS zcl_proubc_api_helper IMPLEMENTATION.
     ENDTRY.
   ENDMETHOD.
 
-
-  METHOD send_bpiobjects_msg.
-    TRY.
-        mo_baseline_client->send_bpiobjects_msg( EXPORTING body = body
-                                               IMPORTING statuscode = statuscode
-                                                         apiresponsestr = apiresponsestr
-                                                         apiresponse = apiresponse ).
-      CATCH cx_static_check.
-    ENDTRY.
-  ENDMETHOD.
-
-
   METHOD send_protocol_msg.
     DATA ls_finalized_protocol_msg TYPE zif_proubc_baseline=>protocolmessage_req.
 
@@ -486,9 +471,9 @@ CLASS zcl_proubc_api_helper IMPLEMENTATION.
     TRY.
         mo_baseline_client->send_protocol_msg( EXPORTING iv_body        = ls_finalized_protocol_msg
                                                          iv_bpitoken    = mv_bpitoken
-                                               IMPORTING statuscode     = statuscode
-                                                         apiresponsestr = apiresponsestr
-                                                         apiresponse    = apiresponse ).
+                                               IMPORTING statuscode     = ev_statuscode
+                                                         apiresponsestr = ev_apiresponsestr
+                                                         apiresponse    = ev_apiresponse ).
       CATCH cx_static_check.
     ENDTRY.
   ENDMETHOD.
@@ -519,8 +504,14 @@ CLASS zcl_proubc_api_helper IMPLEMENTATION.
     IF lv_tenant_jwt IS NOT INITIAL.
       TRY.
           ASSIGN lv_tenant_jwt->* TO FIELD-SYMBOL(<ls_data>).
+          IF SY-SUBRC <> 0.
+          ENDIF.
           ASSIGN COMPONENT 'ACCESS_TOKEN' OF STRUCTURE <ls_data> TO <fs_authreq>.
+          IF SY-SUBRC <> 0.
+          ENDIF.
           ASSIGN <fs_authreq>->* TO <fs_authreq2>.
+          IF SY-SUBRC <> 0.
+          ENDIF.
           mv_bpitoken  = <fs_authreq2>.
 
           cl_http_client=>create_by_url(

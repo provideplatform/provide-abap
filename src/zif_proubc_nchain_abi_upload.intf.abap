@@ -1,8 +1,8 @@
-interface ZIF_PROUBC_NCHAIN_ABI_UPLOAD
-  public .
+INTERFACE zif_proubc_nchain_abi_upload
+  PUBLIC .
 
 
-  types:
+  TYPES:
     BEGIN OF ty_abi_registry,
            nchain_networkid      TYPE zproubc_smartcontract_addr,
            smartcontract_address TYPE zproubc_smartcontract_addr,
@@ -15,25 +15,33 @@ interface ZIF_PROUBC_NCHAIN_ABI_UPLOAD
            changed_on            TYPE timestampl,
            production_mainnet    TYPE char1,
          END OF ty_abi_registry .
-  types:
+  TYPES:
     tty_abi_registry TYPE STANDARD TABLE OF ty_abi_registry .
 
-  methods UPLOAD_ABI_FILE .
-  methods VERIFY_ABI_FILE .
-  methods REGISTER_ABI_FILE
-    exporting
-      !EV_SUCCESS type ABAP_BOOL .
-  methods UNREGISTER_ABI_FILE
-    exporting
-      !EV_SUCCESS type ABAP_BOOL .
-  methods DELETE_FILE
-    exporting
-      !EV_SUCCESS type ABAP_BOOL .
-  methods DELETE_REGISTRY
-    exporting
-      !EV_SUCCESS type ABAP_BOOL .
-  methods UPDATE_VALIDTO .
-  methods UPDATE_VALIDFROM .
-  methods VALIDATE_REGISTRY .
-  methods SET_AL11_ABI_FILE_PATH .
-endinterface.
+  "! Uploads an ABI file into a AL11 directory
+  METHODS UPLOAD_ABI_FILE .
+  "! Creates a table entry to ZPRVDABIREGISTRY, indexing the smart contract/network id to the file
+  METHODS register_abi_file
+    EXPORTING
+      !ev_success TYPE abap_bool .
+  "! Clears the ABI file directory assignment to ZPRVDABIREGISTRY
+  METHODS unregister_abi_file
+    EXPORTING
+      !ev_success TYPE abap_bool .
+  "! Deletes the specific ABI file from AL11
+  METHODS delete_file
+    EXPORTING
+      !ev_success TYPE abap_bool .
+  "! Deletes an entry from ZPRVDABIREGISTRY. Note that AL11 file deletion is handled elsewhere
+  METHODS delete_registry
+    EXPORTING
+      !ev_success TYPE abap_bool .
+  "! Sets a valid to date for the ABI registry table entry (enables timelocked go-live)
+  METHODS UPDATE_VALIDTO .
+  "! Sets a valid from date for the ABI registry table entry (enables timelocked go-live)
+  METHODS UPDATE_VALIDFROM .
+  "! Validates an incoming or current entry to the ZPRVDABIREGISTRY table
+  METHODS VALIDATE_REGISTRY .
+  "! Selects a default ALL path to which ABI files will be stored 
+  METHODS SET_AL11_ABI_FILE_PATH .
+ENDINTERFACE.

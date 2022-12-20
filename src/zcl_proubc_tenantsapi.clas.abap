@@ -64,7 +64,13 @@ CLASS zcl_proubc_tenantsapi IMPLEMENTATION.
 
     DATA(lt_uriattributes) = mo_request->get_uri_attributes( ).
     READ TABLE lt_uriattributes WITH KEY name = 'ID' ASSIGNING FIELD-SYMBOL(<fs_tenantid>).
+    IF SY-SUBRC <> 0.
+      "No id - raise 422
+    ENDIF.
     READ TABLE lt_uriattributes WITH KEY name = 'SUBJACCTID' ASSIGNING FIELD-SYMBOL(<fs_subj_acct_id>).
+    If sy-subrc <> 0.
+      "No subject account id raise 422
+    ENDIF
     IF <fs_tenantid> IS ASSIGNED AND <fs_subj_acct_id> IS ASSIGNED.
       lv_tenantid = <fs_tenantid>-value.
       lv_subj_acct_id = <fs_subj_acct_id>-value.
@@ -73,12 +79,11 @@ CLASS zcl_proubc_tenantsapi IMPLEMENTATION.
           iv_prvdtenant = lv_tenantid
           iv_subjacctid = lv_subj_acct_id
         IMPORTING
-          ev_prvdtenant = ls_prvdtenant
-      ).
+          ev_prvdtenant = ls_prvdtenant ).
       DATA(lo_entity) = mo_response->create_entity( ).
       lo_entity->set_content_type( if_rest_media_type=>gc_appl_json ).
-      lo_entity->set_string_data( /ui2/cl_json=>serialize( EXPORTING data        = ls_prvdtenant
-                                                                     pretty_name = /ui2/cl_json=>pretty_mode-low_case ) ).
+      lo_entity->set_string_data( /ui2/cl_json=>serialize( data        = ls_prvdtenant
+                                                           pretty_name = /ui2/cl_json=>pretty_mode-low_case ) ).
       mo_response->set_status( cl_rest_status_code=>gc_success_ok ).
     ELSEIF <fs_tenantid> IS ASSIGNED.
       lv_tenantid = <fs_tenantid>-value.
@@ -100,8 +105,7 @@ CLASS zcl_proubc_tenantsapi IMPLEMENTATION.
       zcl_proubc_prvdtenants=>get_allprvdtenant( IMPORTING et_prvdtenant = lt_prvdtenants ).
       zcl_proubc_api_helper=>copy_data_to_ref(
             EXPORTING is_data = lt_prvdtenants
-            CHANGING cr_data  = lv_tenantdata
-      ).
+            CHANGING cr_data  = lv_tenantdata ).
 
       lo_entity = mo_response->create_entity( ).
       lo_entity->set_content_type( if_rest_media_type=>gc_appl_json ).
@@ -158,9 +162,9 @@ CLASS zcl_proubc_tenantsapi IMPLEMENTATION.
     zcl_proubc_prvdtenants=>update_prvdtenant( EXPORTING it_prvdtenant = lt_prvdtenants
                                                IMPORTING et_prvdtenant = lt_prvdtenants_out ).
     READ TABLE lt_prvdtenants_out INDEX 1 INTO wa_prvdtenant.
-    if sy-subrc <> 0.
+    IF sy-subrc <> 0.
       "No update mapped
-    endif.
+    ENDIF.
 
     zcl_proubc_api_helper=>copy_data_to_ref( EXPORTING is_data = wa_prvdtenant
                                              CHANGING cr_data  = lv_tenantdata ).

@@ -28,12 +28,14 @@ CLASS zcl_proubc_vault_helper DEFINITION
       encrypt,
       "! Decrypts data
       decrypt,
+      "! Used to cryptographically sign data
       sign,
+      "! Used to cryptographically verify data
       verify,
       "! Initializes other aspects of the vault helper class to ensure connectivity to Vault microservice
       setup_vault_msgs,
       "! Retrieves the wallet address per Vault data input specs
-      get_wallet_address EXPORTING ev_wallet_address TYPE zproubc_smartcontract_addr.
+      get_wallet_address RETURNING VALUE(rv_wallet_address) TYPE zproubc_smartcontract_addr.
   PROTECTED SECTION.
     DATA: mo_api_helper   TYPE REF TO zcl_proubc_api_helper,
           mv_tenant        TYPE zprvdtenantid,
@@ -161,5 +163,6 @@ CLASS zcl_proubc_vault_helper IMPLEMENTATION.
     ENDIF.
   ENDMETHOD.
   METHOD get_wallet_address.
+    rv_wallet_address = ''.
   ENDMETHOD.
 ENDCLASS.
