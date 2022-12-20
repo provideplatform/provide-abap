@@ -1,6 +1,7 @@
 CLASS zcl_proubc_privacy DEFINITION PUBLIC.
   PUBLIC SECTION.
     INTERFACES zif_proubc_privacy.
+    "! Constructor method for initializing PRVD Privacy API proxy
     METHODS constructor IMPORTING !ii_client   TYPE REF TO if_http_client
                                   !iv_tenant   TYPE zprvdtenantid
                                   !iv_bpitoken TYPE zprvdrefreshtoken.
@@ -32,12 +33,13 @@ CLASS zcl_proubc_privacy IMPLEMENTATION.
     mi_client->request->set_header_field( name  = '~request_uri'
                                           value = lv_uri ).
     lv_code = send_receive( ).
-    WRITE / lv_code.
+    "~replace with logging call
     CASE lv_code.
       WHEN 200.
       WHEN 401.
       WHEN 407.
       WHEN 500.
+      WHEN OTHERS.
     ENDCASE.
   ENDMETHOD.
 
@@ -50,12 +52,13 @@ CLASS zcl_proubc_privacy IMPLEMENTATION.
                                           value = lv_uri ).
 * todo, set body, #/components/schemas/CreatecircuitRequest
     lv_code = send_receive( ).
-    WRITE / lv_code.
+    "~replace with logging call
     CASE lv_code.
       WHEN 200.
       WHEN 401.
       WHEN 407.
       WHEN 500.
+      WHEN OTHERS.
     ENDCASE.
   ENDMETHOD.
 
@@ -71,12 +74,13 @@ CLASS zcl_proubc_privacy IMPLEMENTATION.
                                           value = lv_uri ).
 * todo, set body, #/components/schemas/VerifyRequest
     lv_code = send_receive( ).
-    WRITE / lv_code.
+    "~replace with logging call
     CASE lv_code.
       WHEN 200.
       WHEN 401.
       WHEN 407.
       WHEN 500.
+      WHEN OTHERS.
     ENDCASE.
   ENDMETHOD.
 
