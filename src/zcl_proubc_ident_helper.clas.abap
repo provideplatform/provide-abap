@@ -4,20 +4,20 @@ CLASS zcl_proubc_ident_helper DEFINITION
   CREATE PUBLIC .
 
 PUBLIC SECTION.
-    METHODS: "! Creates instance of the Ident helper class
-              constructor,
-             "! Creates a PRVD Ident user with the given parameters
-             create_ident_user IMPORTING iv_firstname TYPE string
+  METHODS: "! Creates instance of the Ident helper class
+            constructor,
+            "! Creates a PRVD Ident user with the given parameters
+            create_ident_user IMPORTING iv_firstname TYPE string
                                          iv_lastname TYPE string
                                          iv_email TYPE string
                                          iv_password TYPE string OPTIONAL,
             "! Creates the PRVD Org to be affiliated to the user
-             create_user_organization IMPORTING iv_tenantid TYPE zprvdtenantid
+            create_user_organization IMPORTING iv_tenantid TYPE zprvdtenantid
                                                 iv_subjacctid TYPE zprvdtenantid
                                                 iv_orgname TYPE string.
 
 PROTECTED SECTION.
-    DATA: mo_ident_client TYPE REF TO zif_proubc_ident.
+  DATA: mo_ident_client TYPE REF TO zif_proubc_ident.
 PRIVATE SECTION.
 ENDCLASS.
 
