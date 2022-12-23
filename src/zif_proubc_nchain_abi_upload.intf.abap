@@ -42,6 +42,6 @@ INTERFACE zif_proubc_nchain_abi_upload
   METHODS UPDATE_VALIDFROM .
   "! Validates an incoming or current entry to the ZPRVDABIREGISTRY table
   METHODS VALIDATE_REGISTRY .
-  "! Selects a default ALL path to which ABI files will be stored 
+  "! Selects a default ALL path to which ABI files will be stored
   METHODS SET_AL11_ABI_FILE_PATH .
 ENDINTERFACE.

@@ -19,7 +19,7 @@ CLASS zcl_proubc_vault_helper DEFINITION
       list_vaults EXPORTING !et_vault_list TYPE zif_proubc_vault=>tty_vault_query,
       "! Creates a PRVD Vault for the user
       create_vault,
-      "! Derives a key for 
+      "! Derives a key for
       derive_key,
       list_keys,
       "! Deletes the specified user key upon user request
@@ -77,7 +77,7 @@ CLASS zcl_proubc_vault_helper IMPLEMENTATION.
     ENDIF.
 
     mo_http_client->propertytype_accept_cookie = if_http_client=>co_enabled.
-    mo_http_client->request->set_header_field( name  = if_http_form_fields_sap=>sap_client 
+    mo_http_client->request->set_header_field( name  = if_http_form_fields_sap=>sap_client
                                                value = '100' ).
 
     "todo fix params

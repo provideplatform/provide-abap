@@ -42,7 +42,7 @@ CLASS ZCL_PROUBC_OBJSTATAPI IMPLEMENTATION.
 
     lo_entity = mo_response->create_entity( ).
     lo_entity->set_content_type( if_rest_media_type=>gc_appl_json ).
-    lo_entity->set_string_data( /ui2/cl_json=>serialize( data        = lv_statusdata 
+    lo_entity->set_string_data( /ui2/cl_json=>serialize( data        = lv_statusdata
                                                          pretty_name = /ui2/cl_json=>pretty_mode-low_case ) ).
     mo_response->set_status( cl_rest_status_code=>gc_success_ok ).
   ENDMETHOD.
@@ -74,7 +74,7 @@ CLASS ZCL_PROUBC_OBJSTATAPI IMPLEMENTATION.
 
     lo_entity = mo_response->create_entity( ).
     lo_entity->set_content_type( if_rest_media_type=>gc_appl_json ).
-    lo_entity->set_string_data( /ui2/cl_json=>serialize( data = ls_resp_objstat 
+    lo_entity->set_string_data( /ui2/cl_json=>serialize( data = ls_resp_objstat
                                                   pretty_name = /ui2/cl_json=>pretty_mode-low_case ) ).
     mo_response->set_status( cl_rest_status_code=>gc_success_ok ).
   ENDMETHOD.

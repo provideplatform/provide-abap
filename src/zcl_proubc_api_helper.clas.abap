@@ -33,7 +33,7 @@ CLASS zcl_proubc_api_helper DEFINITION
         !ev_subject_account_id TYPE zprvdtenantid.
     "! Method to create an instance of the API Helper object
     "! @parameter iv_tenant | PRVD Org ID
-    "! @parameter iv_subjcect_acct_id | PRVD Subject Account ID
+    "! @parameter iv_subject_acct_id  | PRVD Subject Account ID
     "! @parameter iv_workgroup_id | PRVD Workgroup ID
     METHODS constructor
       IMPORTING
@@ -70,7 +70,7 @@ CLASS zcl_proubc_api_helper DEFINITION
     "! Emits PRVD Baseline protocol message
     METHODS send_protocol_msg
       IMPORTING
-        !body           TYPE zif_proubc_baseline=>protocolmessage_req
+        !is_body           TYPE zif_proubc_baseline=>protocolmessage_req
       EXPORTING
         !ev_statuscode     TYPE i
         !ev_apiresponsestr TYPE string
@@ -170,7 +170,7 @@ CLASS zcl_proubc_api_helper IMPLEMENTATION.
           ENDIF.
 
           lo_http_client->propertytype_accept_cookie = if_http_client=>co_enabled.
-          lo_http_client->request->set_header_field( name  = if_http_form_fields_sap=>sap_client 
+          lo_http_client->request->set_header_field( name  = if_http_form_fields_sap=>sap_client
                                                      value = '100' ).
 
           lo_baseline_api = NEW zcl_proubc_baseline( ii_client        = lo_http_client
@@ -216,11 +216,11 @@ CLASS zcl_proubc_api_helper IMPLEMENTATION.
        FROM edidc
        UP TO 1 ROWS
        INTO TABLE @DATA(lt_selected_idocs)
-       ORDER BY PRIMARY KEY
        WHERE direct = '1'
        AND status = '03'
        AND mestyp = 'ORDERS'
-       AND idoctp = 'ORDERS05'.
+       AND idoctp = 'ORDERS05'
+              ORDER BY PRIMARY KEY.
 
     IF sy-subrc <> 0.
       "raise message no idocs available
@@ -430,19 +430,6 @@ CLASS zcl_proubc_api_helper IMPLEMENTATION.
     ENDIF.
   ENDMETHOD.
 
-
-  METHOD create_businessobjects_msg.
-
-    TRY.
-        mo_baseline_client->createbaselinebusinessobject( EXPORTING body = body
-                                               IMPORTING statuscode = statuscode
-                                                         apiresponsestr = apiresponsestr
-                                                         apiresponse = apiresponse ).
-      CATCH cx_static_check.
-    ENDTRY.
-  ENDMETHOD.
-
-
   METHOD get_default_tenant.
     "TODO add authorization check and mapping to sap user id
     ev_defaulttenant = mv_defaulttenant.
@@ -465,15 +452,15 @@ CLASS zcl_proubc_api_helper IMPLEMENTATION.
   METHOD send_protocol_msg.
     DATA ls_finalized_protocol_msg TYPE zif_proubc_baseline=>protocolmessage_req.
 
-    ls_finalized_protocol_msg                    = body.
+    ls_finalized_protocol_msg                    = is_body.
     ls_finalized_protocol_msg-subject_account_id = mv_defaultsubjectacct.
     ls_finalized_protocol_msg-workgroup_id       = mv_selected_workgroupid.
     TRY.
         mo_baseline_client->send_protocol_msg( EXPORTING iv_body        = ls_finalized_protocol_msg
                                                          iv_bpitoken    = mv_bpitoken
-                                               IMPORTING statuscode     = ev_statuscode
-                                                         apiresponsestr = ev_apiresponsestr
-                                                         apiresponse    = ev_apiresponse ).
+                                               IMPORTING ev_statuscode     = ev_statuscode
+                                                         ev_apiresponsestr = ev_apiresponsestr
+                                                         ev_apiresponse    = ev_apiresponse ).
       CATCH cx_static_check.
     ENDTRY.
   ENDMETHOD.

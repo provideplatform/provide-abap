@@ -138,7 +138,7 @@ CLASS ZCL_PROUBC_OBJIDAPI IMPLEMENTATION.
         et_objects = lt_resp_obj ).
 
     READ TABLE lt_resp_obj INDEX 1 INTO ls_resp_obj.
-    IF sy-surbc <> 0.
+    IF sy-subrc <> 0.
       "no update mapped.
     ENDIF.
 

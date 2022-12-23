@@ -96,7 +96,7 @@ INTERFACE zif_proubc_baseline
 " todo, handle array in ABI
     BEGIN OF compiledartifact,
       contractname TYPE string,
-      abi          TYPE REF TO data, 
+      abi          TYPE REF TO data,
       bytecode     TYPE string,
       source       TYPE string,
     END OF compiledartifact .
@@ -395,7 +395,7 @@ INTERFACE zif_proubc_baseline
     END OF protocolmessage .
   TYPES:
     BEGIN OF protocolmessage_req,
-      id               TYPE zbpiobj-object_id, 
+      id               TYPE zbpiobj-object_id,
       payload          TYPE REF TO data,
       payload_mimetype TYPE string,
       type             TYPE string,
@@ -406,7 +406,7 @@ INTERFACE zif_proubc_baseline
        BEGIN OF protocolmessage_resp,
             baseline_id TYPE string,
             proof TYPE string,
-            recipients TYPE tab_string, 
+            recipients TYPE tab_string,
             subject_account_id TYPE zprvdtenantid,
             type TYPE string,
             workgroup_id TYPE zprvdtenantid,

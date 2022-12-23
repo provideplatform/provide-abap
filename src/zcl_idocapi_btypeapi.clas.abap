@@ -39,12 +39,12 @@ CLASS zcl_idocapi_btypeapi IMPLEMENTATION.
       LEFT OUTER JOIN edbast AS b ON a~idoctyp = b~idoctyp
                                   AND b~langua = 'E'
       INTO TABLE lt_basictypes
-      order by PRIMARY key.
+      ORDER BY a~idoctyp.
 
     IF sy-subrc = 0.
       DATA(lo_entity) = mo_response->create_entity( ).
       lo_entity->set_content_type( if_rest_media_type=>gc_appl_json ).
-      lo_entity->set_string_data( /ui2/cl_json=>serialize( data        = lt_basictypes 
+      lo_entity->set_string_data( /ui2/cl_json=>serialize( data        = lt_basictypes
                                                            pretty_name = /ui2/cl_json=>pretty_mode-low_case ) ).
       mo_response->set_status( cl_rest_status_code=>gc_success_ok ).
     ENDIF.

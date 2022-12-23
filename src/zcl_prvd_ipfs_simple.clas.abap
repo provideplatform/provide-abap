@@ -58,7 +58,7 @@ CLASS zcl_prvd_ipfs_simple IMPLEMENTATION.
     CONCATENATE iv_ipfsprojid ':' iv_ipfsapikey INTO lv_creds.
 
     cl_http_utility=>if_http_utility~encode_base64( EXPORTING unencoded = lv_creds
-                                                    RECEIVING encoded   = lv_creds_base64.
+                                                    RECEIVING encoded   = lv_creds_base64 ).
 
     CONCATENATE 'Basic' lv_creds_base64 INTO lv_creds_header SEPARATED BY space.
     mi_client->request->set_header_field( name  = 'Authorization'
@@ -67,7 +67,7 @@ CLASS zcl_prvd_ipfs_simple IMPLEMENTATION.
     mi_client->request->set_header_field( name = 'Content-Type'
                                          value = 'multipart/form-data' ).
 
-    mi_client->request->set_header_field( name = 'Accept' 
+    mi_client->request->set_header_field( name = 'Accept'
                                          value = '*/*' ).
     mi_client->request->set_header_field( name = 'Accept-Encoding'
                                          value = 'gzip, deflate, br').

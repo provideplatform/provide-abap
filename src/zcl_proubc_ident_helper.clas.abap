@@ -43,7 +43,7 @@ CLASS zcl_proubc_ident_helper IMPLEMENTATION.
     ENDIF.
 
     lo_http_client->propertytype_accept_cookie = if_http_client=>co_enabled.
-    lo_http_client->request->set_header_field( name  = if_http_form_fields_sap=>sap_client 
+    lo_http_client->request->set_header_field( name  = if_http_form_fields_sap=>sap_client
                                                value = '100' ).
 
     lo_ident_api = NEW zcl_proubc_ident( ii_client = lo_http_client
@@ -59,7 +59,7 @@ CLASS zcl_proubc_ident_helper IMPLEMENTATION.
     ls_create_user_req-first_name = iv_firstname.
     ls_create_user_req-last_name = iv_lastname.
     ls_create_user_req-email = iv_email.
-    lo_ident_client->createuser( body = ls_create_user_req  ).
+    mo_ident_client->createuser( body = ls_create_user_req  ).
 
     zcl_proubc_prvdtenants=>create_prvdtenant( it_prvdtenant = lt_prvdtenant ).
   ENDMETHOD.

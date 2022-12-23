@@ -140,7 +140,7 @@ CLASS zcl_proubc_tenantsapi IMPLEMENTATION.
                                               CHANGING cr_data = lv_tenantdata ).
     DATA(lo_entity) = mo_response->create_entity( ).
     lo_entity->set_content_type( if_rest_media_type=>gc_appl_json ).
-    lo_entity->set_string_data( /ui2/cl_json=>serialize( data = lv_tenantdata 
+    lo_entity->set_string_data( /ui2/cl_json=>serialize( data = lv_tenantdata
                                                          pretty_name = /ui2/cl_json=>pretty_mode-low_case ) ).
     mo_response->set_status( cl_rest_status_code=>gc_success_created ).
   ENDMETHOD.
@@ -154,7 +154,7 @@ CLASS zcl_proubc_tenantsapi IMPLEMENTATION.
           lv_tenantdata      TYPE REF TO data.
 
     DATA(lv_request_body) = mo_request->get_entity( )->get_string_data( ).
-    /ui2/cl_json=>deserialize( EXPORTING json = lv_request_body 
+    /ui2/cl_json=>deserialize( EXPORTING json = lv_request_body
                                CHANGING  data = ls_prvdtenant ).
 
     APPEND ls_prvdtenant TO lt_prvdtenants.

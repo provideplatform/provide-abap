@@ -29,7 +29,7 @@ INTERFACE zif_proubc_object
     END OF ty_create_object_req .
   TYPES:
     BEGIN OF ty_create_object_req_objid,
-      payload     TYPE REF TO data, 
+      payload     TYPE REF TO data,
       type        TYPE string,
       schema_type TYPE string,
       baseline_id TYPE zbpiobj-baseline_id,

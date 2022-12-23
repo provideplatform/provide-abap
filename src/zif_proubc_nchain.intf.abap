@@ -151,10 +151,10 @@ INTERFACE zif_proubc_nchain
 * Component schema: Abi, object
   TYPES: BEGIN OF ty_abi,
            anonymous       TYPE abap_bool,
-           inputs          TYPE STANDARD TABLE OF string WITH EMPTY KEY, 
+           inputs          TYPE STANDARD TABLE OF string WITH EMPTY KEY,
            name            TYPE string,
            type            TYPE string,
-           outputs         TYPE STANDARD TABLE OF string WITH EMPTY KEY, 
+           outputs         TYPE STANDARD TABLE OF string WITH EMPTY KEY,
            statemutability TYPE string,
          END OF ty_abi.
 

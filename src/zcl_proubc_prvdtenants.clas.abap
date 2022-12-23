@@ -136,11 +136,11 @@ CLASS zcl_proubc_prvdtenants IMPLEMENTATION.
     lo_api_helper = NEW zcl_proubc_api_helper( ).
     SELECT * FROM zprvdtenants INTO TABLE lt_prvdtenant.
     IF sy-subrc = 0.
-    ELSEIF sy-subrc EQ 4. 
+    ELSEIF sy-subrc EQ 4.
     "# can't find it. thats ok
-    ELSEIF sy-subrc EQ 8. 
+    ELSEIF sy-subrc EQ 8.
     "problem with the db
-    ELSE. 
+    ELSE.
     "general error
 
     ENDIF.
@@ -202,9 +202,9 @@ CLASS zcl_proubc_prvdtenants IMPLEMENTATION.
       "ev_prvdtenant-reachable = abap_false. "TODO call the bpi health check
     ELSEIF sy-subrc EQ 4.
     "can't find it. thats ok
-    ELSEIF sy-subrc EQ 8. 
+    ELSEIF sy-subrc EQ 8.
     "problem with the db
-    ELSE. 
+    ELSE.
     "general error wtf
     ENDIF.
   ENDMETHOD.

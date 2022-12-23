@@ -66,9 +66,9 @@ CLASS zcl_proubc_nchain_helper IMPLEMENTATION.
     ENDIF.
 
     IF !io_prvd_vault_helper  IS BOUND.
-      lo_prvd_vault_helper = io_prvd_vault_helper.
+      mo_prvd_vault_helper = io_prvd_vault_helper.
     ELSE.
-      lo_prvd_vault_helper = NEW zcl_proubc_vault_helper( io_api_helper = mo_prvd_api_helper ).
+      mo_prvd_vault_helper = NEW zcl_proubc_vault_helper( io_api_helper = mo_prvd_api_helper ).
     ENDIF.
 
     mo_prvd_api_helper->call_ident_api(
@@ -106,7 +106,7 @@ CLASS zcl_proubc_nchain_helper IMPLEMENTATION.
     ENDIF.
 
     mo_http_client->propertytype_accept_cookie = if_http_client=>co_enabled.
-    mo_http_client->request->set_header_field( name  = if_http_form_fields_sap=>sap_client 
+    mo_http_client->request->set_header_field( name  = if_http_form_fields_sap=>sap_client
                                                value = '100' ).
 
     mo_nchain_api = NEW zcl_proubc_nchain( ii_client   = mo_http_client
@@ -185,7 +185,7 @@ CLASS zcl_proubc_nchain_helper IMPLEMENTATION.
         ls_executecontract-method = 'latestRoundData'.
         ls_executecontract-value = 0.
         ls_executecontract-wallet_id = ls_wallet_created-id.
-      WHEN 404. 
+      WHEN 404.
       "contract not found - might not be deployed
       WHEN OTHERS.
     ENDCASE.
@@ -262,8 +262,8 @@ CLASS zcl_proubc_nchain_helper IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD get_vault_helper.
-    IF lo_prvd_vault_helper IS NOT BOUND.
-      lo_prvd_vault_helper = NEW zcl_proubc_vault_helper(  ).
+    IF mo_prvd_vault_helper IS NOT BOUND.
+      mo_prvd_vault_helper = NEW zcl_proubc_vault_helper(  ).
     ENDIF.
   ENDMETHOD.
 

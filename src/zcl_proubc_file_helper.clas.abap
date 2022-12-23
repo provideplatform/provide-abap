@@ -74,6 +74,8 @@ CLASS zcl_proubc_file_helper IMPLEMENTATION.
         rv_string = DATA(lv_string) ).
     IF sy-subrc = 0.
       ev_filecontent = lv_string.
+    ELSE.
+    "Todo add error handling here
     ENDIF.
   ENDMETHOD.
 
@@ -86,11 +88,12 @@ CLASS zcl_proubc_file_helper IMPLEMENTATION.
       iv_xstr   = ev_filecontent_x
       iv_cp     =  1100
     RECEIVING
-      rv_string = DATA(lv_string)
-    ).
+      rv_string = DATA(lv_string) ).
     IF sy-subrc = 0.
       ev_filecontent = lv_string.
       ev_length = lv_bytes.
+    else.
+    "todo error in binary string conversion
     ENDIF.
 
     OPEN DATASET iv_file_location FOR INPUT IN TEXT MODE ENCODING DEFAULT.
@@ -154,8 +157,7 @@ CLASS zcl_proubc_file_helper IMPLEMENTATION.
       IMPORTING
         ev_apiresponsestr      = lv_ipfs_add_resp
         ev_apiresponse         = lv_ipfs_add_data
-        ev_httpresponsecode    = lv_ipfs_add_code
-    ).
+        ev_httpresponsecode    = lv_ipfs_add_code ).
     IF lv_ipfs_add_code EQ 200.
       ASSIGN lv_ipfs_add_data->* TO FIELD-SYMBOL(<fs_ipfsresp>).
       IF SY-SUBRC <> 0.

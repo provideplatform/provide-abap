@@ -47,9 +47,9 @@ CLASS ZCL_PROUBC_OBTRIGTEST IMPLEMENTATION.
     lo_api_helper->setup_protocol_msg( IMPORTING setup_success = lv_setup_success ).
 
     IF lv_setup_success = 'X'.
-      lo_api_helper->send_protocol_msg( EXPORTING body       = ls_protocol_msg_req 
-                                        IMPORTING statuscode = lv_status
-                                              apiresponsestr = lv_apiresponsestr ).
+      lo_api_helper->send_protocol_msg( EXPORTING body              = ls_protocol_msg_req
+                                        IMPORTING ev_statuscode     = lv_status
+                                                  ev_apiresponsestr = lv_apiresponsestr ).
 
       ls_testresponse-bpi_tenant_id = lo_api_helper->get_default_tenant( ).
       ls_testresponse-status = lv_status.

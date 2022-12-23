@@ -54,19 +54,19 @@
      <SPRSL>E</SPRSL>
      <ARBGB>ZCLPROUBCMSG</ARBGB>
      <MSGNR>007</MSGNR>
-     <TEXT>Ident authentication failure with Tenant &amp; HTTP &amp; Ident core URI &amp;</TEXT>
+     <TEXT>Ident authentication failure with Tenant &amp;1 HTTP &amp;2 Ident core URI &amp;3</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>ZCLPROUBCMSG</ARBGB>
      <MSGNR>008</MSGNR>
-     <TEXT>Baseline autentication failure tithe Tenant &amp; HTTP &amp; BPI core URI &amp;</TEXT>
+     <TEXT>Baseline autentication failure with Tenant &amp;1 HTTP &amp;2 BPI core URI &amp;3</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
      <ARBGB>ZCLPROUBCMSG</ARBGB>
      <MSGNR>009</MSGNR>
-     <TEXT>Failed to create protocol message with Tenant &amp; HTTP &amp; BPI core URI &amp;</TEXT>
+     <TEXT>Failed to create protocol message with Tenant &amp;1 HTTP &amp;2 BPI core URI &amp;3</TEXT>
     </T100>
     <T100>
      <SPRSL>E</SPRSL>
@@ -97,6 +97,78 @@
      <ARBGB>ZCLPROUBCMSG</ARBGB>
      <MSGNR>014</MSGNR>
      <TEXT>ABI File for Nchain Network &amp;1 and Smart Contract Addr &amp;2 not registered</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZCLPROUBCMSG</ARBGB>
+     <MSGNR>015</MSGNR>
+     <TEXT>Error calling PRVD &amp;1 &amp;2 &amp;3 HTTP response &amp;4</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZCLPROUBCMSG</ARBGB>
+     <MSGNR>016</MSGNR>
+     <TEXT>Success calling PRVD &amp;1 &amp;2 &amp;3 HTTP response &amp;4</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZCLPROUBCMSG</ARBGB>
+     <MSGNR>017</MSGNR>
+     <TEXT>Success calling IPFS &amp;1 &amp;2 Host &amp;3 HTTP response &amp;4 CID &amp;5</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZCLPROUBCMSG</ARBGB>
+     <MSGNR>018</MSGNR>
+     <TEXT>Error calling IPFS &amp;1 &amp;2 Host &amp;3 HTTP response &amp;4 CID &amp;5</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZCLPROUBCMSG</ARBGB>
+     <MSGNR>019</MSGNR>
+     <TEXT>Error derefencing from &amp;1 to field symbol &amp;2</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZCLPROUBCMSG</ARBGB>
+     <MSGNR>020</MSGNR>
+     <TEXT>Error reading component &amp;1 from field symbol &amp;2</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZCLPROUBCMSG</ARBGB>
+     <MSGNR>021</MSGNR>
+     <TEXT>Error transferring data from field &amp;1 to field symbol &amp;2</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZCLPROUBCMSG</ARBGB>
+     <MSGNR>022</MSGNR>
+     <TEXT>Error reading idoc number &amp;1 assumed type &amp;2</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZCLPROUBCMSG</ARBGB>
+     <MSGNR>023</MSGNR>
+     <TEXT>Failed PRVD Baseline protocol messaging setup</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZCLPROUBCMSG</ARBGB>
+     <MSGNR>024</MSGNR>
+     <TEXT>Error opening file stream</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZCLPROUBCMSG</ARBGB>
+     <MSGNR>025</MSGNR>
+     <TEXT>Error reading file stream</TEXT>
+    </T100>
+    <T100>
+     <SPRSL>E</SPRSL>
+     <ARBGB>ZCLPROUBCMSG</ARBGB>
+     <MSGNR>026</MSGNR>
+     <TEXT>Error closing file stream</TEXT>
     </T100>
    </T100>
   </asx:values>

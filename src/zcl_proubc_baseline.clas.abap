@@ -13,7 +13,7 @@ CLASS zcl_proubc_baseline DEFINITION
       IMPORTING
         !ii_client        TYPE REF TO if_http_client
         !iv_bpitenant_url TYPE string
-        !iv_bpitoken      TYPE zPRVDREFRESHTOKEN .
+        !iv_bpitoken      TYPE zprvdrefreshtoken .
   PROTECTED SECTION.
     DATA mi_client TYPE REF TO if_http_client.
     DATA lv_bpitenant_url TYPE string.
@@ -103,15 +103,15 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{id}' IN lv_uri WITH lv_temp.
     mi_client->request->set_method( 'POST' ).
-    mi_client->request->set_header_field( name  = '~request_uri' 
+    mi_client->request->set_header_field( name  = '~request_uri'
                                           value = lv_uri ).
 * todo, set body, #/components/schemas/AssociateWorkgroupUserRequest
     get_bearer_token( ).
     lv_code = send_receive( ).
     "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
-      WHEN 201. 
-      " The request was successful and a new entity was created
+      WHEN 201.
+        " The request was successful and a new entity was created
       WHEN 401.
         " todo, raise
       WHEN 403.
@@ -120,6 +120,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
         " todo, raise
       WHEN 503.
         " todo, raise
+      WHEN OTHERS.
+        " todo catch generically
     ENDCASE.
   ENDMETHOD.
 
@@ -130,7 +132,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/authenticate'.
-    DATA lv_authpayload TYPE zif_proubc_Ident=>authorize_access_refreshtoken.
+    DATA lv_authpayload TYPE zif_proubc_ident=>authorize_access_refreshtoken.
     DATA lv_longtermrequestdata TYPE REF TO data.
     DATA lv_requeststr TYPE string.
 
@@ -159,6 +161,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
 
       WHEN 401.
         " todo, raise
+      WHEN OTHERS.
+        " todo catch generically
     ENDCASE.
   ENDMETHOD.
 
@@ -167,7 +171,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/tokens'.
-    DATA lv_authpayload TYPE zif_proubc_Ident=>authorize_access_refreshtoken.
+    DATA lv_authpayload TYPE zif_proubc_ident=>authorize_access_refreshtoken.
     DATA lv_longtermrequestdata TYPE REF TO data.
     DATA lv_requeststr TYPE string.
     DATA lv_authresponsestr TYPE string.
@@ -176,7 +180,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
                    <fs_bpiauthreq2> TYPE string.
 
     mi_client->request->set_method( 'POST' ).
-    mi_client->request->set_header_field( name  = '~request_uri' 
+    mi_client->request->set_header_field( name  = '~request_uri'
                                           value = lv_uri ).
     lv_authpayload-scope = 'offline_access'.
     lv_authpayload-organization_id = iv_tenantid.
@@ -205,8 +209,10 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
         "set_bpi_token( lv_bpiauthreq ).
       WHEN 401.
         " todo, raise authorization failure
-      WHEN 404. 
-      "check URI, BPI tenant
+      WHEN 404.
+        "check URI, BPI tenant
+      WHEN OTHERS.
+        " todo catch generically
     ENDCASE.
   ENDMETHOD.
 
@@ -224,8 +230,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     lv_code = send_receive( ).
     "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
-      WHEN 201. 
-      " The request was successful and a new `Account` was created
+      WHEN 201.
+        " The request was successful and a new `Account` was created
       WHEN 404 OR 403.
         " todo, raise
       WHEN 500.
@@ -244,7 +250,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     DATA lv_busobjmsg TYPE REF TO data.
 
     mi_client->request->set_method( 'POST' ).
-    mi_client->request->set_header_field( name  = '~request_uri' 
+    mi_client->request->set_header_field( name  = '~request_uri'
                                          value  = lv_uri ).
     get_bpi_token( ).
 
@@ -263,7 +269,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     statuscode     = lv_code.
     lv_responsestr = mi_client->response->get_cdata( ).
     apiresponsestr = lv_responsestr.
-    
+
     /ui2/cl_json=>deserialize(
       EXPORTING
         json = lv_responsestr
@@ -272,20 +278,22 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     ).
     "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
-      WHEN 202. 
-      " Accepted
+      WHEN 202.
+        " Accepted
         " application/json,#/components/responses/Accepted
         " todo, raise
       WHEN 401.
         " todo, raise
       WHEN 403.
         " todo, raise
-      WHEN 404. 
-      " The specified resource was not found.
-      WHEN 407. 
-      "check strust
+      WHEN 404.
+        " The specified resource was not found.
+      WHEN 407.
+        "check strust
       WHEN 503.
         " todo, raise
+      WHEN OTHERS.
+        " todo catch generically
     ENDCASE.
   ENDMETHOD.
 
@@ -295,15 +303,15 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/circuits'.
     mi_client->request->set_method( 'POST' ).
-    mi_client->request->set_header_field( name = '~request_uri' 
+    mi_client->request->set_header_field( name = '~request_uri'
                                          value = lv_uri ).
 * todo, set body, #/components/schemas/Circuit
     get_bearer_token( ).
     lv_code = send_receive( ).
     "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
-      "# The request was successful
-      WHEN 200. 
+        "# The request was successful
+      WHEN 200.
       WHEN 401.
         " todo, raise
       WHEN 403.
@@ -312,6 +320,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
         " todo, raise
       WHEN 503.
         " todo, raise
+      WHEN OTHERS.
+        " todo catch generically
     ENDCASE.
   ENDMETHOD.
 
@@ -321,15 +331,15 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/connectors'.
     mi_client->request->set_method( 'POST' ).
-    mi_client->request->set_header_field( name  = '~request_uri' 
+    mi_client->request->set_header_field( name  = '~request_uri'
                                           value = lv_uri ).
 * todo, set body, #/components/schemas/Connector
     get_bearer_token( ).
     lv_code = send_receive( ).
     "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
-      " The request was successful and a new entity was created
-      WHEN 201. 
+        " The request was successful and a new entity was created
+      WHEN 201.
       WHEN 401.
         " todo, raise
       WHEN 403.
@@ -351,15 +361,15 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{id}' IN lv_uri WITH lv_temp.
     mi_client->request->set_method( 'POST' ).
-    mi_client->request->set_header_field( name  = '~request_uri' 
+    mi_client->request->set_header_field( name  = '~request_uri'
                                           value = lv_uri ).
 * todo, set body, #/components/schemas/Key
     get_bearer_token( ).
     lv_code = send_receive( ).
     "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
-      WHEN 201. 
-      " The request was successful and a new entity was created
+      WHEN 201.
+        " The request was successful and a new entity was created
       WHEN 401.
         " todo, raise
       WHEN 403.
@@ -368,6 +378,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
         " todo, raise
       WHEN 503.
         " todo, raise
+      WHEN OTHERS.
+        " todo catch generically
     ENDCASE.
   ENDMETHOD.
 
@@ -377,15 +389,15 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/networks'.
     mi_client->request->set_method( 'POST' ).
-    mi_client->request->set_header_field( name = '~request_uri' 
+    mi_client->request->set_header_field( name = '~request_uri'
                                          value = lv_uri ).
 * todo, set body, #/components/schemas/Network
     get_bearer_token( ).
     lv_code = send_receive( ).
     "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
-      WHEN 201. 
-      " The request was successful and a new entity was created
+      WHEN 201.
+        " The request was successful and a new entity was created
       WHEN 401.
         " todo, raise
       WHEN 403.
@@ -394,6 +406,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
         " todo, raise
       WHEN 503.
         " todo, raise
+      WHEN OTHERS.
+        " todo catch generically
     ENDCASE.
   ENDMETHOD.
 
@@ -403,14 +417,14 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/oracles'.
     mi_client->request->set_method( 'POST' ).
-    mi_client->request->set_header_field( name  = '~request_uri' 
+    mi_client->request->set_header_field( name  = '~request_uri'
                                           value = lv_uri ).
     get_bearer_token( ).
     lv_code = send_receive( ).
     "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
-      WHEN 200. 
-      " The request was successful.
+      WHEN 200.
+        " The request was successful.
       WHEN 401.
         " todo, raise
       WHEN 403.
@@ -419,6 +433,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
         " todo, raise
       WHEN 503.
         " todo, raise
+      WHEN OTHERS.
+        " todo catch generically
     ENDCASE.
   ENDMETHOD.
 
@@ -428,15 +444,15 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/organizations'.
     mi_client->request->set_method( 'POST' ).
-    mi_client->request->set_header_field( name  = '~request_uri' 
+    mi_client->request->set_header_field( name  = '~request_uri'
                                           value = lv_uri ).
 * todo, set body, #/components/schemas/Organization
     get_bearer_token( ).
     lv_code = send_receive( ).
     "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
-      WHEN 201. 
-      " The request was successful.
+      WHEN 201.
+        " The request was successful.
       WHEN 401.
         " todo, raise
       WHEN 403.
@@ -445,6 +461,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
         " todo, raise
       WHEN 503.
         " todo, raise
+      WHEN OTHERS.
+        " todo catch generically
     ENDCASE.
   ENDMETHOD.
 
@@ -454,7 +472,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/transactions'.
     mi_client->request->set_method( 'POST' ).
-    mi_client->request->set_header_field( name  = '~request_uri' 
+    mi_client->request->set_header_field( name  = '~request_uri'
                                           value = lv_uri ).
 * todo, set body, #/components/schemas/Transaction
     get_bearer_token( ).
@@ -462,7 +480,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
       WHEN 201.
-      " The request was successful and a new entity was created
+        " The request was successful and a new entity was created
       WHEN 401.
         " todo, raise
       WHEN 403.
@@ -471,6 +489,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
         " todo, raise
       WHEN 503.
         " todo, raise
+      WHEN OTHERS.
+        " todo catch generically
     ENDCASE.
   ENDMETHOD.
 
@@ -480,17 +500,18 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/users'.
     mi_client->request->set_method( 'POST' ).
-    mi_client->request->set_header_field( name = '~request_uri' 
+    mi_client->request->set_header_field( name = '~request_uri'
                                          value = lv_uri ).
 * todo, set body, #/components/schemas/User
     get_bearer_token( ).
     lv_code = send_receive( ).
     "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
-      WHEN 201. 
-      " User created
+      WHEN 201.
+        " User created
         " application/json,#/components/schemas/User
-
+      WHEN OTHERS.
+        " todo catch generically
     ENDCASE.
   ENDMETHOD.
 
@@ -500,15 +521,15 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/vaults'.
     mi_client->request->set_method( 'POST' ).
-    mi_client->request->set_header_field( name  = '~request_uri' 
+    mi_client->request->set_header_field( name  = '~request_uri'
                                           value = lv_uri ).
 * todo, set body, #/components/schemas/Vault
     get_bearer_token( ).
     lv_code = send_receive( ).
     "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
-      WHEN 201. 
-      " The request was successful and a new entity was created
+      WHEN 201.
+        " The request was successful and a new entity was created
       WHEN 401.
         " todo, raise
       WHEN 403.
@@ -517,6 +538,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
         " todo, raise
       WHEN 503.
         " todo, raise
+      WHEN OTHERS.
+        " todo catch generically
     ENDCASE.
   ENDMETHOD.
 
@@ -526,15 +549,15 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/wallets'.
     mi_client->request->set_method( 'POST' ).
-    mi_client->request->set_header_field( name  = '~request_uri' 
+    mi_client->request->set_header_field( name  = '~request_uri'
                                           value = lv_uri ).
 * todo, set body, #/components/schemas/Wallet
     get_bearer_token( ).
     lv_code = send_receive( ).
     "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
-      WHEN 201. 
-      " The request was successful and a new entity was created
+      WHEN 201.
+        " The request was successful and a new entity was created
       WHEN 401.
         " todo, raise
       WHEN 403.
@@ -543,6 +566,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
         " todo, raise
       WHEN 503.
         " todo, raise
+      WHEN OTHERS.
+        " todo catch generically
     ENDCASE.
   ENDMETHOD.
 
@@ -552,15 +577,15 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/workgroups'.
     mi_client->request->set_method( 'POST' ).
-    mi_client->request->set_header_field( name  = '~request_uri' 
+    mi_client->request->set_header_field( name  = '~request_uri'
                                           value = lv_uri ).
 * todo, set body, #/components/schemas/Workgroup
     get_bearer_token( ).
     lv_code = send_receive( ).
     "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
-      WHEN 200. 
-      " The request was successful
+      WHEN 200.
+        " The request was successful
         " application/json,#/components/schemas/Workgroup
 
       WHEN 401.
@@ -571,6 +596,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
         " todo, raise
       WHEN 503.
         " todo, raise
+      WHEN OTHERS.
+        " todo catch generically
     ENDCASE.
   ENDMETHOD.
 
@@ -601,6 +628,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
         " todo, raise
       WHEN 503.
         " todo, raise
+      WHEN OTHERS.
+        " todo catch generically
     ENDCASE.
   ENDMETHOD.
 
@@ -613,14 +642,14 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{id}' IN lv_uri WITH lv_temp.
     mi_client->request->set_method( 'DELETE' ).
-    mi_client->request->set_header_field( name  = '~request_uri' 
+    mi_client->request->set_header_field( name  = '~request_uri'
                                           value = lv_uri ).
     get_bearer_token( ).
     lv_code = send_receive( ).
     "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
-      WHEN 204. 
-      " The request was successful but did not return a response.
+      WHEN 204.
+        " The request was successful but did not return a response.
       WHEN 401.
         " todo, raise
       WHEN OTHERS.
@@ -636,14 +665,14 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{id}' IN lv_uri WITH lv_temp.
     mi_client->request->set_method( 'DELETE' ).
-    mi_client->request->set_header_field( name  = '~request_uri' 
+    mi_client->request->set_header_field( name  = '~request_uri'
                                           value = lv_uri ).
     get_bearer_token( ).
     lv_code = send_receive( ).
     "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
       WHEN 200.
-      " The request was successful.
+        " The request was successful.
       WHEN 401.
         " todo, raise
       WHEN 403.
@@ -652,6 +681,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
         " todo, raise
       WHEN 503.
         " todo, raise
+      WHEN OTHERS.
+        " todo catch generically
     ENDCASE.
   ENDMETHOD.
 
@@ -667,14 +698,14 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{secret_id}' IN lv_uri WITH lv_temp.
     mi_client->request->set_method( 'DELETE' ).
-    mi_client->request->set_header_field( name  = '~request_uri' 
+    mi_client->request->set_header_field( name  = '~request_uri'
                                           value = lv_uri ).
     get_bearer_token( ).
     lv_code = send_receive( ).
     "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
-      WHEN 204. 
-      " The request was successful but did not return a response
+      WHEN 204.
+        " The request was successful but did not return a response
       WHEN 401.
         " todo, raise
       WHEN 403.
@@ -683,6 +714,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
         " todo, raise
       WHEN 503.
         " todo, raise
+      WHEN OTHERS.
+        " todo catch generically
     ENDCASE.
   ENDMETHOD.
 
@@ -695,14 +728,14 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{id}' IN lv_uri WITH lv_temp.
     mi_client->request->set_method( 'DELETE' ).
-    mi_client->request->set_header_field( name = '~request_uri' 
+    mi_client->request->set_header_field( name = '~request_uri'
                                          value = lv_uri ).
     get_bearer_token( ).
     lv_code = send_receive( ).
     "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
-      WHEN 200. 
-      " Target `User` deleted
+      WHEN 200.
+        " Target `User` deleted
       WHEN 401.
         " todo, raise
       WHEN 403.
@@ -711,6 +744,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
         " todo, raise
       WHEN 503.
         " todo, raise
+      WHEN OTHERS.
+        " todo catch generically
     ENDCASE.
   ENDMETHOD.
 
@@ -723,14 +758,14 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{id}' IN lv_uri WITH lv_temp.
     mi_client->request->set_method( 'DELETE' ).
-    mi_client->request->set_header_field( name = '~request_uri' 
+    mi_client->request->set_header_field( name = '~request_uri'
                                          value = lv_uri ).
     get_bearer_token( ).
     lv_code = send_receive( ).
     "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
-      WHEN 200. 
-      " The request was successful
+      WHEN 200.
+        " The request was successful
       WHEN 401.
         " todo, raise
       WHEN 403.
@@ -739,6 +774,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
         " todo, raise
       WHEN 503.
         " todo, raise
+      WHEN OTHERS.
+        " todo catch generically
     ENDCASE.
   ENDMETHOD.
 
@@ -755,8 +792,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     lv_code = send_receive( ).
     "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
-      WHEN 201. 
-      " The request was successful and a new entity was created
+      WHEN 201.
+        " The request was successful and a new entity was created
       WHEN 401.
         " todo, raise
       WHEN 403.
@@ -769,6 +806,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
         " todo, raise
       WHEN 503.
         " todo, raise
+      WHEN OTHERS.
+        " todo catch generically
     ENDCASE.
   ENDMETHOD.
 
@@ -784,15 +823,15 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{key_id}' IN lv_uri WITH lv_temp.
     mi_client->request->set_method( 'POST' ).
-    mi_client->request->set_header_field( name = '~request_uri' 
+    mi_client->request->set_header_field( name = '~request_uri'
                                          value = lv_uri ).
 * todo, set body, #/components/schemas/Key
     get_bearer_token( ).
     lv_code = send_receive( ).
     "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
-      WHEN 201. 
-      " The request was successful and a new entity was created
+      WHEN 201.
+        " The request was successful and a new entity was created
       WHEN 401.
         " todo, raise
       WHEN 403.
@@ -801,6 +840,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
         " todo, raise
       WHEN 503.
         " todo, raise
+      WHEN OTHERS.
+        " todo catch generically
     ENDCASE.
   ENDMETHOD.
 
@@ -813,15 +854,15 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{id}' IN lv_uri WITH lv_temp.
     mi_client->request->set_method( 'POST' ).
-    mi_client->request->set_header_field( name = '~request_uri' 
+    mi_client->request->set_header_field( name = '~request_uri'
                                          value = lv_uri ).
 * todo, set body, #/components/schemas/ExecuteContractRequest
     get_bearer_token( ).
     lv_code = send_receive( ).
     "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
-      WHEN 202. 
-      " The request was successfully accepted and processing will complete\nasynchronously.\n\nThe API returns 202 Accepted if the contract execution will\nbroadcast a Transaction to the network and returns a ref, which is\nan identifier you ma
+      WHEN 202.
+        " The request was successfully accepted and processing will complete\nasynchronously.\n\nThe API returns 202 Accepted if the contract execution will\nbroadcast a Transaction to the network and returns a ref, which is\nan identifier you ma
         "y use to ask for the execution status of the\nTransaction.\napplication/json; charset=UTF-8:\n  schema:\n    $ref: '#/components/schemas/ExecuteContract'\n
         " todo, raise
       WHEN 401.
@@ -832,6 +873,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
         " todo, raise
       WHEN 503.
         " todo, raise
+      WHEN OTHERS.
+        " todo catch generically
     ENDCASE.
   ENDMETHOD.
 
@@ -850,8 +893,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     lv_code = send_receive( ).
     "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
-      WHEN 200. 
-      " OK
+      WHEN 200.
+        " OK
         " application/json,#/components/schemas/Account
 
       WHEN 403.
@@ -877,8 +920,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     lv_code = send_receive( ).
     "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
-      WHEN 200. 
-      " The request was successful
+      WHEN 200.
+        " The request was successful
       WHEN 401.
         " todo, raise
       WHEN 403.
@@ -906,8 +949,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     lv_code = send_receive( ).
     "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
-      WHEN 200. 
-      " The request was successful.
+      WHEN 200.
+        " The request was successful.
       WHEN 401.
         " todo, raise
       WHEN 403.
@@ -929,14 +972,14 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{id}' IN lv_uri WITH lv_temp.
     mi_client->request->set_method( 'GET' ).
-    mi_client->request->set_header_field( name = '~request_uri' 
+    mi_client->request->set_header_field( name = '~request_uri'
                                          value = lv_uri ).
     get_bearer_token( ).
     lv_code = send_receive( ).
     "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
-      WHEN 200. 
-      " The request was successful.
+      WHEN 200.
+        " The request was successful.
       WHEN 401.
         " todo, raise
       WHEN 403.
@@ -958,14 +1001,14 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{id}' IN lv_uri WITH lv_temp.
     mi_client->request->set_method( 'GET' ).
-    mi_client->request->set_header_field( name = '~request_uri' 
+    mi_client->request->set_header_field( name = '~request_uri'
                                          value = lv_uri ).
     get_bearer_token( ).
     lv_code = send_receive( ).
     "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
-      WHEN 200. 
-      " The request was successful.
+      WHEN 200.
+        " The request was successful.
       WHEN 401.
         " todo, raise
       WHEN 403.
@@ -987,14 +1030,14 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{id}' IN lv_uri WITH lv_temp.
     mi_client->request->set_method( 'GET' ).
-    mi_client->request->set_header_field( name = '~request_uri' 
+    mi_client->request->set_header_field( name = '~request_uri'
                                          value = lv_uri ).
     get_bearer_token( ).
     lv_code = send_receive( ).
     "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
-      WHEN 200. 
-      " The request was successful.
+      WHEN 200.
+        " The request was successful.
       WHEN 401.
         " todo, raise
       WHEN 403.
@@ -1003,6 +1046,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
         " todo, raise
       WHEN 503.
         " todo, raise
+      WHEN OTHERS.
+        " todo catch generically
     ENDCASE.
   ENDMETHOD.
 
@@ -1021,8 +1066,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     lv_code = send_receive( ).
     "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
-      WHEN 200. 
-      " The request was successful.
+      WHEN 200.
+        " The request was successful.
       WHEN 401.
         " todo, raise
       WHEN 403.
@@ -1031,6 +1076,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
         " todo, raise
       WHEN 503.
         " todo, raise
+      WHEN OTHERS.
+        " todo catch generically
     ENDCASE.
   ENDMETHOD.
 
@@ -1052,8 +1099,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     lv_code = send_receive( ).
     "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
-      WHEN 200. 
-      " The request was successful
+      WHEN 200.
+        " The request was successful
       WHEN 401.
         " todo, raise
       WHEN 403.
@@ -1062,6 +1109,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
         " todo, raise
       WHEN 503.
         " todo, raise
+      WHEN OTHERS.
+        " todo catch generically
     ENDCASE.
   ENDMETHOD.
 
@@ -1080,8 +1129,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     lv_code = send_receive( ).
     "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
-      WHEN 200. 
-      " The request was successful
+      WHEN 200.
+        " The request was successful
       WHEN 401.
         " todo, raise
       WHEN 403.
@@ -1090,6 +1139,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
         " todo, raise
       WHEN 503.
         " todo, raise
+      WHEN OTHERS.
+        " todo catch generically
     ENDCASE.
   ENDMETHOD.
 
@@ -1108,8 +1159,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     lv_code = send_receive( ).
     "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
-      WHEN 200. 
-      " The request was successful
+      WHEN 200.
+        " The request was successful
       WHEN 401.
         " todo, raise
       WHEN 403.
@@ -1131,14 +1182,14 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{id}' IN lv_uri WITH lv_temp.
     mi_client->request->set_method( 'GET' ).
-    mi_client->request->set_header_field( name = '~request_uri' 
+    mi_client->request->set_header_field( name = '~request_uri'
                                          value = lv_uri ).
     get_bearer_token( ).
     lv_code = send_receive( ).
     "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
-      WHEN 200. 
-      " The request was successful
+      WHEN 200.
+        " The request was successful
       WHEN 401.
         " todo, raise
       WHEN 403.
@@ -1147,6 +1198,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
         " todo, raise
       WHEN 503.
         " todo, raise
+      WHEN OTHERS.
+        " todo catch generically
     ENDCASE.
   ENDMETHOD.
 
@@ -1158,17 +1211,17 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     lv_temp = page.
     CONDENSE lv_temp.
     IF page IS SUPPLIED.
-      mi_client->request->set_form_field( name = 'page' 
+      mi_client->request->set_form_field( name = 'page'
                                          value = lv_temp ).
     ENDIF.
     lv_temp = rpp.
     CONDENSE lv_temp.
     IF rpp IS SUPPLIED.
-      mi_client->request->set_form_field( name = 'rpp' 
+      mi_client->request->set_form_field( name = 'rpp'
                                          value = lv_temp ).
     ENDIF.
     mi_client->request->set_method( 'GET' ).
-    mi_client->request->set_header_field( name = '~request_uri' 
+    mi_client->request->set_header_field( name = '~request_uri'
                                          value = lv_uri ).
     get_bearer_token( ).
     lv_code = send_receive( ).
@@ -1193,19 +1246,19 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
                                          value = curve ).
     ENDIF.
     IF identifier IS SUPPLIED.
-      mi_client->request->set_form_field( name = 'identifier' 
+      mi_client->request->set_form_field( name = 'identifier'
                                          value = identifier ).
     ENDIF.
     IF provider IS SUPPLIED.
-      mi_client->request->set_form_field( name = 'provider' 
+      mi_client->request->set_form_field( name = 'provider'
                                          value = provider ).
     ENDIF.
     IF proving_scheme IS SUPPLIED.
-      mi_client->request->set_form_field( name = 'proving scheme' 
+      mi_client->request->set_form_field( name = 'proving scheme'
                                          value = proving_scheme ).
     ENDIF.
     IF status IS SUPPLIED.
-      mi_client->request->set_form_field( name = 'status' 
+      mi_client->request->set_form_field( name = 'status'
                                          value = status ).
     ENDIF.
     mi_client->request->set_method( 'GET' ).
@@ -1215,8 +1268,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     lv_code = send_receive( ).
     "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
-      WHEN 200. 
-      " The request was successful
+      WHEN 200.
+        " The request was successful
       WHEN 401.
         " todo, raise
       WHEN 403.
@@ -1225,6 +1278,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
         " todo, raise
       WHEN 503.
         " todo, raise
+      WHEN OTHERS.
+        " todo catch generically
     ENDCASE.
   ENDMETHOD.
 
@@ -1236,19 +1291,19 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     lv_temp = page.
     CONDENSE lv_temp.
     IF page IS SUPPLIED.
-      mi_client->request->set_form_field( name = 'page' 
+      mi_client->request->set_form_field( name = 'page'
                                          value = lv_temp ).
     ENDIF.
     lv_temp = rpp.
     CONDENSE lv_temp.
     IF rpp IS SUPPLIED.
-      mi_client->request->set_form_field( name = 'rpp' 
+      mi_client->request->set_form_field( name = 'rpp'
                                          value = lv_temp ).
     ENDIF.
     lv_temp = public.
     CONDENSE lv_temp.
     IF public IS SUPPLIED.
-      mi_client->request->set_form_field( name = 'public' 
+      mi_client->request->set_form_field( name = 'public'
                                          value = lv_temp ).
     ENDIF.
     mi_client->request->set_method( 'GET' ).
@@ -1258,12 +1313,12 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     lv_code = send_receive( ).
     "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
-      WHEN 200. 
-      " OK
+      WHEN 200.
+        " OK
         " application/json,#/components/schemas/response_listconnectors
 
-      WHEN 422. 
-      " Unprocessable Entity
+      WHEN 422.
+        " Unprocessable Entity
         " application/json,#/components/schemas/Error
 
         " todo, raise
@@ -1299,14 +1354,14 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
                                          value = lv_temp ).
     ENDIF.
     mi_client->request->set_method( 'GET' ).
-    mi_client->request->set_header_field( name = '~request_uri' 
+    mi_client->request->set_header_field( name = '~request_uri'
                                          value = lv_uri ).
     get_bearer_token( ).
     lv_code = send_receive( ).
     "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
-      WHEN 200. 
-      " The request was successful.
+      WHEN 200.
+        " The request was successful.
       WHEN 401.
         " todo, raise
       WHEN 403.
@@ -1330,13 +1385,13 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     lv_temp = page.
     CONDENSE lv_temp.
     IF page IS SUPPLIED.
-      mi_client->request->set_form_field( name = 'page' 
+      mi_client->request->set_form_field( name = 'page'
                                          value = lv_temp ).
     ENDIF.
     lv_temp = rpp.
     CONDENSE lv_temp.
     IF rpp IS SUPPLIED.
-      mi_client->request->set_form_field( name = 'rpp' 
+      mi_client->request->set_form_field( name = 'rpp'
                                          value = lv_temp ).
     ENDIF.
     mi_client->request->set_method( 'GET' ).
@@ -1346,8 +1401,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     lv_code = send_receive( ).
     "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
-      WHEN 200. 
-      " The request was successful
+      WHEN 200.
+        " The request was successful
       WHEN 401.
         " todo, raise
       WHEN 403.
@@ -1356,6 +1411,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
         " todo, raise
       WHEN 503.
         " todo, raise
+      WHEN OTHERS.
+        " todo catch generically
     ENDCASE.
   ENDMETHOD.
 
@@ -1367,13 +1424,13 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     lv_temp = page.
     CONDENSE lv_temp.
     IF page IS SUPPLIED.
-      mi_client->request->set_form_field( name = 'page' 
+      mi_client->request->set_form_field( name = 'page'
                                          value = lv_temp ).
     ENDIF.
     lv_temp = rpp.
     CONDENSE lv_temp.
     IF rpp IS SUPPLIED.
-      mi_client->request->set_form_field( name = 'rpp' 
+      mi_client->request->set_form_field( name = 'rpp'
                                          value = lv_temp ).
     ENDIF.
     lv_temp = public.
@@ -1383,14 +1440,14 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
                                          value = lv_temp ).
     ENDIF.
     mi_client->request->set_method( 'GET' ).
-    mi_client->request->set_header_field( name = '~request_uri' 
+    mi_client->request->set_header_field( name = '~request_uri'
                                          value = lv_uri ).
     get_bearer_token( ).
     lv_code = send_receive( ).
     "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
-      WHEN 200. 
-      " The request was successful
+      WHEN 200.
+        " The request was successful
       WHEN 401.
         " todo, raise
       WHEN 403.
@@ -1399,6 +1456,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
         " todo, raise
       WHEN 503.
         " todo, raise
+      WHEN OTHERS.
+        " todo catch generically
     ENDCASE.
   ENDMETHOD.
 
@@ -1408,14 +1467,14 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/.well-known/openid-configuration'.
     mi_client->request->set_method( 'GET' ).
-    mi_client->request->set_header_field( name = '~request_uri' 
+    mi_client->request->set_header_field( name = '~request_uri'
                                          value = lv_uri ).
     get_bearer_token( ).
     lv_code = send_receive( ).
     "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
-      WHEN 200. 
-      " The request was successful
+      WHEN 200.
+        " The request was successful
       WHEN OTHERS.
     ENDCASE.
   ENDMETHOD.
@@ -1428,24 +1487,24 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     lv_temp = page.
     CONDENSE lv_temp.
     IF page IS SUPPLIED.
-      mi_client->request->set_form_field( name = 'page' 
+      mi_client->request->set_form_field( name = 'page'
                                          value = lv_temp ).
     ENDIF.
     lv_temp = rpp.
     CONDENSE lv_temp.
     IF rpp IS SUPPLIED.
-      mi_client->request->set_form_field( name = 'rpp' 
+      mi_client->request->set_form_field( name = 'rpp'
                                          value = lv_temp ).
     ENDIF.
     mi_client->request->set_method( 'GET' ).
-    mi_client->request->set_header_field( name = '~request_uri' 
+    mi_client->request->set_header_field( name = '~request_uri'
                                          value = lv_uri ).
     get_bearer_token( ).
     lv_code = send_receive( ).
     "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
-      WHEN 200. 
-      " The request was successful.
+      WHEN 200.
+        " The request was successful.
       WHEN 401.
         " todo, raise
       WHEN 403.
@@ -1454,6 +1513,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
         " todo, raise
       WHEN 503.
         " todo, raise
+      WHEN OTHERS.
+        " todo catch generically
     ENDCASE.
   ENDMETHOD.
 
@@ -1465,24 +1526,24 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     lv_temp = page.
     CONDENSE lv_temp.
     IF page IS SUPPLIED.
-      mi_client->request->set_form_field( name = 'page' 
+      mi_client->request->set_form_field( name = 'page'
                                          value = lv_temp ).
     ENDIF.
     lv_temp = rpp.
     CONDENSE lv_temp.
     IF rpp IS SUPPLIED.
-      mi_client->request->set_form_field( name = 'rpp' 
+      mi_client->request->set_form_field( name = 'rpp'
                                          value = lv_temp ).
     ENDIF.
     mi_client->request->set_method( 'GET' ).
-    mi_client->request->set_header_field( name = '~request_uri' 
+    mi_client->request->set_header_field( name = '~request_uri'
                                          value = lv_uri ).
     get_bearer_token( ).
     lv_code = send_receive( ).
     "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
-      WHEN 200. 
-      " The request was successful
+      WHEN 200.
+        " The request was successful
       WHEN 401.
         " todo, raise
       WHEN 403.
@@ -1491,6 +1552,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
         " todo, raise
       WHEN 503.
         " todo, raise
+      WHEN OTHERS.
+        " todo catch generically
     ENDCASE.
   ENDMETHOD.
 
@@ -1521,8 +1584,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     lv_code = send_receive( ).
     "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
-      WHEN 200. 
-      " The request was successful
+      WHEN 200.
+        " The request was successful
       WHEN 401.
         " todo, raise
       WHEN 403.
@@ -1531,6 +1594,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
         " todo, raise
       WHEN 503.
         " todo, raise
+      WHEN OTHERS.
+        " todo catch generically
     ENDCASE.
   ENDMETHOD.
 
@@ -1542,24 +1607,24 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     lv_temp = page.
     CONDENSE lv_temp.
     IF page IS SUPPLIED.
-      mi_client->request->set_form_field( name = 'page' 
+      mi_client->request->set_form_field( name = 'page'
                                          value = lv_temp ).
     ENDIF.
     lv_temp = rpp.
     CONDENSE lv_temp.
     IF rpp IS SUPPLIED.
-      mi_client->request->set_form_field( name = 'rpp' 
+      mi_client->request->set_form_field( name = 'rpp'
                                          value = lv_temp ).
     ENDIF.
     mi_client->request->set_method( 'GET' ).
-    mi_client->request->set_header_field( name = '~request_uri' 
+    mi_client->request->set_header_field( name = '~request_uri'
                                          value = lv_uri ).
     get_bearer_token( ).
     lv_code = send_receive( ).
     "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
-      WHEN 200. 
-      " The request was successful.
+      WHEN 200.
+        " The request was successful.
         " application/json,#/components/schemas/response_listtokens
 
       WHEN 401.
@@ -1570,6 +1635,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
         " todo, raise
       WHEN 503.
         " todo, raise
+      WHEN OTHERS.
+        " todo catch generically
     ENDCASE.
   ENDMETHOD.
 
@@ -1607,8 +1674,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     lv_code = send_receive( ).
     "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
-      WHEN 200. 
-      " The request was successful
+      WHEN 200.
+        " The request was successful
       WHEN 401.
         " todo, raise
       WHEN 403.
@@ -1617,6 +1684,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
         " todo, raise
       WHEN 503.
         " todo, raise
+      WHEN OTHERS.
+        " todo catch generically
     ENDCASE.
   ENDMETHOD.
 
@@ -1645,7 +1714,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
       WHEN 200.
-      " The request was successful
+        " The request was successful
         " application/json,#/components/schemas/response_listusers
 
       WHEN 401.
@@ -1656,6 +1725,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
         " todo, raise
       WHEN 503.
         " todo, raise
+      WHEN OTHERS.
+        " todo catch generically
     ENDCASE.
   ENDMETHOD.
 
@@ -1683,8 +1754,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     lv_code = send_receive( ).
     "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
-      WHEN 200. 
-      " The request was successful
+      WHEN 200.
+        " The request was successful
       WHEN 401.
         " todo, raise
       WHEN 403.
@@ -1693,6 +1764,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
         " todo, raise
       WHEN 503.
         " todo, raise
+      WHEN OTHERS.
+        " todo catch generically
     ENDCASE.
   ENDMETHOD.
 
@@ -1717,8 +1790,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     lv_code = send_receive( ).
     "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
-      WHEN 200. 
-      " The request was successful
+      WHEN 200.
+        " The request was successful
       WHEN 401.
         " todo, raise
       WHEN 403.
@@ -1727,6 +1800,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
         " todo, raise
       WHEN 503.
         " todo, raise
+      WHEN OTHERS.
+        " todo catch generically
     ENDCASE.
   ENDMETHOD.
 
@@ -1754,8 +1829,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     lv_code = send_receive( ).
     "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
-      WHEN 200. 
-      " The request was successful
+      WHEN 200.
+        " The request was successful
       WHEN 401.
         " todo, raise
       WHEN 403.
@@ -1764,6 +1839,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
         " todo, raise
       WHEN 503.
         " todo, raise
+      WHEN OTHERS.
+        " todo catch generically
     ENDCASE.
   ENDMETHOD.
 
@@ -1779,8 +1856,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     lv_code = send_receive( ).
     "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
-      WHEN 200. 
-      " The request was successful
+      WHEN 200.
+        " The request was successful
       WHEN OTHERS.
     ENDCASE.
   ENDMETHOD.
@@ -1809,10 +1886,11 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     lv_code = send_receive( ).
     "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
-      WHEN 200. 
-      " The request was successful
+      WHEN 200.
+        " The request was successful
         " application/json,#/components/schemas/response_listworkgroups
-
+      WHEN OTHERS.
+        " todo catch generically
     ENDCASE.
   ENDMETHOD.
 
@@ -1843,8 +1921,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     lv_code = send_receive( ).
     "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
-      WHEN 200. 
-      " The request was successful
+      WHEN 200.
+        " The request was successful
         " application/json,#/components/schemas/response_listworkgroupusers
 
       WHEN 401.
@@ -1855,6 +1933,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
         " todo, raise
       WHEN 503.
         " todo, raise
+      WHEN OTHERS.
+        " todo catch generically
     ENDCASE.
   ENDMETHOD.
 
@@ -1874,20 +1954,22 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     lv_code = send_receive( ).
     "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
-      WHEN 200. 
-      " The request was successful
+      WHEN 200.
+        " The request was successful
       WHEN 401.
         " todo, raise
       WHEN 403.
         " todo, raise
       WHEN 404.
         " todo, raise
-      WHEN 422. 
-      " The API returns a 422 status code and human-readable error message(s) if (i) the witness parameters is not provided, (ii) required circuit arguments (i.e., fields) are not included within the given witness parameter or (iii) when Circui
+      WHEN 422.
+        " The API returns a 422 status code and human-readable error message(s) if (i) the witness parameters is not provided, (ii) required circuit arguments (i.e., fields) are not included within the given witness parameter or (iii) when Circui
         "t constraints are not satisfied.
         " todo, raise
       WHEN 503.
         " todo, raise
+      WHEN OTHERS.
+        " todo catch generically
     ENDCASE.
   ENDMETHOD.
 
@@ -1909,8 +1991,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     lv_code = send_receive( ).
     "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
-      WHEN 200. 
-      " The request was successful
+      WHEN 200.
+        " The request was successful
       WHEN 401.
         " todo, raise
       WHEN 403.
@@ -1919,6 +2001,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
         " todo, raise
       WHEN 503.
         " todo, raise
+      WHEN OTHERS.
+        " todo catch generically
     ENDCASE.
   ENDMETHOD.
 
@@ -1937,8 +2021,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     lv_code = send_receive( ).
     "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
-      WHEN 200. 
-      " The request was successful
+      WHEN 200.
+        " The request was successful
       WHEN 401.
         " todo, raise
       WHEN 403.
@@ -1947,6 +2031,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
         " todo, raise
       WHEN 503.
         " todo, raise
+      WHEN OTHERS.
+        " todo catch generically
     ENDCASE.
   ENDMETHOD.
 
@@ -1984,10 +2070,10 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
         data             = apiresponse
     ).
     CASE lv_code.
-      WHEN 202. 
-      " The request was successful
-      WHEN 404. 
-      " may be more than one reason for this...
+      WHEN 202.
+        " The request was successful
+      WHEN 404.
+        " may be more than one reason for this...
       WHEN OTHERS.
     ENDCASE.
 
@@ -2004,14 +2090,14 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     DATA lv_protocolmsg TYPE REF TO data.
 
     mi_client->request->set_method( 'POST' ).
-    mi_client->request->set_header_field( name  = '~request_uri' 
+    mi_client->request->set_header_field( name  = '~request_uri'
                                           value = lv_uri ).
     IF bpitoken IS INITIAL.
-      set_bpi_token( EXPORTING iv_tokenstring = IV_bpitoken ).
+      set_bpi_token( EXPORTING iv_tokenstring = iv_bpitoken ).
     ENDIF.
     get_bpi_token( ).
 
-    zcl_proubc_api_helper=>copy_data_to_ref( EXPORTING is_data = IV_body
+    zcl_proubc_api_helper=>copy_data_to_ref( EXPORTING is_data = iv_body
                                               CHANGING cr_data = lv_protocolmsg ).
 
     lv_requeststr = /ui2/cl_json=>serialize( data        = lv_protocolmsg
@@ -2020,21 +2106,21 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     mi_client->request->set_cdata( data =  lv_requeststr ).
 
     lv_code = send_receive( ).
-    statuscode = lv_code.
+    ev_statuscode = lv_code.
     lv_responsestr = mi_client->response->get_cdata( ).
-    apiresponsestr = lv_responsestr.
+    ev_apiresponsestr = lv_responsestr.
     /ui2/cl_json=>deserialize(
       EXPORTING
         json = lv_responsestr
       CHANGING
-        data = apiresponse ).
+        data = ev_apiresponse ).
     CASE lv_code.
-      WHEN 202. 
-      " The request was successful
-      WHEN 401. 
-      " check if correct token was provided or was expired
-      WHEN 404. 
-      " may be more than one reason for this...
+      WHEN 202.
+        " The request was successful
+      WHEN 401.
+        " check if correct token was provided or was expired
+      WHEN 404.
+        " may be more than one reason for this...
       WHEN OTHERS.
     ENDCASE.
 
@@ -2068,8 +2154,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     lv_code = send_receive( ).
     "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
-      WHEN 201. 
-      " The request was successful and a new entity was created
+      WHEN 201.
+        " The request was successful and a new entity was created
       WHEN 401.
         " todo, raise
       WHEN 403.
@@ -2078,6 +2164,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
         " todo, raise
       WHEN 503.
         " todo, raise
+      WHEN OTHERS.
+        " todo catch generically
     ENDCASE.
   ENDMETHOD.
 
@@ -2094,8 +2182,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     lv_code = send_receive( ).
     "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
-      WHEN 201. 
-      " Request successfully authorized a `Token`
+      WHEN 201.
+        " Request successfully authorized a `Token`
         " application/json,#/components/schemas/Token
 
       WHEN 401.
@@ -2106,6 +2194,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
         " todo, raise
       WHEN 503.
         " todo, raise
+      WHEN OTHERS.
+        " todo catch generically
     ENDCASE.
   ENDMETHOD.
 
@@ -2123,7 +2213,7 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
       WHEN 204.
-      " The request was successful but did not return a response
+        " The request was successful but did not return a response
       WHEN 401.
         " todo, raise
       WHEN 403.
@@ -2132,6 +2222,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
         " todo, raise
       WHEN 503.
         " todo, raise
+      WHEN OTHERS.
+        " todo catch generically
     ENDCASE.
   ENDMETHOD.
 
@@ -2150,8 +2242,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     lv_code = send_receive( ).
     "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
-      WHEN 200. 
-      " The request was successful
+      WHEN 200.
+        " The request was successful
       WHEN 401.
         " todo, raise
       WHEN 403.
@@ -2160,6 +2252,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
         " todo, raise
       WHEN 503.
         " todo, raise
+      WHEN OTHERS.
+        " todo catch generically
     ENDCASE.
   ENDMETHOD.
 
@@ -2179,8 +2273,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     lv_code = send_receive( ).
     "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
-      WHEN 204. 
-      " The request was successful but did not return a response
+      WHEN 204.
+        " The request was successful but did not return a response
         " application/json,#/components/responses/NoContent
       WHEN 401.
         " todo, raise
@@ -2190,6 +2284,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
         " todo, raise
       WHEN 503.
         " todo, raise
+      WHEN OTHERS.
+        " todo catch generically
     ENDCASE.
   ENDMETHOD.
 
@@ -2208,8 +2304,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     lv_code = send_receive( ).
     "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
-      WHEN 200. 
-      " The request was successful.
+      WHEN 200.
+        " The request was successful.
       WHEN 401.
         " todo, raise
       WHEN 403.
@@ -2218,6 +2314,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
         " todo, raise
       WHEN 503.
         " todo, raise
+      WHEN OTHERS.
+        " todo catch generically
     ENDCASE.
   ENDMETHOD.
 
@@ -2237,8 +2335,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     lv_code = send_receive( ).
     "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
-      WHEN 200. 
-      " The request was successful.
+      WHEN 200.
+        " The request was successful.
       WHEN 401.
         " todo, raise
       WHEN 403.
@@ -2247,6 +2345,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
         " todo, raise
       WHEN 503.
         " todo, raise
+      WHEN OTHERS.
+        " todo catch generically
     ENDCASE.
   ENDMETHOD.
 
@@ -2266,8 +2366,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     lv_code = send_receive( ).
     "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
-      WHEN 200. 
-      " The request was successful
+      WHEN 200.
+        " The request was successful
         " application/json,#/components/schemas/User
 
       WHEN 401.
@@ -2278,6 +2378,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
         " todo, raise
       WHEN 503.
         " todo, raise
+      WHEN OTHERS.
+        " todo catch generically
     ENDCASE.
   ENDMETHOD.
 
@@ -2297,8 +2399,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     lv_code = send_receive( ).
     "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
-      WHEN 204. 
-      " The request was successful but did not return a response
+      WHEN 204.
+        " The request was successful but did not return a response
       WHEN 401.
         " todo, raise
       WHEN 403.
@@ -2307,6 +2409,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
         " todo, raise
       WHEN 503.
         " todo, raise
+      WHEN OTHERS.
+        " todo catch generically
     ENDCASE.
   ENDMETHOD.
 
@@ -2326,8 +2430,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
     lv_code = send_receive( ).
     "WRITE / lv_code. ~ replace with logging call
     CASE lv_code.
-      WHEN 200. 
-      " The request was successful
+      WHEN 200.
+        " The request was successful
       WHEN 401.
         " todo, raise
       WHEN 403.
@@ -2336,6 +2440,8 @@ CLASS zcl_proubc_baseline IMPLEMENTATION.
         " todo, raise
       WHEN 503.
         " todo, raise
+      WHEN OTHERS.
+        " todo catch generically
     ENDCASE.
   ENDMETHOD.
 ENDCLASS.

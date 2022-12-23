@@ -66,7 +66,7 @@ CLASS zcl_proubc_privacy IMPLEMENTATION.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/api/v1/circuits/{circuit_id}/verify'.
-    lv_temp = circuit_id.
+    lv_temp = iv_circuit_id.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{circuit_id}' IN lv_uri WITH lv_temp.
     mi_client->request->set_method( 'POST' ).

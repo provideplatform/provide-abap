@@ -128,7 +128,7 @@ CLASS zcl_proubc_idochlpr IMPLEMENTATION.
   METHOD constructor.
     "authenticates to PRVD APIs / authority checks use of the PRVD Tenant to SAP
     "used for all PRVD API calls
-    mo_api_helper = NEW zcl_proubc_api_helper( iv_tenant          = iv_tenant 
+    mo_api_helper = NEW zcl_proubc_api_helper( iv_tenant          = iv_tenant
                                                iv_subject_acct_id = iv_subject_acct_id
                                                iv_workgroup_id    = iv_workgroup_id ).
 
@@ -201,7 +201,7 @@ CLASS zcl_proubc_idochlpr IMPLEMENTATION.
           lv_intordersegment = <fs_header_intord>-sdata.
           ev_objid = lv_intordersegment-orderid.
         ENDIF.
-      WHEN OTHERS. 
+      WHEN OTHERS.
       "TODO configure object id determinations, throw errors if missing
     ENDCASE.
   ENDMETHOD.
@@ -345,10 +345,10 @@ CLASS zcl_proubc_idochlpr IMPLEMENTATION.
       "creates the Baseline Protocol / zk-proof of the idoc
       DATA: lv_apiresponse    TYPE REF TO data,
             lv_apiresponsestr TYPE string.
-      mo_api_helper->send_protocol_msg( EXPORTING body           = ls_protocol_msg_req 
-                                        IMPORTING statuscode     = lv_status
-                                                  apiresponse    = lv_apiresponse
-                                                  apiresponsestr = lv_apiresponsestr ).
+      mo_api_helper->send_protocol_msg( EXPORTING body           = ls_protocol_msg_req
+                                        IMPORTING ev_statuscode     = lv_status
+                                                  ev_apiresponse    = lv_apiresponse
+                                                  ev_apiresponsestr = lv_apiresponsestr ).
 
       IF lv_status = '202'.
         DATA: ls_protocol_msg_resp TYPE zif_proubc_baseline=>protocolmessage_resp.
@@ -384,7 +384,7 @@ CLASS zcl_proubc_idochlpr IMPLEMENTATION.
           wa_bpiobj-subject_account_id = ls_protocol_msg_resp-subject_account_id.
           APPEND wa_bpiobj TO lt_newbpis.
         ENDIF.
-      ELSE. 
+      ELSE.
       "log error message
       ENDIF.
 
@@ -437,7 +437,7 @@ CLASS zcl_proubc_idochlpr IMPLEMENTATION.
     AND docnum IN @it_idocnum.
 
     IF sy-subrc EQ 0.
-      launch_idoc_to_baseline( iv_idoctp    = iv_idoctp 
+      launch_idoc_to_baseline( iv_idoctp    = iv_idoctp
                                iv_idocmesty = iv_idocmestyp ).
     else.
       "message no idocs found
@@ -579,7 +579,7 @@ CLASS zcl_proubc_idochlpr IMPLEMENTATION.
     DATA:  dataref TYPE REF TO data.
     DATA: comp_tab    TYPE cl_abap_structdescr=>component_table,
           comp_wa     LIKE LINE OF comp_tab,
-          struct_type TYPE REF TO cl_abap_structdescr
+          struct_type TYPE REF TO cl_abap_structdescr.
     FIELD-SYMBOLS: <segmentdata>  TYPE any,
                    <segment_type> TYPE any,
                    <docnum>       TYPE any,

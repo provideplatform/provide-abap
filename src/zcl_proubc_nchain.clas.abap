@@ -47,15 +47,15 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/api/v1/connectors'.
-    lv_temp = public.
+    lv_temp = iv_public.
     CONDENSE lv_temp.
-    mi_client->request->set_form_field( name  = 'public' 
+    mi_client->request->set_form_field( name  = 'public'
                                         value = lv_temp ).
     mi_client->request->set_method( 'GET' ).
-    mi_client->request->set_header_field( name  = '~request_uri' 
+    mi_client->request->set_header_field( name  = '~request_uri'
                                           value = lv_uri ).
     mi_client->request->set_header_field( name  = 'content-type'
-                                          value = content_type ).
+                                          value = iv_content_type ).
     get_bpi_token( ).
     lv_code = send_receive( ).
     ev_httpresponsecode = lv_code.
@@ -104,7 +104,7 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/api/v1/connectors/{connector_id}'.
-    lv_temp = connector_id.
+    lv_temp = iv_connector_id.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{connector_id}' IN lv_uri WITH lv_temp.
     mi_client->request->set_method( 'GET' ).
@@ -132,7 +132,7 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/api/v1/connectors/{connector_id}'.
-    lv_temp = connector_id.
+    lv_temp = iv_connector_id.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{connector_id}' IN lv_uri WITH lv_temp.
     mi_client->request->set_method( 'DELETE' ).
@@ -160,7 +160,7 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/api/v1/connectors/{connector_id}'.
-    lv_temp = connector_id.
+    lv_temp = iv_connector_id.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{connector_id}' IN lv_uri WITH lv_temp.
     mi_client->request->set_method( 'PUT' ).
@@ -188,7 +188,7 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/api/v1/connectors/{connector_id}/load_balancers'.
-    lv_temp = connector_id.
+    lv_temp = iv_connector_id.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{connector_id}' IN lv_uri WITH lv_temp.
     mi_client->request->set_method( 'GET' ).
@@ -216,7 +216,7 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/api/v1/networks/{network_id}'.
-    lv_temp = network_id.
+    lv_temp = iv_network_id.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{network_id}' IN lv_uri WITH lv_temp.
     mi_client->request->set_method( 'GET' ).
@@ -244,7 +244,7 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/api/v1/networks/{connector_id}'.
-    lv_temp = connector_id.
+    lv_temp = iv_connector_id.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{connector_id}' IN lv_uri WITH lv_temp.
     mi_client->request->set_method( 'GET' ).
@@ -272,7 +272,7 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/api/v1/networks/{network_id}/status'.
-    lv_temp = network_id.
+    lv_temp = iv_network_id.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{network_id}' IN lv_uri WITH lv_temp.
     mi_client->request->set_method( 'GET' ).
@@ -357,7 +357,7 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     mi_client->request->set_header_field( name  = '~request_uri'
                                           value = lv_uri ).
     mi_client->request->set_header_field( name  = 'content-type'
-                                          value = content_type ).
+                                          value = iv_content_type ).
     get_bpi_token( ).
     lv_code = send_receive( ).
     ev_httpresponsecode = lv_code.
@@ -380,14 +380,14 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/api/v1/accounts/{account_id}'.
-    lv_temp = account_id.
+    lv_temp = iv_account_id.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{account_id}' IN lv_uri WITH lv_temp.
     mi_client->request->set_method( 'GET' ).
-    mi_client->request->set_header_field( name  = '~request_uri' 
+    mi_client->request->set_header_field( name  = '~request_uri'
                                           value = lv_uri ).
-    mi_client->request->set_header_field( name  = 'content-type' 
-                                          value = content_type ).
+    mi_client->request->set_header_field( name  = 'content-type'
+                                          value = iv_content_type ).
     get_bpi_token( ).
     lv_code = send_receive( ).
     ev_httpresponsecode = lv_code.
@@ -414,7 +414,7 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     mi_client->request->set_header_field( name  = '~request_uri'
                                           value = lv_uri ).
     mi_client->request->set_header_field( name  = 'content-type'
-                                          value = content_type ).
+                                          value = iv_content_type ).
     get_bpi_token( ).
     lv_code = send_receive( ).
     ev_httpresponsecode = lv_code.
@@ -475,10 +475,10 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/api/v1/wallets/{wallet_id}/accounts'.
-    lv_temp = wallet_id.
+    lv_temp = iv_wallet_id.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{wallet_id}' IN lv_uri WITH lv_temp.
-    lv_temp = page.
+    lv_temp = iv_page.
     CONDENSE lv_temp.
     mi_client->request->set_form_field( name  = 'page'
                                         value = lv_temp ).
@@ -486,7 +486,7 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     mi_client->request->set_header_field( name  = '~request_uri'
                                           value = lv_uri ).
     mi_client->request->set_header_field( name  = 'content-type'
-                                          value = content_type ).
+                                          value = iv_content_type ).
     get_bpi_token( ).
     lv_code = send_receive( ).
     ev_httpresponsecode = lv_code.
@@ -513,7 +513,7 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     mi_client->request->set_header_field( name  = '~request_uri'
                                           value = lv_uri ).
     mi_client->request->set_header_field( name  = 'content-type'
-                                          value = content_type ).
+                                          value = iv_content_type ).
     get_bpi_token( ).
     lv_code = send_receive( ).
     ev_httpresponsecode = lv_code.
@@ -561,14 +561,14 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/api/v1/transactions/{transaction_id}'.
-    lv_temp = transaction_id.
+    lv_temp = iv_transaction_id.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{transaction_id}' IN lv_uri WITH lv_temp.
     mi_client->request->set_method( 'GET' ).
     mi_client->request->set_header_field( name  = '~request_uri'
                                           value = lv_uri ).
     mi_client->request->set_header_field( name  = 'content-type'
-                                          value = content_type ).
+                                          value = iv_content_type ).
     get_bpi_token( ).
     lv_code = send_receive( ).
     ev_httpresponsecode = lv_code.
@@ -595,7 +595,7 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     mi_client->request->set_header_field( name  = '~request_uri'
                                           value = lv_uri ).
     mi_client->request->set_header_field( name  = 'content-type'
-                                          value = content_type ).
+                                          value = iv_content_type ).
     get_bpi_token( ).
     lv_code = send_receive( ).
     ev_httpresponsecode = lv_code.
@@ -644,14 +644,14 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/api/v1/contracts/{contract_id}'.
-    lv_temp = contract_id.
+    lv_temp = iv_contract_id.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{contract_id}' IN lv_uri WITH lv_temp.
     mi_client->request->set_method( 'GET' ).
     mi_client->request->set_header_field( name  = '~request_uri'
                                           value = lv_uri ).
     mi_client->request->set_header_field( name  = 'content-type'
-                                          value = content_type ).
+                                          value = iv_content_type ).
     get_bpi_token( ).
     lv_code = send_receive( ).
     ev_httpresponsecode = lv_code.
@@ -717,7 +717,7 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/api/v1/contracts/{contract_id}/execute'.
     mi_client->request->set_method( 'POST' ).
-    mi_client->request->set_header_field( name  = '~request_uri' 
+    mi_client->request->set_header_field( name  = '~request_uri'
                                           value = lv_uri ).
 * todo, set body, #/components/schemas/ExecutereadonlycontractRequest
     get_bpi_token( ).
