@@ -3,7 +3,7 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <VSEOCLASS>
-    <CLSNAME>ZCL_PROUBC_BASELINE</CLSNAME>
+    <CLSNAME>ZCL_PRVD_BASELINE</CLSNAME>
     <LANGU>E</LANGU>
     <DESCRIPT>proUBC Baseline Protocol Proxy</DESCRIPT>
     <STATE>1</STATE>

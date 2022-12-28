@@ -112,7 +112,7 @@ CLASS ZCL_PROUBC_API_HELPER IMPLEMENTATION.
   METHOD baseline_health_check.
     DATA:
       lo_http_client  TYPE REF TO if_http_client,
-      lo_baseline_api TYPE REF TO zif_proubc_baseline,
+      lo_baseline_api TYPE REF TO zif_prvd_baseline,
       lv_authreq      TYPE zprvdrefreshtoken,
       lv_tenant_jwt   TYPE REF TO data,
       lv_tenant       TYPE zprvdtenantid,
@@ -172,7 +172,7 @@ CLASS ZCL_PROUBC_API_HELPER IMPLEMENTATION.
           lo_http_client->request->set_header_field( name  = if_http_form_fields_sap=>sap_client
                                                      value = '100' ).
 
-          lo_baseline_api = NEW zcl_proubc_baseline( ii_client        = lo_http_client
+          lo_baseline_api = NEW zcl_prvd_baseline( ii_client        = lo_http_client
                                                      iv_bpitenant_url = lv_bpiendpoint
                                                      iv_bpitoken      = lv_authreq ).
 
@@ -204,7 +204,7 @@ CLASS ZCL_PROUBC_API_HELPER IMPLEMENTATION.
 
 
   METHOD build_dummy_idoc_protocol_msg.
-    DATA ls_dummy_idoc_protocol_msg TYPE zif_proubc_baseline=>protocolmessage_req.
+    DATA ls_dummy_idoc_protocol_msg TYPE zif_prvd_baseline=>protocolmessage_req.
     SELECT docnum,
            idoctp,
            status,
@@ -451,7 +451,7 @@ CLASS ZCL_PROUBC_API_HELPER IMPLEMENTATION.
 
 
   METHOD send_protocol_msg.
-    DATA ls_finalized_protocol_msg TYPE zif_proubc_baseline=>protocolmessage_req.
+    DATA ls_finalized_protocol_msg TYPE zif_prvd_baseline=>protocolmessage_req.
 
     ls_finalized_protocol_msg                    = is_body.
     ls_finalized_protocol_msg-subject_account_id = mv_defaultsubjectacct.
@@ -471,7 +471,7 @@ CLASS ZCL_PROUBC_API_HELPER IMPLEMENTATION.
     "resolve tenant
     DATA:
       lo_http_client  TYPE REF TO if_http_client,
-      lo_baseline_api TYPE REF TO zif_proubc_baseline,
+      lo_baseline_api TYPE REF TO zif_prvd_baseline,
       lv_authreq      TYPE zprvdrefreshtoken,
       lv_tenant_jwt   TYPE REF TO data,
       lv_tenant       TYPE zprvdtenantid,
@@ -520,7 +520,7 @@ CLASS ZCL_PROUBC_API_HELPER IMPLEMENTATION.
           lo_http_client->request->set_header_field( name  = if_http_form_fields_sap=>sap_client
                                                      value = '100' ).
 
-          mo_baseline_client = NEW zcl_proubc_baseline( ii_client        = lo_http_client
+          mo_baseline_client = NEW zcl_prvd_baseline( ii_client        = lo_http_client
                                                         iv_bpitenant_url = lv_bpiendpoint
                                                         iv_bpitoken      = mv_bpitoken ).
           IF sy-subrc = 0.
