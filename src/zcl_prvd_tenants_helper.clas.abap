@@ -1,4 +1,4 @@
-CLASS zcl_proubc_prvdtenants DEFINITION
+CLASS zcl_prvd_tenants_helper DEFINITION
   PUBLIC
   FINAL
   CREATE PUBLIC .
@@ -11,11 +11,11 @@ CLASS zcl_proubc_prvdtenants DEFINITION
         !iv_prvdtenant TYPE zprvdtenantid OPTIONAL
         !iv_subjacctid TYPE zprvdtenantid
       EXPORTING
-        !ev_prvdtenant TYPE zif_proubc_tenants=>ty_tenant_wo_token .
+        !ev_prvdtenant TYPE zif_prvd_tenants=>ty_tenant_wo_token .
     "! Returns list of PRVD Org table entries per criteria
     CLASS-METHODS get_allprvdtenant
       EXPORTING
-        !et_prvdtenant TYPE zif_proubc_tenants=>tty_tenant_wo_token .
+        !et_prvdtenant TYPE zif_prvd_tenants=>tty_tenant_wo_token .
     "! Creates a new entry to the PRVD Tenant table
     CLASS-METHODS create_prvdtenant
       IMPORTING
@@ -45,7 +45,7 @@ ENDCLASS.
 
 
 
-CLASS zcl_proubc_prvdtenants IMPLEMENTATION.
+CLASS zcl_prvd_tenants_helper IMPLEMENTATION.
 
 
   METHOD create_prvdtenant.
@@ -130,7 +130,7 @@ CLASS zcl_proubc_prvdtenants IMPLEMENTATION.
 
   METHOD get_allprvdtenant.
     DATA: lt_prvdtenant TYPE TABLE OF zprvdtenants,
-          ls_prvdtenant TYPE zif_proubc_tenants=>ty_tenant_wo_token,
+          ls_prvdtenant TYPE zif_prvd_tenants=>ty_tenant_wo_token,
           lo_api_helper TYPE REF TO zcl_proubc_api_helper.
 
     lo_api_helper = NEW zcl_proubc_api_helper( ).
@@ -212,7 +212,7 @@ CLASS zcl_proubc_prvdtenants IMPLEMENTATION.
 
   METHOD get_refreshtoken.
     DATA: lo_http_client TYPE REF TO if_http_client,
-          lo_ident_api   TYPE REF TO zcl_proubc_ident,
+          lo_ident_api   TYPE REF TO zcl_prvd_ident,
           lv_identapiurl TYPE string.
 
     "todo what authentication is needed here?

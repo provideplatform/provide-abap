@@ -1,4 +1,4 @@
-INTERFACE zif_proubc_blidochlper
+INTERFACE zif_prvd_blidochlper
   PUBLIC .
 
 

@@ -3,9 +3,9 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <VSEOINTERF>
-    <CLSNAME>ZIF_PROUBC_UNITTESTS</CLSNAME>
+    <CLSNAME>ZIF_PRVD_IDOC</CLSNAME>
     <LANGU>E</LANGU>
-    <DESCRIPT>Interface for proUBC ABAP Unit Tests</DESCRIPT>
+    <DESCRIPT>List of iDoc Basic types</DESCRIPT>
     <EXPOSURE>2</EXPOSURE>
     <STATE>1</STATE>
     <UNICODE>X</UNICODE>

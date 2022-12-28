@@ -13,10 +13,12 @@ ENDCLASS.
 
 
 CLASS ZCL_IDOCAPI_SEGMENTAPI IMPLEMENTATION.
+
+
   METHOD if_rest_resource~get.
     DATA: lv_selectedbasictype TYPE string,
-          ls_basictypes        TYPE zif_idocapi_typelist=>ty_basictype,
-          ls_responsedata      TYPE zif_idocapi_typelist=>ty_basictype_w_segments,
+          ls_basictypes        TYPE zif_prvd_idoc=>ty_basictype,
+          ls_responsedata      TYPE zif_prvd_idoc=>ty_basictype_w_segments,
           lv_idoctype          TYPE ledid_idoctype.
 
     DATA(lt_uriattributes) = mo_request->get_uri_attributes( ).

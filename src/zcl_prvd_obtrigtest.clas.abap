@@ -1,4 +1,4 @@
-CLASS zcl_proubc_obtrigtest DEFINITION
+CLASS zcl_prvd_obtrigtest DEFINITION
   PUBLIC
   INHERITING FROM cl_rest_resource
   FINAL
@@ -14,7 +14,7 @@ ENDCLASS.
 
 
 
-CLASS ZCL_PROUBC_OBTRIGTEST IMPLEMENTATION.
+CLASS ZCL_PRVD_OBTRIGTEST IMPLEMENTATION.
 
 
   METHOD if_rest_resource~post.
@@ -22,7 +22,7 @@ CLASS ZCL_PROUBC_OBTRIGTEST IMPLEMENTATION.
           lv_status                 TYPE i,
           ls_protocol_msg_req       TYPE zif_proubc_baseline=>protocolmessage_req,
           ls_dummy_protocol_msg_req TYPE zif_proubc_baseline=>protocolmessage_req,
-          ls_testresponse           TYPE zif_proubc_testobj=>ty_obtrigtest,
+          ls_testresponse           TYPE zif_prvd_testobj=>ty_obtrigtest,
           lv_testresponse           TYPE string,
           lv_apiresponsestr         TYPE string,
           lv_apiresponse            TYPE REF TO data.
@@ -47,7 +47,7 @@ CLASS ZCL_PROUBC_OBTRIGTEST IMPLEMENTATION.
     lo_api_helper->setup_protocol_msg( IMPORTING setup_success = lv_setup_success ).
 
     IF lv_setup_success = 'X'.
-      lo_api_helper->send_protocol_msg( EXPORTING body              = ls_protocol_msg_req
+      lo_api_helper->send_protocol_msg( EXPORTING is_body           = ls_protocol_msg_req
                                         IMPORTING ev_statuscode     = lv_status
                                                   ev_apiresponsestr = lv_apiresponsestr ).
 

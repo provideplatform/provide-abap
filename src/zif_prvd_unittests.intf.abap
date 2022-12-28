@@ -1,4 +1,4 @@
-INTERFACE zif_proubc_unittests
+INTERFACE zif_prvd_unittests
   PUBLIC .
 
   "! Ident reachability

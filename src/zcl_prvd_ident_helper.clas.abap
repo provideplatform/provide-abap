@@ -21,7 +21,11 @@ PROTECTED SECTION.
 PRIVATE SECTION.
 ENDCLASS.
 
-CLASS zcl_prvd_ident_helper IMPLEMENTATION.
+
+
+CLASS ZCL_PRVD_IDENT_HELPER IMPLEMENTATION.
+
+
   METHOD constructor.
     DATA: lv_identurl TYPE string.
     DATA: lo_http_client TYPE REF TO if_http_client,
@@ -51,6 +55,8 @@ CLASS zcl_prvd_ident_helper IMPLEMENTATION.
                                          iv_refreshtoken = '' ).
     mo_ident_client = lo_ident_api.
   ENDMETHOD.
+
+
   METHOD create_ident_user.
     DATA: ls_create_user_req TYPE zif_prvd_ident=>createuserrequest,
           ls_prvdtenant TYPE zsprvdtenant,
@@ -61,8 +67,10 @@ CLASS zcl_prvd_ident_helper IMPLEMENTATION.
     ls_create_user_req-email = iv_email.
     mo_ident_client->createuser( body = ls_create_user_req  ).
 
-    zcl_proubc_prvdtenants=>create_prvdtenant( it_prvdtenant = lt_prvdtenant ).
+    zcl_prvd_tenants_helper=>create_prvdtenant( it_prvdtenant = lt_prvdtenant ).
   ENDMETHOD.
+
+
   METHOD create_user_organization.
   ENDMETHOD.
 ENDCLASS.

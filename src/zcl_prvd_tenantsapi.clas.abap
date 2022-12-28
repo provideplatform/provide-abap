@@ -1,4 +1,4 @@
-CLASS zcl_proubc_tenantsapi DEFINITION
+CLASS zcl_prvd_tenantsapi DEFINITION
   PUBLIC
   INHERITING FROM cl_rest_resource
   FINAL
@@ -20,11 +20,11 @@ ENDCLASS.
 
 
 
-CLASS zcl_proubc_tenantsapi IMPLEMENTATION.
+CLASS zcl_prvd_tenantsapi IMPLEMENTATION.
 
 
   METHOD if_rest_resource~delete.
-    DATA: lv_tenantid TYPE zsprvdtenant-organization_id,
+    DATA: lv_tenantid     TYPE zsprvdtenant-organization_id,
           lv_subj_acct_id TYPE zsprvdtenant-subject_account_id.
     DATA(lt_uriattributes) = mo_request->get_uri_attributes( ).
     READ TABLE lt_uriattributes WITH KEY name = 'ID' ASSIGNING FIELD-SYMBOL(<fs_tenantid>).
@@ -38,11 +38,11 @@ CLASS zcl_proubc_tenantsapi IMPLEMENTATION.
     IF <fs_tenantid> IS ASSIGNED AND <fs_subj_acct_id> IS ASSIGNED.
       lv_tenantid = <fs_tenantid>-value.
       lv_subj_acct_id = <fs_subj_acct_id>-value.
-      zcl_proubc_prvdtenants=>delete_prvdtenant( IMPORTING ev_prvdtenantid = lv_tenantid
+      zcl_prvd_tenants_helper=>delete_prvdtenant( IMPORTING ev_prvdtenantid = lv_tenantid
                                                            ev_subj_acct_id = lv_subj_acct_id ).
     ELSEIF <fs_tenantid> IS ASSIGNED.
       lv_subj_acct_id = <fs_tenantid>-value.
-      zcl_proubc_prvdtenants=>delete_prvdtenant( IMPORTING ev_subj_acct_id = lv_subj_acct_id ).
+      zcl_prvd_tenants_helper=>delete_prvdtenant( IMPORTING ev_subj_acct_id = lv_subj_acct_id ).
     ENDIF.
     "TODO add a delete response if totally necessary....
     mo_response->set_status( cl_rest_status_code=>gc_success_no_content ).
@@ -50,31 +50,31 @@ CLASS zcl_proubc_tenantsapi IMPLEMENTATION.
 
 
   METHOD if_rest_resource~get.
-    DATA: li_api         TYPE REF TO if_mr_api,
-          lv_data        TYPE string,
-          lv_mime        TYPE string,
-          lv_url         TYPE string,
-          lv_tenantid    TYPE zsprvdtenant-organization_id,
+    DATA: li_api          TYPE REF TO if_mr_api,
+          lv_data         TYPE string,
+          lv_mime         TYPE string,
+          lv_url          TYPE string,
+          lv_tenantid     TYPE zsprvdtenant-organization_id,
           lv_subj_acct_id TYPE zsprvdtenant-subject_account_id,
-          lt_prvdtenants TYPE zif_proubc_tenants=>tty_tenant_wo_token,
-          ls_prvdtenant  TYPE zif_proubc_tenants=>ty_tenant_wo_token,
-          lv_tenantdata  TYPE REF TO data.
+          lt_prvdtenants  TYPE zif_prvd_tenants=>tty_tenant_wo_token,
+          ls_prvdtenant   TYPE zif_prvd_tenants=>ty_tenant_wo_token,
+          lv_tenantdata   TYPE REF TO data.
 
     "TODO add SAP auths for reading the tenant(s)
 
     DATA(lt_uriattributes) = mo_request->get_uri_attributes( ).
     READ TABLE lt_uriattributes WITH KEY name = 'ID' ASSIGNING FIELD-SYMBOL(<fs_tenantid>).
-    IF SY-SUBRC <> 0.
+    IF sy-subrc <> 0.
       "No id - raise 422
     ENDIF.
     READ TABLE lt_uriattributes WITH KEY name = 'SUBJACCTID' ASSIGNING FIELD-SYMBOL(<fs_subj_acct_id>).
-    If sy-subrc <> 0.
+    IF sy-subrc <> 0.
       "No subject account id raise 422
-    ENDIF
+    ENDIF.
     IF <fs_tenantid> IS ASSIGNED AND <fs_subj_acct_id> IS ASSIGNED.
       lv_tenantid = <fs_tenantid>-value.
       lv_subj_acct_id = <fs_subj_acct_id>-value.
-      zcl_proubc_prvdtenants=>get_prvdtenant(
+      zcl_prvd_tenants_helper=>get_prvdtenant(
         EXPORTING
           iv_prvdtenant = lv_tenantid
           iv_subjacctid = lv_subj_acct_id
@@ -87,7 +87,7 @@ CLASS zcl_proubc_tenantsapi IMPLEMENTATION.
       mo_response->set_status( cl_rest_status_code=>gc_success_ok ).
     ELSEIF <fs_tenantid> IS ASSIGNED.
       lv_tenantid = <fs_tenantid>-value.
-      zcl_proubc_prvdtenants=>get_prvdtenant(
+      zcl_prvd_tenants_helper=>get_prvdtenant(
         EXPORTING
           iv_subjacctid = lv_tenantid
         IMPORTING
@@ -102,7 +102,7 @@ CLASS zcl_proubc_tenantsapi IMPLEMENTATION.
     ELSE.
 
       "TODO: add reachable true/false. call the bpi endpoints
-      zcl_proubc_prvdtenants=>get_allprvdtenant( IMPORTING et_prvdtenant = lt_prvdtenants ).
+      zcl_prvd_tenants_helper=>get_allprvdtenant( IMPORTING et_prvdtenant = lt_prvdtenants ).
       zcl_proubc_api_helper=>copy_data_to_ref(
             EXPORTING is_data = lt_prvdtenants
             CHANGING cr_data  = lv_tenantdata ).
@@ -130,7 +130,7 @@ CLASS zcl_proubc_tenantsapi IMPLEMENTATION.
 
     APPEND ls_prvdtenant TO lt_prvdtenants.
 
-    zcl_proubc_prvdtenants=>create_prvdtenant( EXPORTING it_prvdtenant = lt_prvdtenants
+    zcl_prvd_tenants_helper=>create_prvdtenant( EXPORTING it_prvdtenant = lt_prvdtenants
                                                IMPORTING et_prvdtenant = lt_prvdtenants_out ).
     READ TABLE lt_prvdtenants_out INDEX 1 INTO wa_prvdtenant.
     IF sy-subrc <> 0.
@@ -159,7 +159,7 @@ CLASS zcl_proubc_tenantsapi IMPLEMENTATION.
 
     APPEND ls_prvdtenant TO lt_prvdtenants.
 
-    zcl_proubc_prvdtenants=>update_prvdtenant( EXPORTING it_prvdtenant = lt_prvdtenants
+    zcl_prvd_tenants_helper=>update_prvdtenant( EXPORTING it_prvdtenant = lt_prvdtenants
                                                IMPORTING et_prvdtenant = lt_prvdtenants_out ).
     READ TABLE lt_prvdtenants_out INDEX 1 INTO wa_prvdtenant.
     IF sy-subrc <> 0.

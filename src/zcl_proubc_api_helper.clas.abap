@@ -70,7 +70,7 @@ CLASS zcl_proubc_api_helper DEFINITION
     "! Emits PRVD Baseline protocol message
     METHODS send_protocol_msg
       IMPORTING
-        !is_body           TYPE zif_proubc_baseline=>protocolmessage_req
+        !is_body           TYPE zif_prvd_baseline=>protocolmessage_req
       EXPORTING
         !ev_statuscode     TYPE i
         !ev_apiresponsestr TYPE string
@@ -85,12 +85,11 @@ CLASS zcl_proubc_api_helper DEFINITION
         VALUE(ev_bpiendpoint) TYPE zprvdtenants-bpi_endpoint .
     METHODS build_dummy_idoc_protocol_msg
       RETURNING
-        VALUE(es_dummy_idoc_msg) TYPE zif_proubc_baseline=>protocolmessage_req .
+        VALUE(es_dummy_idoc_msg) TYPE zif_prvd_baseline=>protocolmessage_req .
     "! Lists the BPI accounts available to the user
     METHODS list_bpi_accounts .
     "! Method to return PRVD Nchain helper class
     METHODS get_nchain_helper EXPORTING eo_prvd_nchain_helper TYPE REF TO zcl_proubc_nchain_helper.
-
   PROTECTED SECTION.
     DATA: mv_defaulttenant        TYPE zprvdtenants-organization_id,
           mv_defaultsubjectacct   TYPE zprvdtenantid,
@@ -100,14 +99,14 @@ CLASS zcl_proubc_api_helper DEFINITION
           mv_bpitoken             TYPE zprvdrefreshtoken,
           mv_default_bpiendpoint  TYPE string,
           mo_ident_client         TYPE REF TO zif_prvd_ident,
-          mo_baseline_client      TYPE REF TO zif_proubc_baseline.
+          mo_baseline_client      TYPE REF TO zif_prvd_baseline.
     METHODS set_default_tenant IMPORTING iv_defaulttenant TYPE zprvdtenants-organization_id OPTIONAL.
   PRIVATE SECTION.
 ENDCLASS.
 
 
 
-CLASS zcl_proubc_api_helper IMPLEMENTATION.
+CLASS ZCL_PROUBC_API_HELPER IMPLEMENTATION.
 
 
   METHOD baseline_health_check.
@@ -260,7 +259,7 @@ CLASS zcl_proubc_api_helper IMPLEMENTATION.
     ls_dummy_idoc_protocol_msg-payload_mimetype = 'json'.
     ls_dummy_idoc_protocol_msg-type = 'ORDERS05'.
 
-    zcl_proubc_idochlpr=>get_dummy_objid( EXPORTING iv_schema = 'ORDERS05'
+    zcl_prvd_idochlpr=>get_dummy_objid( EXPORTING iv_schema = 'ORDERS05'
                    IMPORTING ev_objid = ls_dummy_idoc_protocol_msg-id
                              ev_newidocnum = lv_newidocnum
                     CHANGING ct_edidd = lt_edidd ).
@@ -430,6 +429,7 @@ CLASS zcl_proubc_api_helper IMPLEMENTATION.
     ENDIF.
   ENDMETHOD.
 
+
   METHOD get_default_tenant.
     "TODO add authorization check and mapping to sap user id
     ev_defaulttenant = mv_defaulttenant.
@@ -448,6 +448,7 @@ CLASS zcl_proubc_api_helper IMPLEMENTATION.
       CATCH cx_static_check.
     ENDTRY.
   ENDMETHOD.
+
 
   METHOD send_protocol_msg.
     DATA ls_finalized_protocol_msg TYPE zif_proubc_baseline=>protocolmessage_req.
@@ -570,6 +571,7 @@ CLASS zcl_proubc_api_helper IMPLEMENTATION.
     lo_prvd_nchain_helper = NEW zcl_proubc_nchain_helper( io_prvd_api_helper = me ).
     eo_prvd_nchain_helper = lo_prvd_nchain_helper.
   ENDMETHOD.
+
 
   METHOD get_subject_account_id.
     DATA: lv_unhashed_subject_account_id TYPE string,

@@ -14,11 +14,11 @@ ENDCLASS.
 
 
 
-CLASS zcl_idocapi_btypeapi IMPLEMENTATION.
+CLASS ZCL_IDOCAPI_BTYPEAPI IMPLEMENTATION.
 
 
   METHOD if_rest_resource~get.
-    DATA: lt_basictypes TYPE zif_idocapi_typelist=>tt_basictype.
+    DATA: lt_basictypes TYPE zif_prvd_idoc=>tt_basictype.
 
     SELECT a~idoctyp
             b~descrp

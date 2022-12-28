@@ -1,4 +1,4 @@
-CLASS zcl_proubc_objstatapi DEFINITION
+CLASS zcl_prvd_objstatapi DEFINITION
   PUBLIC
   INHERITING FROM cl_rest_resource
   FINAL
@@ -16,13 +16,13 @@ ENDCLASS.
 
 
 
-CLASS ZCL_PROUBC_OBJSTATAPI IMPLEMENTATION.
+CLASS ZCL_PRVD_OBJSTATAPI IMPLEMENTATION.
 
 
   METHOD if_rest_resource~get.
     DATA(lt_uriattributes) = mo_request->get_uri_attributes( ).
     DATA(lo_entity) = mo_response->create_entity( ).
-    DATA ls_status_response TYPE zif_proubc_object=>ty_update_status_res.
+    DATA ls_status_response TYPE zif_prvd_object=>ty_update_status_res.
     DATA lv_statusdata TYPE REF TO data.
     READ TABLE lt_uriattributes WITH KEY name = 'ID' ASSIGNING FIELD-SYMBOL(<fs_object_get>).
     IF sy-subrc = 0.
@@ -52,8 +52,8 @@ CLASS ZCL_PROUBC_OBJSTATAPI IMPLEMENTATION.
 
     DATA(lo_entity) = mo_response->create_entity( ).
 
-    DATA: ls_objectstat   TYPE zif_proubc_object=>ty_update_status_req,
-          ls_resp_objstat TYPE zif_proubc_object=>ty_update_status_res.
+    DATA: ls_objectstat   TYPE zif_prvd_object=>ty_update_status_req,
+          ls_resp_objstat TYPE zif_prvd_object=>ty_update_status_res.
     DATA(lv_request_body) = mo_request->get_entity( )->get_string_data( ).
 
     /ui2/cl_json=>deserialize( EXPORTING json = lv_request_body

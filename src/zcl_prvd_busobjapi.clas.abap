@@ -1,4 +1,4 @@
-CLASS zcl_proubc_busobjapi DEFINITION
+CLASS zcl_prvd_busobjapi DEFINITION
   PUBLIC
   INHERITING FROM cl_rest_resource
   FINAL
@@ -16,7 +16,7 @@ ENDCLASS.
 
 
 
-CLASS ZCL_PROUBC_BUSOBJAPI IMPLEMENTATION.
+CLASS ZCL_PRVD_BUSOBJAPI IMPLEMENTATION.
 
 
   METHOD if_rest_resource~get.
@@ -50,7 +50,7 @@ CLASS ZCL_PROUBC_BUSOBJAPI IMPLEMENTATION.
     DATA(lo_entity) = mo_response->create_entity( ).
     DATA lv_bpiobjdata TYPE REF TO data.
     "create the business object
-    DATA: lt_objects TYPE zif_proubc_object=>tty_create_object_req_objid.
+    DATA: lt_objects TYPE zif_prvd_object=>tty_create_object_req_objid.
     DATA(lv_request_body) = mo_request->get_entity( )->get_string_data( ).
     /ui2/cl_json=>deserialize( EXPORTING json = lv_request_body
                                CHANGING data  = lt_objects ).

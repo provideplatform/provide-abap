@@ -27,14 +27,14 @@ CLASS zcl_proubc_busobjhlpr DEFINITION
       IMPORTING
         !iv_objectid   TYPE zbpiobj-object_id
       EXPORTING
-        !es_objectstat TYPE zif_proubc_object=>ty_update_status_res .
+        !es_objectstat TYPE zif_prvd_object=>ty_update_status_res .
     "! Updates a BPI object's relative status
     CLASS-METHODS update_object_status
       IMPORTING
         !iv_objectid   TYPE zbpiobj-object_id
-        !is_objectstat TYPE zif_proubc_object=>ty_update_status_req
+        !is_objectstat TYPE zif_prvd_object=>ty_update_status_req
       EXPORTING
-        !es_objectstat TYPE zif_proubc_object=>ty_update_status_res .
+        !es_objectstat TYPE zif_prvd_object=>ty_update_status_res .
     "! Verifies completeness of the BPI object being creates
     CLASS-METHODS validate_object_create
       IMPORTING

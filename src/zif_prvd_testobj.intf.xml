@@ -3,9 +3,9 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <VSEOINTERF>
-    <CLSNAME>ZIF_PROUBC_BASELINE</CLSNAME>
+    <CLSNAME>ZIF_PRVD_TESTOBJ</CLSNAME>
     <LANGU>E</LANGU>
-    <DESCRIPT>proUBC Baseline Proxy</DESCRIPT>
+    <DESCRIPT>proUBC Test endpoint interface</DESCRIPT>
     <EXPOSURE>2</EXPOSURE>
     <STATE>1</STATE>
     <UNICODE>X</UNICODE>

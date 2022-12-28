@@ -1,17 +1,17 @@
-CLASS zcl_proubc_idochlpr DEFINITION
+CLASS zcl_prvd_idochlpr DEFINITION
   PUBLIC
   FINAL
   CREATE PUBLIC .
 
   PUBLIC SECTION.
 
-    INTERFACES zif_proubc_blidochlper .
+    INTERFACES zif_prvd_blidochlper .
 
     TYPES:
       tty_edidd TYPE TABLE OF edidd .
 
     DATA mo_api_helper TYPE REF TO zcl_proubc_api_helper .
-    DATA mt_selected_idocs TYPE zif_proubc_blidochlper=>tty_proubc_idocs .
+    DATA mt_selected_idocs TYPE zif_prvd_blidochlper=>tty_proubc_idocs .
 
     "! Determines the object id for an idoc (ex: BELNR for purchase order ORDERS idoc)
     CLASS-METHODS get_objid
@@ -43,11 +43,11 @@ CLASS zcl_proubc_idochlpr DEFINITION
       IMPORTING
         !it_target_segment_struct TYPE ledid_t_segment_struct
       EXPORTING
-        !et_field_data            TYPE zif_proubc_blidochlper=>tty_idoc_segment_field .
+        !et_field_data            TYPE zif_prvd_blidochlper=>tty_idoc_segment_field .
     "! For given idoc schema, populates the child level idoc segments schema
     CLASS-METHODS generate_child_segment_schema
       CHANGING
-        !cs_segment_schema TYPE zif_proubc_blidochlper=>ty_idoc_segment .
+        !cs_segment_schema TYPE zif_prvd_blidochlper=>ty_idoc_segment .
     "! ZCL_PROUBC_IDOCHLPR object constructor
     METHODS constructor
       IMPORTING
@@ -112,7 +112,7 @@ ENDCLASS.
 
 
 
-CLASS zcl_proubc_idochlpr IMPLEMENTATION.
+CLASS zcl_prvd_idochlpr IMPLEMENTATION.
 
 
   METHOD add_message.
@@ -229,7 +229,7 @@ CLASS zcl_proubc_idochlpr IMPLEMENTATION.
     ENDLOOP.
 
     "get the type descriptor for zif_proubc_blidochlper=>ty_idoc_segment
-    DATA: ls_dummy_segment TYPE zif_proubc_blidochlper=>ty_idoc_segment.
+    DATA: ls_dummy_segment TYPE zif_prvd_blidochlper=>ty_idoc_segment.
 
     "create top level components
     LOOP AT it_idoc_struct ASSIGNING <fs_idoc_struct> WHERE syntax_attrib-parseg IS INITIAL.
@@ -249,7 +249,7 @@ CLASS zcl_proubc_idochlpr IMPLEMENTATION.
     "assign data from tree structure from parent level down
     LOOP AT it_idoc_struct ASSIGNING <fs_idoc_struct> WHERE syntax_attrib-parseg IS INITIAL.
       "map the data
-      DATA: ls_idoc_struct TYPE zif_proubc_blidochlper=>ty_idoc_segment.
+      DATA: ls_idoc_struct TYPE zif_prvd_blidochlper=>ty_idoc_segment.
       ls_idoc_struct-segment_type = <fs_idoc_struct>-segment_type.
       ls_idoc_struct-description = <fs_idoc_struct>-segment_type_attrib-descrp.
       ls_idoc_struct-minoccurs = <fs_idoc_struct>-syntax_attrib-occmin.
@@ -259,7 +259,7 @@ CLASS zcl_proubc_idochlpr IMPLEMENTATION.
       "generate fields
       DATA: lt_mapped_segment_struct TYPE ledid_t_segment_struct.
       lt_mapped_segment_struct = VALUE ledid_t_segment_struct( FOR line IN it_segment_struct WHERE ( segment_type EQ <fs_idoc_struct>-segment_type  ) ( line ) ).
-      zcl_proubc_idochlpr=>generate_segment_fields(
+      zcl_prvd_idochlpr=>generate_segment_fields(
         EXPORTING
           it_target_segment_struct =  lt_mapped_segment_struct
         IMPORTING
@@ -286,7 +286,7 @@ CLASS zcl_proubc_idochlpr IMPLEMENTATION.
 
   METHOD launch_idoc_to_baseline.
     DATA:
-      lo_ident_api         TYPE REF TO zif_proubc_ident,
+      lo_ident_api         TYPE REF TO zif_prvd_ident,
       lo_baseline_api      TYPE REF TO zif_proubc_baseline,
       ls_protocol_msg_req  TYPE zif_proubc_baseline=>protocolmessage_req,
       "ls_bpiobjects_req    TYPE zif_proubc_baseline=>bpiobjects_req,
@@ -337,7 +337,7 @@ CLASS zcl_proubc_idochlpr IMPLEMENTATION.
       ls_protocol_msg_req-payload = lv_flattened_idoc.
       ls_protocol_msg_req-payload_mimetype = 'json'.
       ls_protocol_msg_req-type = wa_idoc_control-idoctp.
-      zcl_proubc_idochlpr=>get_objid( EXPORTING iv_schema = ls_protocol_msg_req-type
+      zcl_prvd_idochlpr=>get_objid( EXPORTING iv_schema = ls_protocol_msg_req-type
                                it_edidd = lt_edidd
                                iv_idoc = lv_idoc
                      IMPORTING ev_objid = ls_protocol_msg_req-id ).
@@ -345,7 +345,7 @@ CLASS zcl_proubc_idochlpr IMPLEMENTATION.
       "creates the Baseline Protocol / zk-proof of the idoc
       DATA: lv_apiresponse    TYPE REF TO data,
             lv_apiresponsestr TYPE string.
-      mo_api_helper->send_protocol_msg( EXPORTING body           = ls_protocol_msg_req
+      mo_api_helper->send_protocol_msg( EXPORTING is_body           = ls_protocol_msg_req
                                         IMPORTING ev_statuscode     = lv_status
                                                   ev_apiresponse    = lv_apiresponse
                                                   ev_apiresponsestr = lv_apiresponsestr ).
@@ -418,7 +418,7 @@ CLASS zcl_proubc_idochlpr IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD zif_proubc_blidochlper~shuttle_idocs.
+  METHOD zif_prvd_blidochlper~shuttle_idocs.
     "object_id  TYPE bpiobj-object_id,
     SELECT docnum,
     idoctp,
@@ -641,8 +641,8 @@ CLASS zcl_proubc_idochlpr IMPLEMENTATION.
 
     "get the idoc metadata
     DATA: lv_selectedbasictype TYPE string,
-          ls_basictypes        TYPE zif_idocapi_typelist=>ty_basictype,
-          ls_responsedata      TYPE zif_idocapi_typelist=>ty_basictype_w_segments,
+          ls_basictypes        TYPE zif_prvd_idoc=>ty_basictype,
+          ls_responsedata      TYPE zif_prvd_idoc=>ty_basictype_w_segments,
           lv_idoc_type_in      TYPE ledid_idoctype,
           lv_idoc_type_out     TYPE ledid_idoc_type,
           lt_idoc_struct       TYPE ledid_t_idoc_struct,
@@ -826,8 +826,8 @@ CLASS zcl_proubc_idochlpr IMPLEMENTATION.
 
 
   METHOD generate_segment_fields.
-    DATA: ls_field_data TYPE zif_proubc_blidochlper=>ty_idoc_segment_field,
-          lt_field_data TYPE zif_proubc_blidochlper=>tty_idoc_segment_field.
+    DATA: ls_field_data TYPE zif_prvd_blidochlper=>ty_idoc_segment_field,
+          lt_field_data TYPE zif_prvd_blidochlper=>tty_idoc_segment_field.
 
     LOOP AT it_target_segment_struct ASSIGNING FIELD-SYMBOL(<fs_target_segment>).
       "**** Field-level data ****

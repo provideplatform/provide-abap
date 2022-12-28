@@ -21,27 +21,27 @@ CLASS ZCL_PROUBC_API_SICF IMPLEMENTATION.
   METHOD if_rest_application~get_root_handler.
     DATA(lo_router) = NEW cl_rest_router( ).
     lo_router->attach( iv_template      = '/tenants'
-                       iv_handler_class = 'ZCL_PROUBC_TENANTSAPI' ).
+                       iv_handler_class = 'ZCL_PRVD_TENANTSAPI' ).
     lo_router->attach( iv_template      = '/tenants/{ID}'
-                       iv_handler_class = 'ZCL_PROUBC_TENANTSAPI' ).
+                       iv_handler_class = 'ZCL_PRVD_TENANTSAPI' ).
     lo_router->attach( iv_template      = '/tenants/{ID}/{SUBJACCTID}'
-                       iv_handler_class = 'ZCL_PROUBC_TENANTSAPI' ).
+                       iv_handler_class = 'ZCL_PRVD_TENANTSAPI' ).
     lo_router->attach( iv_template      = '/status'
-                       iv_handler_class = 'ZCL_PROUBC_HEALTHAPI' ).
+                       iv_handler_class = 'ZCL_PRVD_HEALTHAPI' ).
 
     "middleware tells SAP to create a new object (ex: sales order)
     lo_router->attach( iv_template      = '/objects'
-                       iv_handler_class = 'ZCL_PROUBC_BUSOBJAPI' ).
+                       iv_handler_class = 'ZCL_PRVD_BUSOBJAPI' ).
     "middleware tells SAP to update existing object by id. Are we querying by object ID or by baseline ID?
     lo_router->attach( iv_template      = '/objects/{ID}'
-                       iv_handler_class = 'ZCL_PROUBC_OBJIDAPI' ).
+                       iv_handler_class = 'ZCL_PRVD_OBJIDAPI' ).
     "middleware tells SAP to update status in BPI table
     lo_router->attach( iv_template      = '/objects/{ID}/status'
-                       iv_handler_class = 'ZCL_PROUBC_OBJSTATAPI' ).
+                       iv_handler_class = 'ZCL_PRVD_OBJSTATAPI' ).
 
     "Endpoints used by Shuttle for workflow building
     lo_router->attach( iv_template      = '/auth'
-                       iv_handler_class = 'ZCL_PROUBC_AUTHAPI' ).
+                       iv_handler_class = 'ZCL_PRVD_AUTHAPI' ).
     lo_router->attach( iv_template      = '/schemas'
                        iv_handler_class = 'ZCL_IDOCAPI_BTYPEAPI' ).
     lo_router->attach( iv_template      = '/schemas/{basictypeid}'
@@ -49,7 +49,7 @@ CLASS ZCL_PROUBC_API_SICF IMPLEMENTATION.
 
     "for test purposes only, builds a bunch of mock ORDERS05 idocs and sends them to be zk-proofed
     lo_router->attach( iv_template      = '/test/trigger_outbound'
-                       iv_handler_class = 'ZCL_PROUBC_OBTRIGTEST' ).
+                       iv_handler_class = 'ZCL_PRVD_OBTRIGTEST' ).
 
     ro_root_handler = lo_router.
   ENDMETHOD.

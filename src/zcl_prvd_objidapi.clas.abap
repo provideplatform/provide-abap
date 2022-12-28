@@ -1,4 +1,4 @@
-CLASS zcl_proubc_objidapi DEFINITION
+CLASS zcl_prvd_objidapi DEFINITION
   PUBLIC
   INHERITING FROM cl_rest_resource
   FINAL
@@ -18,7 +18,7 @@ ENDCLASS.
 
 
 
-CLASS ZCL_PROUBC_OBJIDAPI IMPLEMENTATION.
+CLASS ZCL_PRVD_OBJIDAPI IMPLEMENTATION.
 
 
   METHOD if_rest_resource~get.
@@ -64,7 +64,7 @@ CLASS ZCL_PROUBC_OBJIDAPI IMPLEMENTATION.
     DATA(lo_entity) = mo_response->create_entity( ).
     DATA lv_bpiobjdata TYPE REF TO data.
     "create the business object
-    DATA: ls_objects TYPE zif_proubc_object=>ty_create_object_req.
+    DATA: ls_objects TYPE zif_prvd_object=>ty_create_object_req.
     DATA(lv_request_body) = mo_request->get_entity( )->get_string_data( ).
     /ui2/cl_json=>deserialize( EXPORTING json = lv_request_body
                                 CHANGING data = ls_objects ).
@@ -110,7 +110,7 @@ CLASS ZCL_PROUBC_OBJIDAPI IMPLEMENTATION.
     DATA(lt_uriattributes) = mo_request->get_uri_attributes( ).
     DATA(lo_entity) = mo_response->create_entity( ).
     DATA lv_bpiobjdata TYPE REF TO data.
-    DATA: ls_objects TYPE zif_proubc_object=>ty_create_object_req.
+    DATA: ls_objects TYPE zif_prvd_object=>ty_create_object_req.
     DATA(lv_request_body) = mo_request->get_entity( )->get_string_data( ).
     /ui2/cl_json=>deserialize( EXPORTING json = lv_request_body
                                 CHANGING data = ls_objects ).

@@ -1,9 +1,8 @@
-INTERFACE zif_proubc_object
+INTERFACE zif_prvd_object
   PUBLIC .
 
 
   TYPES:
-    "" { status: "something", baseline_id: ""}
     BEGIN OF ty_update_status_req,
       status      TYPE string,
       baseline_id TYPE zbpiobj-baseline_id,

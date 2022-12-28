@@ -1,4 +1,4 @@
-INTERFACE zif_proubc_testobj
+INTERFACE zif_prvd_testobj
   PUBLIC .
 
 
