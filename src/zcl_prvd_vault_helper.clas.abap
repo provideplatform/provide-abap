@@ -1,54 +1,64 @@
-CLASS zcl_proubc_vault_helper DEFINITION
+"INHERITING FROM zcl_proubc_api_helper
+CLASS zcl_prvd_vault_helper DEFINITION
   PUBLIC
-  "INHERITING FROM zcl_proubc_api_helper
   FINAL
   CREATE PUBLIC
-  GLOBAL FRIENDS zcl_proubc_api_helper zcl_proubc_nchain_helper.
+
+  GLOBAL FRIENDS zcl_proubc_api_helper
+                 zcl_proubc_nchain_helper .
 
   PUBLIC SECTION.
-    METHODS:
-      "! Constructor method to return PRVD Vault Helper class instance
-      constructor IMPORTING !io_api_helper         TYPE REF TO zcl_proubc_api_helper OPTIONAL
-                            !iv_org_id             TYPE zprvdtenantid OPTIONAL
-                            !iv_subject_account_id TYPE zprvdtenantid OPTIONAL
-                            !iv_workgroup_id       TYPE zprvdtenantid OPTIONAL
-                            !iv_vault_api_url      TYPE string OPTIONAL,
-      "! Method to create a key
-      create_key,
-      "! Lists the PRVD Vault(s) created for the user
-      list_vaults EXPORTING !et_vault_list TYPE zif_proubc_vault=>tty_vault_query,
-      "! Creates a PRVD Vault for the user
-      create_vault,
-      "! Derives a key for
-      derive_key,
-      list_keys,
-      "! Deletes the specified user key upon user request
-      delete_keys,
-      "! Encrypts data
-      encrypt,
-      "! Decrypts data
-      decrypt,
-      "! Used to cryptographically sign data
-      sign,
-      "! Used to cryptographically verify data
-      verify,
-      "! Initializes other aspects of the vault helper class to ensure connectivity to Vault microservice
-      setup_vault_msgs,
-      "! Retrieves the wallet address per Vault data input specs
-      get_wallet_address RETURNING VALUE(rv_wallet_address) TYPE zproubc_smartcontract_addr.
+
+    "! Constructor method to return PRVD Vault Helper class instance
+    METHODS constructor
+      IMPORTING
+        !io_api_helper         TYPE REF TO zcl_proubc_api_helper OPTIONAL
+        !iv_org_id             TYPE zprvdtenantid OPTIONAL
+        !iv_subject_account_id TYPE zprvdtenantid OPTIONAL
+        !iv_workgroup_id       TYPE zprvdtenantid OPTIONAL
+        !iv_vault_api_url      TYPE string OPTIONAL .
+    "! Method to create a key
+    METHODS create_key .
+    "! Lists the PRVD Vault(s) created for the user
+    METHODS list_vaults
+      EXPORTING
+        !et_vault_list TYPE zif_prvd_vault=>tty_vault_query .
+    "! Creates a PRVD Vault for the user
+    METHODS create_vault .
+    "! Derives a key for
+    METHODS derive_key .
+    METHODS list_keys .
+    "! Deletes the specified user key upon user request
+    METHODS delete_keys .
+    "! Encrypts data
+    METHODS encrypt .
+    "! Decrypts data
+    METHODS decrypt .
+    "! Used to cryptographically sign data
+    METHODS sign .
+    "! Used to cryptographically verify data
+    METHODS verify .
+    "! Initializes other aspects of the vault helper class to ensure connectivity to Vault microservice
+    METHODS setup_vault_msgs .
+    "! Retrieves the wallet address per Vault data input specs
+    METHODS get_wallet_address
+      RETURNING
+        VALUE(rv_wallet_address) TYPE zproubc_smartcontract_addr .
   PROTECTED SECTION.
-    DATA: mo_api_helper   TYPE REF TO zcl_proubc_api_helper,
+    DATA: mo_api_helper    TYPE REF TO zcl_proubc_api_helper,
           mv_tenant        TYPE zprvdtenantid,
           mo_http_client   TYPE REF TO if_http_client,
-          mo_vault_api     TYPE REF TO zcl_proubc_vault,
+          mo_vault_api     TYPE REF TO zcl_prvd_vault,
           mv_vault_api_url TYPE string.
   PRIVATE SECTION.
-    METHODS: get_vault_client RETURNING VALUE(ro_vault_client) TYPE REF TO zcl_proubc_vault.
+    METHODS: get_vault_client RETURNING VALUE(ro_vault_client) TYPE REF TO zcl_prvd_vault.
 ENDCLASS.
 
 
 
-CLASS zcl_proubc_vault_helper IMPLEMENTATION.
+CLASS zcl_prvd_vault_helper IMPLEMENTATION.
+
+
   METHOD constructor.
     super->constructor( ).
 
@@ -84,14 +94,8 @@ CLASS zcl_proubc_vault_helper IMPLEMENTATION.
     "mo_vault_api = NEW zcl_proubc_vault( ii_client = mo_http_client iv_tenant = mv_tenant iv_bpitoken = lv_bpitoken  ).
 
   ENDMETHOD.
-  METHOD list_vaults.
-    mo_vault_api = me->get_vault_client( ).
-    mo_vault_api->zif_proubc_vault~list_vaults( IMPORTING
-        "authorization =
-        et_vault_list = et_vault_list
-    ).
-*    CATCH cx_static_check.
-  ENDMETHOD.
+
+
   METHOD create_key.
     mo_vault_api = me->get_vault_client( ).
 *    mo_vault_api->create_key(
@@ -103,6 +107,8 @@ CLASS zcl_proubc_vault_helper IMPLEMENTATION.
 *    ).
 *    CATCH cx_static_check.
   ENDMETHOD.
+
+
   METHOD create_vault.
     mo_vault_api = me->get_vault_client( ).
 *    mo_vault_api->create_vault(
@@ -113,29 +119,28 @@ CLASS zcl_proubc_vault_helper IMPLEMENTATION.
 *    ).
 *    CATCH cx_static_check.
   ENDMETHOD.
-  METHOD derive_key.
-    mo_vault_api = me->get_vault_client( ).
-  ENDMETHOD.
-  METHOD list_keys.
-    mo_vault_api = me->get_vault_client( ).
-  ENDMETHOD.
-  METHOD delete_keys.
-    mo_vault_api = me->get_vault_client( ).
-  ENDMETHOD.
-  METHOD encrypt.
-    mo_vault_api = me->get_vault_client( ).
-  ENDMETHOD.
+
+
   METHOD decrypt.
     mo_vault_api = me->get_vault_client( ).
   ENDMETHOD.
-  METHOD sign.
+
+
+  METHOD delete_keys.
     mo_vault_api = me->get_vault_client( ).
   ENDMETHOD.
-  METHOD verify.
+
+
+  METHOD derive_key.
     mo_vault_api = me->get_vault_client( ).
   ENDMETHOD.
-  METHOD setup_vault_msgs.
+
+
+  METHOD encrypt.
+    mo_vault_api = me->get_vault_client( ).
   ENDMETHOD.
+
+
   METHOD get_vault_client.
     IF mo_vault_api IS BOUND.
       cl_http_client=>create_by_url(
@@ -162,7 +167,38 @@ CLASS zcl_proubc_vault_helper IMPLEMENTATION.
       ro_vault_client = mo_vault_api.
     ENDIF.
   ENDMETHOD.
+
+
   METHOD get_wallet_address.
     rv_wallet_address = ''.
+  ENDMETHOD.
+
+
+  METHOD list_keys.
+    mo_vault_api = me->get_vault_client( ).
+  ENDMETHOD.
+
+
+  METHOD list_vaults.
+    mo_vault_api = me->get_vault_client( ).
+    mo_vault_api->zif_prvd_vault~list_vaults( IMPORTING
+        "authorization =
+        et_vault_list = et_vault_list
+    ).
+*    CATCH cx_static_check.
+  ENDMETHOD.
+
+
+  METHOD setup_vault_msgs.
+  ENDMETHOD.
+
+
+  METHOD sign.
+    mo_vault_api = me->get_vault_client( ).
+  ENDMETHOD.
+
+
+  METHOD verify.
+    mo_vault_api = me->get_vault_client( ).
   ENDMETHOD.
 ENDCLASS.

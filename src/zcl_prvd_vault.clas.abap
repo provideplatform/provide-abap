@@ -1,10 +1,10 @@
-CLASS zcl_proubc_vault DEFINITION
+CLASS zcl_prvd_vault DEFINITION
   PUBLIC
   FINAL
   CREATE PUBLIC .
 
   PUBLIC SECTION.
-    INTERFACES zif_proubc_vault.
+    INTERFACES zif_prvd_vault.
     "! Constructor method for instantiating the PRVD Vault API proxy
     METHODS constructor IMPORTING !ii_client   TYPE REF TO if_http_client
                                   !iv_tenant   TYPE zprvdtenantid
@@ -23,7 +23,7 @@ ENDCLASS.
 
 
 
-CLASS zcl_proubc_vault IMPLEMENTATION.
+CLASS zcl_prvd_vault IMPLEMENTATION.
 
 
   METHOD constructor.
@@ -53,7 +53,7 @@ CLASS zcl_proubc_vault IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD zif_proubc_vault~createseal_unsealkey.
+  METHOD zif_prvd_vault~createseal_unsealkey.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE 'https://vault.provide.services/api/v1/unsealerkey'.
@@ -78,7 +78,7 @@ CLASS zcl_proubc_vault IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD zif_proubc_vault~create_key.
+  METHOD zif_prvd_vault~create_key.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE 'https://vault.provide.services/api/v1/vaults/{vault_id}/keys'.
@@ -107,7 +107,7 @@ CLASS zcl_proubc_vault IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD zif_proubc_vault~create_vault.
+  METHOD zif_prvd_vault~create_vault.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE 'https://vault.provide.services/api/v1/vaults'.
@@ -135,7 +135,7 @@ CLASS zcl_proubc_vault IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD zif_proubc_vault~delete_key.
+  METHOD zif_prvd_vault~delete_key.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE 'https://vault.provide.services/api/v1/vaults/{vault_id}/keys/{key_id}'.
@@ -166,7 +166,7 @@ CLASS zcl_proubc_vault IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD zif_proubc_vault~delete_secret.
+  METHOD zif_prvd_vault~delete_secret.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE 'https://vault.provide.services/api/v1/vaults/{vault_id}/secrets/{secret_id}'.
@@ -198,7 +198,7 @@ CLASS zcl_proubc_vault IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD zif_proubc_vault~derive_key.
+  METHOD zif_prvd_vault~derive_key.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE 'https://vault.provide.services/api/v1/vaults/{vault_id}/derive'.
@@ -227,7 +227,7 @@ CLASS zcl_proubc_vault IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD zif_proubc_vault~list_keys.
+  METHOD zif_prvd_vault~list_keys.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE 'https://vault.provide.services/api/v1/vaults/{vault_id}/keys'.
@@ -256,7 +256,7 @@ CLASS zcl_proubc_vault IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD zif_proubc_vault~list_secrets.
+  METHOD zif_prvd_vault~list_secrets.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE 'https://vault.provide.services/api/v1/vaults/{vault_id}/secrets'.
@@ -284,7 +284,7 @@ CLASS zcl_proubc_vault IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD zif_proubc_vault~list_vaults.
+  METHOD zif_prvd_vault~list_vaults.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE 'https://vault.provide.services/api/v1/vaults'.
@@ -310,7 +310,7 @@ CLASS zcl_proubc_vault IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD zif_proubc_vault~retreive_secret.
+  METHOD zif_prvd_vault~retreive_secret.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE 'https://vault.provide.services/api/v1/vaults/{vault_id}/secrets/{secret_id}'.
@@ -342,7 +342,7 @@ CLASS zcl_proubc_vault IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD zif_proubc_vault~unseal_vault.
+  METHOD zif_prvd_vault~unseal_vault.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE 'https://vault.provide.services/api/v1/unseal'.

@@ -3,9 +3,9 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <VSEOINTERF>
-    <CLSNAME>ZIF_PROUBC_NCHAIN_ABI_UPLOAD</CLSNAME>
+    <CLSNAME>ZIF_PRVD_FILE</CLSNAME>
     <LANGU>E</LANGU>
-    <DESCRIPT>proUBC NChain ABI upload global interface</DESCRIPT>
+    <DESCRIPT>proUBC Interface Class for File management</DESCRIPT>
     <EXPOSURE>2</EXPOSURE>
     <STATE>1</STATE>
     <UNICODE>X</UNICODE>

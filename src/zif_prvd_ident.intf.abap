@@ -1,4 +1,4 @@
-INTERFACE zif_proubc_ident
+INTERFACE zif_prvd_ident
   PUBLIC .
 
 

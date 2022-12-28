@@ -1,4 +1,4 @@
-INTERFACE zif_proubc_nchain_abi_upload
+INTERFACE zif_prvd_nchain_abi_upload
   PUBLIC .
 
 

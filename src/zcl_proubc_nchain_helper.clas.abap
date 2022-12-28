@@ -2,13 +2,13 @@ CLASS zcl_proubc_nchain_helper DEFINITION
   PUBLIC
   FINAL
   CREATE PUBLIC
-  GLOBAL FRIENDS zcl_proubc_api_helper zcl_proubc_vault_helper.
+  GLOBAL FRIENDS zcl_proubc_api_helper zcl_prvd_vault_helper.
 
   PUBLIC SECTION.
     METHODS:
       "! Creates or retrieves an existing instance of the PRVD Nchain helper class
       constructor IMPORTING !io_prvd_api_helper    TYPE REF TO zcl_proubc_api_helper OPTIONAL
-                            !io_prvd_vault_helper  TYPE REF TO zcl_proubc_vault_helper OPTIONAL
+                            !io_prvd_vault_helper  TYPE REF TO zcl_prvd_vault_helper OPTIONAL
                             !iv_org_id             TYPE zprvdtenantid OPTIONAL
                             !iv_subject_account_id TYPE zprvdtenantid OPTIONAL
                             !iv_workgroup_id       TYPE zprvdtenantid OPTIONAL
@@ -40,7 +40,7 @@ CLASS zcl_proubc_nchain_helper DEFINITION
           mo_nchain_api         TYPE REF TO zcl_proubc_nchain,
           mv_nchain_api_url     TYPE string,
           mo_prvd_api_helper    TYPE REF TO zcl_proubc_api_helper,
-          mo_prvd_vault_helper  TYPE REF TO zcl_proubc_vault_helper,
+          mo_prvd_vault_helper  TYPE REF TO zcl_prvd_vault_helper,
           mv_prvd_token         TYPE zprvdrefreshtoken.
     METHODS: get_vault_helper.
   PRIVATE SECTION.
@@ -68,7 +68,7 @@ CLASS zcl_proubc_nchain_helper IMPLEMENTATION.
     IF !io_prvd_vault_helper  IS BOUND.
       mo_prvd_vault_helper = io_prvd_vault_helper.
     ELSE.
-      mo_prvd_vault_helper = NEW zcl_proubc_vault_helper( io_api_helper = mo_prvd_api_helper ).
+      mo_prvd_vault_helper = NEW zcl_prvd_vault_helper( io_api_helper = mo_prvd_api_helper ).
     ENDIF.
 
     mo_prvd_api_helper->call_ident_api(
@@ -263,7 +263,7 @@ CLASS zcl_proubc_nchain_helper IMPLEMENTATION.
 
   METHOD get_vault_helper.
     IF mo_prvd_vault_helper IS NOT BOUND.
-      mo_prvd_vault_helper = NEW zcl_proubc_vault_helper(  ).
+      mo_prvd_vault_helper = NEW zcl_prvd_vault_helper(  ).
     ENDIF.
   ENDMETHOD.
 

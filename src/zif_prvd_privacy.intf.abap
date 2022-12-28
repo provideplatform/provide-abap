@@ -1,4 +1,4 @@
-INTERFACE zif_proubc_privacy PUBLIC.
+INTERFACE zif_prvd_privacy PUBLIC.
 
 "! Component schema: CreatecircuitRequest, object
   TYPES: BEGIN OF ty_createcircuitrequest,

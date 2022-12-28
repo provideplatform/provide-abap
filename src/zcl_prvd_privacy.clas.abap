@@ -1,6 +1,6 @@
-CLASS zcl_proubc_privacy DEFINITION PUBLIC.
+CLASS zcl_prvd_privacy DEFINITION PUBLIC.
   PUBLIC SECTION.
-    INTERFACES zif_proubc_privacy.
+    INTERFACES zif_prvd_privacy.
     "! Constructor method for initializing PRVD Privacy API proxy
     METHODS constructor IMPORTING !ii_client   TYPE REF TO if_http_client
                                   !iv_tenant   TYPE zprvdtenantid
@@ -12,7 +12,7 @@ CLASS zcl_proubc_privacy DEFINITION PUBLIC.
     METHODS send_receive RETURNING VALUE(rv_code) TYPE i.
 ENDCLASS.
 
-CLASS zcl_proubc_privacy IMPLEMENTATION.
+CLASS zcl_prvd_privacy IMPLEMENTATION.
   METHOD constructor.
     mi_client = ii_client.
     mv_bpitoken = iv_bpitoken.
@@ -25,7 +25,7 @@ CLASS zcl_proubc_privacy IMPLEMENTATION.
     mi_client->response->get_status( IMPORTING code = rv_code ).
   ENDMETHOD.
 
-  METHOD zif_proubc_privacy~listcircuits.
+  METHOD zif_prvd_privacy~listcircuits.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/api/v1/circuits'.
@@ -43,7 +43,7 @@ CLASS zcl_proubc_privacy IMPLEMENTATION.
     ENDCASE.
   ENDMETHOD.
 
-  METHOD zif_proubc_privacy~createcircuit.
+  METHOD zif_prvd_privacy~createcircuit.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/api/v1/circuits'.
@@ -62,7 +62,7 @@ CLASS zcl_proubc_privacy IMPLEMENTATION.
     ENDCASE.
   ENDMETHOD.
 
-  METHOD zif_proubc_privacy~verify.
+  METHOD zif_prvd_privacy~verify.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/api/v1/circuits/{circuit_id}/verify'.

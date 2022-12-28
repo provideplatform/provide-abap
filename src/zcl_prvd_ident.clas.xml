@@ -3,9 +3,9 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <VSEOCLASS>
-    <CLSNAME>ZCL_PROUBC_IDENT_HELPER</CLSNAME>
+    <CLSNAME>ZCL_PRVD_IDENT</CLSNAME>
     <LANGU>E</LANGU>
-    <DESCRIPT>proUBC Helper class for Ident</DESCRIPT>
+    <DESCRIPT>Provide Ident - ABAP Class</DESCRIPT>
     <STATE>1</STATE>
     <CLSCCINCL>X</CLSCCINCL>
     <FIXPT>X</FIXPT>

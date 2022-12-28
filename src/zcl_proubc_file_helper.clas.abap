@@ -41,7 +41,7 @@ CLASS zcl_proubc_file_helper IMPLEMENTATION.
   METHOD get_smartcontract_abi.
     DATA: ls_abi_registry     TYPE zprvdabiregistry,
           lv_abifile_path     TYPE zprvdabiregistry-abi_location,
-          lt_abifile_contents TYPE zif_proubc_file=>tty_filecontent,
+          lt_abifile_contents TYPE zif_prvd_file=>tty_filecontent,
           lv_filestr          TYPE string,
           lv_abi_data         TYPE REF TO data.
     SELECT SINGLE * FROM zprvdabiregistry
@@ -60,7 +60,7 @@ CLASS zcl_proubc_file_helper IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD open_abiregistry.
-    DATA: it_filecontent TYPE TABLE OF zif_proubc_file=>ty_filecontent.
+    DATA: it_filecontent TYPE TABLE OF zif_prvd_file=>ty_filecontent.
     DATA: wa_tab TYPE REF TO data.
     DATA: xstr TYPE xstring.
     OPEN DATASET is_abi_registry-abi_location FOR INPUT IN BINARY MODE.

@@ -99,7 +99,7 @@ CLASS zcl_proubc_api_helper DEFINITION
           mv_defaultbaselinetoken TYPE REF TO data,
           mv_bpitoken             TYPE zprvdrefreshtoken,
           mv_default_bpiendpoint  TYPE string,
-          mo_ident_client         TYPE REF TO zif_proubc_ident,
+          mo_ident_client         TYPE REF TO zif_prvd_ident,
           mo_baseline_client      TYPE REF TO zif_proubc_baseline.
     METHODS set_default_tenant IMPORTING iv_defaulttenant TYPE zprvdtenants-organization_id OPTIONAL.
   PRIVATE SECTION.
@@ -280,14 +280,14 @@ CLASS zcl_proubc_api_helper IMPLEMENTATION.
   METHOD call_ident_api.
     DATA:
       lo_http_client     TYPE REF TO if_http_client,
-      lo_ident_api       TYPE REF TO zif_proubc_ident,
+      lo_ident_api       TYPE REF TO zif_prvd_ident,
       ls_prvdtenant      TYPE zprvdtenants,
       lv_refreshtokenstr TYPE zprvdrefreshtoken,
       lv_identurl        TYPE string,
       lv_apiresponse     TYPE REF TO data,
       lv_tenant          TYPE zprvdtenantid,
       lv_subjacct        TYPE zprvdtenants-subject_account_id,
-      lv_authtokenreqbody TYPE zif_proubc_ident=>refresh_accesstoken_request.
+      lv_authtokenreqbody TYPE zif_prvd_ident=>refresh_accesstoken_request.
 
     IF iv_tenant IS NOT INITIAL.
       lv_tenant = iv_tenant.
@@ -336,7 +336,7 @@ CLASS zcl_proubc_api_helper IMPLEMENTATION.
     lo_http_client->request->set_header_field( name  = if_http_form_fields_sap=>sap_client
                                                value = '100' ).
 
-    lo_ident_api = NEW zcl_proubc_ident( ii_client       = lo_http_client
+    lo_ident_api = NEW zcl_prvd_ident( ii_client       = lo_http_client
                                          iv_tenant       = lv_tenant
                                          iv_refreshtoken = lv_refreshtokenstr ).
     mo_ident_client = lo_ident_api.

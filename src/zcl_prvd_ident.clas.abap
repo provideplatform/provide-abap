@@ -1,4 +1,4 @@
-CLASS zcl_proubc_ident DEFINITION
+CLASS zcl_prvd_ident DEFINITION
   PUBLIC
   CREATE PUBLIC
 
@@ -8,7 +8,7 @@ CLASS zcl_proubc_ident DEFINITION
 * Ident, 1.0
   PUBLIC SECTION.
 
-    INTERFACES zif_proubc_ident .
+    INTERFACES zif_prvd_ident .
     "! Initializes the Ident API proxy
     METHODS constructor
       IMPORTING
@@ -31,7 +31,7 @@ ENDCLASS.
 
 
 
-CLASS zcl_proubc_ident IMPLEMENTATION.
+CLASS zcl_prvd_ident IMPLEMENTATION.
 
 
   METHOD constructor.
@@ -80,7 +80,7 @@ CLASS zcl_proubc_ident IMPLEMENTATION.
     mv_refreshtoken = iv_tokenstring.
   ENDMETHOD.
 
-  METHOD zif_proubc_ident~associateusertoapplication.
+  METHOD zif_prvd_ident~associateusertoapplication.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/applications/{application_id}/users'.
@@ -106,7 +106,7 @@ CLASS zcl_proubc_ident IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD zif_proubc_ident~authentication.
+  METHOD zif_prvd_ident~authentication.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/authenticate'.
@@ -135,7 +135,7 @@ CLASS zcl_proubc_ident IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD zif_proubc_ident~authorizelong_termtoken.
+  METHOD zif_prvd_ident~authorizelong_termtoken.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/tokens'.
@@ -167,7 +167,7 @@ CLASS zcl_proubc_ident IMPLEMENTATION.
 
     CASE lv_code.
       WHEN 200 OR 201 OR 202.
-        DATA: lv_parsedresponse TYPE zif_proubc_ident=>authorizelongtermtokenresponse.
+        DATA: lv_parsedresponse TYPE zif_prvd_ident=>authorizelongtermtokenresponse.
         lv_authresponsestr = mi_client->response->get_cdata( ).
         /ui2/cl_json=>deserialize( EXPORTING json = lv_authresponsestr CHANGING data =  apiresponse ).
       WHEN 401.
@@ -180,7 +180,7 @@ CLASS zcl_proubc_ident IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD zif_proubc_ident~createapplication.
+  METHOD zif_prvd_ident~createapplication.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/applications'.
@@ -205,7 +205,7 @@ CLASS zcl_proubc_ident IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD zif_proubc_ident~createorganization.
+  METHOD zif_prvd_ident~createorganization.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/organizations'.
@@ -230,7 +230,7 @@ CLASS zcl_proubc_ident IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD zif_proubc_ident~createuser.
+  METHOD zif_prvd_ident~createuser.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/users'.
@@ -260,7 +260,7 @@ CLASS zcl_proubc_ident IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD zif_proubc_ident~deleteapplication.
+  METHOD zif_prvd_ident~deleteapplication.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/applications/{application_id}'.
@@ -287,7 +287,7 @@ CLASS zcl_proubc_ident IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD zif_proubc_ident~deleteuser.
+  METHOD zif_prvd_ident~deleteuser.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/tokens/{user_id}'.
@@ -314,7 +314,7 @@ CLASS zcl_proubc_ident IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD zif_proubc_ident~getapplicationdetails.
+  METHOD zif_prvd_ident~getapplicationdetails.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/applications/{application_id}'.
@@ -341,7 +341,7 @@ CLASS zcl_proubc_ident IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD zif_proubc_ident~getorganizationdetails.
+  METHOD zif_prvd_ident~getorganizationdetails.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/organizations/{organization_id}'.
@@ -370,7 +370,7 @@ CLASS zcl_proubc_ident IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD zif_proubc_ident~getuserdetail.
+  METHOD zif_prvd_ident~getuserdetail.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/users/{user_id}'.
@@ -399,7 +399,7 @@ CLASS zcl_proubc_ident IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD zif_proubc_ident~listapplications.
+  METHOD zif_prvd_ident~listapplications.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/applications'.
@@ -421,7 +421,7 @@ CLASS zcl_proubc_ident IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD zif_proubc_ident~listapplicationusers.
+  METHOD zif_prvd_ident~listapplicationusers.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/applications/{application_id}/users'.
@@ -448,7 +448,7 @@ CLASS zcl_proubc_ident IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD zif_proubc_ident~listorganizations.
+  METHOD zif_prvd_ident~listorganizations.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/organizations'.
@@ -472,7 +472,7 @@ CLASS zcl_proubc_ident IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD zif_proubc_ident~listtokens.
+  METHOD zif_prvd_ident~listtokens.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/tokens'.
@@ -497,7 +497,7 @@ CLASS zcl_proubc_ident IMPLEMENTATION.
     ENDCASE.
   ENDMETHOD.
 
-  METHOD zif_proubc_ident~listuserscopy.
+  METHOD zif_prvd_ident~listuserscopy.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/users'.
@@ -521,7 +521,7 @@ CLASS zcl_proubc_ident IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD zif_proubc_ident~refresh_access_token.
+  METHOD zif_prvd_ident~refresh_access_token.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/api/v1/tokens'.
@@ -552,7 +552,7 @@ CLASS zcl_proubc_ident IMPLEMENTATION.
 
     CASE lv_code.
       WHEN 200 OR 201 OR 202.
-        DATA: lv_parsedresponse TYPE zif_proubc_ident=>authorizelongtermtokenresponse.
+        DATA: lv_parsedresponse TYPE zif_prvd_ident=>authorizelongtermtokenresponse.
         lv_authresponsestr = mi_client->response->get_cdata( ).
         /ui2/cl_json=>deserialize( EXPORTING json = lv_authresponsestr
                                     CHANGING data = apiresponse ).
@@ -566,7 +566,7 @@ CLASS zcl_proubc_ident IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD zif_proubc_ident~revoketoken.
+  METHOD zif_prvd_ident~revoketoken.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/tokens/f2202ba1-e2af-4505-9b1a-53e1ce8de904'.
@@ -590,7 +590,7 @@ CLASS zcl_proubc_ident IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD zif_proubc_ident~updateapplication.
+  METHOD zif_prvd_ident~updateapplication.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/applications/{application_id}'.
@@ -618,7 +618,7 @@ CLASS zcl_proubc_ident IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD zif_proubc_ident~updateorganizationdetails.
+  METHOD zif_prvd_ident~updateorganizationdetails.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/organizations/{organization_id}'.
@@ -645,7 +645,7 @@ CLASS zcl_proubc_ident IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD zif_proubc_ident~updateuser.
+  METHOD zif_prvd_ident~updateuser.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/tokens'.
