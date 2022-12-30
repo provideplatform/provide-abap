@@ -1,4 +1,4 @@
-CLASS zcl_proubc_api_helper DEFINITION
+CLASS zcl_prvd_api_helper DEFINITION
   PUBLIC
   CREATE PUBLIC .
 
@@ -89,7 +89,7 @@ CLASS zcl_proubc_api_helper DEFINITION
     "! Lists the BPI accounts available to the user
     METHODS list_bpi_accounts .
     "! Method to return PRVD Nchain helper class
-    METHODS get_nchain_helper EXPORTING eo_prvd_nchain_helper TYPE REF TO zcl_proubc_nchain_helper.
+    METHODS get_nchain_helper EXPORTING eo_prvd_nchain_helper TYPE REF TO zcl_prvd_nchain_helper.
   PROTECTED SECTION.
     DATA: mv_defaulttenant        TYPE zprvdtenants-organization_id,
           mv_defaultsubjectacct   TYPE zprvdtenantid,
@@ -106,7 +106,7 @@ ENDCLASS.
 
 
 
-CLASS ZCL_PROUBC_API_HELPER IMPLEMENTATION.
+CLASS ZCL_PRVD_API_HELPER IMPLEMENTATION.
 
 
   METHOD baseline_health_check.
@@ -567,8 +567,8 @@ CLASS ZCL_PROUBC_API_HELPER IMPLEMENTATION.
 
 
   METHOD get_nchain_helper.
-    DATA lo_prvd_nchain_helper TYPE REF TO zcl_proubc_nchain_helper.
-    lo_prvd_nchain_helper = NEW zcl_proubc_nchain_helper( io_prvd_api_helper = me ).
+    DATA lo_prvd_nchain_helper TYPE REF TO zcl_prvd_nchain_helper.
+    lo_prvd_nchain_helper = NEW zcl_prvd_nchain_helper( io_prvd_api_helper = me ).
     eo_prvd_nchain_helper = lo_prvd_nchain_helper.
   ENDMETHOD.
 

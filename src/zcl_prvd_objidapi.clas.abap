@@ -33,7 +33,7 @@ CLASS ZCL_PRVD_OBJIDAPI IMPLEMENTATION.
       DATA lv_bpiobjdata TYPE REF TO data.
       lv_objectid = <fs_object_get>-value.
 
-      zcl_proubc_busobjhlpr=>get_object(
+      zcl_prvd_busobjhlpr=>get_object(
         EXPORTING
           iv_objectid = lv_objectid
         IMPORTING
@@ -42,7 +42,7 @@ CLASS ZCL_PRVD_OBJIDAPI IMPLEMENTATION.
       IF sy-subrc <> 0.
         "message no object found
       ENDIF.
-      zcl_proubc_api_helper=>copy_data_to_ref(
+      zcl_prvd_api_helper=>copy_data_to_ref(
               EXPORTING is_data = ls_object
               CHANGING cr_data  = lv_bpiobjdata ).
     ELSE.
@@ -87,14 +87,14 @@ CLASS ZCL_PRVD_OBJIDAPI IMPLEMENTATION.
     APPEND  ls_obj TO lt_obj.
 
 
-    zcl_proubc_busobjhlpr=>create_object(
+    zcl_prvd_busobjhlpr=>create_object(
       EXPORTING
         it_objects = lt_obj
       IMPORTING
         et_objects = lt_resp_obj
     ).
 
-    zcl_proubc_api_helper=>copy_data_to_ref( EXPORTING is_data = lt_resp_obj
+    zcl_prvd_api_helper=>copy_data_to_ref( EXPORTING is_data = lt_resp_obj
                                               CHANGING cr_data = lv_bpiobjdata ).
 
 
@@ -131,7 +131,7 @@ CLASS ZCL_PRVD_OBJIDAPI IMPLEMENTATION.
 
     APPEND ls_obj TO lt_obj.
 
-    zcl_proubc_busobjhlpr=>update_object(
+    zcl_prvd_busobjhlpr=>update_object(
       EXPORTING
         it_objects =  lt_obj
       IMPORTING
@@ -142,7 +142,7 @@ CLASS ZCL_PRVD_OBJIDAPI IMPLEMENTATION.
       "no update mapped.
     ENDIF.
 
-    zcl_proubc_api_helper=>copy_data_to_ref( EXPORTING is_data = ls_resp_obj
+    zcl_prvd_api_helper=>copy_data_to_ref( EXPORTING is_data = ls_resp_obj
                                              CHANGING cr_data  = lv_bpiobjdata ).
 
 

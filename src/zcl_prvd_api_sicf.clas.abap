@@ -1,4 +1,4 @@
-CLASS zcl_proubc_api_sicf DEFINITION
+CLASS zcl_prvd_api_sicf DEFINITION
   PUBLIC
   INHERITING FROM cl_rest_http_handler
   CREATE PUBLIC .
@@ -15,7 +15,7 @@ CLASS zcl_proubc_api_sicf DEFINITION
   PRIVATE SECTION.
 ENDCLASS.
 
-CLASS ZCL_PROUBC_API_SICF IMPLEMENTATION.
+CLASS ZCL_PRVD_API_SICF IMPLEMENTATION.
 
 
   METHOD if_rest_application~get_root_handler.
@@ -43,9 +43,9 @@ CLASS ZCL_PROUBC_API_SICF IMPLEMENTATION.
     lo_router->attach( iv_template      = '/auth'
                        iv_handler_class = 'ZCL_PRVD_AUTHAPI' ).
     lo_router->attach( iv_template      = '/schemas'
-                       iv_handler_class = 'ZCL_IDOCAPI_BTYPEAPI' ).
+                       iv_handler_class = 'ZCL_PRVD_IDOC_BTYPEAPI' ).
     lo_router->attach( iv_template      = '/schemas/{basictypeid}'
-                       iv_handler_class = 'ZCL_IDOCAPI_SEGMENTAPI' ).
+                       iv_handler_class = 'ZCL_PRVD_IDOC_SEGMENTAPI' ).
 
     "for test purposes only, builds a bunch of mock ORDERS05 idocs and sends them to be zk-proofed
     lo_router->attach( iv_template      = '/test/trigger_outbound'

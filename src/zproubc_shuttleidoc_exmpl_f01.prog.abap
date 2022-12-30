@@ -6,18 +6,18 @@ CLASS lcl_idoc_moni DEFINITION.
   PUBLIC SECTION.
     METHODS: constructor,
       baseline_idocs.
-    DATA: lo_idochlpr TYPE REF TO  zif_proubc_blidochlper.
+    DATA: lo_idochlpr TYPE REF TO  zif_prvd_blidochlper.
   PROTECTED SECTION.
-    DATA: lt_poebeln TYPE zif_proubc_blidochlper=>tty_r_ebeln,
-          lt_idocnum TYPE zif_proubc_blidochlper=>tty_r_idocnum,
-          lt_idoctyp TYPE zif_proubc_blidochlper=>tty_r_idoctype.
+    DATA: lt_poebeln TYPE zif_prvd_blidochlper=>tty_r_ebeln,
+          lt_idocnum TYPE zif_prvd_blidochlper=>tty_r_idocnum,
+          lt_idoctyp TYPE zif_prvd_blidochlper=>tty_r_idoctype.
 
   PRIVATE SECTION.
 ENDCLASS.
 
 CLASS lcl_idoc_moni IMPLEMENTATION.
   METHOD constructor.
-    me->lo_idochlpr = NEW zcl_proubc_idochlpr( iv_tenant          = p_tenant
+    me->lo_idochlpr = NEW zcl_prvd_idochlpr( iv_tenant          = p_tenant
                                                iv_subject_acct_id = p_sbjact
                                                iv_workgroup_id    = p_wrkgrp ).
     MOVE-CORRESPONDING  s_ebeln[] TO lt_poebeln[].

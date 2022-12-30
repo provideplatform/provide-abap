@@ -1,5 +1,5 @@
 @AccessControl.authorizationCheck: #CHECK
-@EndUserText.label: 'proUBC Schema Traffic Lights'
+@EndUserText.label: 'PRVD Schema Traffic Lights'
 @AbapCatalog.preserveKey: true
 @AbapCatalog.sqlViewName: 'ZIPRVDTRAFLIGHT'
 define root view ZI_PROUBC_SCHEMA_TRAFFICLIGHTS

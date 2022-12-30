@@ -3,9 +3,9 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <VSEOCLASS>
-    <CLSNAME>ZCL_IDOCAPI_SEGMENTAPI</CLSNAME>
+    <CLSNAME>ZCL_PRVD_NCHAIN</CLSNAME>
     <LANGU>E</LANGU>
-    <DESCRIPT>iDoc Segments - iDoc config API</DESCRIPT>
+    <DESCRIPT>proUBC API Proxy - PRVD nChain</DESCRIPT>
     <STATE>1</STATE>
     <CLSCCINCL>X</CLSCCINCL>
     <FIXPT>X</FIXPT>

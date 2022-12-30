@@ -1,4 +1,4 @@
-CLASS zcl_proubc_file_helper DEFINITION
+CLASS zcl_prvd_file_helper DEFINITION
   PUBLIC
   FINAL
   CREATE PUBLIC .
@@ -37,7 +37,7 @@ CLASS zcl_proubc_file_helper DEFINITION
   PRIVATE SECTION.
 ENDCLASS.
 
-CLASS zcl_proubc_file_helper IMPLEMENTATION.
+CLASS zcl_prvd_file_helper IMPLEMENTATION.
   METHOD get_smartcontract_abi.
     DATA: ls_abi_registry     TYPE zprvdabiregistry,
           lv_abifile_path     TYPE zprvdabiregistry-abi_location,
@@ -49,7 +49,7 @@ CLASS zcl_proubc_file_helper IMPLEMENTATION.
        WHERE nchain_networkid = @iv_nchain_networkid
        AND smartcontract_address = @iv_smartcontract_address.
     IF sy-subrc = 0.
-      zcl_proubc_file_helper=>open_abiregistry( EXPORTING is_abi_registry = ls_abi_registry
+      zcl_prvd_file_helper=>open_abiregistry( EXPORTING is_abi_registry = ls_abi_registry
                                                 IMPORTING ev_filecontent  = lv_filestr ).
       ev_abi_str = lv_filestr.
       /ui2/cl_json=>deserialize( EXPORTING json = lv_filestr CHANGING data = lv_abi_data ).

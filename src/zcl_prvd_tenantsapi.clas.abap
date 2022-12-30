@@ -103,7 +103,7 @@ CLASS zcl_prvd_tenantsapi IMPLEMENTATION.
 
       "TODO: add reachable true/false. call the bpi endpoints
       zcl_prvd_tenants_helper=>get_allprvdtenant( IMPORTING et_prvdtenant = lt_prvdtenants ).
-      zcl_proubc_api_helper=>copy_data_to_ref(
+      zcl_prvd_api_helper=>copy_data_to_ref(
             EXPORTING is_data = lt_prvdtenants
             CHANGING cr_data  = lv_tenantdata ).
 
@@ -136,7 +136,7 @@ CLASS zcl_prvd_tenantsapi IMPLEMENTATION.
     IF sy-subrc <> 0.
     ENDIF.
     wa_prvdtenant-refresh_token = '***'.
-    zcl_proubc_api_helper=>copy_data_to_ref( EXPORTING is_data = wa_prvdtenant
+    zcl_prvd_api_helper=>copy_data_to_ref( EXPORTING is_data = wa_prvdtenant
                                               CHANGING cr_data = lv_tenantdata ).
     DATA(lo_entity) = mo_response->create_entity( ).
     lo_entity->set_content_type( if_rest_media_type=>gc_appl_json ).
@@ -166,7 +166,7 @@ CLASS zcl_prvd_tenantsapi IMPLEMENTATION.
       "No update mapped
     ENDIF.
 
-    zcl_proubc_api_helper=>copy_data_to_ref( EXPORTING is_data = wa_prvdtenant
+    zcl_prvd_api_helper=>copy_data_to_ref( EXPORTING is_data = wa_prvdtenant
                                              CHANGING cr_data  = lv_tenantdata ).
     DATA(lo_entity) = mo_response->create_entity( ).
     lo_entity->set_content_type( if_rest_media_type=>gc_appl_json ).

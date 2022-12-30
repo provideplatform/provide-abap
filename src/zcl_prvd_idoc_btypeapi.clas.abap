@@ -1,4 +1,4 @@
-CLASS zcl_idocapi_btypeapi DEFINITION
+CLASS zcl_prvd_idoc_btypeapi DEFINITION
   PUBLIC
   INHERITING FROM cl_rest_resource
   FINAL
@@ -14,7 +14,7 @@ ENDCLASS.
 
 
 
-CLASS ZCL_IDOCAPI_BTYPEAPI IMPLEMENTATION.
+CLASS ZCL_PRVD_IDOC_BTYPEAPI IMPLEMENTATION.
 
 
   METHOD if_rest_resource~get.

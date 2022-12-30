@@ -13,7 +13,7 @@ CLASS ltc_proubc_api_helper DEFINITION FOR TESTING RISK LEVEL HARMLESS DURATION 
     CLASS-METHODS: class_teardown.
     METHODS setup.
     METHODS teardown.
-    DATA: mo_cut TYPE REF TO zcl_proubc_api_helper.
+    DATA: mo_cut TYPE REF TO zcl_prvd_api_helper.
 ENDCLASS.
 
 CLASS ltc_proubc_api_helper IMPLEMENTATION.

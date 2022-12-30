@@ -28,7 +28,7 @@ CLASS ZCL_PRVD_OBJSTATAPI IMPLEMENTATION.
     IF sy-subrc = 0.
       DATA lv_objectid TYPE zbpiobj-object_id.
       lv_objectid = <fs_object_get>-value.
-      zcl_proubc_busobjhlpr=>get_object_status(
+      zcl_prvd_busobjhlpr=>get_object_status(
         EXPORTING
           iv_objectid   = lv_objectid
         IMPORTING
@@ -36,7 +36,7 @@ CLASS ZCL_PRVD_OBJSTATAPI IMPLEMENTATION.
     ELSE.
     ENDIF.
     "/objects
-    zcl_proubc_api_helper=>copy_data_to_ref(
+    zcl_prvd_api_helper=>copy_data_to_ref(
             EXPORTING is_data = ls_status_response
             CHANGING cr_data  = lv_statusdata ).
 
@@ -64,7 +64,7 @@ CLASS ZCL_PRVD_OBJSTATAPI IMPLEMENTATION.
     IF sy-subrc = 0.
       DATA lv_objectid TYPE zbpiobj-object_id.
       lv_objectid = <fs_object_put>-value.
-      zcl_proubc_busobjhlpr=>update_object_status(
+      zcl_prvd_busobjhlpr=>update_object_status(
         EXPORTING
           iv_objectid    = lv_objectid
           is_objectstat  = ls_objectstat

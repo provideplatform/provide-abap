@@ -28,12 +28,12 @@ CLASS ZCL_PRVD_BUSOBJAPI IMPLEMENTATION.
     DATA ls_object TYPE zbpiobj.
     DATA lv_bpiobjdata TYPE REF TO data.
 
-    zcl_proubc_busobjhlpr=>get_object(
+    zcl_prvd_busobjhlpr=>get_object(
       EXPORTING
         iv_objectid = lv_objectid
       IMPORTING
         et_objects  = lt_object ).
-    zcl_proubc_api_helper=>copy_data_to_ref(
+    zcl_prvd_api_helper=>copy_data_to_ref(
             EXPORTING is_data = lt_object
             CHANGING cr_data  = lv_bpiobjdata ).
 
@@ -68,13 +68,13 @@ CLASS ZCL_PRVD_BUSOBJAPI IMPLEMENTATION.
       APPEND ls_obj TO lt_obj.
     ENDLOOP.
 
-    zcl_proubc_busobjhlpr=>create_object(
+    zcl_prvd_busobjhlpr=>create_object(
       EXPORTING
         it_objects = lt_obj
       IMPORTING
         et_objects = lt_resp_obj ).
 
-    zcl_proubc_api_helper=>copy_data_to_ref(
+    zcl_prvd_api_helper=>copy_data_to_ref(
            EXPORTING is_data = lt_resp_obj
            CHANGING cr_data  = lv_bpiobjdata ).
 

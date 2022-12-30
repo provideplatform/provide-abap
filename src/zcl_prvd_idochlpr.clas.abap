@@ -10,7 +10,7 @@ CLASS zcl_prvd_idochlpr DEFINITION
     TYPES:
       tty_edidd TYPE TABLE OF edidd .
 
-    DATA mo_api_helper TYPE REF TO zcl_proubc_api_helper .
+    DATA mo_api_helper TYPE REF TO zcl_prvd_api_helper .
     DATA mt_selected_idocs TYPE zif_prvd_blidochlper=>tty_proubc_idocs .
 
     "! Determines the object id for an idoc (ex: BELNR for purchase order ORDERS idoc)
@@ -128,7 +128,7 @@ CLASS zcl_prvd_idochlpr IMPLEMENTATION.
   METHOD constructor.
     "authenticates to PRVD APIs / authority checks use of the PRVD Tenant to SAP
     "used for all PRVD API calls
-    mo_api_helper = NEW zcl_proubc_api_helper( iv_tenant          = iv_tenant
+    mo_api_helper = NEW zcl_prvd_api_helper( iv_tenant          = iv_tenant
                                                iv_subject_acct_id = iv_subject_acct_id
                                                iv_workgroup_id    = iv_workgroup_id ).
 
@@ -287,10 +287,10 @@ CLASS zcl_prvd_idochlpr IMPLEMENTATION.
   METHOD launch_idoc_to_baseline.
     DATA:
       lo_ident_api         TYPE REF TO zif_prvd_ident,
-      lo_baseline_api      TYPE REF TO zif_proubc_baseline,
-      ls_protocol_msg_req  TYPE zif_proubc_baseline=>protocolmessage_req,
+      lo_baseline_api      TYPE REF TO zif_prvd_baseline,
+      ls_protocol_msg_req  TYPE zif_prvd_baseline=>protocolmessage_req,
       "ls_bpiobjects_req    TYPE zif_proubc_baseline=>bpiobjects_req,
-      ls_bpiobjects_req    TYPE zif_proubc_baseline=>businessobject,
+      ls_bpiobjects_req    TYPE zif_prvd_baseline=>businessobject,
       lt_updatedbpis       TYPE TABLE OF zbpiobj,
       lt_newbpis           TYPE TABLE OF zbpiobj,
       lt_final_updatedbpis TYPE TABLE OF zbpiobj,
@@ -351,7 +351,7 @@ CLASS zcl_prvd_idochlpr IMPLEMENTATION.
                                                   ev_apiresponsestr = lv_apiresponsestr ).
 
       IF lv_status = '202'.
-        DATA: ls_protocol_msg_resp TYPE zif_proubc_baseline=>protocolmessage_resp.
+        DATA: ls_protocol_msg_resp TYPE zif_prvd_baseline=>protocolmessage_resp.
         /ui2/cl_json=>deserialize( EXPORTING json = lv_apiresponsestr
                                     CHANGING data = ls_protocol_msg_resp ).
 
@@ -390,23 +390,23 @@ CLASS zcl_prvd_idochlpr IMPLEMENTATION.
 
     ENDLOOP.
 
-    zcl_proubc_busobjhlpr=>validate_object_create(
+    zcl_prvd_busobjhlpr=>validate_object_create(
       EXPORTING
         it_objects = lt_newbpis
       IMPORTING
         et_objects = lt_final_newbpis ).
-    zcl_proubc_busobjhlpr=>create_object(
+    zcl_prvd_busobjhlpr=>create_object(
       EXPORTING
         it_objects = lt_final_newbpis
 *      IMPORTING
 *        et_objects =
     ).
-    zcl_proubc_busobjhlpr=>validate_object_update(
+    zcl_prvd_busobjhlpr=>validate_object_update(
       EXPORTING
         it_objects = lt_updatedbpis
       IMPORTING
         et_objects = lt_final_updatedbpis ).
-    zcl_proubc_busobjhlpr=>update_object(
+    zcl_prvd_busobjhlpr=>update_object(
       EXPORTING
         it_objects = lt_final_updatedbpis
 *      IMPORTING

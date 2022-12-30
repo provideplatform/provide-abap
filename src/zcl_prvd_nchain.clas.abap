@@ -1,6 +1,6 @@
-CLASS zcl_proubc_nchain DEFINITION PUBLIC.
+CLASS zcl_prvd_nchain DEFINITION PUBLIC.
   PUBLIC SECTION.
-    INTERFACES zif_proubc_nchain.
+    INTERFACES zif_prvd_nchain.
     "! Constructor method to creates the PRVD Nchain API Proxy class
     METHODS constructor IMPORTING !ii_client   TYPE REF TO if_http_client
                                   !iv_tenant   TYPE zprvdtenantid
@@ -16,7 +16,7 @@ CLASS zcl_proubc_nchain DEFINITION PUBLIC.
       RAISING cx_static_check.
 ENDCLASS.
 
-CLASS zcl_proubc_nchain IMPLEMENTATION.
+CLASS zcl_prvd_nchain IMPLEMENTATION.
   METHOD constructor.
     mi_client = ii_client.
     mv_bpitoken = iv_bpitoken.
@@ -43,7 +43,7 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
   ENDMETHOD.
 
 
-  METHOD zif_proubc_nchain~listconnectors.
+  METHOD zif_prvd_nchain~listconnectors.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/api/v1/connectors'.
@@ -74,7 +74,7 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     ENDCASE.
   ENDMETHOD.
 
-  METHOD zif_proubc_nchain~createconnector.
+  METHOD zif_prvd_nchain~createconnector.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/api/v1/connectors'.
@@ -100,7 +100,7 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     ENDCASE.
   ENDMETHOD.
 
-  METHOD zif_proubc_nchain~getconnectordetails.
+  METHOD zif_prvd_nchain~getconnectordetails.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/api/v1/connectors/{connector_id}'.
@@ -128,7 +128,7 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     ENDCASE.
   ENDMETHOD.
 
-  METHOD zif_proubc_nchain~deleteconnector.
+  METHOD zif_prvd_nchain~deleteconnector.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/api/v1/connectors/{connector_id}'.
@@ -156,7 +156,7 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     ENDCASE.
   ENDMETHOD.
 
-  METHOD zif_proubc_nchain~updatenetwork.
+  METHOD zif_prvd_nchain~updatenetwork.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/api/v1/connectors/{connector_id}'.
@@ -184,7 +184,7 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     ENDCASE.
   ENDMETHOD.
 
-  METHOD zif_proubc_nchain~getloadbalancerdetails.
+  METHOD zif_prvd_nchain~getloadbalancerdetails.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/api/v1/connectors/{connector_id}/load_balancers'.
@@ -212,7 +212,7 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     ENDCASE.
   ENDMETHOD.
 
-  METHOD zif_proubc_nchain~listnetworks.
+  METHOD zif_prvd_nchain~listnetworks.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/api/v1/networks/{network_id}'.
@@ -240,7 +240,7 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     ENDCASE.
   ENDMETHOD.
 
-  METHOD zif_proubc_nchain~getnetworkdetail.
+  METHOD zif_prvd_nchain~getnetworkdetail.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/api/v1/networks/{connector_id}'.
@@ -268,7 +268,7 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     ENDCASE.
   ENDMETHOD.
 
-  METHOD zif_proubc_nchain~getnetworkstatus.
+  METHOD zif_prvd_nchain~getnetworkstatus.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/api/v1/networks/{network_id}/status'.
@@ -296,7 +296,7 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     ENDCASE.
   ENDMETHOD.
 
-  METHOD zif_proubc_nchain~createnetwork.
+  METHOD zif_prvd_nchain~createnetwork.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/api/v1/networks'.
@@ -323,7 +323,7 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     ENDCASE.
   ENDMETHOD.
 
-  METHOD zif_proubc_nchain~createaccounts.
+  METHOD zif_prvd_nchain~createaccounts.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/api/v1/accounts'.
@@ -349,7 +349,7 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     ENDCASE.
   ENDMETHOD.
 
-  METHOD zif_proubc_nchain~listaccounts.
+  METHOD zif_prvd_nchain~listaccounts.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/api/v1/accounts'.
@@ -376,7 +376,7 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     ENDCASE.
   ENDMETHOD.
 
-  METHOD zif_proubc_nchain~getaccountdetails.
+  METHOD zif_prvd_nchain~getaccountdetails.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/api/v1/accounts/{account_id}'.
@@ -406,7 +406,7 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     ENDCASE.
   ENDMETHOD.
 
-  METHOD zif_proubc_nchain~listhdwallets.
+  METHOD zif_prvd_nchain~listhdwallets.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/api/v1/wallets'.
@@ -433,7 +433,7 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     ENDCASE.
   ENDMETHOD.
 
-  METHOD zif_proubc_nchain~createhdwallet.
+  METHOD zif_prvd_nchain~createhdwallet.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/api/v1/wallets'.
@@ -444,7 +444,7 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     mi_client->request->set_header_field( name  = '~request_uri'
                                           value = lv_uri ).
 
-    zcl_proubc_api_helper=>copy_data_to_ref( EXPORTING is_data = is_walletrequest
+    zcl_prvd_api_helper=>copy_data_to_ref( EXPORTING is_data = is_walletrequest
                                              CHANGING cr_data  = lv_requestdata  ).
 
     lv_requeststr = /ui2/cl_json=>serialize( data        = lv_requestdata
@@ -471,7 +471,7 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     ENDCASE.
   ENDMETHOD.
 
-  METHOD zif_proubc_nchain~listhdwalletaccounts.
+  METHOD zif_prvd_nchain~listhdwalletaccounts.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/api/v1/wallets/{wallet_id}/accounts'.
@@ -505,7 +505,7 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     ENDCASE.
   ENDMETHOD.
 
-  METHOD zif_proubc_nchain~listtransactions.
+  METHOD zif_prvd_nchain~listtransactions.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/api/v1/transactions'.
@@ -532,7 +532,7 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     ENDCASE.
   ENDMETHOD.
 
-  METHOD zif_proubc_nchain~create_broadcast_txn_ac.
+  METHOD zif_prvd_nchain~create_broadcast_txn_ac.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/api/v1/transactions'.
@@ -557,7 +557,7 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     ENDCASE.
   ENDMETHOD.
 
-  METHOD zif_proubc_nchain~gettransactiondetails.
+  METHOD zif_prvd_nchain~gettransactiondetails.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/api/v1/transactions/{transaction_id}'.
@@ -587,7 +587,7 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     ENDCASE.
   ENDMETHOD.
 
-  METHOD zif_proubc_nchain~listcontracts.
+  METHOD zif_prvd_nchain~listcontracts.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/api/v1/contracts'.
@@ -614,7 +614,7 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     ENDCASE.
   ENDMETHOD.
 
-  METHOD zif_proubc_nchain~deploycontract.
+  METHOD zif_prvd_nchain~deploycontract.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/api/v1/contracts'.
@@ -640,7 +640,7 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     ENDCASE.
   ENDMETHOD.
 
-  METHOD zif_proubc_nchain~getcontractdetail.
+  METHOD zif_prvd_nchain~getcontractdetail.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/api/v1/contracts/{contract_id}'.
@@ -670,7 +670,7 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     ENDCASE.
   ENDMETHOD.
 
-  METHOD zif_proubc_nchain~executecontract.
+  METHOD zif_prvd_nchain~executecontract.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/api/v1/contracts/{contract_id}/execute'.
@@ -684,7 +684,7 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     mi_client->request->set_header_field( name  = '~request_uri'
                                           value = lv_uri ).
 
-    zcl_proubc_api_helper=>copy_data_to_ref( EXPORTING is_data = is_execcontractreq
+    zcl_prvd_api_helper=>copy_data_to_ref( EXPORTING is_data = is_execcontractreq
                                               CHANGING cr_data = lv_requestdata ).
 
     lv_requeststr = /ui2/cl_json=>serialize( data        = lv_requestdata
@@ -712,7 +712,7 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     ENDCASE.
   ENDMETHOD.
 
-  METHOD zif_proubc_nchain~executereadonlycontract.
+  METHOD zif_prvd_nchain~executereadonlycontract.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/api/v1/contracts/{contract_id}/execute'.
@@ -738,7 +738,7 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     ENDCASE.
   ENDMETHOD.
 
-  METHOD zif_proubc_nchain~createpricefeedcontract.
+  METHOD zif_prvd_nchain~createpricefeedcontract.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/api/v1/contracts'.
@@ -750,7 +750,7 @@ CLASS zcl_proubc_nchain IMPLEMENTATION.
     mi_client->request->set_header_field( name  = '~request_uri'
                                           value = lv_uri ).
 
-    zcl_proubc_api_helper=>copy_data_to_ref( EXPORTING is_data = is_pricefeedcontract
+    zcl_prvd_api_helper=>copy_data_to_ref( EXPORTING is_data = is_pricefeedcontract
                                              CHANGING cr_data  = lv_requestdata  ).
 
     lv_requeststr = /ui2/cl_json=>serialize( data        = lv_requestdata

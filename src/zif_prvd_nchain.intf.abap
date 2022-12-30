@@ -1,4 +1,4 @@
-INTERFACE zif_proubc_nchain
+INTERFACE zif_prvd_nchain
   PUBLIC .
 
 * Component schema: CreateconnectorRequest, object

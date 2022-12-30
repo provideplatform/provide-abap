@@ -8,6 +8,6 @@ INTERFACE zif_prvd_testobj
       status               TYPE i,
       bpi_response_payload TYPE string,
       bpi_endpoint         TYPE string,
-      msg_payload          TYPE zif_proubc_baseline=>protocolmessage_req,
+      msg_payload          TYPE zif_prvd_baseline=>protocolmessage_req,
     END OF ty_obtrigtest .
 ENDINTERFACE.

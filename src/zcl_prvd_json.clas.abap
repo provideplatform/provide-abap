@@ -43,6 +43,7 @@ CLASS zcl_prvd_json DEFINITION
 
     CLASS-METHODS:
       serialize     IMPORTING
+                      !engine           TYPE string DEFAULT 'UI2'
                       !data             TYPE data
                       !compress         TYPE bool DEFAULT c_bool-false
                       !name             TYPE string OPTIONAL
@@ -57,7 +58,17 @@ CLASS zcl_prvd_json DEFINITION
                       !conversion_exits TYPE bool DEFAULT c_bool-false
                     RETURNING
                       VALUE(r_json)     TYPE json ,
-      deserialize.
+      deserialize     IMPORTING
+                        !engine           TYPE string DEFAULT 'UI2'
+                        !json             TYPE json OPTIONAL
+                        !jsonx            TYPE xstring OPTIONAL
+                        !pretty_name      TYPE pretty_name_mode DEFAULT pretty_mode-none
+                        !assoc_arrays     TYPE bool DEFAULT c_bool-false
+                        !assoc_arrays_opt TYPE bool DEFAULT c_bool-false
+                        !name_mappings    TYPE name_mappings OPTIONAL
+                        !conversion_exits TYPE bool DEFAULT c_bool-false
+                      CHANGING
+                        !data             TYPE data .
   PROTECTED SECTION.
   PRIVATE SECTION.
 ENDCLASS.
@@ -66,7 +77,42 @@ ENDCLASS.
 
 CLASS zcl_prvd_json IMPLEMENTATION.
   METHOD serialize.
+    CASE engine.
+      WHEN 'UI2'.
+        /ui2/cl_json=>serialize(
+          EXPORTING
+            data             = data
+            compress         = compress
+            name             = name
+            pretty_name      = pretty_name
+            type_descr       = type_descr
+            assoc_arrays     = assoc_arrays
+            ts_as_iso8601    = ts_as_iso8601
+            expand_includes  = expand_includes
+            assoc_arrays_opt = assoc_arrays_opt
+            numc_as_string   = numc_as_string
+            name_mappings    = name_mappings
+            conversion_exits = conversion_exits
+          RECEIVING
+            r_json           = r_json ).
+      WHEN OTHERS.
+    ENDCASE.
   ENDMETHOD.
   METHOD deserialize.
+    CASE engine.
+      WHEN 'UI2'.
+        /ui2/cl_json=>deserialize(
+          EXPORTING
+            json             = json
+            jsonx            = jsonx
+            pretty_name      = pretty_name
+            assoc_arrays     = assoc_arrays
+            assoc_arrays_opt = assoc_arrays_opt
+            name_mappings    = name_mappings
+            conversion_exits = conversion_exits
+          CHANGING
+            data             = data ).
+      WHEN OTHERS.
+    ENDCASE.
   ENDMETHOD.
 ENDCLASS.

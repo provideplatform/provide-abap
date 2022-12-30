@@ -4,15 +4,15 @@ CLASS zcl_prvd_vault_helper DEFINITION
   FINAL
   CREATE PUBLIC
 
-  GLOBAL FRIENDS zcl_proubc_api_helper
-                 zcl_proubc_nchain_helper .
+  GLOBAL FRIENDS zcl_prvd_api_helper
+                 zcl_prvd_nchain_helper .
 
   PUBLIC SECTION.
 
     "! Constructor method to return PRVD Vault Helper class instance
     METHODS constructor
       IMPORTING
-        !io_api_helper         TYPE REF TO zcl_proubc_api_helper OPTIONAL
+        !io_api_helper         TYPE REF TO zcl_prvd_api_helper OPTIONAL
         !iv_org_id             TYPE zprvdtenantid OPTIONAL
         !iv_subject_account_id TYPE zprvdtenantid OPTIONAL
         !iv_workgroup_id       TYPE zprvdtenantid OPTIONAL
@@ -45,7 +45,7 @@ CLASS zcl_prvd_vault_helper DEFINITION
       RETURNING
         VALUE(rv_wallet_address) TYPE zproubc_smartcontract_addr .
   PROTECTED SECTION.
-    DATA: mo_api_helper    TYPE REF TO zcl_proubc_api_helper,
+    DATA: mo_api_helper    TYPE REF TO zcl_prvd_api_helper,
           mv_tenant        TYPE zprvdtenantid,
           mo_http_client   TYPE REF TO if_http_client,
           mo_vault_api     TYPE REF TO zcl_prvd_vault,
@@ -65,7 +65,7 @@ CLASS zcl_prvd_vault_helper IMPLEMENTATION.
     IF io_api_helper IS BOUND.
       mo_api_helper = io_api_helper.
     ELSE.
-      mo_api_helper = NEW zcl_proubc_api_helper( iv_tenant          = iv_org_id
+      mo_api_helper = NEW zcl_prvd_api_helper( iv_tenant          = iv_org_id
                                                  iv_subject_acct_id = iv_subject_account_id
                                                  iv_workgroup_id    = iv_workgroup_id ).
     ENDIF.

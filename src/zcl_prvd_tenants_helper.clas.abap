@@ -131,9 +131,9 @@ CLASS zcl_prvd_tenants_helper IMPLEMENTATION.
   METHOD get_allprvdtenant.
     DATA: lt_prvdtenant TYPE TABLE OF zprvdtenants,
           ls_prvdtenant TYPE zif_prvd_tenants=>ty_tenant_wo_token,
-          lo_api_helper TYPE REF TO zcl_proubc_api_helper.
+          lo_api_helper TYPE REF TO zcl_prvd_api_helper.
 
-    lo_api_helper = NEW zcl_proubc_api_helper( ).
+    lo_api_helper = NEW zcl_prvd_api_helper( ).
     SELECT * FROM zprvdtenants INTO TABLE lt_prvdtenant.
     IF sy-subrc = 0.
     ELSEIF sy-subrc EQ 4.
@@ -172,9 +172,9 @@ CLASS zcl_prvd_tenants_helper IMPLEMENTATION.
 
   METHOD get_prvdtenant.
     DATA: ls_prvdtenant TYPE zprvdtenants,
-          lo_api_helper TYPE REF TO zcl_proubc_api_helper.
+          lo_api_helper TYPE REF TO zcl_prvd_api_helper.
 
-    lo_api_helper = NEW zcl_proubc_api_helper( ).
+    lo_api_helper = NEW zcl_prvd_api_helper( ).
     IF iv_prvdtenant IS NOT INITIAL.
       SELECT SINGLE * FROM zprvdtenants INTO ls_prvdtenant WHERE organization_id = iv_prvdtenant
                                                            AND subject_account_id = iv_subjacctid.

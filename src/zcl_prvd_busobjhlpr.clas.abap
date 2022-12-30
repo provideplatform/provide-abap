@@ -1,4 +1,4 @@
-CLASS zcl_proubc_busobjhlpr DEFINITION
+CLASS zcl_prvd_busobjhlpr DEFINITION
   PUBLIC
   FINAL
   CREATE PUBLIC .
@@ -53,7 +53,7 @@ ENDCLASS.
 
 
 
-CLASS zcl_proubc_busobjhlpr IMPLEMENTATION.
+CLASS zcl_prvd_busobjhlpr IMPLEMENTATION.
 
 
   METHOD create_object.

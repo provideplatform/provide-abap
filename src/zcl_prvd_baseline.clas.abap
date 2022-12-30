@@ -934,7 +934,7 @@ CLASS ZCL_PRVD_BASELINE IMPLEMENTATION.
                                          value = lv_uri ).
     get_bpi_token( ).
 
-    zcl_proubc_api_helper=>copy_data_to_ref( EXPORTING is_data = body
+    zcl_prvd_api_helper=>copy_data_to_ref( EXPORTING is_data = body
                                               CHANGING cr_data = lv_protocolmsg ).
 
     lv_requeststr = /ui2/cl_json=>serialize( data =  lv_protocolmsg
@@ -980,7 +980,7 @@ CLASS ZCL_PRVD_BASELINE IMPLEMENTATION.
     ENDIF.
     get_bpi_token( ).
 
-    zcl_proubc_api_helper=>copy_data_to_ref( EXPORTING is_data = iv_body
+    zcl_prvd_api_helper=>copy_data_to_ref( EXPORTING is_data = iv_body
                                               CHANGING cr_data = lv_protocolmsg ).
 
     lv_requeststr = /ui2/cl_json=>serialize( data        = lv_protocolmsg
@@ -1407,7 +1407,7 @@ CLASS ZCL_PRVD_BASELINE IMPLEMENTATION.
     lv_authpayload-scope = 'offline_access'.
     lv_authpayload-organization_id = iv_tenantid.
 
-    zcl_proubc_api_helper=>copy_data_to_ref( EXPORTING is_data = lv_authpayload
+    zcl_prvd_api_helper=>copy_data_to_ref( EXPORTING is_data = lv_authpayload
                                               CHANGING cr_data = lv_longtermrequestdata ).
 
     lv_requeststr = /ui2/cl_json=>serialize( data        = lv_longtermrequestdata
@@ -1450,7 +1450,7 @@ CLASS ZCL_PRVD_BASELINE IMPLEMENTATION.
     lv_authpayload-scope = 'offline_access'.
     lv_authpayload-organization_id = iv_tenantid.
 
-    zcl_proubc_api_helper=>copy_data_to_ref( EXPORTING is_data = lv_authpayload
+    zcl_prvd_api_helper=>copy_data_to_ref( EXPORTING is_data = lv_authpayload
                                              CHANGING cr_data  = lv_longtermrequestdata  ).
 
     lv_requeststr = /ui2/cl_json=>serialize( EXPORTING data        = lv_longtermrequestdata
@@ -1519,7 +1519,7 @@ CLASS ZCL_PRVD_BASELINE IMPLEMENTATION.
                                          value  = lv_uri ).
     get_bpi_token( ).
 
-    zcl_proubc_api_helper=>copy_data_to_ref( EXPORTING is_data = body
+    zcl_prvd_api_helper=>copy_data_to_ref( EXPORTING is_data = body
                                               CHANGING cr_data = lv_busobjmsg ).
 
     lv_requeststr = /ui2/cl_json=>serialize( data        = lv_busobjmsg

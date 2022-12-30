@@ -18,16 +18,16 @@ CLASS ZCL_PRVD_OBTRIGTEST IMPLEMENTATION.
 
 
   METHOD if_rest_resource~post.
-    DATA: lo_api_helper             TYPE REF TO zcl_proubc_api_helper,
+    DATA: lo_api_helper             TYPE REF TO zcl_prvd_api_helper,
           lv_status                 TYPE i,
-          ls_protocol_msg_req       TYPE zif_proubc_baseline=>protocolmessage_req,
-          ls_dummy_protocol_msg_req TYPE zif_proubc_baseline=>protocolmessage_req,
+          ls_protocol_msg_req       TYPE zif_prvd_baseline=>protocolmessage_req,
+          ls_dummy_protocol_msg_req TYPE zif_prvd_baseline=>protocolmessage_req,
           ls_testresponse           TYPE zif_prvd_testobj=>ty_obtrigtest,
           lv_testresponse           TYPE string,
           lv_apiresponsestr         TYPE string,
           lv_apiresponse            TYPE REF TO data.
 
-    lo_api_helper = NEW zcl_proubc_api_helper( ).
+    lo_api_helper = NEW zcl_prvd_api_helper( ).
 
     DATA(lo_entity) = mo_response->create_entity( ).
     lo_entity->set_content_type( if_rest_media_type=>gc_appl_json ).
