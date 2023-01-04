@@ -5,7 +5,7 @@
    <VSEOCLASS>
     <CLSNAME>ZCL_PRVD_IDOCHLPR</CLSNAME>
     <LANGU>E</LANGU>
-    <DESCRIPT>proUBC iDoc tooling helper</DESCRIPT>
+    <DESCRIPT>PRVD iDoc tooling helper</DESCRIPT>
     <STATE>1</STATE>
     <CLSCCINCL>X</CLSCCINCL>
     <FIXPT>X</FIXPT>

@@ -5,7 +5,7 @@
    <VSEOCLASS>
     <CLSNAME>ZCL_PRVD_BASELINE</CLSNAME>
     <LANGU>E</LANGU>
-    <DESCRIPT>proUBC Baseline Protocol Proxy</DESCRIPT>
+    <DESCRIPT>PRVD Baseline Protocol Proxy</DESCRIPT>
     <STATE>1</STATE>
     <CLSCCINCL>X</CLSCCINCL>
     <FIXPT>X</FIXPT>

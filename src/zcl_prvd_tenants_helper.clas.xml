@@ -5,7 +5,7 @@
    <VSEOCLASS>
     <CLSNAME>ZCL_PRVD_TENANTS_HELPER</CLSNAME>
     <LANGU>E</LANGU>
-    <DESCRIPT>Helper class for maintaining prvd orgs</DESCRIPT>
+    <DESCRIPT>Helper class for maintaining PRVD orgs</DESCRIPT>
     <STATE>1</STATE>
     <CLSCCINCL>X</CLSCCINCL>
     <FIXPT>X</FIXPT>

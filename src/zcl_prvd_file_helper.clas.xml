@@ -5,7 +5,7 @@
    <VSEOCLASS>
     <CLSNAME>ZCL_PRVD_FILE_HELPER</CLSNAME>
     <LANGU>E</LANGU>
-    <DESCRIPT>proUBC Helper Class for file management</DESCRIPT>
+    <DESCRIPT>PRVD Helper Class for file management</DESCRIPT>
     <STATE>1</STATE>
     <CLSCCINCL>X</CLSCCINCL>
     <FIXPT>X</FIXPT>

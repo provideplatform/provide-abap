@@ -5,7 +5,7 @@
    <VSEOCLASS>
     <CLSNAME>ZCL_PRVD_AUTHAPI</CLSNAME>
     <LANGU>E</LANGU>
-    <DESCRIPT>proUBC API endpoint - Authentication</DESCRIPT>
+    <DESCRIPT>PRVD connector API endpoint - Authentication</DESCRIPT>
     <STATE>1</STATE>
     <CLSCCINCL>X</CLSCCINCL>
     <FIXPT>X</FIXPT>

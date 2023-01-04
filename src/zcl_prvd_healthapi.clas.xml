@@ -5,7 +5,7 @@
    <VSEOCLASS>
     <CLSNAME>ZCL_PRVD_HEALTHAPI</CLSNAME>
     <LANGU>E</LANGU>
-    <DESCRIPT>proUBC API endpoint - Health check</DESCRIPT>
+    <DESCRIPT>PRVD API endpoint - Health check</DESCRIPT>
     <STATE>1</STATE>
     <CLSCCINCL>X</CLSCCINCL>
     <FIXPT>X</FIXPT>

@@ -5,7 +5,7 @@
    <VSEOCLASS>
     <CLSNAME>ZCL_PRVD_API_HELPER</CLSNAME>
     <LANGU>E</LANGU>
-    <DESCRIPT>Helper class for the Pro UBC API</DESCRIPT>
+    <DESCRIPT>Helper class for the PRVD Stack API connector</DESCRIPT>
     <STATE>1</STATE>
     <CLSCCINCL>X</CLSCCINCL>
     <FIXPT>X</FIXPT>

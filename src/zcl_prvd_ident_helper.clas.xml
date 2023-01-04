@@ -5,7 +5,7 @@
    <VSEOCLASS>
     <CLSNAME>ZCL_PRVD_IDENT_HELPER</CLSNAME>
     <LANGU>E</LANGU>
-    <DESCRIPT>proUBC Helper class for Ident</DESCRIPT>
+    <DESCRIPT>PRVD Helper class for Ident</DESCRIPT>
     <STATE>1</STATE>
     <CLSCCINCL>X</CLSCCINCL>
     <FIXPT>X</FIXPT>

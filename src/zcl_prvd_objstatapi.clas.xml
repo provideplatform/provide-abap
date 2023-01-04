@@ -5,7 +5,7 @@
    <VSEOCLASS>
     <CLSNAME>ZCL_PRVD_OBJSTATAPI</CLSNAME>
     <LANGU>E</LANGU>
-    <DESCRIPT>proUBC API endpoint - Business Objects</DESCRIPT>
+    <DESCRIPT>API endpoint - Business Objects</DESCRIPT>
     <STATE>1</STATE>
     <CLSCCINCL>X</CLSCCINCL>
     <FIXPT>X</FIXPT>
