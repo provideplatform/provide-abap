@@ -3,7 +3,7 @@
 *&---------------------------------------------------------------------*
 *&
 *&---------------------------------------------------------------------*
-REPORT zproubc_manage_schema_tlights.
+REPORT zprvd_manage_schema_tlights.
 
 DATA: lo_prvd_schemas_helper TYPE REF TO zcl_prvd_schemas_helper,
       ls_traflight           TYPE zprvdtraflight.

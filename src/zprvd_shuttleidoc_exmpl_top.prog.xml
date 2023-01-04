@@ -3,9 +3,10 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <PROGDIR>
-    <NAME>ZPROUBC_MANAGE_SCHEMA_TLIGHTS</NAME>
+    <NAME>ZPRVD_SHUTTLEIDOC_EXMPL_TOP</NAME>
     <DBAPL>S</DBAPL>
-    <SUBC>1</SUBC>
+    <DBNA>D$</DBNA>
+    <SUBC>I</SUBC>
     <FIXPT>X</FIXPT>
     <LDBNAME>D$S</LDBNAME>
     <UCCHECK>X</UCCHECK>
@@ -13,8 +14,8 @@
    <TPOOL>
     <item>
      <ID>R</ID>
-     <ENTRY>proUBC Manage Schemas Traffic lights</ENTRY>
-     <LENGTH>36</LENGTH>
+     <ENTRY>Top include for proUBC Shuttle idoc manager</ENTRY>
+     <LENGTH>43</LENGTH>
     </item>
    </TPOOL>
   </asx:values>

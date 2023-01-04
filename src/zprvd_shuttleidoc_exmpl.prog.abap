@@ -1,12 +1,14 @@
 *&---------------------------------------------------------------------*
 *& Report ZPROUBC_SHUTTLEIDOC_EXMPL
 *&---------------------------------------------------------------------*
-*& proUBC iDoc Baseline Example program
+*& PRVD Connector iDoc Baseline Example program
 *&---------------------------------------------------------------------*
-REPORT zproubc_shuttleidoc_exmpl.
+REPORT zprvd_shuttleidoc_exmpl.
 
-INCLUDE zproubc_shuttleidoc_exmpl_top.
-INCLUDE zproubc_shuttleidoc_exmpl_f01.
+INCLUDE ZPRVD_SHUTTLEIDOC_EXMPL_TOP.
+*INCLUDE zproubc_shuttleidoc_exmpl_top.
+INCLUDE ZPRVD_SHUTTLEIDOC_EXMPL_F01.
+*INCLUDE zproubc_shuttleidoc_exmpl_f01.
 
 INITIALIZATION.
   GET PARAMETER ID 'ZPRVDTENANT' FIELD p_tenant.
