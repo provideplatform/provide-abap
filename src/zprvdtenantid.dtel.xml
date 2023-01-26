@@ -10,7 +10,7 @@
     <SCRLEN1>10</SCRLEN1>
     <SCRLEN2>13</SCRLEN2>
     <SCRLEN3>13</SCRLEN3>
-    <DDTEXT>proUBC Tenant ID</DDTEXT>
+    <DDTEXT>PRVD Tenant ID</DDTEXT>
     <REPTEXT>proUBC Tenant</REPTEXT>
     <SCRTEXT_S>prvdTenant</SCRTEXT_S>
     <SCRTEXT_M>proUBC Tenant</SCRTEXT_M>

@@ -21,14 +21,14 @@ CLASS zcl_prvd_nchain_helper DEFINITION
                                          !es_contract_summary TYPE zif_prvd_nchain=>ty_executecontract_summary
                                          !ev_outputamount     TYPE string,
       "! Generates the data structure needed to call a smart contract on an EVM network via PRVD Nchain
-      smartcontract_factory IMPORTING !iv_smartcontractaddress TYPE zproubc_smartcontract_addr
+      smartcontract_factory IMPORTING !iv_smartcontractaddress TYPE zprvd_smartcontract_addr
                                       !iv_name                 TYPE string
                                       !iv_walletaddress        TYPE zcasesensitive_str
                                       !iv_nchain_networkid     TYPE zprvd_nchain_networkid
                                       !iv_contracttype         TYPE zcasesensitive_str OPTIONAL
                             EXPORTING !es_selectedcontract     TYPE zif_prvd_nchain=>ty_chainlinkpricefeed_req,
       "! Gets the current EVM wallet address being used (e.g 0x409148kldsjflakj...)
-      get_wallet_address RETURNING VALUE(ev_wallet_address) TYPE zproubc_smartcontract_addr,
+      get_wallet_address RETURNING VALUE(ev_wallet_address) TYPE zprvd_smartcontract_addr,
       "! Gets the PRVD Nchain API proxy
       get_nchain_client RETURNING VALUE(ro_nchain_client) TYPE REF TO zcl_prvd_nchain.
   PROTECTED SECTION.
@@ -48,7 +48,8 @@ ENDCLASS.
 
 
 
-CLASS zcl_prvd_nchain_helper IMPLEMENTATION.
+CLASS ZCL_PRVD_NCHAIN_HELPER IMPLEMENTATION.
+
 
   METHOD constructor.
     DATA: lv_jwt    TYPE REF TO data,
@@ -115,6 +116,7 @@ CLASS zcl_prvd_nchain_helper IMPLEMENTATION.
 
   ENDMETHOD.
 
+
   METHOD call_chainlink_pricefeed.
     "create the wallet
     DATA: ls_pricefeedwallet            TYPE zif_prvd_nchain=>ty_createhdwalletrequest,
@@ -131,7 +133,7 @@ CLASS zcl_prvd_nchain_helper IMPLEMENTATION.
           lv_executecontract_xstr       TYPE xstring,
           lv_executecontract_data       TYPE REF TO data,
           lv_executecontract_responsecd TYPE i,
-          lv_network_contract_id        TYPE zproubc_smartcontract_addr,
+          lv_network_contract_id        TYPE zprvd_smartcontract_addr,
           lv_prvd_stack_contract_id     TYPE zcasesensitive_str,
           ls_execute_contract_resp      TYPE zif_prvd_nchain=>ty_executecontract_resp,
           ls_execute_contract_summary   TYPE zif_prvd_nchain=>ty_executecontract_summary.
@@ -246,6 +248,7 @@ CLASS zcl_prvd_nchain_helper IMPLEMENTATION.
 *    CATCH cx_static_check.
   ENDMETHOD.
 
+
   METHOD smartcontract_factory.
     DATA: ls_contract TYPE zif_prvd_nchain=>ty_chainlinkpricefeed_req.
     ls_contract-address = iv_smartcontractaddress.
@@ -261,19 +264,21 @@ CLASS zcl_prvd_nchain_helper IMPLEMENTATION.
 
   ENDMETHOD.
 
+
   METHOD get_vault_helper.
     IF mo_prvd_vault_helper IS NOT BOUND.
       mo_prvd_vault_helper = NEW zcl_prvd_vault_helper(  ).
     ENDIF.
   ENDMETHOD.
 
+
   METHOD get_wallet_address.
     get_vault_helper( ).
     ev_wallet_address = ''.
   ENDMETHOD.
 
+
   METHOD get_nchain_client.
     ro_nchain_client = mo_nchain_api.
   ENDMETHOD.
-
 ENDCLASS.

@@ -7,7 +7,7 @@ CLASS zcl_prvd_file_helper DEFINITION
     CLASS-METHODS:
       "! Retrieves a EVM smart contract ABI from the registry + AL11 based on the smart contract address and network ID
       get_smartcontract_abi IMPORTING !iv_nchain_networkid      TYPE zprvd_nchain_networkid
-                                      !iv_smartcontract_address TYPE zproubc_smartcontract_addr
+                                      !iv_smartcontract_address TYPE zprvd_smartcontract_addr
                             EXPORTING !ev_abi_str               TYPE zcasesensitive_str
                                       !ev_abi_data              TYPE REF TO data ,
       "! Retrieves the ABI file contents based upon the ABI registry table entry
@@ -37,7 +37,11 @@ CLASS zcl_prvd_file_helper DEFINITION
   PRIVATE SECTION.
 ENDCLASS.
 
-CLASS zcl_prvd_file_helper IMPLEMENTATION.
+
+
+CLASS ZCL_PRVD_FILE_HELPER IMPLEMENTATION.
+
+
   METHOD get_smartcontract_abi.
     DATA: ls_abi_registry     TYPE zprvdabiregistry,
           lv_abifile_path     TYPE zprvdabiregistry-abi_location,
@@ -59,6 +63,7 @@ CLASS zcl_prvd_file_helper IMPLEMENTATION.
     ENDIF.
   ENDMETHOD.
 
+
   METHOD open_abiregistry.
     DATA: it_filecontent TYPE TABLE OF zif_prvd_file=>ty_filecontent.
     DATA: wa_tab TYPE REF TO data.
@@ -78,6 +83,7 @@ CLASS zcl_prvd_file_helper IMPLEMENTATION.
     "Todo add error handling here
     ENDIF.
   ENDMETHOD.
+
 
   METHOD open_file_generic.
     OPEN DATASET iv_file_location FOR INPUT IN BINARY MODE.
@@ -102,11 +108,14 @@ CLASS zcl_prvd_file_helper IMPLEMENTATION.
 
   ENDMETHOD.
 
+
   METHOD write_file_generic.
   ENDMETHOD.
 
+
   METHOD read_file_from_ipfs.
   ENDMETHOD.
+
 
   METHOD transfer_file_to_ipfs.
     DATA:
@@ -175,5 +184,4 @@ CLASS zcl_prvd_file_helper IMPLEMENTATION.
 
 
   ENDMETHOD.
-
 ENDCLASS.

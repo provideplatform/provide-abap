@@ -1,8 +1,8 @@
-INTERFACE zif_prvd_tenants
-  PUBLIC .
+interface ZIF_PRVD_TENANTS
+  public .
 
 
-  TYPES:
+  types:
     BEGIN OF ty_tenant_wo_token,
       mandt          TYPE mandt,
       organization_id      TYPE zprvdtenants-organization_id,
@@ -16,6 +16,6 @@ INTERFACE zif_prvd_tenants
       changed_at     TYPE zprvdtenants-changed_at,
       reachable      TYPE boolean,
     END OF ty_tenant_wo_token .
-  TYPES:
+  types:
     tty_tenant_wo_token TYPE TABLE OF ty_tenant_wo_token .
-ENDINTERFACE.
+endinterface.

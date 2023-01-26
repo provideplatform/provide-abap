@@ -1,8 +1,8 @@
-INTERFACE zif_prvd_testobj
-  PUBLIC .
+interface ZIF_PRVD_TESTOBJ
+  public .
 
 
-  TYPES:
+  types:
     BEGIN OF ty_obtrigtest,
       bpi_tenant_id        TYPE zprvdtenants-organization_id,
       status               TYPE i,
@@ -10,4 +10,4 @@ INTERFACE zif_prvd_testobj
       bpi_endpoint         TYPE string,
       msg_payload          TYPE zif_prvd_baseline=>protocolmessage_req,
     END OF ty_obtrigtest .
-ENDINTERFACE.
+endinterface.

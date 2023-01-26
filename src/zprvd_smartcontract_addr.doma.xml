@@ -3,14 +3,13 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <DD01V>
-    <DOMNAME>ZPRVD_NCHAIN_NETWORKID</DOMNAME>
+    <DOMNAME>ZPRVD_SMARTCONTRACT_ADDR</DOMNAME>
     <DDLANGUAGE>E</DDLANGUAGE>
     <DATATYPE>CHAR</DATATYPE>
-    <LENG>000040</LENG>
-    <OUTPUTLEN>000040</OUTPUTLEN>
+    <LENG>000042</LENG>
+    <OUTPUTLEN>000042</OUTPUTLEN>
     <LOWERCASE>X</LOWERCASE>
-    <DDTEXT>PRVD Nchain Network ID</DDTEXT>
-    <DOMMASTER>E</DOMMASTER>
+    <DDTEXT>EVM Smart Contract address</DDTEXT>
    </DD01V>
   </asx:values>
  </asx:abap>

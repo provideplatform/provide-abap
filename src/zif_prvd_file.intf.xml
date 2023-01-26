@@ -5,7 +5,7 @@
    <VSEOINTERF>
     <CLSNAME>ZIF_PRVD_FILE</CLSNAME>
     <LANGU>E</LANGU>
-    <DESCRIPT>proUBC Interface Class for File management</DESCRIPT>
+    <DESCRIPT>PRVD Interface Class for File management</DESCRIPT>
     <EXPOSURE>2</EXPOSURE>
     <STATE>1</STATE>
     <UNICODE>X</UNICODE>

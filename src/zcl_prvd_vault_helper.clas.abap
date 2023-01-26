@@ -1,49 +1,49 @@
 "INHERITING FROM zcl_proubc_api_helper
-CLASS zcl_prvd_vault_helper DEFINITION
-  PUBLIC
-  FINAL
-  CREATE PUBLIC
+class ZCL_PRVD_VAULT_HELPER definition
+  public
+  final
+  create public
 
-  GLOBAL FRIENDS zcl_prvd_api_helper
-                 zcl_prvd_nchain_helper .
+  global friends ZCL_PRVD_API_HELPER
+                 ZCL_PRVD_NCHAIN_HELPER .
 
-  PUBLIC SECTION.
+public section.
 
     "! Constructor method to return PRVD Vault Helper class instance
-    METHODS constructor
-      IMPORTING
-        !io_api_helper         TYPE REF TO zcl_prvd_api_helper OPTIONAL
-        !iv_org_id             TYPE zprvdtenantid OPTIONAL
-        !iv_subject_account_id TYPE zprvdtenantid OPTIONAL
-        !iv_workgroup_id       TYPE zprvdtenantid OPTIONAL
-        !iv_vault_api_url      TYPE string OPTIONAL .
+  methods CONSTRUCTOR
+    importing
+      !IO_API_HELPER type ref to ZCL_PRVD_API_HELPER optional
+      !IV_ORG_ID type ZPRVDTENANTID optional
+      !IV_SUBJECT_ACCOUNT_ID type ZPRVDTENANTID optional
+      !IV_WORKGROUP_ID type ZPRVDTENANTID optional
+      !IV_VAULT_API_URL type STRING optional .
     "! Method to create a key
-    METHODS create_key .
+  methods CREATE_KEY .
     "! Lists the PRVD Vault(s) created for the user
-    METHODS list_vaults
-      EXPORTING
-        !et_vault_list TYPE zif_prvd_vault=>tty_vault_query .
+  methods LIST_VAULTS
+    exporting
+      !ET_VAULT_LIST type ZIF_PRVD_VAULT=>TTY_VAULT_QUERY .
     "! Creates a PRVD Vault for the user
-    METHODS create_vault .
+  methods CREATE_VAULT .
     "! Derives a key for
-    METHODS derive_key .
-    METHODS list_keys .
+  methods DERIVE_KEY .
+  methods LIST_KEYS .
     "! Deletes the specified user key upon user request
-    METHODS delete_keys .
+  methods DELETE_KEYS .
     "! Encrypts data
-    METHODS encrypt .
+  methods ENCRYPT .
     "! Decrypts data
-    METHODS decrypt .
+  methods DECRYPT .
     "! Used to cryptographically sign data
-    METHODS sign .
+  methods SIGN .
     "! Used to cryptographically verify data
-    METHODS verify .
+  methods VERIFY .
     "! Initializes other aspects of the vault helper class to ensure connectivity to Vault microservice
-    METHODS setup_vault_msgs .
+  methods SETUP_VAULT_MSGS .
     "! Retrieves the wallet address per Vault data input specs
-    METHODS get_wallet_address
-      RETURNING
-        VALUE(rv_wallet_address) TYPE zproubc_smartcontract_addr .
+  methods GET_WALLET_ADDRESS
+    returning
+      value(RV_WALLET_ADDRESS) type ZPRVD_SMARTCONTRACT_ADDR .
   PROTECTED SECTION.
     DATA: mo_api_helper    TYPE REF TO zcl_prvd_api_helper,
           mv_tenant        TYPE zprvdtenantid,
@@ -56,7 +56,7 @@ ENDCLASS.
 
 
 
-CLASS zcl_prvd_vault_helper IMPLEMENTATION.
+CLASS ZCL_PRVD_VAULT_HELPER IMPLEMENTATION.
 
 
   METHOD constructor.

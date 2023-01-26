@@ -9,8 +9,8 @@ CLASS zcl_prvd_schemas_helper DEFINITION
       add_schema_traflight IMPORTING !iv_schemaname        TYPE char100
                                      !iv_valid_from        TYPE timestampl OPTIONAL
                                      !iv_valid_to          TYPE timestampl OPTIONAL
-                                     !iv_schema_tlight     TYPE zproubc_schema_trafficlight
-                                     !iv_schema_type       TYPE zproubc_schema_types
+                                     !iv_schema_tlight     TYPE zprvd_schema_trafficlight
+                                     !iv_schema_type       TYPE zprvd_schema_types
                                      !iv_deletion_flag     TYPE char1 OPTIONAL
                            EXPORTING !es_created_traflight TYPE zprvdtraflight ,
       "! Deletes a schema traffic light entry
@@ -24,7 +24,8 @@ ENDCLASS.
 
 
 
-CLASS zcl_prvd_schemas_helper IMPLEMENTATION.
+CLASS ZCL_PRVD_SCHEMAS_HELPER IMPLEMENTATION.
+
 
   METHOD create_schema_id.
     DATA lo_digest TYPE REF TO cl_abap_message_digest.
@@ -52,6 +53,7 @@ CLASS zcl_prvd_schemas_helper IMPLEMENTATION.
     lv_hash_string = lo_digest->to_string( ).
     ev_schemaid = lv_hash_string.
   ENDMETHOD.
+
 
   METHOD add_schema_traflight.
     DATA: ls_schema_traflight    TYPE zprvdtraflight,
@@ -136,6 +138,8 @@ CLASS zcl_prvd_schemas_helper IMPLEMENTATION.
 
 
   ENDMETHOD.
+
+
   METHOD delete_entries.
     DATA: lv_del_count TYPE i.
     SELECT * FROM zprvdtraflight INTO TABLE @DATA(lt_marked_to_delete) WHERE deletion_flag = 'X'.

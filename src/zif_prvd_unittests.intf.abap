@@ -1,16 +1,27 @@
-INTERFACE zif_prvd_unittests
-  PUBLIC .
+interface ZIF_PRVD_UNITTESTS
+  public .
+
 
   "! Ident reachability
-  METHODS: is_ident_reachable RETURNING VALUE(rv_result) TYPE abap_bool.
+  methods IS_IDENT_REACHABLE
+    returning
+      value(RV_RESULT) type ABAP_BOOL .
   "! Ident authentication
-  METHODS: is_ident_auth_ok RETURNING VALUE(rv_result) TYPE abap_bool.
+  methods IS_IDENT_AUTH_OK
+    returning
+      value(RV_RESULT) type ABAP_BOOL .
   "! BPI reachability
-  METHODS: is_bpi_reachable RETURNING VALUE(rv_result) TYPE abap_bool.
+  methods IS_BPI_REACHABLE
+    returning
+      value(RV_RESULT) type ABAP_BOOL .
   "! Sending a protocol message
-  METHODS: is_protocol_message_ok RETURNING VALUE(rv_result) TYPE abap_bool.
+  methods IS_PROTOCOL_MESSAGE_OK
+    returning
+      value(RV_RESULT) type ABAP_BOOL .
   "! general http expected check
-  METHODS: is_expected_http_status IMPORTING i_expected_stat TYPE i
-                                   RETURNING VALUE(rv_result)   TYPE abap_bool.
-
-ENDINTERFACE.
+  methods IS_EXPECTED_HTTP_STATUS
+    importing
+      !I_EXPECTED_STAT type I
+    returning
+      value(RV_RESULT) type ABAP_BOOL .
+endinterface.
