@@ -13,12 +13,14 @@ ENDCLASS.
 
 
 
-CLASS zcl_prvd_schemas_api IMPLEMENTATION.
+CLASS ZCL_PRVD_SCHEMAS_API IMPLEMENTATION.
+
+
   METHOD if_rest_resource~get.
 
     DATA(lt_uriattributes) = mo_request->get_uri_attributes( ).
     DATA: lv_schematype TYPE string,
-          lt_basictypes TYPE zif_idocapi_typelist=>tt_basictype.
+          lt_basictypes TYPE zif_prvd_idoc=>tt_basictype.
 
     READ TABLE lt_uriattributes WITH KEY name = 'schematype' ASSIGNING FIELD-SYMBOL(<fs_schematype>).
     IF sy-subrc = 0.
@@ -53,6 +55,8 @@ CLASS zcl_prvd_schemas_api IMPLEMENTATION.
           lo_entity->set_string_data( /ui2/cl_json=>serialize( data        = lt_basictypes
                                                                pretty_name = /ui2/cl_json=>pretty_mode-low_case ) ).
           mo_response->set_status( cl_rest_status_code=>gc_success_ok ).
+        else.
+          "message No idoc types found
         ENDIF.
       WHEN 'DDIC'.
       "Handle DDIC types

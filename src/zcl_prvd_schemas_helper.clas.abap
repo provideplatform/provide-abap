@@ -7,12 +7,12 @@ CLASS zcl_prvd_schemas_helper DEFINITION
     METHODS:
       "! Adds a schema traffic light entry
       add_schema_traflight IMPORTING !iv_schemaname        TYPE char100
-                                            !iv_valid_from        TYPE timestampl OPTIONAL
-                                            !iv_valid_to          TYPE timestampl OPTIONAL
-                                            !iv_schema_tlight     TYPE zproubc_schema_trafficlight
-                                            !iv_schema_type       TYPE zproubc_schema_types
-                                            !iv_deletion_flag     TYPE char1 OPTIONAL
-                                  EXPORTING !es_created_traflight TYPE zprvdtraflight ,
+                                     !iv_valid_from        TYPE timestampl OPTIONAL
+                                     !iv_valid_to          TYPE timestampl OPTIONAL
+                                     !iv_schema_tlight     TYPE zprvd_schema_trafficlight
+                                     !iv_schema_type       TYPE zprvd_schema_types
+                                     !iv_deletion_flag     TYPE char1 OPTIONAL
+                           EXPORTING !es_created_traflight TYPE zprvdtraflight ,
       "! Deletes a schema traffic light entry
       delete_entries.
   PROTECTED SECTION.
@@ -24,7 +24,8 @@ ENDCLASS.
 
 
 
-CLASS zcl_prvd_schemas_helper IMPLEMENTATION.
+CLASS ZCL_PRVD_SCHEMAS_HELPER IMPLEMENTATION.
+
 
   METHOD create_schema_id.
     DATA lo_digest TYPE REF TO cl_abap_message_digest.
@@ -53,6 +54,7 @@ CLASS zcl_prvd_schemas_helper IMPLEMENTATION.
     ev_schemaid = lv_hash_string.
   ENDMETHOD.
 
+
   METHOD add_schema_traflight.
     DATA: ls_schema_traflight    TYPE zprvdtraflight,
           lv_default_validfrom   TYPE timestampl,
@@ -79,7 +81,7 @@ CLASS zcl_prvd_schemas_helper IMPLEMENTATION.
       CONVERT TIME STAMP lv_temp_validto TIME ZONE sy-timlo
       INTO DATE lv_default_validtodate TIME lv_default_validtotime.
       "trash this man...
-      lv_default_validtodate = lv_default_validtodate + 7. 
+      lv_default_validtodate = lv_default_validtodate + 7.
       CONVERT DATE lv_default_validtodate TIME lv_default_validtotime
           INTO TIME STAMP lv_default_validto  TIME ZONE sy-timlo.
     ENDIF.
@@ -110,13 +112,12 @@ CLASS zcl_prvd_schemas_helper IMPLEMENTATION.
       GET TIME STAMP FIELD ls_schema_traflight-changed_on.
       ls_schema_traflight-deletion_flag = iv_deletion_flag.
     ELSEIF sy-subrc EQ 4.
-      me->create_schema_id(
+      create_schema_id(
         EXPORTING
           iv_schemaname = iv_schemaname
-        iv_valid_from = ls_schema_traflight-valid_from
-      IMPORTING
-        ev_schemaid   = ls_schema_traflight-schema_id
-      ).
+          iv_valid_from = ls_schema_traflight-valid_from
+        IMPORTING
+          ev_schemaid   = ls_schema_traflight-schema_id ).
       ls_schema_traflight-created_by = sy-uname.
       GET TIME STAMP FIELD ls_schema_traflight-created_on.
       IF ls_schema_traflight-schema_id IS INITIAL.
@@ -128,15 +129,17 @@ CLASS zcl_prvd_schemas_helper IMPLEMENTATION.
 
     IF ls_schema_traflight IS NOT INITIAL.
       MODIFY zprvdtraflight FROM ls_schema_traflight.
-      if sy-subrc <> 0.
+      IF sy-subrc <> 0.
         "error updating table
-      endif.
+      ENDIF.
     ELSE.
       "no data to update
     ENDIF.
 
 
   ENDMETHOD.
+
+
   METHOD delete_entries.
     DATA: lv_del_count TYPE i.
     SELECT * FROM zprvdtraflight INTO TABLE @DATA(lt_marked_to_delete) WHERE deletion_flag = 'X'.
@@ -145,6 +148,8 @@ CLASS zcl_prvd_schemas_helper IMPLEMENTATION.
       DELETE zprvdtraflight FROM TABLE lt_marked_to_delete.
       IF sy-subrc = 0.
         WRITE: 'deleted entries:', 30 lv_del_count.
+      ELSE.
+        "error updating table
       ENDIF.
     ENDIF.
   ENDMETHOD.
