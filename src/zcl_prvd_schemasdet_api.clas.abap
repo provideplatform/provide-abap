@@ -13,11 +13,13 @@ ENDCLASS.
 
 
 
-CLASS zcl_prvd_schemasdet_api IMPLEMENTATION.
+CLASS ZCL_PRVD_SCHEMASDET_API IMPLEMENTATION.
+
+
   METHOD if_rest_resource~get.
     DATA: lv_selectedbasictype TYPE string,
-          ls_basictypes        TYPE zif_idocapi_typelist=>ty_basictype,
-          ls_responsedata      TYPE zif_idocapi_typelist=>ty_basictype_w_segments,
+          ls_basictypes        TYPE zif_prvd_idoc=>ty_basictype,
+          ls_responsedata      TYPE zif_prvd_idoc=>ty_basictype_w_segments,
           lv_idoctype          TYPE ledid_idoctype.
 
     DATA(lt_uriattributes) = mo_request->get_uri_attributes( ).
@@ -48,15 +50,17 @@ CLASS zcl_prvd_schemasdet_api IMPLEMENTATION.
                                 AND b~langua = 'E'
     WHERE a~idoctyp = @lv_selectedbasictype
     INTO @lS_basictypes.
+    IF sy-subrc <> 0.
+    ENDIF.
 
     ls_responsedata-basictype = ls_basictypes.
 
     GET PARAMETER ID 'SEG' FIELD DATA(l_segtyp).
     GET PARAMETER ID 'IDC' FIELD DATA(l_idoctyp).
     GET PARAMETER ID 'CIM' FIELD DATA(l_cimtyp).
-    GET PARAMETER ID 'EDIDEF_OBJTYP' FIELD DATA(l_type). "settings from we30
+    GET PARAMETER ID 'EDIDEF_OBJTYP' FIELD DATA(l_type).
     GET PARAMETER ID 'EDD' FIELD DATA(l_object).
-    GET PARAMETER ID 'EDI_SELDOCU' FIELD DATA(l_recsel). "record selection
+    GET PARAMETER ID 'EDI_SELDOCU' FIELD DATA(l_recsel).
 
     DATA: lv_idoc_type      TYPE ledid_idoc_type,
           lt_idoc_struct    TYPE ledid_t_idoc_struct,
@@ -87,13 +91,10 @@ CLASS zcl_prvd_schemasdet_api IMPLEMENTATION.
         it_segments              = lt_segments
         it_segment_struct        = lt_segment_struct
       IMPORTING
-        ev_idoc_schema_json_tree =  lv_idoc_schema_json_tree
-    ).
+        ev_idoc_schema_json_tree = lv_idoc_schema_json_tree ).
 
     DATA: lv_responsejson TYPE string.
-    lv_responsejson = /ui2/cl_json=>serialize(
-         data = lv_idoc_schema_json_tree
-    ).
+    lv_responsejson = /ui2/cl_json=>serialize( data = lv_idoc_schema_json_tree ).
 
     "create the json HTTP response
     DATA(lo_entity) = mo_response->create_entity( ).

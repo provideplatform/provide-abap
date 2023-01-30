@@ -10,7 +10,7 @@
     <SCRLEN1>10</SCRLEN1>
     <SCRLEN2>11</SCRLEN2>
     <SCRLEN3>18</SCRLEN3>
-    <DDTEXT>proUBC Baseline ID data element</DDTEXT>
+    <DDTEXT>PRVD Baseline ID data element</DDTEXT>
     <REPTEXT>proUBC Baseline ID</REPTEXT>
     <SCRTEXT_S>BaselineID</SCRTEXT_S>
     <SCRTEXT_M>Baseline ID</SCRTEXT_M>
