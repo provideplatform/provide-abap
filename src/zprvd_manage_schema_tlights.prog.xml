@@ -6,6 +6,7 @@
     <NAME>ZPRVD_MANAGE_SCHEMA_TLIGHTS</NAME>
     <DBAPL>S</DBAPL>
     <SUBC>1</SUBC>
+    <RLOAD>E</RLOAD>
     <FIXPT>X</FIXPT>
     <LDBNAME>D$S</LDBNAME>
     <UCCHECK>X</UCCHECK>
@@ -13,7 +14,7 @@
    <TPOOL>
     <item>
      <ID>R</ID>
-     <ENTRY>proUBC Manage Schemas Traffic lights</ENTRY>
+     <ENTRY>PRVD Manage Schemas Traffic lights</ENTRY>
      <LENGTH>36</LENGTH>
     </item>
    </TPOOL>
