@@ -1,7 +1,5 @@
 *---------------------------------------------------------------------*
 *    view related data declarations
-*   generation date: 01/26/2023 at 20:39:06
-*   view maintenance generator version: #001407#
 *---------------------------------------------------------------------*
 *...processing: ZPRVDABIREGISTRY................................*
 DATA:  BEGIN OF STATUS_ZPRVDABIREGISTRY              .   "state vector
