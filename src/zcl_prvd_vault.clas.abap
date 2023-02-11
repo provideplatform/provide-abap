@@ -74,6 +74,7 @@ CLASS zcl_prvd_vault IMPLEMENTATION.
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
+      WHEN OTHERS.
     ENDCASE.
   ENDMETHOD.
 
@@ -103,6 +104,7 @@ CLASS zcl_prvd_vault IMPLEMENTATION.
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
+      WHEN OTHERS.
     ENDCASE.
   ENDMETHOD.
 
@@ -131,6 +133,7 @@ CLASS zcl_prvd_vault IMPLEMENTATION.
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
+      WHEN OTHERS.
     ENDCASE.
   ENDMETHOD.
 
@@ -162,6 +165,7 @@ CLASS zcl_prvd_vault IMPLEMENTATION.
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
+      WHEN OTHERS.
     ENDCASE.
   ENDMETHOD.
 
@@ -194,6 +198,7 @@ CLASS zcl_prvd_vault IMPLEMENTATION.
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
+      WHEN OTHERS.
     ENDCASE.
   ENDMETHOD.
 
@@ -223,6 +228,7 @@ CLASS zcl_prvd_vault IMPLEMENTATION.
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
+      WHEN OTHERS.
     ENDCASE.
   ENDMETHOD.
 
@@ -230,17 +236,14 @@ CLASS zcl_prvd_vault IMPLEMENTATION.
   METHOD zif_prvd_vault~list_keys.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE 'https://vault.provide.services/api/v1/vaults/{vault_id}/keys'.
-    lv_temp = vault_id.
+    DATA lv_uri TYPE string VALUE '/api/v1/vaults/{vault_id}/keys'.
+    lv_temp = iv_vault_id.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{vault_id}' IN lv_uri WITH lv_temp.
     mi_client->request->set_method( 'GET' ).
     mi_client->request->set_header_field( name = '~request_uri'
                                          value = lv_uri ).
     get_bpi_token( ).
-    mi_client->request->set_header_field( name = 'Content-Type'
-                                         value = content_type ).
-    mi_client->request->set_cdata( body ).
     lv_code = send_receive( ).
     ev_httpresponsecode = lv_code.
     ev_apiresponsestr = mi_client->response->get_cdata( ).
@@ -252,6 +255,7 @@ CLASS zcl_prvd_vault IMPLEMENTATION.
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
+      WHEN OTHERS.
     ENDCASE.
   ENDMETHOD.
 
@@ -280,6 +284,7 @@ CLASS zcl_prvd_vault IMPLEMENTATION.
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
+      WHEN OTHERS.
     ENDCASE.
   ENDMETHOD.
 
@@ -306,6 +311,7 @@ CLASS zcl_prvd_vault IMPLEMENTATION.
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
+      WHEN OTHERS.
     ENDCASE.
   ENDMETHOD.
 
@@ -338,6 +344,7 @@ CLASS zcl_prvd_vault IMPLEMENTATION.
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
+      WHEN OTHERS.
     ENDCASE.
   ENDMETHOD.
 
@@ -364,6 +371,7 @@ CLASS zcl_prvd_vault IMPLEMENTATION.
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
+      WHEN OTHERS.
     ENDCASE.
   ENDMETHOD.
 ENDCLASS.
