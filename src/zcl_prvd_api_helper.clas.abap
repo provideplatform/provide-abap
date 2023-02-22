@@ -94,6 +94,8 @@ CLASS zcl_prvd_api_helper DEFINITION
     METHODS get_workgroup RETURNING VALUE(rv_workgroup) TYPE zprvdtenantid.
     "! Method to return PRVD Nchain helper class
     METHODS get_nchain_helper EXPORTING eo_prvd_nchain_helper TYPE REF TO zcl_prvd_nchain_helper.
+    "! Method to return the access token
+    METHODS get_access_token RETURNING VALUE(rv_access_token) type zprvdrefreshtoken.
   PROTECTED SECTION.
     DATA: mv_defaulttenant        TYPE zprvdtenants-organization_id,
           mv_defaultsubjectacct   TYPE zprvdtenantid,
@@ -596,5 +598,9 @@ CLASS zcl_prvd_api_helper IMPLEMENTATION.
   ENDMETHOD.
   METHOD get_workgroup.
     rv_workgroup = mv_selected_workgroupid.
+  ENDMETHOD.
+
+  method get_access_token.
+    rv_access_token = mv_bpitoken.
   ENDMETHOD.
 ENDCLASS.

@@ -68,9 +68,9 @@ CLASS zcl_prvd_nchain IMPLEMENTATION.
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
-      "success
+        "success
       WHEN OTHERS.
-      "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
+        "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
   ENDMETHOD.
 
@@ -94,9 +94,9 @@ CLASS zcl_prvd_nchain IMPLEMENTATION.
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
-      "Success
+        "Success
       WHEN OTHERS.
-       "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
+        "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
   ENDMETHOD.
 
@@ -122,9 +122,9 @@ CLASS zcl_prvd_nchain IMPLEMENTATION.
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
-      "success
+        "success
       WHEN OTHERS.
-      "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
+        "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
   ENDMETHOD.
 
@@ -150,9 +150,9 @@ CLASS zcl_prvd_nchain IMPLEMENTATION.
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
-      "success
+        "success
       WHEN OTHERS.
-      "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
+        "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
   ENDMETHOD.
 
@@ -178,9 +178,9 @@ CLASS zcl_prvd_nchain IMPLEMENTATION.
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
-      "Success
+        "Success
       WHEN OTHERS.
-      "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
+        "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
   ENDMETHOD.
 
@@ -206,9 +206,9 @@ CLASS zcl_prvd_nchain IMPLEMENTATION.
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
-      "Success
+        "Success
       WHEN OTHERS.
-      "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
+        "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
   ENDMETHOD.
 
@@ -234,9 +234,9 @@ CLASS zcl_prvd_nchain IMPLEMENTATION.
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
-      "Success
+        "Success
       WHEN OTHERS.
-      "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
+        "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
   ENDMETHOD.
 
@@ -262,9 +262,9 @@ CLASS zcl_prvd_nchain IMPLEMENTATION.
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
-      "Success
+        "Success
       WHEN OTHERS.
-      "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
+        "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
   ENDMETHOD.
 
@@ -290,9 +290,9 @@ CLASS zcl_prvd_nchain IMPLEMENTATION.
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
-      "Success
+        "Success
       WHEN OTHERS.
-      "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
+        "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
   ENDMETHOD.
 
@@ -317,9 +317,9 @@ CLASS zcl_prvd_nchain IMPLEMENTATION.
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
-      "Success
+        "Success
       WHEN OTHERS.
-      "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
+        "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
   ENDMETHOD.
 
@@ -343,9 +343,9 @@ CLASS zcl_prvd_nchain IMPLEMENTATION.
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
-      "Success
+        "Success
       WHEN OTHERS.
-      "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
+        "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
   ENDMETHOD.
 
@@ -370,9 +370,9 @@ CLASS zcl_prvd_nchain IMPLEMENTATION.
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
-      "Success
+        "Success
       WHEN OTHERS.
-      "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
+        "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
   ENDMETHOD.
 
@@ -400,9 +400,9 @@ CLASS zcl_prvd_nchain IMPLEMENTATION.
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
-      "Success
+        "Success
       WHEN OTHERS.
-      "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
+        "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
   ENDMETHOD.
 
@@ -427,9 +427,9 @@ CLASS zcl_prvd_nchain IMPLEMENTATION.
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
-      "Success
+        "Success
       WHEN OTHERS.
-      "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
+        "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
   ENDMETHOD.
 
@@ -465,9 +465,9 @@ CLASS zcl_prvd_nchain IMPLEMENTATION.
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
-      "Success
+        "Success
       WHEN OTHERS.
-      "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
+        "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
   ENDMETHOD.
 
@@ -499,9 +499,9 @@ CLASS zcl_prvd_nchain IMPLEMENTATION.
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
-      "Success
+        "Success
       WHEN OTHERS.
-      "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
+        "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
   ENDMETHOD.
 
@@ -526,9 +526,9 @@ CLASS zcl_prvd_nchain IMPLEMENTATION.
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
-      "Success
+        "Success
       WHEN OTHERS.
-      "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
+        "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
   ENDMETHOD.
 
@@ -536,9 +536,20 @@ CLASS zcl_prvd_nchain IMPLEMENTATION.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/api/v1/transactions'.
+    DATA lv_txndata TYPE REF TO data.
+    DATA lv_requeststr TYPE string.
     mi_client->request->set_method( 'POST' ).
     mi_client->request->set_header_field( name  = '~request_uri'
                                           value = lv_uri ).
+
+    zcl_prvd_api_helper=>copy_data_to_ref( EXPORTING is_data = is_nchain_txn
+                                              CHANGING cr_data = lv_txndata ).
+
+    lv_requeststr = /ui2/cl_json=>serialize( data        = lv_txndata
+                                             pretty_name = /ui2/cl_json=>pretty_mode-low_case ).
+
+    mi_client->request->set_cdata( data =  lv_requeststr ).
+
     get_bpi_token( ).
     lv_code = send_receive( ).
     ev_httpresponsecode = lv_code.
@@ -551,9 +562,9 @@ CLASS zcl_prvd_nchain IMPLEMENTATION.
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
-      "Success
+        "Success
       WHEN OTHERS.
-      "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
+        "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
   ENDMETHOD.
 
@@ -581,9 +592,9 @@ CLASS zcl_prvd_nchain IMPLEMENTATION.
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
-      "Success
+        "Success
       WHEN OTHERS.
-      "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
+        "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
   ENDMETHOD.
 
@@ -608,9 +619,9 @@ CLASS zcl_prvd_nchain IMPLEMENTATION.
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
-      "Success
+        "Success
       WHEN OTHERS.
-      "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
+        "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
   ENDMETHOD.
 
@@ -634,9 +645,9 @@ CLASS zcl_prvd_nchain IMPLEMENTATION.
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
-      "Success
+        "Success
       WHEN OTHERS.
-      "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
+        "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
   ENDMETHOD.
 
@@ -664,9 +675,9 @@ CLASS zcl_prvd_nchain IMPLEMENTATION.
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
-      "Success
+        "Success
       WHEN OTHERS.
-      "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
+        "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
   ENDMETHOD.
 
@@ -706,9 +717,9 @@ CLASS zcl_prvd_nchain IMPLEMENTATION.
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
-      "Success
+        "Success
       WHEN OTHERS.
-      "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
+        "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
   ENDMETHOD.
 
@@ -732,9 +743,9 @@ CLASS zcl_prvd_nchain IMPLEMENTATION.
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
-      "Success
+        "Success
       WHEN OTHERS.
-      "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
+        "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
   ENDMETHOD.
 
@@ -770,9 +781,9 @@ CLASS zcl_prvd_nchain IMPLEMENTATION.
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
-      "Success
+        "Success
       WHEN OTHERS.
-      "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
+        "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
   ENDMETHOD.
 

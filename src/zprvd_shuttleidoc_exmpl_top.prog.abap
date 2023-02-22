@@ -1,5 +1,5 @@
 *&---------------------------------------------------------------------*
-*& Include zproubc_shuttleidoc_top
+*& Include zprvd_shuttleidoc_top
 *&---------------------------------------------------------------------*
 
 SELECTION-SCREEN BEGIN OF BLOCK 1 WITH FRAME TITLE TEXT-001.

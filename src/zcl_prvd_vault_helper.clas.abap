@@ -26,7 +26,7 @@ CLASS zcl_prvd_vault_helper DEFINITION
     METHODS create_vault .
     "! Derives a key for
     METHODS derive_key .
-    METHODS list_keys IMPORTING iv_vault_id type zprvdvaultid RETURNING VALUE(rt_vault_keys) type zif_prvd_vault=>ty_vault_keys_list.
+    METHODS list_keys IMPORTING iv_vault_id TYPE zprvdvaultid RETURNING VALUE(rt_vault_keys) TYPE zif_prvd_vault=>ty_vault_keys_list.
     "! Deletes the specified user key upon user request
     METHODS delete_keys .
     "! Encrypts data
@@ -43,6 +43,8 @@ CLASS zcl_prvd_vault_helper DEFINITION
     METHODS get_wallet_address
       RETURNING
         VALUE(rv_wallet_address) TYPE zprvd_smartcontract_addr .
+    "! Retrives the access token
+    METHODS get_access_token RETURNING VALUE(rv_access_token) TYPE zprvdrefreshtoken.
   PROTECTED SECTION.
     DATA: mo_prvd_api_helper    TYPE REF TO zcl_prvd_api_helper,
           mv_tenant             TYPE zprvdtenantid,
@@ -239,9 +241,9 @@ CLASS zcl_prvd_vault_helper IMPLEMENTATION.
 
 
   METHOD list_keys.
-    data: lv_apiresponsestr type string,
-          lv_apiresponse type ref to data,
-          lv_httpresponsecode type i.
+    DATA: lv_apiresponsestr   TYPE string,
+          lv_apiresponse      TYPE REF TO data,
+          lv_httpresponsecode TYPE i.
     mo_vault_api = me->get_vault_client( ).
     mo_vault_api->zif_prvd_vault~list_keys(
       EXPORTING
@@ -251,16 +253,38 @@ CLASS zcl_prvd_vault_helper IMPLEMENTATION.
         ev_apiresponse      = lv_apiresponse
         ev_httpresponsecode = lv_httpresponsecode
     ).
+    if lv_httpresponsecode eq 200.
+      /ui2/cl_json=>deserialize(
+        EXPORTING
+          json             = lv_apiresponsestr
+        CHANGING
+          data             = rt_vault_keys
+      ).
+    endif.
 *    CATCH cx_static_check.
   ENDMETHOD.
 
 
   METHOD list_vaults.
+    DATA: lv_apiresponsestr   TYPE string,
+          lv_apiresponse      TYPE REF TO data,
+          lv_httpresponsecode TYPE i.
     mo_vault_api = me->get_vault_client( ).
-    mo_vault_api->zif_prvd_vault~list_vaults( IMPORTING
-        "authorization =
-        et_vault_list = rt_vault_list
+    mo_vault_api->zif_prvd_vault~list_vaults(
+        IMPORTING
+            ev_apiresponsestr   = lv_apiresponsestr
+            ev_apiresponse      = lv_apiresponse
+            ev_httpresponsecode = lv_httpresponsecode
     ).
+    IF lv_httpresponsecode EQ 200.
+      /ui2/cl_json=>deserialize(
+        EXPORTING
+          json             = lv_apiresponsestr
+        CHANGING
+          data             = rt_vault_list
+      ).
+    ENDIF.
+
 *    CATCH cx_static_check.
   ENDMETHOD.
 
@@ -276,5 +300,9 @@ CLASS zcl_prvd_vault_helper IMPLEMENTATION.
 
   METHOD verify.
     mo_vault_api = me->get_vault_client( ).
+  ENDMETHOD.
+
+  METHOD get_access_token.
+    rv_access_token = mv_prvd_token.
   ENDMETHOD.
 ENDCLASS.

@@ -6,11 +6,19 @@
     <NAME>ZPRVD_SHUTTLEIDOC_EXMPL</NAME>
     <DBAPL>S</DBAPL>
     <SUBC>1</SUBC>
-    <APPL>X</APPL>
+    <RSTAT>P</RSTAT>
+    <RLOAD>E</RLOAD>
     <FIXPT>X</FIXPT>
     <LDBNAME>D$S</LDBNAME>
     <UCCHECK>X</UCCHECK>
    </PROGDIR>
+   <TPOOL>
+    <item>
+     <ID>R</ID>
+     <ENTRY>Example batch program to baseline idoc via Provide Shuttle</ENTRY>
+     <LENGTH>58</LENGTH>
+    </item>
+   </TPOOL>
   </asx:values>
  </asx:abap>
 </abapGit>

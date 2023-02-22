@@ -293,21 +293,22 @@ CLASS zcl_prvd_vault IMPLEMENTATION.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE 'https://vault.provide.services/api/v1/vaults'.
-    DATA lv_responsestr.
+    DATA lv_responsestr type string.
     mi_client->request->set_method( 'GET' ).
     mi_client->request->set_header_field( name = '~request_uri'
                                          value = lv_uri ).
     get_bpi_token( ).
     "mi_client->request->set_cdata( body ).
     lv_code = send_receive( ).
+    ev_httpresponsecode = lv_code.
     lv_responsestr = mi_client->response->get_cdata( ).
     ev_apiresponsestr = lv_responsestr.
-*    /ui2/cl_json=>deserialize(
-*      EXPORTING
-*        json             = lv_responsestr
-*      CHANGING
-*        data             = ev_apiresponse
-*    ).
+    /ui2/cl_json=>deserialize(
+      EXPORTING
+        json             = lv_responsestr
+      CHANGING
+        data             = ev_apiresponse
+    ).
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.

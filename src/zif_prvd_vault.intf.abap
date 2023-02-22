@@ -208,8 +208,7 @@ INTERFACE zif_prvd_vault
   "! Response: 200
   "! Body schema: string
   METHODS list_vaults
-    EXPORTING et_vault_list       TYPE zif_prvd_vault=>tty_vault_query
-              ev_apiresponsestr   TYPE string
+    EXPORTING ev_apiresponsestr   TYPE string
               ev_apiresponse      TYPE REF TO data
               ev_httpresponsecode TYPE i
     RAISING   cx_static_check.
