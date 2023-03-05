@@ -34,7 +34,9 @@ CLASS zcl_prvd_vault_helper DEFINITION
     "! Decrypts data
     METHODS decrypt .
     "! Used to cryptographically sign data
-    METHODS sign .
+    METHODS sign IMPORTING iv_vault_id type zprvdvaultid
+                           is_message type zif_prvd_vault=>ty_signed_message
+                 RETURNING VALUE(rs_vault_signed_message) type zif_prvd_vault=>ty_signature .
     "! Used to cryptographically verify data
     METHODS verify .
     "! Initializes other aspects of the vault helper class to ensure connectivity to Vault microservice
@@ -294,7 +296,26 @@ CLASS zcl_prvd_vault_helper IMPLEMENTATION.
 
 
   METHOD sign.
+      DATA: lv_apiresponsestr   TYPE string,
+          lv_apiresponse      TYPE REF TO data,
+          lv_httpresponsecode TYPE i.
     mo_vault_api = me->get_vault_client( ).
+    mo_vault_api->zif_prvd_vault~sign(
+      EXPORTING
+        iv_vaultid          = iv_vault_id
+        is_message          = is_message
+        iv_content_type     = 'json'
+      IMPORTING
+        ev_apiresponsestr   = lv_apiresponsestr
+        ev_apiresponse      = lv_apiresponse
+       ev_httpresponsecode = lv_httpresponsecode
+    ).
+    case lv_httpresponsecode.
+        when 201.
+        when others.
+        "todo log error.
+    ENDCASE.
+*    CATCH cx_static_check.
   ENDMETHOD.
 
 
