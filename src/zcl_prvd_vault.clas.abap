@@ -379,18 +379,26 @@ CLASS zcl_prvd_vault IMPLEMENTATION.
   METHOD zif_prvd_vault~sign.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE 'https://vault.provide.services/api/v1/vaults/{vault_id}/sign'.
-    data lv_request_data type ref to data.
-    data lv_request_str type string.
+    DATA lv_uri TYPE string VALUE '/api/v1/vaults/{vault_id}/keys/{key_id}/sign'.
+    DATA lv_request_data TYPE REF TO data.
+    DATA lv_request_str TYPE string.
     lv_temp = iv_vaultid.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{vault_id}' IN lv_uri WITH lv_temp.
+    lv_temp = iv_keyid.
+    REPLACE ALL OCCURRENCES OF '{key_id}' IN lv_uri WITH lv_temp.
+
     mi_client->request->set_method( 'POST' ).
     mi_client->request->set_header_field( name = '~request_uri'
                                          value = lv_uri ).
     get_bpi_token( ).
     mi_client->request->set_header_field( name = 'Content-Type'
                                          value = iv_content_type ).
+
+    lv_request_str = /ui2/cl_json=>serialize( data =  is_message
+                                              pretty_name = /ui2/cl_json=>pretty_mode-low_case ).
+
+
     mi_client->request->set_cdata( lv_request_str ).
     lv_code = send_receive( ).
     ev_httpresponsecode = lv_code.

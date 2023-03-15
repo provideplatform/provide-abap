@@ -262,6 +262,7 @@ INTERFACE zif_prvd_vault
   METHODS sign
     IMPORTING
               iv_vaultid          TYPE zprvdvaultid
+              iv_keyid            type zprvdvaultid
               is_message          TYPE ty_signed_message
               iv_content_type     TYPE string
     EXPORTING

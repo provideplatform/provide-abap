@@ -36,7 +36,11 @@ CLASS zcl_prvd_nchain_helper DEFINITION
                                    iv_vaultkey   TYPE zprvdvaultid
                                    iv_value      TYPE i,
       "! Gets the PRVD Nchain API proxy
-      get_nchain_client RETURNING VALUE(ro_nchain_client) TYPE REF TO zcl_prvd_nchain.
+      get_nchain_client RETURNING VALUE(ro_nchain_client) TYPE REF TO zcl_prvd_nchain,
+      approve_smart_contract IMPORTING iv_approval_data              TYPE string
+                                       is_signature                  TYPE zif_prvd_vault=>ty_signature
+                                       iv_signing_address            TYPE zprvd_smartcontract_addr
+                                       iv_destination_smart_contract TYPE zprvd_smartcontract_addr.
   PROTECTED SECTION.
     DATA: mv_tenant             TYPE zprvdtenantid,
           mv_org_id             TYPE zprvdtenantid,
@@ -48,7 +52,7 @@ CLASS zcl_prvd_nchain_helper DEFINITION
           mo_prvd_api_helper    TYPE REF TO zcl_prvd_api_helper,
           mo_prvd_vault_helper  TYPE REF TO zcl_prvd_vault_helper,
           mv_prvd_token         TYPE zprvdrefreshtoken.
-    METHODS: get_vault_helper.
+    METHODS: get_vault_helper RETURNING VALUE(ro_prvd_vault_helper) TYPE REF TO zcl_prvd_vault_helper.
   PRIVATE SECTION.
 ENDCLASS.
 
@@ -275,6 +279,7 @@ CLASS zcl_prvd_nchain_helper IMPLEMENTATION.
     IF mo_prvd_vault_helper IS NOT BOUND.
       mo_prvd_vault_helper = NEW zcl_prvd_vault_helper(  ).
     ENDIF.
+    ro_prvd_vault_helper = mo_prvd_vault_helper.
   ENDMETHOD.
 
 
@@ -292,14 +297,14 @@ CLASS zcl_prvd_nchain_helper IMPLEMENTATION.
     DATA: ls_nchain_txn      TYPE zif_prvd_nchain=>ty_create_broadcast_txn_ac,
           lv_apiresponsestr  TYPE string,
           lv_apiresponsedata TYPE REF TO data,
-          lv_apiresponsecd  TYPE i.
+          lv_apiresponsecd   TYPE i.
 
 
-      ls_nchain_txn-network_id = iv_network_id.
-      ls_nchain_txn-key_id = iv_vaultkey.
-      ls_nchain_txn-account_id = iv_vaultid.
-      ls_nchain_txn-to = iv_to_addr.
-      ls_nchain_txn-value = iv_value.
+    ls_nchain_txn-network_id = iv_network_id.
+    ls_nchain_txn-key_id = iv_vaultkey.
+    ls_nchain_txn-account_id = iv_vaultid.
+    ls_nchain_txn-to = iv_to_addr.
+    ls_nchain_txn-value = iv_value.
 
 
     mo_nchain_api->zif_prvd_nchain~create_broadcast_txn_ac(
@@ -308,5 +313,23 @@ CLASS zcl_prvd_nchain_helper IMPLEMENTATION.
                   ev_apiresponse      = lv_apiresponsedata
                   ev_httpresponsecode = lv_apiresponsecd ).
 *          CATCH cx_static_check.
+  ENDMETHOD.
+
+  METHOD approve_smart_contract.
+    DATA: ls_approve_smartcontract TYPE zif_prvd_nchain=>ty_contract_approval,
+          lv_apiresponsestr        TYPE string,
+          lv_apiresponsedata       TYPE REF TO data,
+          lv_apiresponsecd         TYPE i.
+
+    mo_nchain_api->zif_prvd_nchain~approve_smart_contract(
+          EXPORTING is_contract_approval = ls_approve_smartcontract
+          IMPORTING ev_apiresponsestr   = lv_apiresponsestr
+                    ev_apiresponse      = lv_apiresponsedata
+                    ev_httpresponsecode = lv_apiresponsecd  ).
+    CASE lv_apiresponsecd.
+      WHEN 201.
+      WHEN OTHERS.
+    ENDCASE.
+
   ENDMETHOD.
 ENDCLASS.

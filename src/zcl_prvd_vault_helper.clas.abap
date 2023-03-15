@@ -34,9 +34,10 @@ CLASS zcl_prvd_vault_helper DEFINITION
     "! Decrypts data
     METHODS decrypt .
     "! Used to cryptographically sign data
-    METHODS sign IMPORTING iv_vault_id type zprvdvaultid
-                           is_message type zif_prvd_vault=>ty_signed_message
-                 RETURNING VALUE(rs_vault_signed_message) type zif_prvd_vault=>ty_signature .
+    METHODS sign IMPORTING iv_vault_id                    TYPE zprvdvaultid
+                           iv_key_id                      TYPE zprvdvaultid
+                           is_message                     TYPE zif_prvd_vault=>ty_signed_message
+                 RETURNING VALUE(rs_vault_signed_message) TYPE zif_prvd_vault=>ty_signature .
     "! Used to cryptographically verify data
     METHODS verify .
     "! Initializes other aspects of the vault helper class to ensure connectivity to Vault microservice
@@ -83,24 +84,27 @@ CLASS zcl_prvd_vault_helper IMPLEMENTATION.
     mv_org_id = mo_prvd_api_helper->get_default_tenant( ).
     mv_subject_account_id = mo_prvd_api_helper->get_subject_account( ).
     mv_workgroup_id = mo_prvd_api_helper->get_workgroup( ).
+    mv_prvd_token = mo_prvd_api_helper->get_access_token( ).
 
-    mo_prvd_api_helper->call_ident_api(
-        IMPORTING
-          ev_authtoken   = lv_jwt
-          status         = lv_status ).
+    IF mv_prvd_token IS INITIAL.
+      mo_prvd_api_helper->call_ident_api(
+          IMPORTING
+            ev_authtoken   = lv_jwt
+            status         = lv_status ).
 
-    FIELD-SYMBOLS: <fs_authreq>  TYPE any,
-                   <fs_authreq2> TYPE string.
-    ASSIGN lv_jwt->* TO FIELD-SYMBOL(<ls_data>).
-    IF sy-subrc <> 0.
+      FIELD-SYMBOLS: <fs_authreq>  TYPE any,
+                     <fs_authreq2> TYPE string.
+      ASSIGN lv_jwt->* TO FIELD-SYMBOL(<ls_data>).
+      IF sy-subrc <> 0.
+      ENDIF.
+      ASSIGN COMPONENT 'ACCESS_TOKEN' OF STRUCTURE <ls_data> TO <fs_authreq>.
+      IF sy-subrc <> 0.
+      ENDIF.
+      ASSIGN <fs_authreq>->* TO <fs_authreq2>.
+      IF sy-subrc <> 0.
+      ENDIF.
+      mv_prvd_token  = <fs_authreq2>.
     ENDIF.
-    ASSIGN COMPONENT 'ACCESS_TOKEN' OF STRUCTURE <ls_data> TO <fs_authreq>.
-    IF sy-subrc <> 0.
-    ENDIF.
-    ASSIGN <fs_authreq>->* TO <fs_authreq2>.
-    IF sy-subrc <> 0.
-    ENDIF.
-    mv_prvd_token  = <fs_authreq2>.
 
     mv_vault_api_url = 'https://vault.provide.services'.
 
@@ -210,7 +214,7 @@ CLASS zcl_prvd_vault_helper IMPLEMENTATION.
 
 
   METHOD get_vault_client.
-    IF mo_vault_api IS BOUND.
+    IF mo_vault_api IS NOT BOUND.
       cl_http_client=>create_by_url(
     EXPORTING
       url                = mv_vault_api_url
@@ -229,7 +233,7 @@ CLASS zcl_prvd_vault_helper IMPLEMENTATION.
       mo_http_client->request->set_header_field( name  = if_http_form_fields_sap=>sap_client value = '100' ).
 
       "todo fix params
-      "mo_vault_api = NEW zcl_proubc_vault( ii_client = mo_http_client iv_tenant = mv_tenant iv_bpitoken = lv_bpitoken  ).
+      mo_vault_api = NEW zcl_prvd_vault( ii_client = mo_http_client iv_tenant = mv_tenant iv_bpitoken = mv_prvd_token  ).
       ro_vault_client = mo_vault_api.
     ELSE.
       ro_vault_client = mo_vault_api.
@@ -255,14 +259,14 @@ CLASS zcl_prvd_vault_helper IMPLEMENTATION.
         ev_apiresponse      = lv_apiresponse
         ev_httpresponsecode = lv_httpresponsecode
     ).
-    if lv_httpresponsecode eq 200.
+    IF lv_httpresponsecode EQ 200.
       /ui2/cl_json=>deserialize(
         EXPORTING
           json             = lv_apiresponsestr
         CHANGING
           data             = rt_vault_keys
       ).
-    endif.
+    ENDIF.
 *    CATCH cx_static_check.
   ENDMETHOD.
 
@@ -296,13 +300,14 @@ CLASS zcl_prvd_vault_helper IMPLEMENTATION.
 
 
   METHOD sign.
-      DATA: lv_apiresponsestr   TYPE string,
+    DATA: lv_apiresponsestr   TYPE string,
           lv_apiresponse      TYPE REF TO data,
           lv_httpresponsecode TYPE i.
     mo_vault_api = me->get_vault_client( ).
     mo_vault_api->zif_prvd_vault~sign(
       EXPORTING
         iv_vaultid          = iv_vault_id
+        iv_keyid            = iv_key_id
         is_message          = is_message
         iv_content_type     = 'json'
       IMPORTING
@@ -310,9 +315,13 @@ CLASS zcl_prvd_vault_helper IMPLEMENTATION.
         ev_apiresponse      = lv_apiresponse
        ev_httpresponsecode = lv_httpresponsecode
     ).
-    case lv_httpresponsecode.
-        when 201.
-        when others.
+    CASE lv_httpresponsecode.
+      WHEN 201.
+        DATA: lif_ajson TYPE REF TO zif_ajson.
+
+        lif_ajson = zcl_ajson=>parse( lv_apiresponsestr ).
+        rs_vault_signed_message-signature = lif_ajson->get_string( '/signature' ).
+      WHEN OTHERS.
         "todo log error.
     ENDCASE.
 *    CATCH cx_static_check.

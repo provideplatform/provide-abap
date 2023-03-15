@@ -71,6 +71,8 @@ CLASS zcl_prvd_api_helper DEFINITION
     METHODS send_protocol_msg
       IMPORTING
         !is_body           TYPE zif_prvd_baseline=>protocolmessage_req
+        !iv_subj_acct      TYPE zprvdtenantid OPTIONAL
+        !iv_workgroup_id   TYPE zprvdtenantid OPTIONAL
       EXPORTING
         !ev_statuscode     TYPE i
         !ev_apiresponsestr TYPE string
@@ -95,7 +97,7 @@ CLASS zcl_prvd_api_helper DEFINITION
     "! Method to return PRVD Nchain helper class
     METHODS get_nchain_helper EXPORTING eo_prvd_nchain_helper TYPE REF TO zcl_prvd_nchain_helper.
     "! Method to return the access token
-    METHODS get_access_token RETURNING VALUE(rv_access_token) type zprvdrefreshtoken.
+    METHODS get_access_token RETURNING VALUE(rv_access_token) TYPE zprvdrefreshtoken.
   PROTECTED SECTION.
     DATA: mv_defaulttenant        TYPE zprvdtenants-organization_id,
           mv_defaultsubjectacct   TYPE zprvdtenantid,
@@ -292,7 +294,8 @@ CLASS zcl_prvd_api_helper IMPLEMENTATION.
       lv_apiresponse      TYPE REF TO data,
       lv_tenant           TYPE zprvdtenantid,
       lv_subjacct         TYPE zprvdtenants-subject_account_id,
-      lv_authtokenreqbody TYPE zif_prvd_ident=>refresh_accesstoken_request.
+      lv_authtokenreqbody TYPE zif_prvd_ident=>refresh_accesstoken_request,
+      lv_apiresponsestr   TYPE string.
 
     IF iv_tenant IS NOT INITIAL.
       lv_tenant = iv_tenant.
@@ -352,11 +355,17 @@ CLASS zcl_prvd_api_helper IMPLEMENTATION.
     lv_authtokenreqbody-grant_type = 'refresh_token'.
     lo_ident_api->refresh_access_token(
       EXPORTING
-        body        = lv_authtokenreqbody
+        is_req_body        = lv_authtokenreqbody
       IMPORTING
-        status      = status
-        apiresponse = lv_apiresponse   ).
-    ev_authtoken = lv_apiresponse.
+        ev_httpresponsecode      = status
+        ev_apiresponsestr = lv_apiresponsestr
+        ev_apiresponse = lv_apiresponse   ).
+    CASE status.
+      WHEN 201.
+        ev_authtoken = lv_apiresponse.
+      WHEN OTHERS.
+        "ident call failed - log error
+    ENDCASE.
   ENDMETHOD.
 
 
@@ -385,6 +394,7 @@ CLASS zcl_prvd_api_helper IMPLEMENTATION.
           mv_defaultsubjectacct = wa_defaulttenant-subject_account_id.
           mv_selected_workgroupid = wa_defaulttenant-workgroup_id.
           mv_default_bpiendpoint = wa_defaulttenant-bpi_endpoint.
+          setup_protocol_msg( ).
           RETURN.
         ELSE.
           "Message no default org determined
@@ -460,8 +470,17 @@ CLASS zcl_prvd_api_helper IMPLEMENTATION.
     DATA ls_finalized_protocol_msg TYPE zif_prvd_baseline=>protocolmessage_req.
 
     ls_finalized_protocol_msg                    = is_body.
-    ls_finalized_protocol_msg-subject_account_id = mv_defaultsubjectacct.
-    ls_finalized_protocol_msg-workgroup_id       = mv_selected_workgroupid.
+    IF iv_subj_acct IS NOT INITIAL.
+      ls_finalized_protocol_msg-subject_account_id = iv_subj_acct.
+    ELSE.
+      ls_finalized_protocol_msg-subject_account_id = mv_defaultsubjectacct.
+    ENDIF.
+    IF iv_workgroup_id IS NOT INITIAL.
+      ls_finalized_protocol_msg-workgroup_id = iv_workgroup_id.
+    ELSE.
+      ls_finalized_protocol_msg-workgroup_id       = mv_selected_workgroupid.
+    ENDIF.
+    "TODO add auth check right here
     TRY.
         mo_baseline_client->send_protocol_msg( EXPORTING iv_body        = ls_finalized_protocol_msg
                                                          iv_bpitoken    = mv_bpitoken
@@ -600,7 +619,7 @@ CLASS zcl_prvd_api_helper IMPLEMENTATION.
     rv_workgroup = mv_selected_workgroupid.
   ENDMETHOD.
 
-  method get_access_token.
+  METHOD get_access_token.
     rv_access_token = mv_bpitoken.
   ENDMETHOD.
 ENDCLASS.

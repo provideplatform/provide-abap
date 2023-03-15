@@ -427,6 +427,16 @@ INTERFACE zif_prvd_nchain
       walletid              TYPE zprvd_smartcontract_addr,
     END OF ty_executecontract_summary .
 
+  TYPES: BEGIN OF ty_contract_approval,
+           data       TYPE string,
+           signature  TYPE string,
+           signer     TYPE zprvd_smartcontract_addr,
+           network_id TYPE zprvd_nchain_networkid,
+           value      TYPE string,
+           to         TYPE string,
+         END OF ty_contract_approval.
+
+
   "! GET - "List connectors"
   "! Operation id: Listconnectors
   "! Parameter: public, required, query
@@ -757,6 +767,15 @@ INTERFACE zif_prvd_nchain
     IMPORTING
       !iv_smartcontractaddr TYPE zprvd_smartcontract_addr
       !is_pricefeedcontract TYPE ty_chainlinkpricefeed_req
+    EXPORTING
+      !ev_apiresponsestr    TYPE string
+      !ev_apiresponse       TYPE REF TO data
+      !ev_httpresponsecode  TYPE i
+    RAISING
+      cx_static_check .
+  METHODS approve_smart_contract
+    IMPORTING
+      !is_contract_approval TYPE ty_contract_approval
     EXPORTING
       !ev_apiresponsestr    TYPE string
       !ev_apiresponse       TYPE REF TO data

@@ -18,4 +18,11 @@ interface ZIF_PRVD_TENANTS
     END OF ty_tenant_wo_token .
   types:
     tty_tenant_wo_token TYPE TABLE OF ty_tenant_wo_token .
+
+  types:
+    BEGIN OF ty_org_refresh_token_req,
+      mandt          TYPE mandt,
+      organization_id      TYPE zprvdtenants-organization_id,
+      refresh_token  type zprvdrefreshtoken,
+    end of ty_org_refresh_token_req.
 endinterface.
