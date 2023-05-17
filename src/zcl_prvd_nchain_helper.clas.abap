@@ -302,7 +302,7 @@ CLASS zcl_prvd_nchain_helper IMPLEMENTATION.
 
     ls_nchain_txn-network_id = iv_network_id.
     ls_nchain_txn-key_id = iv_vaultkey.
-    ls_nchain_txn-account_id = iv_vaultid.
+    ls_nchain_txn-user_id = iv_vaultid.
     ls_nchain_txn-to = iv_to_addr.
     ls_nchain_txn-value = iv_value.
 

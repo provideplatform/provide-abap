@@ -32,7 +32,11 @@ CLASS zcl_prvd_file_helper DEFINITION
                                       iv_xcontentlength TYPE i
                             EXPORTING ev_contentid      TYPE string,
       "! Reads a file from IPFS for a given content ID hash
-      read_file_from_ipfs.
+      read_file_from_ipfs IMPORTING iv_cid type zprvdipfscid
+                                    iv_ipfs_host type string OPTIONAL
+                          EXPORTING ev_httpresponsecode type i
+                                    ev_httpresponsestr type string
+                                    ev_httpresponsedata type ref to data.
   PROTECTED SECTION.
   PRIVATE SECTION.
 ENDCLASS.
@@ -59,7 +63,7 @@ CLASS ZCL_PRVD_FILE_HELPER IMPLEMENTATION.
       /ui2/cl_json=>deserialize( EXPORTING json = lv_filestr CHANGING data = lv_abi_data ).
       ev_abi_data = lv_abi_data.
     ELSE.
-      MESSAGE e014(zclproubcmsg) WITH iv_nchain_networkid iv_smartcontract_address.
+      MESSAGE e014(zclprvdmsg) WITH iv_nchain_networkid iv_smartcontract_address.
     ENDIF.
   ENDMETHOD.
 

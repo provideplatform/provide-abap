@@ -60,6 +60,7 @@ INTERFACE zif_prvd_ident
     BEGIN OF authenticationrequest,
            email    TYPE string,
            password TYPE zcasesensitive_str,
+           scope type string,
          END OF authenticationrequest .
   TYPES:
 "! Component schema: CreateuserRequest, object

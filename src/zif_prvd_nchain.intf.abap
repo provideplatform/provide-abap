@@ -109,7 +109,7 @@ INTERFACE zif_prvd_nchain
       key_id     TYPE string,
       to         TYPE string,
       value      TYPE i,
-      account_id TYPE string,
+      user_id TYPE string,
     END OF ty_create_broadcast_txn_ac .
   TYPES:
 * Component schema: create_broadcast_transaction-WalletRequest, object
