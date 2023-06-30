@@ -109,7 +109,7 @@ INTERFACE zif_prvd_nchain
       key_id     TYPE string,
       to         TYPE string,
       value      TYPE i,
-      user_id TYPE string,
+      user_id    TYPE string,
     END OF ty_create_broadcast_txn_ac .
   TYPES:
 * Component schema: create_broadcast_transaction-WalletRequest, object
@@ -381,7 +381,13 @@ INTERFACE zif_prvd_nchain
       params    TYPE STANDARD TABLE OF string WITH EMPTY KEY,
       value     TYPE i,
       wallet_id TYPE string,
-    END OF ty_executecontractrequest .
+    END OF ty_executecontractrequest,
+    BEGIN OF ty_executecontractreq_account,
+      method    TYPE string,
+      params    TYPE STANDARD TABLE OF string WITH EMPTY KEY,
+      value     TYPE i,
+      account_id TYPE string,
+    end of TY_EXECUTECONTRACTREQ_ACCOUNT.
   TYPES:
 * Component schema: ExecutereadonlycontractRequest, object
     BEGIN OF ty_executereadonlycontractreq,
@@ -403,6 +409,14 @@ INTERFACE zif_prvd_nchain
       params     TYPE ty_pricefeed_req_params,
       type       TYPE zcasesensitive_str,
     END OF ty_chainlinkpricefeed_req .
+  TYPES:
+    BEGIN OF ty_create_contract_req,
+      address    TYPE zcasesensitive_str,
+      name       TYPE zcasesensitive_str,
+      network_id TYPE zcasesensitive_str,
+      params     TYPE ty_pricefeed_req_params,
+      type       TYPE zcasesensitive_str,
+    END OF ty_create_contract_req .
   TYPES:
     BEGIN OF ty_hdwalletcreate_resp,
       id              TYPE string,
@@ -435,6 +449,17 @@ INTERFACE zif_prvd_nchain
            value      TYPE string,
            to         TYPE string,
          END OF ty_contract_approval.
+
+  TYPES: BEGIN OF ty_account,
+           id              TYPE zcasesensitive_str,
+           created_at      TYPE zcasesensitive_str,
+           organization_id TYPE zcasesensitive_str,
+           vault_id        TYPE zcasesensitive_str,
+           key_id          TYPE zcasesensitive_str,
+           purpose         TYPE integer,
+           public_key      TYPE zcasesensitive_str,
+         END OF ty_account.
+  TYPES: ty_account_list TYPE STANDARD TABLE OF ty_account.
 
 
   "! GET - "List connectors"
@@ -587,8 +612,6 @@ INTERFACE zif_prvd_nchain
   "! Parameter: content-type, required, header
   "! Response: 200
   METHODS listaccounts
-    IMPORTING
-      !iv_content_type     TYPE string
     EXPORTING
       !ev_apiresponsestr   TYPE string
       !ev_apiresponse      TYPE REF TO data
@@ -615,8 +638,6 @@ INTERFACE zif_prvd_nchain
   "! Parameter: content-type, required, header
   "! Response: 200
   METHODS listhdwallets
-    IMPORTING
-      !iv_content_type     TYPE string
     EXPORTING
       !ev_apiresponsestr   TYPE string
       !ev_apiresponse      TYPE REF TO data
@@ -767,6 +788,16 @@ INTERFACE zif_prvd_nchain
     IMPORTING
       !iv_smartcontractaddr TYPE zprvd_smartcontract_addr
       !is_pricefeedcontract TYPE ty_chainlinkpricefeed_req
+    EXPORTING
+      !ev_apiresponsestr    TYPE string
+      !ev_apiresponse       TYPE REF TO data
+      !ev_httpresponsecode  TYPE i
+    RAISING
+      cx_static_check .
+  METHODS create_contract
+    IMPORTING
+      !iv_smartcontractaddr TYPE zprvd_smartcontract_addr
+      !is_contract TYPE ty_create_contract_req
     EXPORTING
       !ev_apiresponsestr    TYPE string
       !ev_apiresponse       TYPE REF TO data

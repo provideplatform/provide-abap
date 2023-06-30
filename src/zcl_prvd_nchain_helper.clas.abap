@@ -40,7 +40,16 @@ CLASS zcl_prvd_nchain_helper DEFINITION
       approve_smart_contract IMPORTING iv_approval_data              TYPE string
                                        is_signature                  TYPE zif_prvd_vault=>ty_signature
                                        iv_signing_address            TYPE zprvd_smartcontract_addr
-                                       iv_destination_smart_contract TYPE zprvd_smartcontract_addr.
+                                       iv_destination_smart_contract TYPE zprvd_smartcontract_addr,
+      "! Retrieves lists of accounts available for signing
+      get_accounts EXPORTING et_accounts TYPE zif_prvd_nchain=>ty_account_list,
+      "! Executes a contract via PRVD Nchain
+      execute_contract IMPORTING iv_contract_id       TYPE zcasesensitive_str
+                                 iv_exec_contract_req TYPE zif_prvd_nchain=>ty_executecontractreq_account,
+      "! Sets up contract instance on Nchain
+      create_contract IMPORTING iv_smartcontractaddr  TYPE zprvd_smartcontract_addr
+                                is_contract           TYPE zif_prvd_nchain=>ty_create_contract_req
+                      RETURNING VALUE(rv_contract_id) TYPE zcasesensitive_str.
   PROTECTED SECTION.
     DATA: mv_tenant             TYPE zprvdtenantid,
           mv_org_id             TYPE zprvdtenantid,
@@ -328,6 +337,84 @@ CLASS zcl_prvd_nchain_helper IMPLEMENTATION.
                     ev_httpresponsecode = lv_apiresponsecd  ).
     CASE lv_apiresponsecd.
       WHEN 201.
+      WHEN OTHERS.
+    ENDCASE.
+
+  ENDMETHOD.
+
+  METHOD get_accounts.
+    DATA: lv_apiresponsestr  TYPE string,
+          lv_apiresponsedata TYPE REF TO data,
+          lv_apiresponsecd   TYPE i.
+
+    mo_nchain_api->zif_prvd_nchain~listhdwallets(
+      IMPORTING
+        ev_apiresponsestr   = lv_apiresponsestr
+        ev_apiresponse      = lv_apiresponsedata
+        ev_httpresponsecode = lv_apiresponsecd
+    ).
+    CASE lv_apiresponsecd.
+      WHEN 200.
+          /ui2/cl_json=>deserialize(
+      EXPORTING
+        json             = lv_apiresponsestr
+      CHANGING
+        data             = et_accounts ).
+      WHEN OTHERS.
+    ENDCASE.
+
+  ENDMETHOD.
+
+  METHOD execute_contract.
+    DATA: lv_apiresponsestr  TYPE string,
+          lv_apiresponsedata TYPE REF TO data,
+          lv_apiresponsecd   TYPE i.
+
+    mo_nchain_api->zif_prvd_nchain~executecontract(
+      EXPORTING iv_contract_id      = iv_contract_id
+                is_execcontractreq = iv_exec_contract_req
+      IMPORTING ev_apiresponsestr   = lv_apiresponsestr
+                ev_apiresponse      = lv_apiresponsedata
+                ev_httpresponsecode = lv_apiresponsecd ).
+    CASE lv_apiresponsecd.
+      WHEN 201.
+      WHEN OTHERS.
+    ENDCASE.
+  ENDMETHOD.
+
+  METHOD create_contract.
+    DATA: lv_createdcontract_str        TYPE string,
+          lv_createdcontract_data       TYPE REF TO data,
+          lv_createdcontract_responsecd TYPE i.
+
+    mo_nchain_api->zif_prvd_nchain~create_contract(
+        EXPORTING
+          iv_smartcontractaddr = iv_smartcontractaddr
+          is_contract = is_contract
+        IMPORTING
+          ev_apiresponsestr    = lv_createdcontract_str
+          ev_apiresponse       = lv_createdcontract_data
+          ev_httpresponsecode  = lv_createdcontract_responsecd ).
+    CASE lv_createdcontract_responsecd.
+      WHEN 201.
+
+        FIELD-SYMBOLS: <fs_prvd_stack_contractid>     TYPE any,
+                       <fs_prvd_stack_contractid_str> TYPE string.
+
+        IF lv_createdcontract_data IS NOT INITIAL.
+          ASSIGN lv_createdcontract_data->* TO FIELD-SYMBOL(<ls_contractdata>).
+          IF sy-subrc <> 0.
+          ENDIF.
+          ASSIGN COMPONENT 'ID' OF STRUCTURE <ls_contractdata> TO <fs_prvd_stack_contractid>.
+          IF sy-subrc <> 0.
+          ENDIF.
+          ASSIGN <fs_prvd_stack_contractid>->* TO <fs_prvd_stack_contractid_str>.
+          IF sy-subrc <> 0.
+          ENDIF.
+          rv_contract_id = <fs_prvd_stack_contractid_str>.
+        ENDIF.
+      WHEN 404.
+        "contract not found - might not be deployed
       WHEN OTHERS.
     ENDCASE.
 

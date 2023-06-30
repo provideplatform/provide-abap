@@ -96,6 +96,8 @@ CLASS zcl_prvd_api_helper DEFINITION
     METHODS get_workgroup RETURNING VALUE(rv_workgroup) TYPE zprvdtenantid.
     "! Method to return PRVD Nchain helper class
     METHODS get_nchain_helper EXPORTING eo_prvd_nchain_helper TYPE REF TO zcl_prvd_nchain_helper.
+    "! Method to return PRVD Vault helper class
+    METHODS get_vault_helper EXPORTING eo_prvd_vault_helper TYPE REF TO zcl_prvd_vault_helper.
     "! Method to return the access token
     METHODS get_access_token RETURNING VALUE(rv_access_token) TYPE zprvdrefreshtoken.
   PROTECTED SECTION.
@@ -595,6 +597,12 @@ CLASS zcl_prvd_api_helper IMPLEMENTATION.
     DATA lo_prvd_nchain_helper TYPE REF TO zcl_prvd_nchain_helper.
     lo_prvd_nchain_helper = NEW zcl_prvd_nchain_helper( io_prvd_api_helper = me ).
     eo_prvd_nchain_helper = lo_prvd_nchain_helper.
+  ENDMETHOD.
+
+  METHOD get_vault_helper.
+    DATA lo_prvd_vault_helper TYPE REF TO zcl_prvd_vault_helper.
+    lo_prvd_vault_helper = NEW zcl_prvd_vault_helper(  io_prvd_api_helper = me ).
+    eo_prvd_vault_helper = lo_prvd_vault_helper.
   ENDMETHOD.
 
 

@@ -48,6 +48,12 @@ CLASS zcl_prvd_vault_helper DEFINITION
         VALUE(rv_wallet_address) TYPE zprvd_smartcontract_addr .
     "! Retrives the access token
     METHODS get_access_token RETURNING VALUE(rv_access_token) TYPE zprvdrefreshtoken.
+    "! Retrieves vault specific to org
+    METHODS get_org_vault IMPORTING iv_org_id       TYPE zprvdtenantid OPTIONAL
+                          RETURNING VALUE(rs_vault) TYPE zif_prvd_vault=>ty_vault_query.
+    "! Retrieves the vault key for the Ethereum wallet. This DOES NOT return the pneumonic phrase.
+    METHODS get_wallet_vault_key IMPORTING iv_vault_id         TYPE zcasesensitive_str
+                                 RETURNING VALUE(rs_vault_key) TYPE zif_prvd_vault=>ty_vault_keys.
   PROTECTED SECTION.
     DATA: mo_prvd_api_helper    TYPE REF TO zcl_prvd_api_helper,
           mv_tenant             TYPE zprvdtenantid,
@@ -334,5 +340,28 @@ CLASS zcl_prvd_vault_helper IMPLEMENTATION.
 
   METHOD get_access_token.
     rv_access_token = mv_prvd_token.
+  ENDMETHOD.
+
+  METHOD get_org_vault.
+    DATA: lt_vault_list TYPE zif_prvd_vault=>tty_vault_query,
+          ls_org_vault  TYPE zif_prvd_vault=>ty_vault_query.
+    lt_vault_list = list_vaults( ).
+    READ TABLE lt_vault_list INTO ls_org_vault INDEX 1.
+    IF sy-subrc = 0.
+      rs_vault = ls_org_vault.
+    ELSE.
+    ENDIF.
+  ENDMETHOD.
+
+  METHOD get_wallet_vault_key.
+    DATA: lt_vault_keys TYPE zif_prvd_vault=>ty_vault_keys_list,
+          ls_wallet_key TYPE zif_prvd_vault=>ty_vault_keys.
+
+    lt_vault_keys = list_keys( iv_vault_id ).
+    READ TABLE lt_vault_keys INTO ls_wallet_key WITH KEY spec = 'secp256k1'.
+    IF sy-subrc = 0.
+      rs_vault_key = ls_wallet_key.
+    ELSE.
+    ENDIF.
   ENDMETHOD.
 ENDCLASS.
