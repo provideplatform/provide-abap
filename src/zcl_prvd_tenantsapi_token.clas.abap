@@ -1,0 +1,15 @@
+CLASS zcl_prvd_tenantsapi_token DEFINITION
+  PUBLIC
+  INHERITING FROM cl_rest_resource
+  FINAL
+  CREATE PUBLIC .
+
+  PUBLIC SECTION.
+  PROTECTED SECTION.
+  PRIVATE SECTION.
+ENDCLASS.
+
+
+
+CLASS zcl_prvd_tenantsapi_token IMPLEMENTATION.
+ENDCLASS.

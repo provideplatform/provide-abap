@@ -539,7 +539,7 @@ CLASS zcl_prvd_ident IMPLEMENTATION.
 
     mi_client->request->get_header_fields( CHANGING fields = lt_headerfields ).
 
-    zcl_prvd_api_helper=>copy_data_to_ref( EXPORTING is_data = body
+    zcl_prvd_api_helper=>copy_data_to_ref( EXPORTING is_data = is_req_body
                                               CHANGING cr_data = lv_longtermrequestdata ).
 
     lv_requeststr = /ui2/cl_json=>serialize( EXPORTING data = lv_longtermrequestdata
@@ -548,14 +548,14 @@ CLASS zcl_prvd_ident IMPLEMENTATION.
     mi_client->request->set_cdata( data = lv_requeststr ).
 
     lv_code = send_receive( ).
-    status = lv_code.
+    ev_apiresponsestr = mi_client->response->get_cdata( ).
+    /ui2/cl_json=>deserialize( EXPORTING json = ev_apiresponsestr
+                               CHANGING data  = ev_apiresponse ).
+    ev_httpresponsecode = lv_code.
 
     CASE lv_code.
       WHEN 200 OR 201 OR 202.
-        DATA: lv_parsedresponse TYPE zif_prvd_ident=>authorizelongtermtokenresponse.
-        lv_authresponsestr = mi_client->response->get_cdata( ).
-        /ui2/cl_json=>deserialize( EXPORTING json = lv_authresponsestr
-                                    CHANGING data = apiresponse ).
+        "Success
       WHEN 401.
       "refresh token incorrect
       WHEN 407.

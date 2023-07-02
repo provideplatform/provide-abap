@@ -1,5 +1,5 @@
 *&---------------------------------------------------------------------*
-*& Include zproubc_shuttleidoc_f01
+*& Include zprvd_shuttleidoc_f01
 *&---------------------------------------------------------------------*
 
 CLASS lcl_idoc_moni DEFINITION.

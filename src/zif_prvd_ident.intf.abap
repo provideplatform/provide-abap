@@ -60,6 +60,7 @@ INTERFACE zif_prvd_ident
     BEGIN OF authenticationrequest,
            email    TYPE string,
            password TYPE zcasesensitive_str,
+           scope type string,
          END OF authenticationrequest .
   TYPES:
 "! Component schema: CreateuserRequest, object
@@ -262,10 +263,11 @@ INTERFACE zif_prvd_ident
 "! Body ref: #/components/schemas/refresh_accesstoken_request
   METHODS refresh_access_token
     IMPORTING
-      !body TYPE refresh_accesstoken_request
+      !is_req_body TYPE refresh_accesstoken_request
     EXPORTING
-      !status TYPE i
-      !apiresponse TYPE REF TO data
+      !ev_apiresponsestr   TYPE string
+      !ev_apiresponse      TYPE REF TO data
+      !ev_httpresponsecode TYPE i
     RAISING
       cx_static_check .
   METHODS authorizelong_termtoken

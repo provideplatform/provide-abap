@@ -27,209 +27,247 @@ INTERFACE zif_prvd_vault
            description TYPE string,
          END OF ty_vault_query.
 
-  TYPES: tty_vault_query TYPE TABLE OF ty_vault_query.
+  TYPES: tty_vault_query TYPE TABLE OF ty_vault_query WITH KEY id.
 
   TYPES: BEGIN OF ty_vault_create,
            name        TYPE string,
            description TYPE string,
          END OF ty_vault_create.
 
+  TYPES: BEGIN OF ty_vault_keys,
+           id          TYPE string,
+           created_at  TYPE string,
+           vault_id    TYPE string,
+           type        TYPE string,
+           usage       TYPE string,
+           spec        TYPE string,
+           name        TYPE string,
+           description TYPE string,
+           address     TYPE string,
+           public_key  TYPE string,
+           fingerprint TYPE string,
+         END OF ty_vault_keys.
+
+  TYPES: ty_vault_keys_list TYPE TABLE OF ty_vault_keys WITH KEY id.
+
+  TYPES: BEGIN OF ty_signed_message,
+           message TYPE string,
+         END OF ty_signed_message.
+
+  TYPES: BEGIN OF ty_signature,
+           signature TYPE string,
+         END OF ty_signature.
 
 
-"! POST - "Create a key: C25519"
-"! Operation id: Createakey:C25519
-"! Parameter: authorization, required, header
-"! Parameter: Content-Type, required, header
-"! Parameter: vault_id, required, path
-"! Response: 200
-"! Body schema: string
+
+  "! POST - "Create a key: C25519"
+  "! Operation id: Createakey:C25519
+  "! Parameter: iv_authorization, required, header
+  "! Parameter: Content-Type, required, header
+  "! Parameter: vault_id, required, path
+  "! Response: 200
+  "! Body schema: string
   METHODS create_key
     IMPORTING
-              authorization       TYPE string
-              content_type        TYPE string
-              vault_id            TYPE string
+              iv_authorization    TYPE string
+              iv_content_type     TYPE string
+              iv_vault_id         TYPE zprvdvaultid
               body                TYPE string
     EXPORTING
               ev_apiresponsestr   TYPE string
-              ev_apiresponse       TYPE REF TO data
+              ev_apiresponse      TYPE REF TO data
               ev_httpresponsecode TYPE i
     RAISING   cx_static_check.
 
-"! GET - "List keys"
-"! Operation id: Listkeys
-"! Parameter: authorization, required, header
-"! Parameter: Content-Type, required, header
-"! Parameter: vault_id, required, path
-"! Response: 200
-"! Body schema: string
+  "! GET - "List keys"
+  "! Operation id: Listkeys
+  "! Parameter: iv_authorization, required, header
+  "! Parameter: Content-Type, required, header
+  "! Parameter: vault_id, required, path
+  "! Response: 200
+  "! Body schema: string
   METHODS list_keys
     IMPORTING
-              authorization       TYPE string
-              content_type        TYPE string
-              vault_id            TYPE string
-              body                TYPE string
+              iv_vault_id         TYPE zprvdvaultid
     EXPORTING
               ev_apiresponsestr   TYPE string
-              ev_apiresponse       TYPE REF TO data
+              ev_apiresponse      TYPE REF TO data
               ev_httpresponsecode TYPE i
     RAISING   cx_static_check.
 
-"! POST - "Derive a key: ChaCha20"
-"! Operation id: Deriveakey:ChaCha20
-"! Parameter: authorization, required, header
-"! Parameter: Content-Type, required, header
-"! Parameter: vault_id, required, path
-"! Response: 200
-"! Body schema: string
+  "! POST - "Derive a key: ChaCha20"
+  "! Operation id: Deriveakey:ChaCha20
+  "! Parameter: iv_authorization, required, header
+  "! Parameter: Content-Type, required, header
+  "! Parameter: vault_id, required, path
+  "! Response: 200
+  "! Body schema: string
   METHODS derive_key
     IMPORTING
-              authorization       TYPE string
-              content_type        TYPE string
-              vault_id            TYPE string
-              body                TYPE string
+              iv_authorization    TYPE string
+              iv_content_type     TYPE string
+              iv_vault_id         TYPE string
+              is_body             TYPE string
     EXPORTING
               ev_apiresponsestr   TYPE string
-              ev_apiresponse       TYPE REF TO data
+              ev_apiresponse      TYPE REF TO data
               ev_httpresponsecode TYPE i
     RAISING   cx_static_check.
 
-"! DELETE - "Delete a key"
-"! Operation id: Deleteakey
-"! Parameter: authorization, required, header
-"! Parameter: Content-Type, required, header
-"! Parameter: vault_id, required, path
-"! Parameter: key_id, required, path
-"! Response: 200
+  "! DELETE - "Delete a key"
+  "! Operation id: Deleteakey
+  "! Parameter: iv_authorization, required, header
+  "! Parameter: Content-Type, required, header
+  "! Parameter: vault_id, required, path
+  "! Parameter: key_id, required, path
+  "! Response: 200
   METHODS delete_key
     IMPORTING
-              authorization       TYPE string
-              content_type        TYPE string
-              vault_id            TYPE string
-              key_id              TYPE string
+              iv_authorization    TYPE string
+              iv_content_type     TYPE string
+              iv_vault_id         TYPE string
+              iv_key_id           TYPE string
     EXPORTING
               ev_apiresponsestr   TYPE string
-              ev_apiresponse       TYPE REF TO data
+              ev_apiresponse      TYPE REF TO data
               ev_httpresponsecode TYPE i
     RAISING   cx_static_check.
 
-"! GET - "List secrets"
-"! Operation id: Listsecrets
-"! Parameter: authorization, required, header
-"! Parameter: Content-Type, required, header
-"! Parameter: vault_id, required, path
-"! Response: 200
+  "! GET - "List secrets"
+  "! Operation id: Listsecrets
+  "! Parameter: iv_authorization, required, header
+  "! Parameter: Content-Type, required, header
+  "! Parameter: vault_id, required, path
+  "! Response: 200
   METHODS list_secrets
     IMPORTING
-              authorization       TYPE string
-              content_type        TYPE string
-              vault_id            TYPE string
+              iv_authorization    TYPE string
+              iv_content_type     TYPE string
+              iv_vault_id         TYPE zprvdvaultid
     EXPORTING
               ev_apiresponsestr   TYPE string
-              ev_apiresponse       TYPE REF TO data
+              ev_apiresponse      TYPE REF TO data
               ev_httpresponsecode TYPE i
     RAISING   cx_static_check.
 
-"! POST - "Retreive secret"
-"! Operation id: Retreivesecret
-"! Parameter: authorization, required, header
-"! Parameter: Content-Type, required, header
-"! Parameter: vault_id, required, path
-"! Parameter: secret_id, required, path
-"! Response: 200
-"! Body schema: string
+  "! POST - "Retreive secret"
+  "! Operation id: Retreivesecret
+  "! Parameter: iv_authorization, required, header
+  "! Parameter: Content-Type, required, header
+  "! Parameter: vault_id, required, path
+  "! Parameter: secret_id, required, path
+  "! Response: 200
+  "! Body schema: string
   METHODS retreive_secret
     IMPORTING
-              authorization       TYPE string
-              content_type        TYPE string
-              vault_id            TYPE string
-              secret_id           TYPE string
-              body                TYPE string
+              iv_authorization    TYPE string
+              iv_content_type     TYPE string
+              iv_vault_id         TYPE zprvdvaultid
+              iv_secret_id        TYPE string
+              is_body             TYPE string
     EXPORTING
               ev_apiresponsestr   TYPE string
-              ev_apiresponse       TYPE REF TO data
+              ev_apiresponse      TYPE REF TO data
               ev_httpresponsecode TYPE i
     RAISING   cx_static_check.
 
-"! DELETE - "Delete secret"
-"! Operation id: Deletesecret
-"! Parameter: authorization, required, header
-"! Parameter: Content-Type, required, header
-"! Parameter: vault_id, required, path
-"! Parameter: secret_id, required, path
-"! Response: 200
-"! Body schema: string
+  "! DELETE - "Delete secret"
+  "! Operation id: Deletesecret
+  "! Parameter: iv_authorization, required, header
+  "! Parameter: Content-Type, required, header
+  "! Parameter: vault_id, required, path
+  "! Parameter: secret_id, required, path
+  "! Response: 200
+  "! Body schema: string
   METHODS delete_secret
     IMPORTING
-              authorization       TYPE string
-              content_type        TYPE string
-              vault_id            TYPE string
-              secret_id           TYPE string
-              body                TYPE string
+              iv_authorization    TYPE string
+              iv_content_type     TYPE string
+              iv_vault_id         TYPE zprvdvaultid
+              iv_secret_id        TYPE string
+              is_body             TYPE string
     EXPORTING
               ev_apiresponsestr   TYPE string
-              ev_apiresponse       TYPE REF TO data
+              ev_apiresponse      TYPE REF TO data
               ev_httpresponsecode TYPE i
     RAISING   cx_static_check.
 
-"! POST - "Create Vault"
-"! Operation id: CreateVault
-"! Parameter: Content-Type, required, header
-"! Parameter: content-type, required, header
-"! Parameter: Authorization, required, header
-"! Response: 200
-"! Body schema: string
+  "! POST - "Create Vault"
+  "! Operation id: CreateVault
+  "! Parameter: Content-Type, required, header
+  "! Parameter: content-type, required, header
+  "! Parameter: iv_authorization, required, header
+  "! Response: 200
+  "! Body schema: string
   METHODS create_vault
     IMPORTING
-              content_type        TYPE string
-              authorization       TYPE string
-              body                TYPE string
+              iv_content_type     TYPE string
+              iv_authorization    TYPE string
+              is_body             TYPE string
     EXPORTING
               ev_apiresponsestr   TYPE string
-              ev_apiresponse       TYPE REF TO data
+              ev_apiresponse      TYPE REF TO data
               ev_httpresponsecode TYPE i
     RAISING   cx_static_check.
 
-"! GET - "List Vaults"
-"! Operation id: ListVaults
-"! Parameter: Authorization, required, header
-"! Response: 200
-"! Body schema: string
+  "! GET - "List Vaults"
+  "! Operation id: ListVaults
+  "! Parameter: Authorization, required, header
+  "! Response: 200
+  "! Body schema: string
   METHODS list_vaults
-    EXPORTING et_vault_list       TYPE zif_prvd_vault=>tty_vault_query
-              ev_apiresponsestr   TYPE string
-              ev_apiresponse       TYPE REF TO data
+    EXPORTING ev_apiresponsestr   TYPE string
+              ev_apiresponse      TYPE REF TO data
               ev_httpresponsecode TYPE i
     RAISING   cx_static_check.
 
-"! POST - "Create Seal/Unseal key"
-"! Operation id: CreateSeal/Unsealkey
-"! Parameter: authorization, required, header
-"! Parameter: Content-Type, required, header
-"! Response: 200
+  "! POST - "Create Seal/Unseal key"
+  "! Operation id: CreateSeal/Unsealkey
+  "! Parameter: authorization, required, header
+  "! Parameter: Content-Type, required, header
+  "! Response: 200
   METHODS createseal_unsealkey
     IMPORTING
-              authorization       TYPE string
-              content_type        TYPE string
+              iv_authorization    TYPE string
+              iv_content_type     TYPE string
     EXPORTING
-              ev_apiresponsestr type string
-              ev_apiresponse       TYPE REF TO data
+              ev_apiresponsestr   TYPE string
+              ev_apiresponse      TYPE REF TO data
               ev_httpresponsecode TYPE i
     RAISING   cx_static_check.
 
-"! POST - "Unseal vault"
-"! Operation id: Unsealvault
-"! Parameter: authorization, required, header
-"! Parameter: Content-Type, required, header
-"! Response: 200
-"! Body schema: string
+  "! POST - "Unseal vault"
+  "! Operation id: Unsealvault
+  "! Parameter: iv_authorization, required, header
+  "! Parameter: Content-Type, required, header
+  "! Response: 200
+  "! Body schema: string
   METHODS unseal_vault
     IMPORTING
-              authorization       TYPE string
-              content_type        TYPE string
-              body                TYPE string
+              iv_authorization    TYPE string
+              iv_content_type     TYPE string
+              is_body             TYPE string
     EXPORTING
               ev_apiresponsestr   TYPE string
-              ev_apiresponse       TYPE REF TO data
+              ev_apiresponse      TYPE REF TO data
+              ev_httpresponsecode TYPE i
+    RAISING   cx_static_check.
+
+  "! POST- "Sign"
+  "! Operation id: {vaultid}sign
+  "! Parameter: authorization, required, header
+  "! Parameter: Content-Type, required, header
+  "! Response: 200
+  "! Body schema: string
+  METHODS sign
+    IMPORTING
+              iv_vaultid          TYPE zprvdvaultid
+              iv_keyid            type zprvdvaultid
+              is_message          TYPE ty_signed_message
+              iv_content_type     TYPE string
+    EXPORTING
+              ev_apiresponsestr   TYPE string
+              ev_apiresponse      TYPE REF TO data
               ev_httpresponsecode TYPE i
     RAISING   cx_static_check.
 

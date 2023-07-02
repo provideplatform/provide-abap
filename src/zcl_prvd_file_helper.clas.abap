@@ -10,6 +10,10 @@ CLASS zcl_prvd_file_helper DEFINITION
                                       !iv_smartcontract_address TYPE zprvd_smartcontract_addr
                             EXPORTING !ev_abi_str               TYPE zcasesensitive_str
                                       !ev_abi_data              TYPE REF TO data ,
+      "! updates an entry to the abi registry table
+      update_abi_registry IMPORTING !iv_nchain_networkid      TYPE zprvd_nchain_networkid
+                                    !iv_smartcontract_address TYPE zprvd_smartcontract_addr
+                                    !iv_al11_location         TYPE zcasesensitive_str,
       "! Retrieves the ABI file contents based upon the ABI registry table entry
       open_abiregistry IMPORTING !is_abi_registry TYPE zprvdabiregistry
                        EXPORTING !ev_filecontent  TYPE zcasesensitive_str ,
@@ -32,14 +36,18 @@ CLASS zcl_prvd_file_helper DEFINITION
                                       iv_xcontentlength TYPE i
                             EXPORTING ev_contentid      TYPE string,
       "! Reads a file from IPFS for a given content ID hash
-      read_file_from_ipfs.
+      read_file_from_ipfs IMPORTING iv_cid              TYPE zprvdipfscid
+                                    iv_ipfs_host        TYPE string OPTIONAL
+                          EXPORTING ev_httpresponsecode TYPE i
+                                    ev_httpresponsestr  TYPE string
+                                    ev_httpresponsedata TYPE REF TO data.
   PROTECTED SECTION.
   PRIVATE SECTION.
 ENDCLASS.
 
 
 
-CLASS ZCL_PRVD_FILE_HELPER IMPLEMENTATION.
+CLASS zcl_prvd_file_helper IMPLEMENTATION.
 
 
   METHOD get_smartcontract_abi.
@@ -59,10 +67,28 @@ CLASS ZCL_PRVD_FILE_HELPER IMPLEMENTATION.
       /ui2/cl_json=>deserialize( EXPORTING json = lv_filestr CHANGING data = lv_abi_data ).
       ev_abi_data = lv_abi_data.
     ELSE.
-      MESSAGE e014(zclproubcmsg) WITH iv_nchain_networkid iv_smartcontract_address.
+      MESSAGE e014(zclprvdmsg) WITH iv_nchain_networkid iv_smartcontract_address.
     ENDIF.
   ENDMETHOD.
 
+  METHOD update_abi_registry.
+    DATA: ls_abi_registry TYPE zprvdabiregistry,
+          lv_timestamp    TYPE timestampl.
+
+    ls_abi_registry-smartcontract_address = iv_smartcontract_address.
+    ls_abi_registry-nchain_networkid = iv_nchain_networkid.
+    ls_abi_registry-abi_location = iv_al11_location.
+    ls_abi_registry-created_by = sy-uname.
+
+    GET TIME STAMP FIELD lv_timestamp.
+    ls_abi_registry-created_on = lv_timestamp.
+    ls_abi_registry-valid_from = lv_timestamp.
+
+    MODIFY zprvdabiregistry FROM ls_abi_registry.
+    IF sy-subrc <> 0.
+      "try data entry again.
+    ENDIF.
+  ENDMETHOD.
 
   METHOD open_abiregistry.
     DATA: it_filecontent TYPE TABLE OF zif_prvd_file=>ty_filecontent.
@@ -80,7 +106,7 @@ CLASS ZCL_PRVD_FILE_HELPER IMPLEMENTATION.
     IF sy-subrc = 0.
       ev_filecontent = lv_string.
     ELSE.
-    "Todo add error handling here
+      "Todo add error handling here
     ENDIF.
   ENDMETHOD.
 
@@ -98,8 +124,8 @@ CLASS ZCL_PRVD_FILE_HELPER IMPLEMENTATION.
     IF sy-subrc = 0.
       ev_filecontent = lv_string.
       ev_length = lv_bytes.
-    else.
-    "todo error in binary string conversion
+    ELSE.
+      "todo error in binary string conversion
     ENDIF.
 
     OPEN DATASET iv_file_location FOR INPUT IN TEXT MODE ENCODING DEFAULT.
@@ -130,8 +156,8 @@ CLASS ZCL_PRVD_FILE_HELPER IMPLEMENTATION.
       lv_ipfs_url      TYPE string.
 
     DATA: lv_ipfs_add_code TYPE i,
-      lv_ipfs_add_resp TYPE string,
-      lv_ipfs_add_data TYPE REF TO data.
+          lv_ipfs_add_resp TYPE string,
+          lv_ipfs_add_data TYPE REF TO data.
     FIELD-SYMBOLS: <fs_contentid>     TYPE any,
                    <fs_contentid_str> TYPE string.
 
@@ -169,14 +195,14 @@ CLASS ZCL_PRVD_FILE_HELPER IMPLEMENTATION.
         ev_httpresponsecode    = lv_ipfs_add_code ).
     IF lv_ipfs_add_code EQ 200.
       ASSIGN lv_ipfs_add_data->* TO FIELD-SYMBOL(<fs_ipfsresp>).
-      IF SY-SUBRC <> 0.
+      IF sy-subrc <> 0.
       ENDIF.
       ASSIGN COMPONENT 'NAME' OF STRUCTURE <fs_ipfsresp> TO <fs_contentid>.
-      IF SY-SUBRC <> 0.
+      IF sy-subrc <> 0.
       ENDIF.
       ASSIGN <fs_contentid>->* TO <fs_contentid_str>.
       ev_contentid = <fs_contentid_str>.
-      IF SY-SUBRC <> 0.
+      IF sy-subrc <> 0.
       ENDIF.
     ELSE.
       "Error calling IPFS Add enpoint HTTP response code &1

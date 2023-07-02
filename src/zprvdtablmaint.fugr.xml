@@ -376,7 +376,6 @@
        <CONT_NAME>TCTRL_ZPRVDABIREGISTRY</CONT_NAME>
        <TYPE>TEXT</TYPE>
        <NAME>*ZPRVDABIREGISTRY-NCHAIN_NETWORKID</NAME>
-       <TEXT>PRVD_Nchain_Network_ID__________________</TEXT>
        <LINE>001</LINE>
        <COLUMN>001</COLUMN>
        <LENGTH>040</LENGTH>
@@ -393,7 +392,6 @@
        <CONT_NAME>TCTRL_ZPRVDABIREGISTRY</CONT_NAME>
        <TYPE>TEXT</TYPE>
        <NAME>*ZPRVDABIREGISTRY-SMARTCONTRACT_ADDRESS</NAME>
-       <TEXT>Smart_contract_address__________________</TEXT>
        <LINE>001</LINE>
        <COLUMN>002</COLUMN>
        <LENGTH>040</LENGTH>
@@ -410,7 +408,6 @@
        <CONT_NAME>TCTRL_ZPRVDABIREGISTRY</CONT_NAME>
        <TYPE>TEXT</TYPE>
        <NAME>*ZPRVDABIREGISTRY-ABI_LOCATION</NAME>
-       <TEXT>ABI_File_location_______________________</TEXT>
        <LINE>001</LINE>
        <COLUMN>003</COLUMN>
        <LENGTH>040</LENGTH>
@@ -427,7 +424,6 @@
        <CONT_NAME>TCTRL_ZPRVDABIREGISTRY</CONT_NAME>
        <TYPE>TEXT</TYPE>
        <NAME>*ZPRVDABIREGISTRY-CREATED_BY</NAME>
-       <TEXT>User_Name_______________________________</TEXT>
        <LINE>001</LINE>
        <COLUMN>004</COLUMN>
        <LENGTH>040</LENGTH>
@@ -444,7 +440,6 @@
        <CONT_NAME>TCTRL_ZPRVDABIREGISTRY</CONT_NAME>
        <TYPE>TEXT</TYPE>
        <NAME>*ZPRVDABIREGISTRY-CHANGED_BY</NAME>
-       <TEXT>User_Name_______________________________</TEXT>
        <LINE>001</LINE>
        <COLUMN>005</COLUMN>
        <LENGTH>040</LENGTH>
@@ -490,7 +485,6 @@
        <CONT_NAME>TCTRL_ZPRVDABIREGISTRY</CONT_NAME>
        <TYPE>TEMPLATE</TYPE>
        <NAME>ZPRVDABIREGISTRY-NCHAIN_NETWORKID</NAME>
-       <TEXT>________________________________________</TEXT>
        <ROLLING>X</ROLLING>
        <LINE>001</LINE>
        <COLUMN>001</COLUMN>
@@ -707,7 +701,6 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>TEXT</TYPE>
        <NAME>ZPRVDABIREGISTRY-NCHAIN_NETWORKID</NAME>
-       <TEXT>Nchain_Network_ID___</TEXT>
        <LINE>001</LINE>
        <COLUMN>001</COLUMN>
        <LENGTH>020</LENGTH>
@@ -724,7 +717,6 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>TEMPLATE</TYPE>
        <NAME>ZPRVDABIREGISTRY-NCHAIN_NETWORKID</NAME>
-       <TEXT>________________________________________</TEXT>
        <LINE>001</LINE>
        <COLUMN>022</COLUMN>
        <LENGTH>040</LENGTH>
@@ -742,7 +734,6 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>TEXT</TYPE>
        <NAME>ZPRVDABIREGISTRY-SMARTCONTRACT_ADDRESS</NAME>
-       <TEXT>Smartcontract_addr</TEXT>
        <LINE>002</LINE>
        <COLUMN>001</COLUMN>
        <LENGTH>018</LENGTH>
@@ -759,7 +750,6 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>TEMPLATE</TYPE>
        <NAME>ZPRVDABIREGISTRY-SMARTCONTRACT_ADDRESS</NAME>
-       <TEXT>__________________________________________</TEXT>
        <LINE>002</LINE>
        <COLUMN>022</COLUMN>
        <LENGTH>042</LENGTH>
@@ -793,7 +783,6 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>TEXT</TYPE>
        <NAME>ZPRVDABIREGISTRY-VALID_FROM</NAME>
-       <TEXT>Time_Stamp_____</TEXT>
        <LINE>005</LINE>
        <COLUMN>002</COLUMN>
        <LENGTH>015</LENGTH>
@@ -810,7 +799,6 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>TEMPLATE</TYPE>
        <NAME>ZPRVDABIREGISTRY-VALID_FROM</NAME>
-       <TEXT>___.___.___.___.___,_______</TEXT>
        <LINE>005</LINE>
        <COLUMN>020</COLUMN>
        <LENGTH>027</LENGTH>
@@ -826,7 +814,6 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>TEXT</TYPE>
        <NAME>ZPRVDABIREGISTRY-VALID_TO</NAME>
-       <TEXT>Time_Stamp_____</TEXT>
        <LINE>006</LINE>
        <COLUMN>002</COLUMN>
        <LENGTH>015</LENGTH>
@@ -843,7 +830,6 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>TEMPLATE</TYPE>
        <NAME>ZPRVDABIREGISTRY-VALID_TO</NAME>
-       <TEXT>___.___.___.___.___,_______</TEXT>
        <LINE>006</LINE>
        <COLUMN>020</COLUMN>
        <LENGTH>027</LENGTH>
@@ -859,7 +845,6 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>TEXT</TYPE>
        <NAME>ZPRVDABIREGISTRY-ABI_LOCATION</NAME>
-       <TEXT>ABI_File_location</TEXT>
        <LINE>007</LINE>
        <COLUMN>002</COLUMN>
        <LENGTH>017</LENGTH>
@@ -895,7 +880,6 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>TEXT</TYPE>
        <NAME>ZPRVDABIREGISTRY-CREATED_BY</NAME>
-       <TEXT>User_Name______</TEXT>
        <LINE>008</LINE>
        <COLUMN>002</COLUMN>
        <LENGTH>015</LENGTH>
@@ -912,7 +896,6 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>TEMPLATE</TYPE>
        <NAME>ZPRVDABIREGISTRY-CREATED_BY</NAME>
-       <TEXT>____________</TEXT>
        <ROLLING>X</ROLLING>
        <LINE>008</LINE>
        <COLUMN>020</COLUMN>
@@ -929,7 +912,6 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>TEXT</TYPE>
        <NAME>ZPRVDABIREGISTRY-CREATED_ON</NAME>
-       <TEXT>Time_Stamp_____</TEXT>
        <LINE>009</LINE>
        <COLUMN>002</COLUMN>
        <LENGTH>015</LENGTH>
@@ -946,7 +928,6 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>TEMPLATE</TYPE>
        <NAME>ZPRVDABIREGISTRY-CREATED_ON</NAME>
-       <TEXT>___.___.___.___.___,_______</TEXT>
        <ROLLING>X</ROLLING>
        <LINE>009</LINE>
        <COLUMN>020</COLUMN>
@@ -963,7 +944,6 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>TEXT</TYPE>
        <NAME>ZPRVDABIREGISTRY-CHANGED_BY</NAME>
-       <TEXT>User_Name______</TEXT>
        <LINE>010</LINE>
        <COLUMN>002</COLUMN>
        <LENGTH>015</LENGTH>
@@ -980,7 +960,6 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>TEMPLATE</TYPE>
        <NAME>ZPRVDABIREGISTRY-CHANGED_BY</NAME>
-       <TEXT>____________</TEXT>
        <ROLLING>X</ROLLING>
        <LINE>010</LINE>
        <COLUMN>020</COLUMN>
@@ -997,7 +976,6 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>TEXT</TYPE>
        <NAME>ZPRVDABIREGISTRY-CHANGED_ON</NAME>
-       <TEXT>Time_Stamp_____</TEXT>
        <LINE>011</LINE>
        <COLUMN>002</COLUMN>
        <LENGTH>015</LENGTH>
@@ -1014,7 +992,6 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>TEMPLATE</TYPE>
        <NAME>ZPRVDABIREGISTRY-CHANGED_ON</NAME>
-       <TEXT>___.___.___.___.___,_______</TEXT>
        <ROLLING>X</ROLLING>
        <LINE>011</LINE>
        <COLUMN>020</COLUMN>
@@ -1048,7 +1025,6 @@
        <CONT_NAME>SCREEN</CONT_NAME>
        <TYPE>TEMPLATE</TYPE>
        <NAME>ZPRVDABIREGISTRY-PRODUCTION_MAINNET</NAME>
-       <TEXT>_</TEXT>
        <ROLLING>X</ROLLING>
        <LINE>012</LINE>
        <COLUMN>020</COLUMN>

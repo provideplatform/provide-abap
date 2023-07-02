@@ -16,7 +16,7 @@ CLASS zcl_prvd_baseline DEFINITION
         !iv_bpitoken      TYPE zprvdrefreshtoken .
   PROTECTED SECTION.
     DATA mi_client TYPE REF TO if_http_client.
-    DATA lv_bpitenant_url TYPE string.
+    DATA mv_bpitenant_url TYPE string.
     DATA authtoken TYPE zprvdrefreshtoken.
     DATA bpitoken TYPE zprvdrefreshtoken.
     METHODS send_receive RETURNING VALUE(rv_code) TYPE i.
@@ -36,7 +36,7 @@ CLASS ZCL_PRVD_BASELINE IMPLEMENTATION.
 
   METHOD constructor.
     mi_client = ii_client.
-    lv_bpitenant_url = iv_bpitenant_url.
+    mv_bpitenant_url = iv_bpitenant_url.
   ENDMETHOD.
 
 

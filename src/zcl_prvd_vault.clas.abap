@@ -62,7 +62,7 @@ CLASS zcl_prvd_vault IMPLEMENTATION.
                                          value = lv_uri ).
     get_bpi_token( ).
     mi_client->request->set_header_field( name = 'Content-Type'
-                                         value = content_type ).
+                                         value = iv_content_type ).
     lv_code = send_receive( ).
     ev_httpresponsecode = lv_code.
     ev_apiresponsestr = mi_client->response->get_cdata( ).
@@ -74,6 +74,7 @@ CLASS zcl_prvd_vault IMPLEMENTATION.
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
+      WHEN OTHERS.
     ENDCASE.
   ENDMETHOD.
 
@@ -82,7 +83,7 @@ CLASS zcl_prvd_vault IMPLEMENTATION.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE 'https://vault.provide.services/api/v1/vaults/{vault_id}/keys'.
-    lv_temp = vault_id.
+    lv_temp = iv_vault_id.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{vault_id}' IN lv_uri WITH lv_temp.
     mi_client->request->set_method( 'POST' ).
@@ -90,7 +91,7 @@ CLASS zcl_prvd_vault IMPLEMENTATION.
                                           value = lv_uri ).
     get_bpi_token( ).
     mi_client->request->set_header_field( name = 'Content-Type'
-                                         value = content_type ).
+                                         value = iv_content_type ).
     mi_client->request->set_cdata( body ).
     lv_code = send_receive( ).
     ev_httpresponsecode = lv_code.
@@ -103,6 +104,7 @@ CLASS zcl_prvd_vault IMPLEMENTATION.
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
+      WHEN OTHERS.
     ENDCASE.
   ENDMETHOD.
 
@@ -115,11 +117,11 @@ CLASS zcl_prvd_vault IMPLEMENTATION.
     mi_client->request->set_header_field( name = '~request_uri'
                                          value = lv_uri ).
     mi_client->request->set_header_field( name = 'Content-Type'
-                                         value = content_type ).
+                                         value = iv_content_type ).
     mi_client->request->set_header_field( name = 'content-type'
-                                         value = content_type ).
+                                         value = iv_content_type ).
     get_bpi_token( ).
-    mi_client->request->set_cdata( body ).
+    mi_client->request->set_cdata( is_body ).
     lv_code = send_receive( ).
     ev_httpresponsecode = lv_code.
     ev_apiresponsestr = mi_client->response->get_cdata( ).
@@ -131,6 +133,7 @@ CLASS zcl_prvd_vault IMPLEMENTATION.
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
+      WHEN OTHERS.
     ENDCASE.
   ENDMETHOD.
 
@@ -139,10 +142,10 @@ CLASS zcl_prvd_vault IMPLEMENTATION.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE 'https://vault.provide.services/api/v1/vaults/{vault_id}/keys/{key_id}'.
-    lv_temp = vault_id.
+    lv_temp = iv_vault_id.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{vault_id}' IN lv_uri WITH lv_temp.
-    lv_temp = key_id.
+    lv_temp = iv_key_id.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{key_id}' IN lv_uri WITH lv_temp.
     mi_client->request->set_method( 'DELETE' ).
@@ -150,7 +153,7 @@ CLASS zcl_prvd_vault IMPLEMENTATION.
                                          value = lv_uri ).
     get_bpi_token( ).
     mi_client->request->set_header_field( name = 'Content-Type'
-                                         value = content_type ).
+                                         value = iv_content_type ).
     lv_code = send_receive( ).
     ev_httpresponsecode = lv_code.
     ev_apiresponsestr = mi_client->response->get_cdata( ).
@@ -162,6 +165,7 @@ CLASS zcl_prvd_vault IMPLEMENTATION.
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
+      WHEN OTHERS.
     ENDCASE.
   ENDMETHOD.
 
@@ -170,10 +174,10 @@ CLASS zcl_prvd_vault IMPLEMENTATION.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE 'https://vault.provide.services/api/v1/vaults/{vault_id}/secrets/{secret_id}'.
-    lv_temp = vault_id.
+    lv_temp = iv_vault_id.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{vault_id}' IN lv_uri WITH lv_temp.
-    lv_temp = secret_id.
+    lv_temp = iv_secret_id.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{secret_id}' IN lv_uri WITH lv_temp.
     mi_client->request->set_method( 'DELETE' ).
@@ -181,8 +185,8 @@ CLASS zcl_prvd_vault IMPLEMENTATION.
                                          value = lv_uri ).
     get_bpi_token( ).
     mi_client->request->set_header_field( name = 'Content-Type'
-                                         value = content_type ).
-    mi_client->request->set_cdata( body ).
+                                         value = iv_content_type ).
+    mi_client->request->set_cdata( is_body ).
     lv_code = send_receive( ).
     ev_httpresponsecode = lv_code.
     ev_apiresponsestr = mi_client->response->get_cdata( ).
@@ -194,6 +198,7 @@ CLASS zcl_prvd_vault IMPLEMENTATION.
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
+      WHEN OTHERS.
     ENDCASE.
   ENDMETHOD.
 
@@ -202,7 +207,7 @@ CLASS zcl_prvd_vault IMPLEMENTATION.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE 'https://vault.provide.services/api/v1/vaults/{vault_id}/derive'.
-    lv_temp = vault_id.
+    lv_temp = iv_vault_id.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{vault_id}' IN lv_uri WITH lv_temp.
     mi_client->request->set_method( 'POST' ).
@@ -210,8 +215,8 @@ CLASS zcl_prvd_vault IMPLEMENTATION.
                                          value = lv_uri ).
     get_bpi_token( ).
     mi_client->request->set_header_field( name = 'Content-Type'
-                                         value = content_type ).
-    mi_client->request->set_cdata( body ).
+                                         value = iv_content_type ).
+    mi_client->request->set_cdata( is_body ).
     lv_code = send_receive( ).
     ev_httpresponsecode = lv_code.
     ev_apiresponsestr = mi_client->response->get_cdata( ).
@@ -223,6 +228,7 @@ CLASS zcl_prvd_vault IMPLEMENTATION.
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
+      WHEN OTHERS.
     ENDCASE.
   ENDMETHOD.
 
@@ -230,17 +236,14 @@ CLASS zcl_prvd_vault IMPLEMENTATION.
   METHOD zif_prvd_vault~list_keys.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
-    DATA lv_uri TYPE string VALUE 'https://vault.provide.services/api/v1/vaults/{vault_id}/keys'.
-    lv_temp = vault_id.
+    DATA lv_uri TYPE string VALUE '/api/v1/vaults/{vault_id}/keys'.
+    lv_temp = iv_vault_id.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{vault_id}' IN lv_uri WITH lv_temp.
     mi_client->request->set_method( 'GET' ).
     mi_client->request->set_header_field( name = '~request_uri'
                                          value = lv_uri ).
     get_bpi_token( ).
-    mi_client->request->set_header_field( name = 'Content-Type'
-                                         value = content_type ).
-    mi_client->request->set_cdata( body ).
     lv_code = send_receive( ).
     ev_httpresponsecode = lv_code.
     ev_apiresponsestr = mi_client->response->get_cdata( ).
@@ -252,6 +255,7 @@ CLASS zcl_prvd_vault IMPLEMENTATION.
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
+      WHEN OTHERS.
     ENDCASE.
   ENDMETHOD.
 
@@ -260,7 +264,7 @@ CLASS zcl_prvd_vault IMPLEMENTATION.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE 'https://vault.provide.services/api/v1/vaults/{vault_id}/secrets'.
-    lv_temp = vault_id.
+    lv_temp = iv_vault_id.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{vault_id}' IN lv_uri WITH lv_temp.
     mi_client->request->set_method( 'GET' ).
@@ -268,7 +272,7 @@ CLASS zcl_prvd_vault IMPLEMENTATION.
                                          value = lv_uri ).
     get_bpi_token( ).
     mi_client->request->set_header_field( name = 'Content-Type'
-                                         value = content_type ).
+                                         value = iv_content_type ).
     lv_code = send_receive( ).
     ev_httpresponsecode = lv_code.
     ev_apiresponsestr = mi_client->response->get_cdata( ).
@@ -280,6 +284,7 @@ CLASS zcl_prvd_vault IMPLEMENTATION.
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
+      WHEN OTHERS.
     ENDCASE.
   ENDMETHOD.
 
@@ -288,24 +293,26 @@ CLASS zcl_prvd_vault IMPLEMENTATION.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE 'https://vault.provide.services/api/v1/vaults'.
-    DATA lv_responsestr.
+    DATA lv_responsestr TYPE string.
     mi_client->request->set_method( 'GET' ).
     mi_client->request->set_header_field( name = '~request_uri'
                                          value = lv_uri ).
     get_bpi_token( ).
     "mi_client->request->set_cdata( body ).
     lv_code = send_receive( ).
+    ev_httpresponsecode = lv_code.
     lv_responsestr = mi_client->response->get_cdata( ).
     ev_apiresponsestr = lv_responsestr.
-*    /ui2/cl_json=>deserialize(
-*      EXPORTING
-*        json             = lv_responsestr
-*      CHANGING
-*        data             = ev_apiresponse
-*    ).
+    /ui2/cl_json=>deserialize(
+      EXPORTING
+        json             = lv_responsestr
+      CHANGING
+        data             = ev_apiresponse
+    ).
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
+      WHEN OTHERS.
     ENDCASE.
   ENDMETHOD.
 
@@ -314,10 +321,10 @@ CLASS zcl_prvd_vault IMPLEMENTATION.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE 'https://vault.provide.services/api/v1/vaults/{vault_id}/secrets/{secret_id}'.
-    lv_temp = vault_id.
+    lv_temp = iv_vault_id.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{vault_id}' IN lv_uri WITH lv_temp.
-    lv_temp = secret_id.
+    lv_temp = iv_secret_id.
     lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
     REPLACE ALL OCCURRENCES OF '{secret_id}' IN lv_uri WITH lv_temp.
     mi_client->request->set_method( 'POST' ).
@@ -325,8 +332,8 @@ CLASS zcl_prvd_vault IMPLEMENTATION.
                                          value = lv_uri ).
     get_bpi_token( ).
     mi_client->request->set_header_field( name = 'Content-Type'
-                                         value = content_type ).
-    mi_client->request->set_cdata( body ).
+                                         value = iv_content_type ).
+    mi_client->request->set_cdata( is_body ).
     lv_code = send_receive( ).
     ev_httpresponsecode = lv_code.
     ev_apiresponsestr = mi_client->response->get_cdata( ).
@@ -338,6 +345,7 @@ CLASS zcl_prvd_vault IMPLEMENTATION.
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
+      WHEN OTHERS.
     ENDCASE.
   ENDMETHOD.
 
@@ -351,8 +359,8 @@ CLASS zcl_prvd_vault IMPLEMENTATION.
                                          value = lv_uri ).
     get_bpi_token( ).
     mi_client->request->set_header_field( name = 'Content-Type'
-                                         value = content_type ).
-    mi_client->request->set_cdata( body ).
+                                         value = iv_content_type ).
+    mi_client->request->set_cdata( is_body ).
     lv_code = send_receive( ).
     ev_httpresponsecode = lv_code.
     ev_apiresponsestr = mi_client->response->get_cdata( ).
@@ -364,6 +372,46 @@ CLASS zcl_prvd_vault IMPLEMENTATION.
     "WRITE / lv_code. ~replace with logging call
     CASE lv_code.
       WHEN 200.
+      WHEN OTHERS.
+    ENDCASE.
+  ENDMETHOD.
+
+  METHOD zif_prvd_vault~sign.
+    DATA lv_code TYPE i.
+    DATA lv_temp TYPE string.
+    DATA lv_uri TYPE string VALUE '/api/v1/vaults/{vault_id}/keys/{key_id}/sign'.
+    DATA lv_request_data TYPE REF TO data.
+    DATA lv_request_str TYPE string.
+    lv_temp = iv_vaultid.
+    lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
+    REPLACE ALL OCCURRENCES OF '{vault_id}' IN lv_uri WITH lv_temp.
+    lv_temp = iv_keyid.
+    REPLACE ALL OCCURRENCES OF '{key_id}' IN lv_uri WITH lv_temp.
+
+    mi_client->request->set_method( 'POST' ).
+    mi_client->request->set_header_field( name = '~request_uri'
+                                         value = lv_uri ).
+    get_bpi_token( ).
+    mi_client->request->set_header_field( name = 'Content-Type'
+                                         value = iv_content_type ).
+
+    lv_request_str = /ui2/cl_json=>serialize( data =  is_message
+                                              pretty_name = /ui2/cl_json=>pretty_mode-low_case ).
+
+
+    mi_client->request->set_cdata( lv_request_str ).
+    lv_code = send_receive( ).
+    ev_httpresponsecode = lv_code.
+    ev_apiresponsestr = mi_client->response->get_cdata( ).
+    /ui2/cl_json=>deserialize(
+      EXPORTING
+        json             = ev_apiresponsestr
+      CHANGING
+        data             = ev_apiresponse ).
+    "WRITE / lv_code. ~replace with logging call
+    CASE lv_code.
+      WHEN 200.
+      WHEN OTHERS.
     ENDCASE.
   ENDMETHOD.
 ENDCLASS.

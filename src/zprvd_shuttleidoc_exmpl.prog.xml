@@ -18,66 +18,6 @@
      <ENTRY>Example batch program to baseline idoc via Provide Shuttle</ENTRY>
      <LENGTH>58</LENGTH>
     </item>
-    <item>
-     <ID>S</ID>
-     <KEY>CB_TEST</KEY>
-     <ENTRY>Test mode</ENTRY>
-     <LENGTH>17</LENGTH>
-    </item>
-    <item>
-     <ID>S</ID>
-     <KEY>P_DIR</KEY>
-     <ENTRY>iDoc Direction</ENTRY>
-     <LENGTH>22</LENGTH>
-    </item>
-    <item>
-     <ID>S</ID>
-     <KEY>P_IDOCTP</KEY>
-     <ENTRY>iDoc Type</ENTRY>
-     <LENGTH>17</LENGTH>
-    </item>
-    <item>
-     <ID>S</ID>
-     <KEY>P_MESTYP</KEY>
-     <ENTRY>iDoc Message Type</ENTRY>
-     <LENGTH>25</LENGTH>
-    </item>
-    <item>
-     <ID>S</ID>
-     <KEY>P_SBJACT</KEY>
-     <ENTRY>PRVD Subject Account ID</ENTRY>
-     <LENGTH>31</LENGTH>
-    </item>
-    <item>
-     <ID>S</ID>
-     <KEY>P_STAT</KEY>
-     <ENTRY>iDoc status</ENTRY>
-     <LENGTH>19</LENGTH>
-    </item>
-    <item>
-     <ID>S</ID>
-     <KEY>P_TENANT</KEY>
-     <ENTRY>PRVD Tenant ID</ENTRY>
-     <LENGTH>22</LENGTH>
-    </item>
-    <item>
-     <ID>S</ID>
-     <KEY>P_WRKGRP</KEY>
-     <ENTRY>PRVD Workgroup ID</ENTRY>
-     <LENGTH>25</LENGTH>
-    </item>
-    <item>
-     <ID>S</ID>
-     <KEY>S_EBELN</KEY>
-     <ENTRY>Purchase Order</ENTRY>
-     <LENGTH>22</LENGTH>
-    </item>
-    <item>
-     <ID>S</ID>
-     <KEY>S_IDOC</KEY>
-     <ENTRY>iDoc number</ENTRY>
-     <LENGTH>19</LENGTH>
-    </item>
    </TPOOL>
   </asx:values>
  </asx:abap>

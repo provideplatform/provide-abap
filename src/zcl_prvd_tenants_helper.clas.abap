@@ -39,6 +39,12 @@ CLASS zcl_prvd_tenants_helper DEFINITION
     METHODS get_authtoken
       EXPORTING
         !ev_prvdtenantid TYPE zprvdtenantid .
+    "! Creates the refresh token for the SAP user, given PRVD ident credentials
+    methods update_refresh_token
+      importing
+        !iv_email type string
+        !iv_password type zcasesensitive_str
+        !iv_prvd_org type zprvdtenantid .
   PROTECTED SECTION.
   PRIVATE SECTION.
 ENDCLASS.
@@ -50,7 +56,7 @@ CLASS zcl_prvd_tenants_helper IMPLEMENTATION.
 
   METHOD create_prvdtenant.
     CONSTANTS: lc_default_identurl TYPE string VALUE 'https://ident.provide.services',
-               lc_default_bpiurl TYPE string VALUE 'https://baseline.provide.services'.
+               lc_default_bpiurl TYPE string VALUE 'https://axiom.provide.services'.
     DATA: ls_prvdtenant         TYPE zprvdtenants,
           lt_prvdtenant         TYPE TABLE OF zprvdtenants,
           lt_existingprvdtenant TYPE TABLE OF zprvdtenants,
@@ -298,5 +304,108 @@ CLASS zcl_prvd_tenants_helper IMPLEMENTATION.
     ENDIF.
 
 
+  ENDMETHOD.
+  method update_refresh_token.
+      DATA:
+      lo_http_client      TYPE REF TO if_http_client,
+      lo_ident_api        TYPE REF TO zif_prvd_ident,
+      lo_bpi_api          type ref to zif_prvd_baseline,
+      ls_prvdtenant       TYPE zprvdtenants,
+      lv_refreshtokenstr  TYPE zprvdrefreshtoken,
+      lv_identurl         TYPE string,
+      lv_bpiurl           type string,
+      lv_apiresponse      TYPE REF TO data,
+      lv_tenant           TYPE zprvdtenantid,
+      lv_subjacct         TYPE zprvdtenants-subject_account_id,
+      lv_authtokenreqbody TYPE zif_prvd_ident=>refresh_accesstoken_request,
+      lv_apiresponsestr   TYPE string,
+      ls_basic_authbody   type zif_prvd_ident=>authenticationrequest,
+      ls_token_authbody   type zif_prvd_ident=>authorize_access_refreshtoken.
+
+  "set some defaults, if not already set
+  lv_identurl = 'https://ident.provide.services'.
+  lv_bpiurl = 'https://axiom.provide.services'.
+
+  "set up an Ident API Proxy
+        cl_http_client=>create_by_url(
+      EXPORTING
+        url                = lv_identurl
+      IMPORTING
+        client             = lo_http_client
+      EXCEPTIONS
+        argument_not_found = 1
+        plugin_not_active  = 2
+        internal_error     = 3
+        OTHERS             = 4 ).
+    IF sy-subrc <> 0.
+      " error handling
+      RETURN.
+    ENDIF.
+
+
+
+    lo_http_client->propertytype_accept_cookie       = if_http_client=>co_enabled.
+    lo_http_client->request->set_header_field( name  = if_http_form_fields_sap=>sap_client
+                                               value = '100' ).
+
+    lo_ident_api = NEW zcl_prvd_ident( ii_client       = lo_http_client
+                                         iv_tenant       = lv_tenant
+                                         iv_refreshtoken = '' ).
+
+  " Use basic auth to authenticate to DID for access token
+
+    lo_ident_api->authentication(
+      EXPORTING
+        body        = ls_basic_authbody
+*      IMPORTING
+*        apiresponse =
+    ).
+*    CATCH cx_static_check.
+
+  " Use access token to acquire long-dated refresh token ~ https://ident.provide.services/api/v1/tokens
+    lo_ident_api->authorizelong_termtoken(
+      EXPORTING
+        body        = ls_token_authbody
+*      IMPORTING
+*        status      =
+*        apiresponse =
+    ).
+*    CATCH cx_static_check.
+  " Set up an Axiom/Baseline API Proxy
+    cl_http_client=>create_by_url(
+      EXPORTING
+        url                = lv_bpiurl
+      IMPORTING
+        client             = lo_http_client
+      EXCEPTIONS
+        argument_not_found = 1
+        plugin_not_active  = 2
+        internal_error     = 3
+        OTHERS             = 4 ).
+    IF sy-subrc <> 0.
+      " error handling
+      RETURN.
+    ENDIF.
+
+
+
+    lo_http_client->propertytype_accept_cookie       = if_http_client=>co_enabled.
+    lo_http_client->request->set_header_field( name  = if_http_form_fields_sap=>sap_client
+                                               value = '100' ).
+
+    lo_bpi_api = NEW zcl_prvd_baseline( ii_client        = lo_http_client
+                                        iv_bpitoken      = ''
+                                        iv_bpitenant_url = lv_bpiurl ).
+  " Get all the Axiom workgroups, subject accounts for this user
+    lo_bpi_api->listworkgroups(
+*      EXPORTING
+*        page        =
+*        rpp         =
+*      RECEIVING
+*        return_data =
+ ).
+*    CATCH cx_static_check.
+  " Get subject account for each workgroup
+  " Save the marshalled result: user, refresh token, workgroup, subject account
   ENDMETHOD.
 ENDCLASS.

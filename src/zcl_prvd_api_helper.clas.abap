@@ -71,6 +71,8 @@ CLASS zcl_prvd_api_helper DEFINITION
     METHODS send_protocol_msg
       IMPORTING
         !is_body           TYPE zif_prvd_baseline=>protocolmessage_req
+        !iv_subj_acct      TYPE zprvdtenantid OPTIONAL
+        !iv_workgroup_id   TYPE zprvdtenantid OPTIONAL
       EXPORTING
         !ev_statuscode     TYPE i
         !ev_apiresponsestr TYPE string
@@ -88,8 +90,16 @@ CLASS zcl_prvd_api_helper DEFINITION
         VALUE(es_dummy_idoc_msg) TYPE zif_prvd_baseline=>protocolmessage_req .
     "! Lists the BPI accounts available to the user
     METHODS list_bpi_accounts .
+    "! Gets the current subject account
+    METHODS get_subject_account RETURNING VALUE(rv_subject_account) TYPE zprvdtenantid.
+    "! Gets the current workgroup
+    METHODS get_workgroup RETURNING VALUE(rv_workgroup) TYPE zprvdtenantid.
     "! Method to return PRVD Nchain helper class
     METHODS get_nchain_helper EXPORTING eo_prvd_nchain_helper TYPE REF TO zcl_prvd_nchain_helper.
+    "! Method to return PRVD Vault helper class
+    METHODS get_vault_helper EXPORTING eo_prvd_vault_helper TYPE REF TO zcl_prvd_vault_helper.
+    "! Method to return the access token
+    METHODS get_access_token RETURNING VALUE(rv_access_token) TYPE zprvdrefreshtoken.
   PROTECTED SECTION.
     DATA: mv_defaulttenant        TYPE zprvdtenants-organization_id,
           mv_defaultsubjectacct   TYPE zprvdtenantid,
@@ -106,7 +116,7 @@ ENDCLASS.
 
 
 
-CLASS ZCL_PRVD_API_HELPER IMPLEMENTATION.
+CLASS zcl_prvd_api_helper IMPLEMENTATION.
 
 
   METHOD baseline_health_check.
@@ -144,13 +154,13 @@ CLASS ZCL_PRVD_API_HELPER IMPLEMENTATION.
     IF lv_tenant_jwt IS NOT INITIAL.
       TRY.
           ASSIGN lv_tenant_jwt->* TO FIELD-SYMBOL(<ls_data>).
-          IF SY-SUBRC <> 0.
+          IF sy-subrc <> 0.
           ENDIF.
           ASSIGN COMPONENT 'ACCESS_TOKEN' OF STRUCTURE <ls_data> TO <fs_authreq>.
-          IF SY-SUBRC <> 0.
+          IF sy-subrc <> 0.
           ENDIF.
           ASSIGN <fs_authreq>->* TO <fs_authreq2>.
-          IF SY-SUBRC <> 0.
+          IF sy-subrc <> 0.
           ENDIF.
           lv_authreq = <fs_authreq2>.
 
@@ -252,8 +262,8 @@ CLASS ZCL_PRVD_API_HELPER IMPLEMENTATION.
         int_edidd       = lt_edidd
       EXCEPTIONS
         OTHERS          = 1.
-    IF SY-SUBRC <> 0.
-    "Message error reading idoc
+    IF sy-subrc <> 0.
+      "Message error reading idoc
     ENDIF.
 
     ls_dummy_idoc_protocol_msg-payload_mimetype = 'json'.
@@ -278,15 +288,16 @@ CLASS ZCL_PRVD_API_HELPER IMPLEMENTATION.
 
   METHOD call_ident_api.
     DATA:
-      lo_http_client     TYPE REF TO if_http_client,
-      lo_ident_api       TYPE REF TO zif_prvd_ident,
-      ls_prvdtenant      TYPE zprvdtenants,
-      lv_refreshtokenstr TYPE zprvdrefreshtoken,
-      lv_identurl        TYPE string,
-      lv_apiresponse     TYPE REF TO data,
-      lv_tenant          TYPE zprvdtenantid,
-      lv_subjacct        TYPE zprvdtenants-subject_account_id,
-      lv_authtokenreqbody TYPE zif_prvd_ident=>refresh_accesstoken_request.
+      lo_http_client      TYPE REF TO if_http_client,
+      lo_ident_api        TYPE REF TO zif_prvd_ident,
+      ls_prvdtenant       TYPE zprvdtenants,
+      lv_refreshtokenstr  TYPE zprvdrefreshtoken,
+      lv_identurl         TYPE string,
+      lv_apiresponse      TYPE REF TO data,
+      lv_tenant           TYPE zprvdtenantid,
+      lv_subjacct         TYPE zprvdtenants-subject_account_id,
+      lv_authtokenreqbody TYPE zif_prvd_ident=>refresh_accesstoken_request,
+      lv_apiresponsestr   TYPE string.
 
     IF iv_tenant IS NOT INITIAL.
       lv_tenant = iv_tenant.
@@ -346,11 +357,17 @@ CLASS ZCL_PRVD_API_HELPER IMPLEMENTATION.
     lv_authtokenreqbody-grant_type = 'refresh_token'.
     lo_ident_api->refresh_access_token(
       EXPORTING
-        body        = lv_authtokenreqbody
+        is_req_body        = lv_authtokenreqbody
       IMPORTING
-        status      = status
-        apiresponse = lv_apiresponse   ).
-    ev_authtoken = lv_apiresponse.
+        ev_httpresponsecode      = status
+        ev_apiresponsestr = lv_apiresponsestr
+        ev_apiresponse = lv_apiresponse   ).
+    CASE status.
+      WHEN 201.
+        ev_authtoken = lv_apiresponse.
+      WHEN OTHERS.
+        "ident call failed - log error
+    ENDCASE.
   ENDMETHOD.
 
 
@@ -379,6 +396,7 @@ CLASS ZCL_PRVD_API_HELPER IMPLEMENTATION.
           mv_defaultsubjectacct = wa_defaulttenant-subject_account_id.
           mv_selected_workgroupid = wa_defaulttenant-workgroup_id.
           mv_default_bpiendpoint = wa_defaulttenant-bpi_endpoint.
+          setup_protocol_msg( ).
           RETURN.
         ELSE.
           "Message no default org determined
@@ -454,8 +472,17 @@ CLASS ZCL_PRVD_API_HELPER IMPLEMENTATION.
     DATA ls_finalized_protocol_msg TYPE zif_prvd_baseline=>protocolmessage_req.
 
     ls_finalized_protocol_msg                    = is_body.
-    ls_finalized_protocol_msg-subject_account_id = mv_defaultsubjectacct.
-    ls_finalized_protocol_msg-workgroup_id       = mv_selected_workgroupid.
+    IF iv_subj_acct IS NOT INITIAL.
+      ls_finalized_protocol_msg-subject_account_id = iv_subj_acct.
+    ELSE.
+      ls_finalized_protocol_msg-subject_account_id = mv_defaultsubjectacct.
+    ENDIF.
+    IF iv_workgroup_id IS NOT INITIAL.
+      ls_finalized_protocol_msg-workgroup_id = iv_workgroup_id.
+    ELSE.
+      ls_finalized_protocol_msg-workgroup_id       = mv_selected_workgroupid.
+    ENDIF.
+    "TODO add auth check right here
     TRY.
         mo_baseline_client->send_protocol_msg( EXPORTING iv_body        = ls_finalized_protocol_msg
                                                          iv_bpitoken    = mv_bpitoken
@@ -492,13 +519,13 @@ CLASS ZCL_PRVD_API_HELPER IMPLEMENTATION.
     IF lv_tenant_jwt IS NOT INITIAL.
       TRY.
           ASSIGN lv_tenant_jwt->* TO FIELD-SYMBOL(<ls_data>).
-          IF SY-SUBRC <> 0.
+          IF sy-subrc <> 0.
           ENDIF.
           ASSIGN COMPONENT 'ACCESS_TOKEN' OF STRUCTURE <ls_data> TO <fs_authreq>.
-          IF SY-SUBRC <> 0.
+          IF sy-subrc <> 0.
           ENDIF.
           ASSIGN <fs_authreq>->* TO <fs_authreq2>.
-          IF SY-SUBRC <> 0.
+          IF sy-subrc <> 0.
           ENDIF.
           mv_bpitoken  = <fs_authreq2>.
 
@@ -572,6 +599,12 @@ CLASS ZCL_PRVD_API_HELPER IMPLEMENTATION.
     eo_prvd_nchain_helper = lo_prvd_nchain_helper.
   ENDMETHOD.
 
+  METHOD get_vault_helper.
+    DATA lo_prvd_vault_helper TYPE REF TO zcl_prvd_vault_helper.
+    lo_prvd_vault_helper = NEW zcl_prvd_vault_helper(  io_prvd_api_helper = me ).
+    eo_prvd_vault_helper = lo_prvd_vault_helper.
+  ENDMETHOD.
+
 
   METHOD get_subject_account_id.
     DATA: lv_unhashed_subject_account_id TYPE string,
@@ -585,5 +618,16 @@ CLASS ZCL_PRVD_API_HELPER IMPLEMENTATION.
     lv_hashed_subject_account_id = lo_digest->to_string( ).
 
     ev_subject_account_id = lv_hashed_subject_account_id.
+  ENDMETHOD.
+
+  METHOD get_subject_account.
+    rv_subject_account = mv_defaultsubjectacct.
+  ENDMETHOD.
+  METHOD get_workgroup.
+    rv_workgroup = mv_selected_workgroupid.
+  ENDMETHOD.
+
+  METHOD get_access_token.
+    rv_access_token = mv_bpitoken.
   ENDMETHOD.
 ENDCLASS.

@@ -29,8 +29,27 @@ CLASS zcl_prvd_nchain_helper DEFINITION
                             EXPORTING !es_selectedcontract     TYPE zif_prvd_nchain=>ty_chainlinkpricefeed_req,
       "! Gets the current EVM wallet address being used (e.g 0x409148kldsjflakj...)
       get_wallet_address RETURNING VALUE(ev_wallet_address) TYPE zprvd_smartcontract_addr,
+      "! Creates a generic account Nchain txn
+      create_account_txn IMPORTING iv_network_id TYPE zprvd_nchain_networkid
+                                   iv_to_addr    TYPE zprvd_smartcontract_addr
+                                   iv_vaultid    TYPE zprvdvaultid
+                                   iv_vaultkey   TYPE zprvdvaultid
+                                   iv_value      TYPE i,
       "! Gets the PRVD Nchain API proxy
-      get_nchain_client RETURNING VALUE(ro_nchain_client) TYPE REF TO zcl_prvd_nchain.
+      get_nchain_client RETURNING VALUE(ro_nchain_client) TYPE REF TO zcl_prvd_nchain,
+      approve_smart_contract IMPORTING iv_approval_data              TYPE string
+                                       is_signature                  TYPE zif_prvd_vault=>ty_signature
+                                       iv_signing_address            TYPE zprvd_smartcontract_addr
+                                       iv_destination_smart_contract TYPE zprvd_smartcontract_addr,
+      "! Retrieves lists of accounts available for signing
+      get_accounts EXPORTING et_accounts TYPE zif_prvd_nchain=>ty_account_list,
+      "! Executes a contract via PRVD Nchain
+      execute_contract IMPORTING iv_contract_id       TYPE zcasesensitive_str
+                                 iv_exec_contract_req TYPE zif_prvd_nchain=>ty_executecontractreq_account,
+      "! Sets up contract instance on Nchain
+      create_contract IMPORTING iv_smartcontractaddr  TYPE zprvd_smartcontract_addr
+                                is_contract           TYPE zif_prvd_nchain=>ty_create_contract_req
+                      RETURNING VALUE(rv_contract_id) TYPE zcasesensitive_str.
   PROTECTED SECTION.
     DATA: mv_tenant             TYPE zprvdtenantid,
           mv_org_id             TYPE zprvdtenantid,
@@ -42,13 +61,13 @@ CLASS zcl_prvd_nchain_helper DEFINITION
           mo_prvd_api_helper    TYPE REF TO zcl_prvd_api_helper,
           mo_prvd_vault_helper  TYPE REF TO zcl_prvd_vault_helper,
           mv_prvd_token         TYPE zprvdrefreshtoken.
-    METHODS: get_vault_helper.
+    METHODS: get_vault_helper RETURNING VALUE(ro_prvd_vault_helper) TYPE REF TO zcl_prvd_vault_helper.
   PRIVATE SECTION.
 ENDCLASS.
 
 
 
-CLASS ZCL_PRVD_NCHAIN_HELPER IMPLEMENTATION.
+CLASS zcl_prvd_nchain_helper IMPLEMENTATION.
 
 
   METHOD constructor.
@@ -69,7 +88,7 @@ CLASS ZCL_PRVD_NCHAIN_HELPER IMPLEMENTATION.
     IF !io_prvd_vault_helper  IS BOUND.
       mo_prvd_vault_helper = io_prvd_vault_helper.
     ELSE.
-      mo_prvd_vault_helper = NEW zcl_prvd_vault_helper( io_api_helper = mo_prvd_api_helper ).
+      mo_prvd_vault_helper = NEW zcl_prvd_vault_helper( io_prvd_api_helper = mo_prvd_api_helper ).
     ENDIF.
 
     mo_prvd_api_helper->call_ident_api(
@@ -80,13 +99,13 @@ CLASS ZCL_PRVD_NCHAIN_HELPER IMPLEMENTATION.
     FIELD-SYMBOLS: <fs_authreq>  TYPE any,
                    <fs_authreq2> TYPE string.
     ASSIGN lv_jwt->* TO FIELD-SYMBOL(<ls_data>).
-    IF SY-SUBRC <> 0.
+    IF sy-subrc <> 0.
     ENDIF.
     ASSIGN COMPONENT 'ACCESS_TOKEN' OF STRUCTURE <ls_data> TO <fs_authreq>.
-    IF SY-SUBRC <> 0.
+    IF sy-subrc <> 0.
     ENDIF.
     ASSIGN <fs_authreq>->* TO <fs_authreq2>.
-    IF SY-SUBRC <> 0.
+    IF sy-subrc <> 0.
     ENDIF.
     mv_prvd_token  = <fs_authreq2>.
 
@@ -148,7 +167,7 @@ CLASS ZCL_PRVD_NCHAIN_HELPER IMPLEMENTATION.
         /ui2/cl_json=>deserialize( EXPORTING json = lv_getwallet_str
                                     CHANGING data = ls_wallet_created ).
       WHEN OTHERS.
-      "add error handling
+        "add error handling
     ENDCASE.
     "eth/usd pair -- see https://docs.chain.link/docs/consuming-data-feeds/
     "https://docs.chain.link/docs/data-feeds/price-feeds/addresses/?network=polygon#Mumbai%20Testnet
@@ -174,13 +193,13 @@ CLASS ZCL_PRVD_NCHAIN_HELPER IMPLEMENTATION.
 
         IF lv_createdcontract_data IS NOT INITIAL.
           ASSIGN lv_createdcontract_data->* TO FIELD-SYMBOL(<ls_contractdata>).
-          IF SY-SUBRC <> 0.
+          IF sy-subrc <> 0.
           ENDIF.
           ASSIGN COMPONENT 'ID' OF STRUCTURE <ls_contractdata> TO <fs_prvd_stack_contractid>.
-          IF SY-SUBRC <> 0.
+          IF sy-subrc <> 0.
           ENDIF.
           ASSIGN <fs_prvd_stack_contractid>->* TO <fs_prvd_stack_contractid_str>.
-          IF SY-SUBRC <> 0.
+          IF sy-subrc <> 0.
           ENDIF.
           lv_prvd_stack_contract_id = <fs_prvd_stack_contractid_str>.
         ENDIF.
@@ -188,7 +207,7 @@ CLASS ZCL_PRVD_NCHAIN_HELPER IMPLEMENTATION.
         ls_executecontract-value = 0.
         ls_executecontract-wallet_id = ls_wallet_created-id.
       WHEN 404.
-      "contract not found - might not be deployed
+        "contract not found - might not be deployed
       WHEN OTHERS.
     ENDCASE.
 *
@@ -210,10 +229,10 @@ CLASS ZCL_PRVD_NCHAIN_HELPER IMPLEMENTATION.
         "TODO - losing response values when deserializing. Round IDs surpass p8 type
         /ui2/cl_json=>deserialize( EXPORTING jsonx = lv_executecontract_xstr CHANGING data = ls_execute_contract_resp  ).
         ASSIGN lv_executecontract_data->* TO FIELD-SYMBOL(<ls_contractoutputs>).
-        IF SY-SUBRC <> 0.
+        IF sy-subrc <> 0.
         ENDIF.
         ASSIGN COMPONENT 'RESPONSE' OF STRUCTURE <ls_contractoutputs> TO FIELD-SYMBOL(<fs_executecontract_resp>).
-        IF SY-SUBRC <> 0.
+        IF sy-subrc <> 0.
         ENDIF.
         es_contract_resp = ls_execute_contract_resp.
         es_contract_summary = ls_execute_contract_summary.
@@ -269,6 +288,7 @@ CLASS ZCL_PRVD_NCHAIN_HELPER IMPLEMENTATION.
     IF mo_prvd_vault_helper IS NOT BOUND.
       mo_prvd_vault_helper = NEW zcl_prvd_vault_helper(  ).
     ENDIF.
+    ro_prvd_vault_helper = mo_prvd_vault_helper.
   ENDMETHOD.
 
 
@@ -280,5 +300,123 @@ CLASS ZCL_PRVD_NCHAIN_HELPER IMPLEMENTATION.
 
   METHOD get_nchain_client.
     ro_nchain_client = mo_nchain_api.
+  ENDMETHOD.
+
+  METHOD create_account_txn.
+    DATA: ls_nchain_txn      TYPE zif_prvd_nchain=>ty_create_broadcast_txn_ac,
+          lv_apiresponsestr  TYPE string,
+          lv_apiresponsedata TYPE REF TO data,
+          lv_apiresponsecd   TYPE i.
+
+
+    ls_nchain_txn-network_id = iv_network_id.
+    ls_nchain_txn-key_id = iv_vaultkey.
+    ls_nchain_txn-user_id = iv_vaultid.
+    ls_nchain_txn-to = iv_to_addr.
+    ls_nchain_txn-value = iv_value.
+
+
+    mo_nchain_api->zif_prvd_nchain~create_broadcast_txn_ac(
+        EXPORTING is_nchain_txn       = ls_nchain_txn
+        IMPORTING ev_apiresponsestr   = lv_apiresponsestr
+                  ev_apiresponse      = lv_apiresponsedata
+                  ev_httpresponsecode = lv_apiresponsecd ).
+*          CATCH cx_static_check.
+  ENDMETHOD.
+
+  METHOD approve_smart_contract.
+    DATA: ls_approve_smartcontract TYPE zif_prvd_nchain=>ty_contract_approval,
+          lv_apiresponsestr        TYPE string,
+          lv_apiresponsedata       TYPE REF TO data,
+          lv_apiresponsecd         TYPE i.
+
+    mo_nchain_api->zif_prvd_nchain~approve_smart_contract(
+          EXPORTING is_contract_approval = ls_approve_smartcontract
+          IMPORTING ev_apiresponsestr   = lv_apiresponsestr
+                    ev_apiresponse      = lv_apiresponsedata
+                    ev_httpresponsecode = lv_apiresponsecd  ).
+    CASE lv_apiresponsecd.
+      WHEN 201.
+      WHEN OTHERS.
+    ENDCASE.
+
+  ENDMETHOD.
+
+  METHOD get_accounts.
+    DATA: lv_apiresponsestr  TYPE string,
+          lv_apiresponsedata TYPE REF TO data,
+          lv_apiresponsecd   TYPE i.
+
+    mo_nchain_api->zif_prvd_nchain~listhdwallets(
+      IMPORTING
+        ev_apiresponsestr   = lv_apiresponsestr
+        ev_apiresponse      = lv_apiresponsedata
+        ev_httpresponsecode = lv_apiresponsecd
+    ).
+    CASE lv_apiresponsecd.
+      WHEN 200.
+          /ui2/cl_json=>deserialize(
+      EXPORTING
+        json             = lv_apiresponsestr
+      CHANGING
+        data             = et_accounts ).
+      WHEN OTHERS.
+    ENDCASE.
+
+  ENDMETHOD.
+
+  METHOD execute_contract.
+    DATA: lv_apiresponsestr  TYPE string,
+          lv_apiresponsedata TYPE REF TO data,
+          lv_apiresponsecd   TYPE i.
+
+    mo_nchain_api->zif_prvd_nchain~executecontract(
+      EXPORTING iv_contract_id      = iv_contract_id
+                is_execcontractreq = iv_exec_contract_req
+      IMPORTING ev_apiresponsestr   = lv_apiresponsestr
+                ev_apiresponse      = lv_apiresponsedata
+                ev_httpresponsecode = lv_apiresponsecd ).
+    CASE lv_apiresponsecd.
+      WHEN 201.
+      WHEN OTHERS.
+    ENDCASE.
+  ENDMETHOD.
+
+  METHOD create_contract.
+    DATA: lv_createdcontract_str        TYPE string,
+          lv_createdcontract_data       TYPE REF TO data,
+          lv_createdcontract_responsecd TYPE i.
+
+    mo_nchain_api->zif_prvd_nchain~create_contract(
+        EXPORTING
+          iv_smartcontractaddr = iv_smartcontractaddr
+          is_contract = is_contract
+        IMPORTING
+          ev_apiresponsestr    = lv_createdcontract_str
+          ev_apiresponse       = lv_createdcontract_data
+          ev_httpresponsecode  = lv_createdcontract_responsecd ).
+    CASE lv_createdcontract_responsecd.
+      WHEN 201.
+
+        FIELD-SYMBOLS: <fs_prvd_stack_contractid>     TYPE any,
+                       <fs_prvd_stack_contractid_str> TYPE string.
+
+        IF lv_createdcontract_data IS NOT INITIAL.
+          ASSIGN lv_createdcontract_data->* TO FIELD-SYMBOL(<ls_contractdata>).
+          IF sy-subrc <> 0.
+          ENDIF.
+          ASSIGN COMPONENT 'ID' OF STRUCTURE <ls_contractdata> TO <fs_prvd_stack_contractid>.
+          IF sy-subrc <> 0.
+          ENDIF.
+          ASSIGN <fs_prvd_stack_contractid>->* TO <fs_prvd_stack_contractid_str>.
+          IF sy-subrc <> 0.
+          ENDIF.
+          rv_contract_id = <fs_prvd_stack_contractid_str>.
+        ENDIF.
+      WHEN 404.
+        "contract not found - might not be deployed
+      WHEN OTHERS.
+    ENDCASE.
+
   ENDMETHOD.
 ENDCLASS.
