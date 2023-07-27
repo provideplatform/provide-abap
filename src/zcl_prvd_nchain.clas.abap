@@ -605,8 +605,6 @@ CLASS zcl_prvd_nchain IMPLEMENTATION.
     mi_client->request->set_method( 'GET' ).
     mi_client->request->set_header_field( name  = '~request_uri'
                                           value = lv_uri ).
-    mi_client->request->set_header_field( name  = 'content-type'
-                                          value = iv_content_type ).
     get_bpi_token( ).
     lv_code = send_receive( ).
     ev_httpresponsecode = lv_code.
@@ -661,8 +659,6 @@ CLASS zcl_prvd_nchain IMPLEMENTATION.
     mi_client->request->set_method( 'GET' ).
     mi_client->request->set_header_field( name  = '~request_uri'
                                           value = lv_uri ).
-    mi_client->request->set_header_field( name  = 'content-type'
-                                          value = iv_content_type ).
     get_bpi_token( ).
     lv_code = send_receive( ).
     ev_httpresponsecode = lv_code.

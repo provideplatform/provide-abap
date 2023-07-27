@@ -480,6 +480,15 @@ INTERFACE zif_prvd_nchain
             hash type zcasesensitive_str,
          END OF ty_basic_txn_details.
 
+  types: begin of ty_deployed_contract,
+            id type zcasesensitive_str,
+            name type zcasesensitive_str,
+            network_id type zprvd_nchain_networkid,
+            address type zprvd_smartcontract_addr,
+         end of ty_deployed_contract.
+
+  types: ty_contract_list type standard table of ty_deployed_contract.
+
 
   "! GET - "List connectors"
   "! Operation id: Listconnectors
@@ -737,8 +746,6 @@ INTERFACE zif_prvd_nchain
   "! Parameter: content-type, required, header
   "! Response: 200
   METHODS listcontracts
-    IMPORTING
-      !iv_content_type     TYPE string
     EXPORTING
       !ev_apiresponsestr   TYPE string
       !ev_apiresponse      TYPE REF TO data
@@ -765,7 +772,6 @@ INTERFACE zif_prvd_nchain
   "! Response: 200
   METHODS getcontractdetail
     IMPORTING
-      !iv_content_type     TYPE string
       !iv_contract_id      TYPE string
     EXPORTING
       !ev_apiresponsestr   TYPE string
