@@ -41,15 +41,33 @@ CLASS zcl_prvd_nchain_helper DEFINITION
                                        is_signature                  TYPE zif_prvd_vault=>ty_signature
                                        iv_signing_address            TYPE zprvd_smartcontract_addr
                                        iv_destination_smart_contract TYPE zprvd_smartcontract_addr,
+      "! Retrieves list of available wallets
+      get_wallets EXPORTING et_wallets TYPE zif_prvd_nchain=>ty_wallet_list,
       "! Retrieves lists of accounts available for signing
       get_accounts EXPORTING et_accounts TYPE zif_prvd_nchain=>ty_account_list,
       "! Executes a contract via PRVD Nchain
-      execute_contract IMPORTING iv_contract_id       TYPE zcasesensitive_str
-                                 iv_exec_contract_req TYPE zif_prvd_nchain=>ty_executecontractreq_account,
+      execute_contract_by_wallet IMPORTING iv_contract_id               TYPE zcasesensitive_str
+                                           iv_exec_contract_req         TYPE zif_prvd_nchain=>ty_executecontractrequest
+                                 RETURNING VALUE(rs_exec_contract_resp) TYPE zif_prvd_nchain=>ty_executecontract_resp,
+      execute_contract_by_account IMPORTING iv_contract_id               TYPE zcasesensitive_str
+                                            iv_exec_contract_req         TYPE zif_prvd_nchain=>ty_executecontractreq_account
+                                  RETURNING VALUE(rs_exec_contract_resp) TYPE zif_prvd_nchain=>ty_executecontract_resp,
       "! Sets up contract instance on Nchain
       create_contract IMPORTING iv_smartcontractaddr  TYPE zprvd_smartcontract_addr
                                 is_contract           TYPE zif_prvd_nchain=>ty_create_contract_req
-                      RETURNING VALUE(rv_contract_id) TYPE zcasesensitive_str.
+                      RETURNING VALUE(rv_contract_id) TYPE zcasesensitive_str,
+      "! Retrieves the transaction details
+      get_tx_details IMPORTING iv_ref_number        TYPE zcasesensitive_str
+                     RETURNING VALUE(rs_tx_details) TYPE zif_prvd_nchain=>ty_basic_txn_details,
+      get_contract_instance IMPORTING iv_network_id         TYPE zprvd_nchain_networkid
+                                      iv_smartcontract_addr TYPE zprvd_smartcontract_addr
+                            RETURNING VALUE(rv_contract_id) TYPE zcasesensitive_str,
+      add_contract_to_nchain IMPORTING iv_network_id         TYPE zprvd_nchain_networkid
+                                       iv_smartcontract_addr TYPE zprvd_smartcontract_addr
+                                       iv_contract_name      TYPE zcasesensitive_str
+                                       iv_contract_type      TYPE zcasesensitive_str
+                                       iv_org_wallet_id      type zcasesensitive_str
+                             RETURNING VALUE(rv_contract_id) TYPE zcasesensitive_str.
   PROTECTED SECTION.
     DATA: mv_tenant             TYPE zprvdtenantid,
           mv_org_id             TYPE zprvdtenantid,
@@ -211,7 +229,7 @@ CLASS zcl_prvd_nchain_helper IMPLEMENTATION.
       WHEN OTHERS.
     ENDCASE.
 *
-    mo_nchain_api->zif_prvd_nchain~executecontract(
+    mo_nchain_api->zif_prvd_nchain~executecontract_by_wallet(
       EXPORTING
         iv_contract_id      = lv_prvd_stack_contract_id
         is_execcontractreq  = ls_executecontract
@@ -342,7 +360,7 @@ CLASS zcl_prvd_nchain_helper IMPLEMENTATION.
 
   ENDMETHOD.
 
-  METHOD get_accounts.
+  METHOD get_wallets.
     DATA: lv_apiresponsestr  TYPE string,
           lv_apiresponsedata TYPE REF TO data,
           lv_apiresponsecd   TYPE i.
@@ -351,33 +369,80 @@ CLASS zcl_prvd_nchain_helper IMPLEMENTATION.
       IMPORTING
         ev_apiresponsestr   = lv_apiresponsestr
         ev_apiresponse      = lv_apiresponsedata
-        ev_httpresponsecode = lv_apiresponsecd
-    ).
+        ev_httpresponsecode = lv_apiresponsecd ).
     CASE lv_apiresponsecd.
       WHEN 200.
-          /ui2/cl_json=>deserialize(
-      EXPORTING
-        json             = lv_apiresponsestr
-      CHANGING
-        data             = et_accounts ).
+        /ui2/cl_json=>deserialize(
+    EXPORTING
+      json             = lv_apiresponsestr
+    CHANGING
+      data             = et_wallets ).
+      WHEN OTHERS.
+    ENDCASE.
+  ENDMETHOD.
+
+  METHOD get_accounts.
+    DATA: lv_apiresponsestr  TYPE string,
+          lv_apiresponsedata TYPE REF TO data,
+          lv_apiresponsecd   TYPE i.
+
+    mo_nchain_api->zif_prvd_nchain~listaccounts(
+      IMPORTING
+        ev_apiresponsestr   = lv_apiresponsestr
+        ev_apiresponse      = lv_apiresponsedata
+        ev_httpresponsecode = lv_apiresponsecd ).
+    CASE lv_apiresponsecd.
+      WHEN 200.
+        /ui2/cl_json=>deserialize(
+            EXPORTING
+              json             = lv_apiresponsestr
+            CHANGING
+              data             = et_accounts ).
       WHEN OTHERS.
     ENDCASE.
 
   ENDMETHOD.
 
-  METHOD execute_contract.
+  METHOD execute_contract_by_wallet.
     DATA: lv_apiresponsestr  TYPE string,
           lv_apiresponsedata TYPE REF TO data,
           lv_apiresponsecd   TYPE i.
 
-    mo_nchain_api->zif_prvd_nchain~executecontract(
+    mo_nchain_api->zif_prvd_nchain~executecontract_by_wallet(
       EXPORTING iv_contract_id      = iv_contract_id
                 is_execcontractreq = iv_exec_contract_req
       IMPORTING ev_apiresponsestr   = lv_apiresponsestr
                 ev_apiresponse      = lv_apiresponsedata
                 ev_httpresponsecode = lv_apiresponsecd ).
     CASE lv_apiresponsecd.
-      WHEN 201.
+      WHEN 202.
+        /ui2/cl_json=>deserialize(
+            EXPORTING
+              json             = lv_apiresponsestr
+            CHANGING
+              data             = rs_exec_contract_resp ).
+      WHEN OTHERS.
+    ENDCASE.
+  ENDMETHOD.
+
+  METHOD execute_contract_by_account.
+    DATA: lv_apiresponsestr  TYPE string,
+          lv_apiresponsedata TYPE REF TO data,
+          lv_apiresponsecd   TYPE i.
+
+    mo_nchain_api->zif_prvd_nchain~executecontract_by_account(
+      EXPORTING iv_contract_id      = iv_contract_id
+                is_execcontractreq = iv_exec_contract_req
+      IMPORTING ev_apiresponsestr   = lv_apiresponsestr
+                ev_apiresponse      = lv_apiresponsedata
+                ev_httpresponsecode = lv_apiresponsecd ).
+    CASE lv_apiresponsecd.
+      WHEN 202.
+        /ui2/cl_json=>deserialize(
+            EXPORTING
+              json             = lv_apiresponsestr
+            CHANGING
+              data             = rs_exec_contract_resp ).
       WHEN OTHERS.
     ENDCASE.
   ENDMETHOD.
@@ -418,5 +483,77 @@ CLASS zcl_prvd_nchain_helper IMPLEMENTATION.
       WHEN OTHERS.
     ENDCASE.
 
+  ENDMETHOD.
+
+  METHOD get_tx_details.
+    DATA: lv_apiresponsestr  TYPE string,
+          lv_apiresponsedata TYPE REF TO data,
+          lv_apiresponsecd   TYPE i.
+    mo_nchain_api->zif_prvd_nchain~gettransactiondetails(
+      EXPORTING
+        iv_transaction_id   = iv_ref_number
+      IMPORTING
+        ev_apiresponsestr   = lv_apiresponsestr
+        ev_apiresponse      = lv_apiresponsedata
+        ev_httpresponsecode = lv_apiresponsecd    ).
+    CASE lv_apiresponsecd.
+      WHEN 200.
+        /ui2/cl_json=>deserialize(
+          EXPORTING
+            json             = lv_apiresponsestr
+          CHANGING
+            data             = rs_tx_details ).
+      WHEN OTHERS.
+    ENDCASE.
+*    CATCH cx_static_check.
+  ENDMETHOD.
+
+  METHOD get_contract_instance.
+    DATA: lv_apiresponsestr  TYPE string,
+          lv_apiresponsedata TYPE REF TO data,
+          lv_apiresponsecd   TYPE i,
+          lt_contractslist   TYPE zif_prvd_nchain=>ty_contract_list,
+          ls_contract        TYPE zif_prvd_nchain=>ty_deployed_contract.
+
+    mo_nchain_api->zif_prvd_nchain~listcontracts(
+      IMPORTING
+        ev_apiresponsestr   = lv_apiresponsestr
+        ev_apiresponse      = lv_apiresponsedata
+        ev_httpresponsecode = lv_apiresponsecd ).
+
+    CASE lv_apiresponsecd.
+      WHEN 200.
+        /ui2/cl_json=>deserialize(
+         EXPORTING
+           json             = lv_apiresponsestr
+         CHANGING
+           data             = lt_contractslist ).
+        READ TABLE lt_contractslist WITH KEY network_id = iv_network_id  address = iv_smartcontract_addr
+            INTO ls_contract.
+        IF sy-subrc = 0.
+          rv_contract_id = ls_contract-id.
+        ENDIF.
+      WHEN OTHERS.
+    ENDCASE.
+
+*    CATCH cx_static_check.
+  ENDMETHOD.
+
+  METHOD add_contract_to_nchain.
+    DATA: lv_apiresponsestr  TYPE string,
+          lv_apiresponsedata TYPE REF TO data,
+          lv_apiresponsecd   TYPE i,
+          ls_vault               TYPE zif_prvd_vault=>ty_vault_query,
+          ls_wallet_key          TYPE zif_prvd_vault=>ty_vault_keys,
+          ls_selectedcontract    TYPE zif_prvd_nchain=>ty_chainlinkpricefeed_req.
+
+
+    smartcontract_factory( EXPORTING iv_smartcontractaddress = iv_smartcontract_addr
+                           iv_name                 = iv_contract_name
+                           iv_walletaddress        = iv_org_wallet_id
+                           iv_nchain_networkid     = iv_network_id
+                           iv_contracttype         = iv_contract_type
+                 IMPORTING es_selectedcontract = ls_selectedcontract ).
+    rv_contract_id = create_contract( EXPORTING iv_smartcontractaddr = iv_smartcontract_addr is_contract = ls_selectedcontract ).
   ENDMETHOD.
 ENDCLASS.

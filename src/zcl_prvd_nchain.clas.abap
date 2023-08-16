@@ -356,7 +356,7 @@ CLASS zcl_prvd_nchain IMPLEMENTATION.
     mi_client->request->set_method( 'GET' ).
     mi_client->request->set_header_field( name  = '~request_uri'
                                           value = lv_uri ).
-   " mi_client->request->set_header_field( name  = 'content-type'
+    " mi_client->request->set_header_field( name  = 'content-type'
     "                                      value = iv_content_type ).
     get_bpi_token( ).
     lv_code = send_receive( ).
@@ -579,7 +579,7 @@ CLASS zcl_prvd_nchain IMPLEMENTATION.
     mi_client->request->set_header_field( name  = '~request_uri'
                                           value = lv_uri ).
     mi_client->request->set_header_field( name  = 'content-type'
-                                          value = iv_content_type ).
+                                          value = 'application/json' ).
     get_bpi_token( ).
     lv_code = send_receive( ).
     ev_httpresponsecode = lv_code.
@@ -605,8 +605,6 @@ CLASS zcl_prvd_nchain IMPLEMENTATION.
     mi_client->request->set_method( 'GET' ).
     mi_client->request->set_header_field( name  = '~request_uri'
                                           value = lv_uri ).
-    mi_client->request->set_header_field( name  = 'content-type'
-                                          value = iv_content_type ).
     get_bpi_token( ).
     lv_code = send_receive( ).
     ev_httpresponsecode = lv_code.
@@ -661,8 +659,6 @@ CLASS zcl_prvd_nchain IMPLEMENTATION.
     mi_client->request->set_method( 'GET' ).
     mi_client->request->set_header_field( name  = '~request_uri'
                                           value = lv_uri ).
-    mi_client->request->set_header_field( name  = 'content-type'
-                                          value = iv_content_type ).
     get_bpi_token( ).
     lv_code = send_receive( ).
     ev_httpresponsecode = lv_code.
@@ -681,7 +677,49 @@ CLASS zcl_prvd_nchain IMPLEMENTATION.
     ENDCASE.
   ENDMETHOD.
 
-  METHOD zif_prvd_nchain~executecontract.
+  METHOD zif_prvd_nchain~executecontract_by_wallet.
+    DATA lv_code TYPE i.
+    DATA lv_temp TYPE string.
+    DATA lv_uri TYPE string VALUE '/api/v1/contracts/{contract_id}/execute'.
+    DATA lv_requeststr TYPE string.
+    DATA lv_requestdata TYPE REF TO data.
+    DATA: lv_response_xstring TYPE xstring.
+    lv_temp = iv_contract_id.
+    lv_temp = cl_http_utility=>escape_url( condense( lv_temp ) ).
+    REPLACE ALL OCCURRENCES OF '{contract_id}' IN lv_uri WITH lv_temp.
+    mi_client->request->set_method( 'POST' ).
+    mi_client->request->set_header_field( name  = '~request_uri'
+                                          value = lv_uri ).
+
+    zcl_prvd_api_helper=>copy_data_to_ref( EXPORTING is_data = is_execcontractreq
+                                              CHANGING cr_data = lv_requestdata ).
+
+    lv_requeststr = /ui2/cl_json=>serialize( data        = lv_requestdata
+                                             pretty_name = /ui2/cl_json=>pretty_mode-low_case ).
+
+    mi_client->request->set_cdata( data = lv_requeststr ).
+
+    get_bpi_token( ).
+    lv_code = send_receive( ).
+    ev_httpresponsecode = lv_code.
+    ev_apiresponsestr = mi_client->response->get_cdata( ).
+    lv_response_xstring = mi_client->response->get_data( ).
+    ev_apiresponsexstr = lv_response_xstring.
+    /ui2/cl_json=>deserialize(
+      EXPORTING
+        json             = ev_apiresponsestr
+      CHANGING
+        data             = ev_apiresponse ).
+    "WRITE / lv_code. ~replace with logging call
+    CASE lv_code.
+      WHEN 200.
+        "Success
+      WHEN OTHERS.
+        "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
+    ENDCASE.
+  ENDMETHOD.
+
+  METHOD zif_prvd_nchain~executecontract_by_account.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/api/v1/contracts/{contract_id}/execute'.
@@ -787,7 +825,7 @@ CLASS zcl_prvd_nchain IMPLEMENTATION.
     ENDCASE.
   ENDMETHOD.
 
-    METHOD zif_prvd_nchain~create_contract.
+  METHOD zif_prvd_nchain~create_contract.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/api/v1/contracts'.
@@ -826,8 +864,8 @@ CLASS zcl_prvd_nchain IMPLEMENTATION.
   ENDMETHOD.
 
 
-  method zif_prvd_nchain~approve_smart_contract.
-      DATA lv_code TYPE i.
+  METHOD zif_prvd_nchain~approve_smart_contract.
+    DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/api/v1/contracts'.
     DATA lv_requeststr TYPE string.

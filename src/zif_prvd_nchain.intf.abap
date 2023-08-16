@@ -383,11 +383,11 @@ INTERFACE zif_prvd_nchain
       wallet_id TYPE string,
     END OF ty_executecontractrequest,
     BEGIN OF ty_executecontractreq_account,
-      method    TYPE string,
-      params    TYPE STANDARD TABLE OF string WITH EMPTY KEY,
-      value     TYPE i,
+      method     TYPE string,
+      params     TYPE STANDARD TABLE OF string WITH EMPTY KEY,
+      value      TYPE i,
       account_id TYPE string,
-    end of TY_EXECUTECONTRACTREQ_ACCOUNT.
+    END OF ty_executecontractreq_account.
   TYPES:
 * Component schema: ExecutereadonlycontractRequest, object
     BEGIN OF ty_executereadonlycontractreq,
@@ -450,7 +450,7 @@ INTERFACE zif_prvd_nchain
            to         TYPE string,
          END OF ty_contract_approval.
 
-  TYPES: BEGIN OF ty_account,
+  TYPES: BEGIN OF ty_wallet,
            id              TYPE zcasesensitive_str,
            created_at      TYPE zcasesensitive_str,
            organization_id TYPE zcasesensitive_str,
@@ -458,8 +458,36 @@ INTERFACE zif_prvd_nchain
            key_id          TYPE zcasesensitive_str,
            purpose         TYPE integer,
            public_key      TYPE zcasesensitive_str,
+         END OF ty_wallet.
+  TYPES: ty_wallet_list TYPE STANDARD TABLE OF ty_wallet.
+
+  TYPES: BEGIN OF ty_account,
+           id              TYPE zcasesensitive_str,
+           created_at      TYPE zcasesensitive_str,
+           network_id      TYPE zcasesensitive_str,
+           organization_id TYPE zcasesensitive_str,
+           vault_id        TYPE zcasesensitive_str,
+           key_id          TYPE zcasesensitive_str,
+           public_key      TYPE zcasesensitive_str,
+           address         TYPE zcasesensitive_str,
          END OF ty_account.
   TYPES: ty_account_list TYPE STANDARD TABLE OF ty_account.
+
+  types: BEGIN OF ty_basic_txn_details,
+            id type zcasesensitive_str,
+            ref type zcasesensitive_str,
+            network_id type zprvd_nchain_networkid,
+            hash type zcasesensitive_str,
+         END OF ty_basic_txn_details.
+
+  types: begin of ty_deployed_contract,
+            id type zcasesensitive_str,
+            name type zcasesensitive_str,
+            network_id type zprvd_nchain_networkid,
+            address type zprvd_smartcontract_addr,
+         end of ty_deployed_contract.
+
+  types: ty_contract_list type standard table of ty_deployed_contract.
 
 
   "! GET - "List connectors"
@@ -706,7 +734,6 @@ INTERFACE zif_prvd_nchain
   "! Response: 200
   METHODS gettransactiondetails
     IMPORTING
-      !iv_content_type     TYPE string
       !iv_transaction_id   TYPE string
     EXPORTING
       !ev_apiresponsestr   TYPE string
@@ -719,8 +746,6 @@ INTERFACE zif_prvd_nchain
   "! Parameter: content-type, required, header
   "! Response: 200
   METHODS listcontracts
-    IMPORTING
-      !iv_content_type     TYPE string
     EXPORTING
       !ev_apiresponsestr   TYPE string
       !ev_apiresponse      TYPE REF TO data
@@ -747,7 +772,6 @@ INTERFACE zif_prvd_nchain
   "! Response: 200
   METHODS getcontractdetail
     IMPORTING
-      !iv_content_type     TYPE string
       !iv_contract_id      TYPE string
     EXPORTING
       !ev_apiresponsestr   TYPE string
@@ -760,10 +784,26 @@ INTERFACE zif_prvd_nchain
   "! Parameter: contract_id, required, path
   "! Response: 200
   "! Body ref: #/components/schemas/ExecutecontractRequest
-  METHODS executecontract
+  METHODS executecontract_by_wallet
     IMPORTING
       !iv_contract_id      TYPE zcasesensitive_str
       !is_execcontractreq  TYPE ty_executecontractrequest
+    EXPORTING
+      !ev_apiresponsestr   TYPE string
+      !ev_apiresponsexstr  TYPE xstring
+      !ev_apiresponse      TYPE REF TO data
+      !ev_httpresponsecode TYPE i
+    RAISING
+      cx_static_check .
+    "! POST - "Execute contract"
+  "! Operation id: Executecontract
+  "! Parameter: contract_id, required, path
+  "! Response: 200
+  "! Body ref: #/components/schemas/ExecutecontractRequest
+  METHODS executecontract_by_account
+    IMPORTING
+      !iv_contract_id      TYPE zcasesensitive_str
+      !is_execcontractreq  TYPE ty_executecontractreq_account
     EXPORTING
       !ev_apiresponsestr   TYPE string
       !ev_apiresponsexstr  TYPE xstring
@@ -797,7 +837,7 @@ INTERFACE zif_prvd_nchain
   METHODS create_contract
     IMPORTING
       !iv_smartcontractaddr TYPE zprvd_smartcontract_addr
-      !is_contract TYPE ty_create_contract_req
+      !is_contract          TYPE ty_create_contract_req
     EXPORTING
       !ev_apiresponsestr    TYPE string
       !ev_apiresponse       TYPE REF TO data
