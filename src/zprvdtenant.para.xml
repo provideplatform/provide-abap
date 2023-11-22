@@ -8,7 +8,7 @@
    <TPARAT>
     <PARAMID>ZPRVDTENANT</PARAMID>
     <SPRACHE>E</SPRACHE>
-    <PARTEXT>proUBC PRVD Tenant ID</PARTEXT>
+    <PARTEXT>PRVD Tenant ID</PARTEXT>
    </TPARAT>
   </asx:values>
  </asx:abap>
