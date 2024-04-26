@@ -9,8 +9,21 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - name: Startup confirmation
+      run: echo Starting provide-abap build
+
     - name: Checkout repository
       uses: actions/checkout@v3
 
-    - name: Startup
-      run: echo Starting provide-abap build
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20' 
+
+    - name: Install abaplint
+      run: npm install -g abaplint
+
+    - name: Run abaplint and save output
+      run: abaplint -f json > abaplint-output.json      
+
+

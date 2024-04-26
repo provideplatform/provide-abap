@@ -565,10 +565,10 @@
       "ignoreNames": [],
       "ignorePatterns": [],
       "ignoreExceptions": true,
-      "importing": "^I._.+$, ^IV._.+$ ",
+      "importing": "^(I|IV)._.+$",
       "returning": "^R._.+$",
       "changing": "^C._.+$",
-      "exporting": "^E._.+$, ^EV._.+$, ^ES._.+$ "
+      "exporting": "^(E|EV)._.+$"
     },
     "mix_returning": {
       "exclude": [],
