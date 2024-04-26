@@ -11,7 +11,6 @@ CLASS zcl_prvd_nchain DEFINITION PUBLIC.
           mv_tenantid TYPE zcasesensitive_str.
     METHODS send_receive RETURNING VALUE(rv_code) TYPE i.
   PRIVATE SECTION.
-    METHODS sap_auth_check.
     METHODS get_bpi_token
       RAISING cx_static_check.
 ENDCLASS.
@@ -37,12 +36,6 @@ CLASS zcl_prvd_nchain IMPLEMENTATION.
         value = lv_bearertoken ).
   ENDMETHOD.
 
-
-  METHOD sap_auth_check.
-    "TODO create authorization field in su20. need to check default character length for tenant id. SAP auth check limits to 40 chars.
-  ENDMETHOD.
-
-
   METHOD zif_prvd_nchain~listconnectors.
     DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
@@ -65,7 +58,7 @@ CLASS zcl_prvd_nchain IMPLEMENTATION.
         json             = ev_apiresponsestr
       CHANGING
         data             = ev_apiresponse ).
-    "WRITE / lv_code. ~replace with logging call
+    
     CASE lv_code.
       WHEN 200.
         "success
@@ -91,10 +84,10 @@ CLASS zcl_prvd_nchain IMPLEMENTATION.
         json             = ev_apiresponsestr
       CHANGING
         data             = ev_apiresponse ).
-    "WRITE / lv_code. ~replace with logging call
+    
     CASE lv_code.
       WHEN 200.
-        "Success
+        RETURN
       WHEN OTHERS.
         "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
@@ -119,7 +112,7 @@ CLASS zcl_prvd_nchain IMPLEMENTATION.
         json             = ev_apiresponsestr
       CHANGING
         data             = ev_apiresponse ).
-    "WRITE / lv_code. ~replace with logging call
+    
     CASE lv_code.
       WHEN 200.
         "success
@@ -147,7 +140,7 @@ CLASS zcl_prvd_nchain IMPLEMENTATION.
         json             = ev_apiresponsestr
       CHANGING
         data             = ev_apiresponse ).
-    "WRITE / lv_code. ~replace with logging call
+    
     CASE lv_code.
       WHEN 200.
         "success
@@ -175,10 +168,10 @@ CLASS zcl_prvd_nchain IMPLEMENTATION.
         json             = ev_apiresponsestr
       CHANGING
         data             = ev_apiresponse ).
-    "WRITE / lv_code. ~replace with logging call
+    
     CASE lv_code.
       WHEN 200.
-        "Success
+        RETURN.
       WHEN OTHERS.
         "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
@@ -203,10 +196,10 @@ CLASS zcl_prvd_nchain IMPLEMENTATION.
         json            = ev_apiresponsestr
       CHANGING
         data            = ev_apiresponse ).
-    "WRITE / lv_code. ~replace with logging call
+    
     CASE lv_code.
       WHEN 200.
-        "Success
+        RETURN.
       WHEN OTHERS.
         "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
@@ -231,10 +224,10 @@ CLASS zcl_prvd_nchain IMPLEMENTATION.
         json             = ev_apiresponsestr
       CHANGING
         data             = ev_apiresponse ).
-    "WRITE / lv_code. ~replace with logging call
+    
     CASE lv_code.
       WHEN 200.
-        "Success
+        RETURN.
       WHEN OTHERS.
         "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
@@ -259,10 +252,10 @@ CLASS zcl_prvd_nchain IMPLEMENTATION.
         json             = ev_apiresponsestr
       CHANGING
         data             = ev_apiresponse ).
-    "WRITE / lv_code. ~replace with logging call
+    
     CASE lv_code.
       WHEN 200.
-        "Success
+        RETURN.
       WHEN OTHERS.
         "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
@@ -287,10 +280,10 @@ CLASS zcl_prvd_nchain IMPLEMENTATION.
         json             = ev_apiresponsestr
       CHANGING
         data             = ev_apiresponse ).
-    "WRITE / lv_code. ~replace with logging call
+    
     CASE lv_code.
       WHEN 200.
-        "Success
+        RETURN.
       WHEN OTHERS.
         "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
@@ -314,10 +307,10 @@ CLASS zcl_prvd_nchain IMPLEMENTATION.
         json             = ev_apiresponsestr
       CHANGING
         data             = ev_apiresponse ).
-    "WRITE / lv_code. ~replace with logging call
+    
     CASE lv_code.
       WHEN 200.
-        "Success
+        RETURN.
       WHEN OTHERS.
         "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
@@ -340,10 +333,10 @@ CLASS zcl_prvd_nchain IMPLEMENTATION.
         json             = ev_apiresponsestr
       CHANGING
         data             = ev_apiresponse ).
-    "WRITE / lv_code. ~replace with logging call
+    
     CASE lv_code.
       WHEN 200.
-        "Success
+        RETURN.
       WHEN OTHERS.
         "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
@@ -356,8 +349,6 @@ CLASS zcl_prvd_nchain IMPLEMENTATION.
     mi_client->request->set_method( 'GET' ).
     mi_client->request->set_header_field( name  = '~request_uri'
                                           value = lv_uri ).
-    " mi_client->request->set_header_field( name  = 'content-type'
-    "                                      value = iv_content_type ).
     get_bpi_token( ).
     lv_code = send_receive( ).
     ev_httpresponsecode = lv_code.
@@ -367,10 +358,10 @@ CLASS zcl_prvd_nchain IMPLEMENTATION.
         json             = ev_apiresponsestr
       CHANGING
         data             = ev_apiresponse ).
-    "WRITE / lv_code. ~replace with logging call
+    
     CASE lv_code.
       WHEN 200.
-        "Success
+        RETURN.
       WHEN OTHERS.
         "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
@@ -397,10 +388,10 @@ CLASS zcl_prvd_nchain IMPLEMENTATION.
         json             = ev_apiresponsestr
       CHANGING
         data             = ev_apiresponse ).
-    "WRITE / lv_code. ~replace with logging call
+    
     CASE lv_code.
       WHEN 200.
-        "Success
+        RETURN.
       WHEN OTHERS.
         "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
@@ -413,8 +404,7 @@ CLASS zcl_prvd_nchain IMPLEMENTATION.
     mi_client->request->set_method( 'GET' ).
     mi_client->request->set_header_field( name  = '~request_uri'
                                           value = lv_uri ).
-    "mi_client->request->set_header_field( name  = 'content-type'
-    "                                      value = iv_content_type ).
+
     get_bpi_token( ).
     lv_code = send_receive( ).
     ev_httpresponsecode = lv_code.
@@ -424,10 +414,10 @@ CLASS zcl_prvd_nchain IMPLEMENTATION.
         json             = ev_apiresponsestr
       CHANGING
         data             = ev_apiresponse ).
-    "WRITE / lv_code. ~replace with logging call
+    
     CASE lv_code.
       WHEN 200.
-        "Success
+        RETURN.
       WHEN OTHERS.
         "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
@@ -445,7 +435,7 @@ CLASS zcl_prvd_nchain IMPLEMENTATION.
                                           value = lv_uri ).
 
     zcl_prvd_api_helper=>copy_data_to_ref( EXPORTING is_data = is_walletrequest
-                                             CHANGING cr_data  = lv_requestdata  ).
+                                           CHANGING cr_data  = lv_requestdata ).
 
     lv_requeststr = /ui2/cl_json=>serialize( data        = lv_requestdata
                                              pretty_name = /ui2/cl_json=>pretty_mode-low_case ).
@@ -460,12 +450,11 @@ CLASS zcl_prvd_nchain IMPLEMENTATION.
       EXPORTING
         json             = ev_apiresponsestr
       CHANGING
-        data             = ev_apiresponse
-    ).
-    "WRITE / lv_code. ~replace with logging call
+        data             = ev_apiresponse ).
+    
     CASE lv_code.
       WHEN 200.
-        "Success
+        RETURN.
       WHEN OTHERS.
         "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
@@ -496,10 +485,10 @@ CLASS zcl_prvd_nchain IMPLEMENTATION.
         json             = ev_apiresponsestr
       CHANGING
         data             = ev_apiresponse ).
-    "WRITE / lv_code. ~replace with logging call
+    
     CASE lv_code.
       WHEN 200.
-        "Success
+        RETURN.
       WHEN OTHERS.
         "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
@@ -523,10 +512,10 @@ CLASS zcl_prvd_nchain IMPLEMENTATION.
         json             = ev_apiresponsestr
       CHANGING
         data             = ev_apiresponse ).
-    "WRITE / lv_code. ~replace with logging call
+    
     CASE lv_code.
       WHEN 200.
-        "Success
+        RETURN.
       WHEN OTHERS.
         "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
@@ -543,12 +532,12 @@ CLASS zcl_prvd_nchain IMPLEMENTATION.
                                           value = lv_uri ).
 
     zcl_prvd_api_helper=>copy_data_to_ref( EXPORTING is_data = is_nchain_txn
-                                              CHANGING cr_data = lv_txndata ).
+                                           CHANGING cr_data  = lv_txndata ).
 
     lv_requeststr = /ui2/cl_json=>serialize( data        = lv_txndata
                                              pretty_name = /ui2/cl_json=>pretty_mode-low_case ).
 
-    mi_client->request->set_cdata( data =  lv_requeststr ).
+    mi_client->request->set_cdata( lv_requeststr ).
 
     get_bpi_token( ).
     lv_code = send_receive( ).
@@ -559,10 +548,10 @@ CLASS zcl_prvd_nchain IMPLEMENTATION.
         json             = ev_apiresponsestr
       CHANGING
         data             = ev_apiresponse ).
-    "WRITE / lv_code. ~replace with logging call
+    
     CASE lv_code.
       WHEN 200.
-        "Success
+        RETURN.
       WHEN OTHERS.
         "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
@@ -589,10 +578,10 @@ CLASS zcl_prvd_nchain IMPLEMENTATION.
         json             = ev_apiresponsestr
       CHANGING
         data             = ev_apiresponse ).
-    "WRITE / lv_code. ~replace with logging call
+    
     CASE lv_code.
       WHEN 200.
-        "Success
+        RETURN.
       WHEN OTHERS.
         "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
@@ -614,10 +603,10 @@ CLASS zcl_prvd_nchain IMPLEMENTATION.
         json             = ev_apiresponsestr
       CHANGING
         data             = ev_apiresponse ).
-    "WRITE / lv_code. ~replace with logging call
+    
     CASE lv_code.
       WHEN 200.
-        "Success
+        RETURN.
       WHEN OTHERS.
         "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
@@ -640,10 +629,10 @@ CLASS zcl_prvd_nchain IMPLEMENTATION.
         json             = ev_apiresponsestr
       CHANGING
         data             = ev_apiresponse ).
-    "WRITE / lv_code. ~replace with logging call
+    
     CASE lv_code.
       WHEN 200.
-        "Success
+        RETURN.
       WHEN OTHERS.
         "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
@@ -668,10 +657,10 @@ CLASS zcl_prvd_nchain IMPLEMENTATION.
         json             = ev_apiresponsestr
       CHANGING
         data             = ev_apiresponse ).
-    "WRITE / lv_code. ~replace with logging call
+    
     CASE lv_code.
       WHEN 200.
-        "Success
+        RETURN.
       WHEN OTHERS.
         "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
@@ -710,10 +699,10 @@ CLASS zcl_prvd_nchain IMPLEMENTATION.
         json             = ev_apiresponsestr
       CHANGING
         data             = ev_apiresponse ).
-    "WRITE / lv_code. ~replace with logging call
+    
     CASE lv_code.
       WHEN 200.
-        "Success
+        RETURN.
       WHEN OTHERS.
         "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
@@ -752,10 +741,10 @@ CLASS zcl_prvd_nchain IMPLEMENTATION.
         json             = ev_apiresponsestr
       CHANGING
         data             = ev_apiresponse ).
-    "WRITE / lv_code. ~replace with logging call
+    
     CASE lv_code.
       WHEN 200.
-        "Success
+        RETURN.
       WHEN OTHERS.
         "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
@@ -778,10 +767,10 @@ CLASS zcl_prvd_nchain IMPLEMENTATION.
         json             = ev_apiresponsestr
       CHANGING
         data             = ev_apiresponse ).
-    "WRITE / lv_code. ~replace with logging call
+    
     CASE lv_code.
       WHEN 200.
-        "Success
+        RETURN.
       WHEN OTHERS.
         "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
@@ -816,10 +805,10 @@ CLASS zcl_prvd_nchain IMPLEMENTATION.
         json             = ev_apiresponsestr
       CHANGING
         data             = ev_apiresponse ).
-    "WRITE / lv_code. ~replace with logging call
+    
     CASE lv_code.
       WHEN 200.
-        "Success
+        RETURN.
       WHEN OTHERS.
         "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
@@ -838,7 +827,7 @@ CLASS zcl_prvd_nchain IMPLEMENTATION.
                                           value = lv_uri ).
 
     zcl_prvd_api_helper=>copy_data_to_ref( EXPORTING is_data = is_contract
-                                             CHANGING cr_data  = lv_requestdata  ).
+                                           CHANGING cr_data  = lv_requestdata ).
 
     lv_requeststr = /ui2/cl_json=>serialize( data        = lv_requestdata
                                              pretty_name = /ui2/cl_json=>pretty_mode-low_case ).
@@ -854,10 +843,10 @@ CLASS zcl_prvd_nchain IMPLEMENTATION.
         json             = ev_apiresponsestr
       CHANGING
         data             = ev_apiresponse ).
-    "WRITE / lv_code. ~replace with logging call
+    
     CASE lv_code.
       WHEN 200.
-        "Success
+        RETURN.
       WHEN OTHERS.
         "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
@@ -891,10 +880,10 @@ CLASS zcl_prvd_nchain IMPLEMENTATION.
         json             = ev_apiresponsestr
       CHANGING
         data             = ev_apiresponse ).
-    "WRITE / lv_code. ~replace with logging call
+    
     CASE lv_code.
       WHEN 200.
-        "Success
+        RETURN.
       WHEN OTHERS.
         "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
