@@ -21,7 +21,7 @@ jobs:
         node-version: '20' 
 
     - name: Install abaplint
-      run: npm install -g abaplint
+      run: npm install -g @abaplint/cli
 
     - name: Run abaplint and save output
       run: abaplint -f json > abaplint-output.json      
