@@ -81,7 +81,6 @@ CLASS zcl_prvd_ident IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD zif_prvd_ident~associateusertoapplication.
-    DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/applications/{application_id}/users'.
     lv_temp = application_id.
@@ -91,7 +90,7 @@ CLASS zcl_prvd_ident IMPLEMENTATION.
     mi_client->request->set_header_field( name = '~request_uri'
                                          value = lv_uri ).
 * todo, set body, #/components/schemas/AssociateusertoapplicationRequest
-    lv_code = send_receive( ).
+    DATA(lv_code) = send_receive( ).
     ev_apiresponsestr = mi_client->response->get_cdata( ).
     /ui2/cl_json=>deserialize( EXPORTING json = ev_apiresponsestr
                                 CHANGING data = ev_apiresponse ).
@@ -107,7 +106,6 @@ CLASS zcl_prvd_ident IMPLEMENTATION.
 
 
   METHOD zif_prvd_ident~authentication.
-    DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/authenticate'.
     DATA lv_basicauthdata TYPE REF TO data.
@@ -122,7 +120,7 @@ CLASS zcl_prvd_ident IMPLEMENTATION.
     mi_client->request->set_cdata( data   =  /ui2/cl_json=>serialize( data        = lv_basicauthdata
                                                                       pretty_name = /ui2/cl_json=>pretty_mode-low_case ) ).
 
-    lv_code = send_receive( ).
+    DATA(lv_code) = send_receive( ).
     ""TODO add logging call
     CASE lv_code.
       WHEN 201.
@@ -136,7 +134,7 @@ CLASS zcl_prvd_ident IMPLEMENTATION.
 
 
   METHOD zif_prvd_ident~authorizelong_termtoken.
-    DATA lv_code TYPE i.
+    
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/tokens'.
     DATA: lv_longtermrequestdata TYPE REF TO data,
@@ -162,7 +160,7 @@ CLASS zcl_prvd_ident IMPLEMENTATION.
 
     mi_client->request->set_cdata( lv_requeststr ).
 
-    lv_code = send_receive( ).
+    DATA(lv_code) = send_receive( ).
     status = lv_code.
 
     CASE lv_code.
@@ -181,7 +179,7 @@ CLASS zcl_prvd_ident IMPLEMENTATION.
 
 
   METHOD zif_prvd_ident~createapplication.
-    DATA lv_code TYPE i.
+    
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/applications'.
     mi_client->request->set_method( 'POST' ).
@@ -190,7 +188,7 @@ CLASS zcl_prvd_ident IMPLEMENTATION.
     mi_client->request->set_header_field( name  = 'name'
                                           value = name ).
 * todo, set body, #/components/schemas/CreateapplicationRequest
-    lv_code = send_receive( ).
+    DATA(lv_code) = send_receive( ).
     ev_apiresponsestr = mi_client->response->get_cdata( ).
     /ui2/cl_json=>deserialize( EXPORTING json = ev_apiresponsestr
                                CHANGING  data = ev_apiresponse ).
@@ -206,7 +204,7 @@ CLASS zcl_prvd_ident IMPLEMENTATION.
 
 
   METHOD zif_prvd_ident~createorganization.
-    DATA lv_code TYPE i.
+    
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/organizations'.
     mi_client->request->set_method( 'POST' ).
@@ -215,7 +213,7 @@ CLASS zcl_prvd_ident IMPLEMENTATION.
     mi_client->request->set_header_field( name  = 'name'
                                           value = name ).
 * todo, set body, #/components/schemas/CreateorganizationRequest
-    lv_code = send_receive( ).
+    DATA(lv_code) = send_receive( ).
     ev_apiresponsestr = mi_client->response->get_cdata( ).
     /ui2/cl_json=>deserialize( EXPORTING json = ev_apiresponsestr
                                 CHANGING data = ev_apiresponse ).
@@ -231,7 +229,7 @@ CLASS zcl_prvd_ident IMPLEMENTATION.
 
 
   METHOD zif_prvd_ident~createuser.
-    DATA lv_code TYPE i.
+    
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/users'.
     DATA lv_requestdata TYPE REF TO data.
@@ -240,12 +238,12 @@ CLASS zcl_prvd_ident IMPLEMENTATION.
     mi_client->request->set_header_field( name  = '~request_uri'
                                           value = lv_uri ).
     zcl_prvd_api_helper=>copy_data_to_ref( EXPORTING is_data = body
-                                              CHANGING cr_data = lv_REQUESTDATA ).
+                                              CHANGING cr_data = lv_requestdata ).
     lv_requeststr = /ui2/cl_json=>serialize( data = lv_requestdata
                                              pretty_name = /ui2/cl_json=>pretty_mode-low_case ).
 
     mi_client->request->set_cdata( data = lv_requeststr ).
-    lv_code = send_receive( ).
+    DATA(lv_code) = send_receive( ).
     ev_apiresponsestr = mi_client->response->get_cdata( ).
     /ui2/cl_json=>deserialize( EXPORTING json = ev_apiresponsestr
                                CHANGING data  = ev_apiresponse ).
@@ -261,7 +259,7 @@ CLASS zcl_prvd_ident IMPLEMENTATION.
 
 
   METHOD zif_prvd_ident~deleteapplication.
-    DATA lv_code TYPE i.
+    
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/applications/{application_id}'.
     lv_temp = application_id.
@@ -272,7 +270,7 @@ CLASS zcl_prvd_ident IMPLEMENTATION.
                                          value = lv_uri ).
     mi_client->request->set_header_field( name = 'content-type'
                                          value = content_type ).
-    lv_code = send_receive( ).
+    DATA(lv_code) = send_receive( ).
     ev_apiresponsestr = mi_client->response->get_cdata( ).
     /ui2/cl_json=>deserialize( EXPORTING json = ev_apiresponsestr
                                 CHANGING data = ev_apiresponse ).
@@ -288,7 +286,7 @@ CLASS zcl_prvd_ident IMPLEMENTATION.
 
 
   METHOD zif_prvd_ident~deleteuser.
-    DATA lv_code TYPE i.
+    
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/tokens/{user_id}'.
     lv_temp = user_id.
@@ -299,7 +297,7 @@ CLASS zcl_prvd_ident IMPLEMENTATION.
                                          value = lv_uri ).
     mi_client->request->set_header_field( name = 'content-type'
                                          value = content_type ).
-    lv_code = send_receive( ).
+    DATA(lv_code) = send_receive( ).
     ev_apiresponsestr = mi_client->response->get_cdata( ).
     /ui2/cl_json=>deserialize( EXPORTING json = ev_apiresponsestr
                                 CHANGING data = ev_apiresponse ).
@@ -315,7 +313,6 @@ CLASS zcl_prvd_ident IMPLEMENTATION.
 
 
   METHOD zif_prvd_ident~getapplicationdetails.
-    DATA lv_code TYPE i.
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/applications/{application_id}'.
     lv_temp = application_id.
@@ -326,7 +323,7 @@ CLASS zcl_prvd_ident IMPLEMENTATION.
                                           value = lv_uri ).
     mi_client->request->set_header_field( name  = 'content-type'
                                           value = content_type ).
-    lv_code = send_receive( ).
+    DATA(lv_code) = send_receive( ).
     ev_apiresponsestr = mi_client->response->get_cdata( ).
     /ui2/cl_json=>deserialize( EXPORTING json = ev_apiresponsestr
                                CHANGING data  = ev_apiresponse ).
@@ -335,14 +332,14 @@ CLASS zcl_prvd_ident IMPLEMENTATION.
     CASE lv_code.
       WHEN 200.
        "Success
-       WHEN OTHERS.
+      WHEN OTHERS.
        "message error calling &1-method &2-lv_uri. HTTP response &3-lv_code
     ENDCASE.
   ENDMETHOD.
 
 
   METHOD zif_prvd_ident~getorganizationdetails.
-    DATA lv_code TYPE i.
+    
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/organizations/{organization_id}'.
     lv_temp = organization_id.
@@ -355,7 +352,7 @@ CLASS zcl_prvd_ident IMPLEMENTATION.
                                           value = content_type ).
     mi_client->request->set_header_field( name  = 'name'
                                           value = name ).
-    lv_code = send_receive( ).
+    DATA(lv_code) = send_receive( ).
     ev_apiresponsestr = mi_client->response->get_cdata( ).
     /ui2/cl_json=>deserialize( EXPORTING json = ev_apiresponsestr
                                CHANGING data  = ev_apiresponse ).
@@ -371,7 +368,7 @@ CLASS zcl_prvd_ident IMPLEMENTATION.
 
 
   METHOD zif_prvd_ident~getuserdetail.
-    DATA lv_code TYPE i.
+    
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/users/{user_id}'.
     lv_temp = user_id.
@@ -384,7 +381,7 @@ CLASS zcl_prvd_ident IMPLEMENTATION.
                                           value = content_type ).
     mi_client->request->set_header_field( name  = 'name'
                                           value = name ).
-    lv_code = send_receive( ).
+    DATA(lv_code) = send_receive( ).
     ev_apiresponsestr = mi_client->response->get_cdata( ).
     /ui2/cl_json=>deserialize( EXPORTING json = ev_apiresponsestr
                                CHANGING data  = ev_apiresponse ).
@@ -400,13 +397,13 @@ CLASS zcl_prvd_ident IMPLEMENTATION.
 
 
   METHOD zif_prvd_ident~listapplications.
-    DATA lv_code TYPE i.
+    
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/applications'.
     mi_client->request->set_method( 'GET' ).
     mi_client->request->set_header_field( name  = '~request_uri'
                                           value = lv_uri ).
-    lv_code = send_receive( ).
+    DATA(lv_code) = send_receive( ).
     ev_apiresponsestr = mi_client->response->get_cdata( ).
     /ui2/cl_json=>deserialize( EXPORTING json = ev_apiresponsestr
                                CHANGING data  = ev_apiresponse ).
@@ -422,7 +419,7 @@ CLASS zcl_prvd_ident IMPLEMENTATION.
 
 
   METHOD zif_prvd_ident~listapplicationusers.
-    DATA lv_code TYPE i.
+    
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/applications/{application_id}/users'.
     lv_temp = application_id.
@@ -433,7 +430,7 @@ CLASS zcl_prvd_ident IMPLEMENTATION.
                                           value = lv_uri ).
     mi_client->request->set_header_field( name = 'content-type'
                                           value = content_type ).
-    lv_code = send_receive( ).
+    DATA(lv_code) = send_receive( ).
     ev_apiresponsestr = mi_client->response->get_cdata( ).
     /ui2/cl_json=>deserialize( EXPORTING json = ev_apiresponsestr
                                CHANGING data  = ev_apiresponse ).
@@ -449,7 +446,7 @@ CLASS zcl_prvd_ident IMPLEMENTATION.
 
 
   METHOD zif_prvd_ident~listorganizations.
-    DATA lv_code TYPE i.
+    
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/organizations'.
     mi_client->request->set_method( 'GET' ).
@@ -457,7 +454,7 @@ CLASS zcl_prvd_ident IMPLEMENTATION.
                                           value = lv_uri ).
     mi_client->request->set_header_field( name  = 'content-type'
                                           value = content_type ).
-    lv_code = send_receive( ).
+    DATA(lv_code) = send_receive( ).
     ev_apiresponsestr = mi_client->response->get_cdata( ).
     /ui2/cl_json=>deserialize( EXPORTING json = ev_apiresponsestr
                                CHANGING data  = ev_apiresponse ).
@@ -473,7 +470,7 @@ CLASS zcl_prvd_ident IMPLEMENTATION.
 
 
   METHOD zif_prvd_ident~listtokens.
-    DATA lv_code TYPE i.
+    
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/tokens'.
     mi_client->request->set_method( 'GET' ).
@@ -483,7 +480,7 @@ CLASS zcl_prvd_ident IMPLEMENTATION.
                                          value = content_type ).
     mi_client->request->set_header_field( name = 'name'
                                          value = name ).
-    lv_code = send_receive( ).
+    DATA(lv_code) = send_receive( ).
     ev_apiresponsestr = mi_client->response->get_cdata( ).
     /ui2/cl_json=>deserialize( EXPORTING json = ev_apiresponsestr
                                 CHANGING data = ev_apiresponse ).
@@ -498,7 +495,7 @@ CLASS zcl_prvd_ident IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD zif_prvd_ident~listuserscopy.
-    DATA lv_code TYPE i.
+    
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/users'.
     mi_client->request->set_method( 'GET' ).
@@ -506,7 +503,7 @@ CLASS zcl_prvd_ident IMPLEMENTATION.
                                          value = lv_uri ).
     mi_client->request->set_header_field( name = 'content-type'
                                          value = content_type ).
-    lv_code = send_receive( ).
+    DATA(lv_code) = send_receive( ).
     ev_apiresponsestr = mi_client->response->get_cdata( ).
     /ui2/cl_json=>deserialize( EXPORTING json = ev_apiresponsestr
                                 CHANGING data = ev_apiresponse ).
@@ -522,7 +519,7 @@ CLASS zcl_prvd_ident IMPLEMENTATION.
 
 
   METHOD zif_prvd_ident~refresh_access_token.
-    DATA lv_code TYPE i.
+    
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/api/v1/tokens'.
     DATA: lv_longtermrequestdata TYPE REF TO data,
@@ -547,7 +544,7 @@ CLASS zcl_prvd_ident IMPLEMENTATION.
 
     mi_client->request->set_cdata( data = lv_requeststr ).
 
-    lv_code = send_receive( ).
+    DATA(lv_code) = send_receive( ).
     ev_apiresponsestr = mi_client->response->get_cdata( ).
     /ui2/cl_json=>deserialize( EXPORTING json = ev_apiresponsestr
                                CHANGING data  = ev_apiresponse ).
@@ -567,7 +564,7 @@ CLASS zcl_prvd_ident IMPLEMENTATION.
 
 
   METHOD zif_prvd_ident~revoketoken.
-    DATA lv_code TYPE i.
+    
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/tokens/f2202ba1-e2af-4505-9b1a-53e1ce8de904'.
     mi_client->request->set_method( 'DELETE' ).
@@ -575,7 +572,7 @@ CLASS zcl_prvd_ident IMPLEMENTATION.
                                           value = lv_uri ).
     mi_client->request->set_header_field( name  = 'content-type'
                                           value = content_type ).
-    lv_code = send_receive( ).
+    DATA(lv_code) = send_receive( ).
     ev_apiresponsestr = mi_client->response->get_cdata( ).
     /ui2/cl_json=>deserialize( EXPORTING json = ev_apiresponsestr
                                CHANGING data  = ev_apiresponse ).
@@ -591,7 +588,7 @@ CLASS zcl_prvd_ident IMPLEMENTATION.
 
 
   METHOD zif_prvd_ident~updateapplication.
-    DATA lv_code TYPE i.
+    
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/applications/{application_id}'.
     lv_temp = application_id.
@@ -603,7 +600,7 @@ CLASS zcl_prvd_ident IMPLEMENTATION.
     mi_client->request->set_header_field( name  = 'name'
                                           value = name ).
 * todo, set body, #/components/schemas/UpdateapplicationRequest
-    lv_code = send_receive( ).
+    DATA(lv_code) = send_receive( ).
     ev_apiresponsestr = mi_client->response->get_cdata( ).
     /ui2/cl_json=>deserialize( EXPORTING json = ev_apiresponsestr
                                CHANGING data  = ev_apiresponse ).
@@ -619,7 +616,7 @@ CLASS zcl_prvd_ident IMPLEMENTATION.
 
 
   METHOD zif_prvd_ident~updateorganizationdetails.
-    DATA lv_code TYPE i.
+    
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/organizations/{organization_id}'.
     lv_temp = organization_id.
@@ -646,7 +643,7 @@ CLASS zcl_prvd_ident IMPLEMENTATION.
 
 
   METHOD zif_prvd_ident~updateuser.
-    DATA lv_code TYPE i.
+    
     DATA lv_temp TYPE string.
     DATA lv_uri TYPE string VALUE '/tokens'.
     mi_client->request->set_method( 'PUT' ).
@@ -655,7 +652,7 @@ CLASS zcl_prvd_ident IMPLEMENTATION.
     mi_client->request->set_header_field( name  = 'name'
                                           value = name ).
 * todo, set body, #/components/schemas/UpdateuserRequest
-    lv_code = send_receive( ).
+    DATA(lv_code) = send_receive( ).
     ev_apiresponsestr = mi_client->response->get_cdata( ).
     /ui2/cl_json=>deserialize( EXPORTING json = ev_apiresponsestr
                                CHANGING data  = ev_apiresponse ).

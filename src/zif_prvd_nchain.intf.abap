@@ -473,21 +473,21 @@ INTERFACE zif_prvd_nchain
          END OF ty_account.
   TYPES: ty_account_list TYPE STANDARD TABLE OF ty_account.
 
-  types: BEGIN OF ty_basic_txn_details,
-            id type zcasesensitive_str,
-            ref type zcasesensitive_str,
-            network_id type zprvd_nchain_networkid,
-            hash type zcasesensitive_str,
+  TYPES: BEGIN OF ty_basic_txn_details,
+            id TYPE zcasesensitive_str,
+            ref TYPE zcasesensitive_str,
+            network_id TYPE zprvd_nchain_networkid,
+            hash TYPE zcasesensitive_str,
          END OF ty_basic_txn_details.
 
-  types: begin of ty_deployed_contract,
-            id type zcasesensitive_str,
-            name type zcasesensitive_str,
-            network_id type zprvd_nchain_networkid,
-            address type zprvd_smartcontract_addr,
-         end of ty_deployed_contract.
+  TYPES: BEGIN OF ty_deployed_contract,
+            id TYPE zcasesensitive_str,
+            name TYPE zcasesensitive_str,
+            network_id TYPE zprvd_nchain_networkid,
+            address TYPE zprvd_smartcontract_addr,
+         END OF ty_deployed_contract.
 
-  types: ty_contract_list type standard table of ty_deployed_contract.
+  TYPES: ty_contract_list TYPE STANDARD TABLE OF ty_deployed_contract.
 
 
   "! GET - "List connectors"
@@ -720,7 +720,7 @@ INTERFACE zif_prvd_nchain
   "! Response: 200
   "! Body ref: #/components/schemas/Create%26broadcasttransaction-AccountRequest
   METHODS create_broadcast_txn_ac
-    IMPORTING is_nchain_txn        TYPE zif_prvd_nchain=>ty_create_broadcast_txn_ac
+    IMPORTING !is_nchain_txn       TYPE ty_create_broadcast_txn_ac
     EXPORTING
               !ev_apiresponsestr   TYPE string
               !ev_apiresponse      TYPE REF TO data
@@ -824,6 +824,7 @@ INTERFACE zif_prvd_nchain
       !ev_httpresponsecode TYPE i
     RAISING
       cx_static_check .
+  "! Creates a middleware instance for the contract in the PRVD stack
   METHODS createpricefeedcontract
     IMPORTING
       !iv_smartcontractaddr TYPE zprvd_smartcontract_addr
@@ -834,6 +835,7 @@ INTERFACE zif_prvd_nchain
       !ev_httpresponsecode  TYPE i
     RAISING
       cx_static_check .
+  "! Creates a middleware instance for the contract in the PRVD stack
   METHODS create_contract
     IMPORTING
       !iv_smartcontractaddr TYPE zprvd_smartcontract_addr
@@ -844,6 +846,7 @@ INTERFACE zif_prvd_nchain
       !ev_httpresponsecode  TYPE i
     RAISING
       cx_static_check .
+  "! Approves the smart contract for users
   METHODS approve_smart_contract
     IMPORTING
       !is_contract_approval TYPE ty_contract_approval
