@@ -26,20 +26,26 @@ CLASS zcl_prvd_vault_helper DEFINITION
     METHODS create_vault .
     "! Derives a key for
     METHODS derive_key .
-    METHODS list_keys IMPORTING iv_vault_id TYPE zprvdvaultid RETURNING VALUE(rt_vault_keys) TYPE zif_prvd_vault=>ty_vault_keys_list.
+    METHODS list_keys IMPORTING iv_vault_id TYPE zprvdvaultid
+                      RETURNING VALUE(rt_vault_keys) TYPE zif_prvd_vault=>ty_vault_keys_list.
     "! Deletes the specified user key upon user request
     METHODS delete_keys .
     "! Encrypts data
-    METHODS encrypt .
+    METHODS encrypt IMPORTING iv_vault_id TYPE zprvdvaultid
+                              iv_key_id   TYPE zprvdvaultid.
     "! Decrypts data
-    METHODS decrypt .
+    METHODS decrypt IMPORTING iv_vault_id TYPE zprvdvaultid
+                              iv_key_id   TYPE zprvdvaultid.
     "! Used to cryptographically sign data
-    METHODS sign IMPORTING iv_vault_id                    TYPE zprvdvaultid
-                           iv_key_id                      TYPE zprvdvaultid
-                           is_message                     TYPE zif_prvd_vault=>ty_signed_message
+    METHODS vault_sign IMPORTING iv_vault_id              TYPE zprvdvaultid
+                                 iv_key_id                TYPE zprvdvaultid
+                                 is_message               TYPE zif_prvd_vault=>ty_signed_message
                  RETURNING VALUE(rs_vault_signed_message) TYPE zif_prvd_vault=>ty_signature .
     "! Used to cryptographically verify data
-    METHODS verify .
+    METHODS verify IMPORTING iv_vault_id        TYPE zprvdvaultid
+                             iv_key_id          TYPE zprvdvaultid
+                             is_message         TYPE zif_prvd_vault=>ty_signed_message
+                   RETURNING VALUE(rv_verified) TYPE boolean .
     "! Initializes other aspects of the vault helper class to ensure connectivity to Vault microservice
     METHODS setup_vault_msgs .
     "! Retrieves the wallet address per Vault data input specs
@@ -133,49 +139,14 @@ CLASS zcl_prvd_vault_helper IMPLEMENTATION.
                                                value = '100' ).
 
     mo_vault_api = NEW zcl_prvd_vault( ii_client   = mo_http_client
-                                           iv_tenant   = mv_org_id
-                                           iv_bpitoken = mv_prvd_token ).
-
-
-
-
-
-*    IF io_api_helper IS BOUND.
-*      mo_api_helper = io_api_helper.
-*    ELSE.
-*      mo_api_helper = NEW zcl_prvd_api_helper( iv_tenant          = iv_org_id
-*                                                 iv_subject_acct_id = iv_subject_account_id
-*                                                 iv_workgroup_id    = iv_workgroup_id ).
-*    ENDIF.
-*
-*    mv_vault_api_url = 'https://vault.provide.services'.
-*
-*    cl_http_client=>create_by_url(
-*      EXPORTING
-*        url                = mv_vault_api_url
-*      IMPORTING
-*        client             = mo_http_client
-*      EXCEPTIONS
-*        argument_not_found = 1
-*        plugin_not_active  = 2
-*        internal_error     = 3
-*        OTHERS             = 4 ).
-*    IF sy-subrc <> 0.
-*      " error handling
-*    ENDIF.
-*
-*    mo_http_client->propertytype_accept_cookie = if_http_client=>co_enabled.
-*    mo_http_client->request->set_header_field( name  = if_http_form_fields_sap=>sap_client
-*                                               value = '100' ).
-
-    "todo fix params
-    "mo_vault_api = NEW zcl_proubc_vault( ii_client = mo_http_client iv_tenant = mv_tenant iv_bpitoken = lv_bpitoken  ).
+                                       iv_tenant   = mv_org_id
+                                       iv_bpitoken = mv_prvd_token ).
 
   ENDMETHOD.
 
 
   METHOD create_key.
-    mo_vault_api = me->get_vault_client( ).
+    mo_vault_api = get_vault_client( ).
 *    mo_vault_api->create_key(
 *      EXPORTING
 *        authorization =
@@ -188,34 +159,34 @@ CLASS zcl_prvd_vault_helper IMPLEMENTATION.
 
 
   METHOD create_vault.
-    mo_vault_api = me->get_vault_client( ).
+    mo_vault_api = get_vault_client( ).
 *    mo_vault_api->create_vault(
 *      EXPORTING
 *        content_type  =
 *        authorization =
 *        body          =
 *    ).
-*    CATCH cx_static_check.
+*    CATCH cx_static_check
   ENDMETHOD.
 
 
   METHOD decrypt.
-    mo_vault_api = me->get_vault_client( ).
+    mo_vault_api = get_vault_client( ).
   ENDMETHOD.
 
 
   METHOD delete_keys.
-    mo_vault_api = me->get_vault_client( ).
+    mo_vault_api = get_vault_client( ).
   ENDMETHOD.
 
 
   METHOD derive_key.
-    mo_vault_api = me->get_vault_client( ).
+    mo_vault_api = get_vault_client( ).
   ENDMETHOD.
 
 
   METHOD encrypt.
-    mo_vault_api = me->get_vault_client( ).
+    mo_vault_api = get_vault_client( ).
   ENDMETHOD.
 
 
@@ -239,7 +210,9 @@ CLASS zcl_prvd_vault_helper IMPLEMENTATION.
       mo_http_client->request->set_header_field( name  = if_http_form_fields_sap=>sap_client value = '100' ).
 
       "todo fix params
-      mo_vault_api = NEW zcl_prvd_vault( ii_client = mo_http_client iv_tenant = mv_tenant iv_bpitoken = mv_prvd_token  ).
+      mo_vault_api = NEW zcl_prvd_vault( ii_client   = mo_http_client
+                                         iv_tenant   = mv_tenant
+                                         iv_bpitoken = mv_prvd_token ).
       ro_vault_client = mo_vault_api.
     ELSE.
       ro_vault_client = mo_vault_api.
@@ -256,24 +229,21 @@ CLASS zcl_prvd_vault_helper IMPLEMENTATION.
     DATA: lv_apiresponsestr   TYPE string,
           lv_apiresponse      TYPE REF TO data,
           lv_httpresponsecode TYPE i.
-    mo_vault_api = me->get_vault_client( ).
+    mo_vault_api = get_vault_client( ).
     mo_vault_api->zif_prvd_vault~list_keys(
       EXPORTING
-        iv_vault_id            = iv_vault_id
+        iv_vault_id         = iv_vault_id
       IMPORTING
         ev_apiresponsestr   = lv_apiresponsestr
         ev_apiresponse      = lv_apiresponse
-        ev_httpresponsecode = lv_httpresponsecode
-    ).
+        ev_httpresponsecode = lv_httpresponsecode ).
     IF lv_httpresponsecode EQ 200.
       /ui2/cl_json=>deserialize(
         EXPORTING
           json             = lv_apiresponsestr
         CHANGING
-          data             = rt_vault_keys
-      ).
+          data             = rt_vault_keys ).
     ENDIF.
-*    CATCH cx_static_check.
   ENDMETHOD.
 
 
@@ -281,23 +251,19 @@ CLASS zcl_prvd_vault_helper IMPLEMENTATION.
     DATA: lv_apiresponsestr   TYPE string,
           lv_apiresponse      TYPE REF TO data,
           lv_httpresponsecode TYPE i.
-    mo_vault_api = me->get_vault_client( ).
+    mo_vault_api = get_vault_client( ).
     mo_vault_api->zif_prvd_vault~list_vaults(
         IMPORTING
             ev_apiresponsestr   = lv_apiresponsestr
             ev_apiresponse      = lv_apiresponse
-            ev_httpresponsecode = lv_httpresponsecode
-    ).
+            ev_httpresponsecode = lv_httpresponsecode ).
     IF lv_httpresponsecode EQ 200.
       /ui2/cl_json=>deserialize(
         EXPORTING
           json             = lv_apiresponsestr
         CHANGING
-          data             = rt_vault_list
-      ).
+          data             = rt_vault_list ).
     ENDIF.
-
-*    CATCH cx_static_check.
   ENDMETHOD.
 
 
@@ -309,7 +275,7 @@ CLASS zcl_prvd_vault_helper IMPLEMENTATION.
     DATA: lv_apiresponsestr   TYPE string,
           lv_apiresponse      TYPE REF TO data,
           lv_httpresponsecode TYPE i.
-    mo_vault_api = me->get_vault_client( ).
+    mo_vault_api = get_vault_client( ).
     mo_vault_api->zif_prvd_vault~sign(
       EXPORTING
         iv_vaultid          = iv_vault_id
@@ -319,8 +285,7 @@ CLASS zcl_prvd_vault_helper IMPLEMENTATION.
       IMPORTING
         ev_apiresponsestr   = lv_apiresponsestr
         ev_apiresponse      = lv_apiresponse
-       ev_httpresponsecode = lv_httpresponsecode
-    ).
+       ev_httpresponsecode = lv_httpresponsecode ).
     CASE lv_httpresponsecode.
       WHEN 201.
         DATA: lif_ajson TYPE REF TO zif_ajson.
@@ -330,12 +295,11 @@ CLASS zcl_prvd_vault_helper IMPLEMENTATION.
       WHEN OTHERS.
         "todo log error.
     ENDCASE.
-*    CATCH cx_static_check.
   ENDMETHOD.
 
 
   METHOD verify.
-    mo_vault_api = me->get_vault_client( ).
+    mo_vault_api = get_vault_client( ).
   ENDMETHOD.
 
   METHOD get_access_token.

@@ -1,8 +1,8 @@
-interface ZIF_PRVD_PRIVACY
-  public .
+INTERFACE zif_prvd_privacy
+  PUBLIC .
 
 
-  types:
+  TYPES:
 "! Component schema: CreatecircuitRequest, object
     BEGIN OF ty_createcircuitrequest,
            iv_identifier TYPE string,
@@ -11,7 +11,7 @@ interface ZIF_PRVD_PRIVACY
            iv_provider TYPE string,
            iv_name TYPE string,
          END OF ty_createcircuitrequest .
-  types:
+  TYPES:
 "! Component schema: ProveRequest, object
     BEGIN OF ty_proverequest,
           iv_identifier TYPE string,
@@ -20,13 +20,13 @@ interface ZIF_PRVD_PRIVACY
           iv_provider TYPE string,
           iv_name TYPE string,
          END OF ty_proverequest .
-  types:
+  TYPES:
 "! Component schema: Witness, object
     BEGIN OF ty_witness,
            iv_x TYPE string,
            iv_y TYPE string,
          END OF ty_witness .
-  types:
+  TYPES:
 "! Component schema: VerifyRequest, object
     BEGIN OF ty_verifyrequest,
            is_witness TYPE ty_witness,
@@ -36,27 +36,27 @@ interface ZIF_PRVD_PRIVACY
 "! GET - "List circuits"
 "! Operation id: Listcircuits
 "! Response: 200
-  methods LISTCIRCUITS
-    raising
-      CX_STATIC_CHECK .
+  METHODS listcircuits
+    RAISING
+      cx_static_check .
 "! POST - "Create circuit"
 "! Operation id: Createcircuit
 "! Response: 200
 "! Body ref: #/components/schemas/CreatecircuitRequest
-  methods CREATECIRCUIT
-    importing
-      !IS_BODY type TY_CREATECIRCUITREQUEST
-    raising
-      CX_STATIC_CHECK .
+  METHODS createcircuit
+    IMPORTING
+      !is_body TYPE ty_createcircuitrequest
+    RAISING
+      cx_static_check .
 "! POST - "Verify"
 "! Operation id: Verify
 "! Parameter: circuit_id, required, path
 "! Response: 200
 "! Body ref: #/components/schemas/VerifyRequest
-  methods VERIFY
-    importing
-      !IV_CIRCUIT_ID type STRING
-      !IS_BODY type TY_VERIFYREQUEST
-    raising
-      CX_STATIC_CHECK .
-endinterface.
+  METHODS verify
+    IMPORTING
+      !iv_circuit_id TYPE string
+      !is_body TYPE ty_verifyrequest
+    RAISING
+      cx_static_check .
+ENDINTERFACE.

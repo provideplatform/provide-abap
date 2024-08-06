@@ -36,15 +36,16 @@ CLASS zcl_prvd_tenants_helper DEFINITION
     METHODS get_refreshtoken
       EXPORTING
         !ev_prvdtenantid TYPE zprvdtenantid .
+    "! Gets an access token for the given SAP user
     METHODS get_authtoken
       EXPORTING
         !ev_prvdtenantid TYPE zprvdtenantid .
     "! Creates the refresh token for the SAP user, given PRVD ident credentials
-    methods update_refresh_token
-      importing
-        !iv_email type string
-        !iv_password type zcasesensitive_str
-        !iv_prvd_org type zprvdtenantid .
+    METHODS update_refresh_token
+      IMPORTING
+        !iv_email TYPE string
+        !iv_password TYPE zcasesensitive_str
+        !iv_prvd_org TYPE zprvdtenantid .
   PROTECTED SECTION.
   PRIVATE SECTION.
 ENDCLASS.
@@ -66,15 +67,6 @@ CLASS zcl_prvd_tenants_helper IMPLEMENTATION.
     CHECK it_prvdtenant IS NOT INITIAL.
 
     "duplicate check
-
-    "TODO improve data validation process, add subject account id
-    "throw out error message if the tenant already exists
-*    SELECT * FROM zprvdtenants INTO TABLE lt_existingprvdtenant
-*        FOR ALL ENTRIES IN it_prvdtenant WHERE tenant_id = it_prvdtenant-tenant_id.
-*    IF sy-dbcnt > 0.
-*      MESSAGE e004(zclproubcmsg) WITH 'orgid'.
-*    ENDIF.
-
     GET TIME STAMP FIELD lv_timestamp.
 
     LOOP AT it_prvdtenant ASSIGNING FIELD-SYMBOL(<fs_prvdtenant>).
@@ -109,7 +101,7 @@ CLASS zcl_prvd_tenants_helper IMPLEMENTATION.
     IF sy-subrc <> 0.
       "TODO add raise exception here
     ELSE.
-      MOVE-CORRESPONDING lt_prvdtenant TO et_prvdtenant.
+      et_prvdtenant = corresponding( lt_prvdtenant ).
     ENDIF.
 
   ENDMETHOD.
@@ -140,7 +132,7 @@ CLASS zcl_prvd_tenants_helper IMPLEMENTATION.
           lo_api_helper TYPE REF TO zcl_prvd_api_helper.
 
     lo_api_helper = NEW zcl_prvd_api_helper( ).
-    SELECT * FROM zprvdtenants INTO TABLE lt_prvdtenant.
+    SELECT * FROM zprvdtenants INTO TABLE lt_prvdtenant ORDER BY zprvdtenantid.
     IF sy-subrc = 0.
     ELSEIF sy-subrc EQ 4.
     "# can't find it. thats ok
@@ -182,13 +174,13 @@ CLASS zcl_prvd_tenants_helper IMPLEMENTATION.
 
     lo_api_helper = NEW zcl_prvd_api_helper( ).
     IF iv_prvdtenant IS NOT INITIAL.
-      SELECT SINGLE * FROM zprvdtenants INTO ls_prvdtenant WHERE organization_id = iv_prvdtenant
-                                                           AND subject_account_id = iv_subjacctid.
+      SELECT SINGLE * FROM zprvdtenants INTO @ls_prvdtenant WHERE organization_id = @iv_prvdtenant
+                                                           AND subject_account_id = @iv_subjacctid.
       IF sy-subrc <> 0.
         "message no PRVD tenant found
       ENDIF.
     ELSE.
-      SELECT SINGLE * FROM zprvdtenants INTO ls_prvdtenant WHERE subject_account_id = iv_subjacctid.
+      SELECT SINGLE * FROM zprvdtenants INTO @ls_prvdtenant WHERE subject_account_id = @iv_subjacctid.
       IF sy-subrc <> 0.
         "message no PRVD tenant found
       ENDIF.
@@ -223,15 +215,14 @@ CLASS zcl_prvd_tenants_helper IMPLEMENTATION.
 
     "todo what authentication is needed here?
     cl_http_client=>create_by_url(
-    EXPORTING
-       url   = lv_identapiurl
-    IMPORTING
-      client = lo_http_client
-    EXCEPTIONS
-      argument_not_found = 1
-      plugin_not_active  = 2
-      internal_error     = 3
-    ).
+      EXPORTING
+        url                = lv_identapiurl
+      IMPORTING
+        client             = lo_http_client
+      EXCEPTIONS
+        argument_not_found = 1
+        plugin_not_active  = 2
+        internal_error     = 3 ).
 
     IF sy-subrc NE 0.
       "todo add exception handling here
@@ -305,29 +296,29 @@ CLASS zcl_prvd_tenants_helper IMPLEMENTATION.
 
 
   ENDMETHOD.
-  method update_refresh_token.
-      DATA:
+  METHOD update_refresh_token.
+    DATA:
       lo_http_client      TYPE REF TO if_http_client,
       lo_ident_api        TYPE REF TO zif_prvd_ident,
-      lo_bpi_api          type ref to zif_prvd_baseline,
+      lo_bpi_api          TYPE REF TO zif_prvd_baseline,
       ls_prvdtenant       TYPE zprvdtenants,
       lv_refreshtokenstr  TYPE zprvdrefreshtoken,
       lv_identurl         TYPE string,
-      lv_bpiurl           type string,
+      lv_bpiurl           TYPE string,
       lv_apiresponse      TYPE REF TO data,
       lv_tenant           TYPE zprvdtenantid,
       lv_subjacct         TYPE zprvdtenants-subject_account_id,
       lv_authtokenreqbody TYPE zif_prvd_ident=>refresh_accesstoken_request,
       lv_apiresponsestr   TYPE string,
-      ls_basic_authbody   type zif_prvd_ident=>authenticationrequest,
-      ls_token_authbody   type zif_prvd_ident=>authorize_access_refreshtoken.
+      ls_basic_authbody   TYPE zif_prvd_ident=>authenticationrequest,
+      ls_token_authbody   TYPE zif_prvd_ident=>authorize_access_refreshtoken.
 
   "set some defaults, if not already set
-  lv_identurl = 'https://ident.provide.services'.
-  lv_bpiurl = 'https://axiom.provide.services'.
+    lv_identurl = 'https://ident.provide.services'.
+    lv_bpiurl = 'https://axiom.provide.services'.
 
   "set up an Ident API Proxy
-        cl_http_client=>create_by_url(
+    cl_http_client=>create_by_url(
       EXPORTING
         url                = lv_identurl
       IMPORTING

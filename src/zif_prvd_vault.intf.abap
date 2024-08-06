@@ -6,18 +6,18 @@ INTERFACE zif_prvd_vault
              c_vaultkey_asym TYPE string VALUE 'assymetric'.
 
   "vault key specs - symmetric
-  CONSTANTS: c_vaultkey_spec_aes256 TYPE string VALUE 'AES-256-GCM'.
-  CONSTANTS: c_vaultkey_spec_chacha20 TYPE string VALUE 'ChaCha20'.
+  CONSTANTS c_vaultkey_spec_aes256 TYPE string VALUE 'AES-256-GCM'.
+  CONSTANTS c_vaultkey_spec_chacha20 TYPE string VALUE 'ChaCha20'.
   "RSA
-  CONSTANTS: c_vaultkey_spec_rsa TYPE string VALUE 'RSA'.
+  CONSTANTS c_vaultkey_spec_rsa TYPE string VALUE 'RSA'.
 
   "vault key specs - assymetric
-  CONSTANTS: c_vaultkey_spec_bjj TYPE string VALUE 'babyJubJub'.
-  CONSTANTS: c_vaultkey_spec_c25519 TYPE string VALUE 'C25519'.
-  CONSTANTS: c_vaultkey_spec_ed25519 TYPE string VALUE 'Ed25519'.
-  CONSTANTS: c_vaultkey_spec_nats_ed25519 TYPE string VALUE 'Ed25519-nkey'.
-  CONSTANTS: c_vaultkey_spec_secp256k1 TYPE string VALUE 'secp256k1'.
-  CONSTANTS: c_vaultkey_spec_bip39 TYPE string VALUE 'BIP39'.
+  CONSTANTS c_vaultkey_spec_bjj TYPE string VALUE 'babyJubJub'.
+  CONSTANTS c_vaultkey_spec_c25519 TYPE string VALUE 'C25519'.
+  CONSTANTS c_vaultkey_spec_ed25519 TYPE string VALUE 'Ed25519'.
+  CONSTANTS c_vaultkey_spec_nats_ed25519 TYPE string VALUE 'Ed25519-nkey'.
+  CONSTANTS c_vaultkey_spec_secp256k1 TYPE string VALUE 'secp256k1'.
+  CONSTANTS c_vaultkey_spec_bip39 TYPE string VALUE 'BIP39'.
 
 
   TYPES: BEGIN OF ty_vault_query,
@@ -27,7 +27,7 @@ INTERFACE zif_prvd_vault
            description TYPE string,
          END OF ty_vault_query.
 
-  TYPES: tty_vault_query TYPE TABLE OF ty_vault_query WITH KEY id.
+  TYPES tty_vault_query TYPE TABLE OF ty_vault_query WITH KEY id.
 
   TYPES: BEGIN OF ty_vault_create,
            name        TYPE string,
@@ -48,7 +48,7 @@ INTERFACE zif_prvd_vault
            fingerprint TYPE string,
          END OF ty_vault_keys.
 
-  TYPES: ty_vault_keys_list TYPE TABLE OF ty_vault_keys WITH KEY id.
+  TYPES ty_vault_keys_list TYPE TABLE OF ty_vault_keys WITH KEY id.
 
   TYPES: BEGIN OF ty_signed_message,
            message TYPE string,
@@ -262,7 +262,7 @@ INTERFACE zif_prvd_vault
   METHODS sign
     IMPORTING
               iv_vaultid          TYPE zprvdvaultid
-              iv_keyid            type zprvdvaultid
+              iv_keyid            TYPE zprvdvaultid
               is_message          TYPE ty_signed_message
               iv_content_type     TYPE string
     EXPORTING
